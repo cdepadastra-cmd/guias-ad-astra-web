@@ -42,7 +42,7 @@ NAV_ACT = [("Todas las actividades", "/actividades/"), ("Barranquismo", "/activi
            ("Alpinismo y ascensiones", "/actividades/?categoria=Ascensiones"), ("Espeleología", "/actividades/?categoria=Espeleología"), ("Escalada y boulder", "/actividades/?categoria=Escalada"),
            ("Senderismo", "/actividades/?categoria=Senderismo"), ("Travesías y viajes", "/actividades/?categoria=Viajes")]
 NAV_CUR = [("Todos los cursos", "/formacion-cursos/")] + [(c["disc_label"], "/actividades/%s/" % c["slug"]) for c in COURSES]
-NAV_OTR = [("Alquiler de material", "/actividades/alquiler-material-montana/"), ("Organización de eventos", "/actividades/organizacion-eventos-deportivos/"), ("Gredos Limpio", "/actividades/gredos-limpio/"),
+NAV_OTR = [("Calculadora de rutas", "/calculadora-rutas/"), ("Alquiler de material", "/actividades/alquiler-material-montana/"), ("Organización de eventos", "/actividades/organizacion-eventos-deportivos/"), ("Gredos Limpio", "/actividades/gredos-limpio/"),
            ("Oeste de Gredos", "/actividades/comarca-natural-oeste-de-gredos/"), ("Vía Verde Ruta de la Plata", "/actividades/via-verde-ruta-de-la-plata/")]
 
 def dd(label, items, key, active):
@@ -72,7 +72,7 @@ def footer():
             '</div><div class="copy"><span>© %d Guías Ad Astra · Montaña y Aventura</span><span>Empresa de turismo activo · Castilla y León</span></div></div></footer>'
             '<a class="wa-float" href="https://wa.me/%s" target="_blank" rel="noopener" aria-label="Escribir por WhatsApp">%s</a>' % (datetime.date.today().year, SITE["wa"], WA_SVG))
 
-def page(path, title, desc, body, active="", ld=None, og_type="website", image=None, priority="0.7", noindex=False):
+def page(path, title, desc, body, active="", ld=None, og_type="website", image=None, priority="0.7", noindex=False, head="", scripts=""):
     ld = ld or []
     image = image or SITE["og_image"]
     lds = "".join('<script type="application/ld+json">%s</script>' % json.dumps(x, ensure_ascii=False) for x in ld)
@@ -86,9 +86,9 @@ def page(path, title, desc, body, active="", ld=None, og_type="website", image=N
            '<meta name="theme-color" content="#160d09"><meta name="geo.region" content="ES-CL"><meta name="geo.placename" content="Sierra de Gredos, Castilla y León">'
            '<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
            '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600&family=Barlow:wght@400;500;600&family=Bebas+Neue&display=swap">'
-           '<link rel="stylesheet" href="/css/estilos.css"><link rel="icon" href="/favicon.svg" type="image/svg+xml">' + lds +
+           '<link rel="stylesheet" href="/css/estilos.css"><link rel="icon" href="/favicon.svg" type="image/svg+xml">' + head + lds +
            '</head><body>' + header(active) + '<main id="contenido">' + body + '</main>' + footer() +
-           '<script src="/config.js"></script><script src="/js/app.js" defer></script></body></html>')
+           '<script src="/config.js"></script><script src="/js/app.js" defer></script>' + scripts + '</body></html>')
     if BASE:
         doc = doc.replace('href="/', 'href="%s/' % BASE).replace('src="/', 'src="%s/' % BASE)
     out = os.path.join(OUT, path.strip("/"), "index.html") if path != "/404" else os.path.join(OUT, "404.html")
@@ -593,6 +593,58 @@ def build_404():
 </script>""")
     page("/404", "Te has perdido en la montaña | Guías Ad Astra", "La página que buscas no existe o ha cambiado de sitio.", body, "", noindex=True)
 
+
+def build_calculator():
+    path = "/calculadora-rutas/"
+    faq = [
+        ("¿Cómo se calcula el tiempo de una ruta de montaña?", "Se calcula por separado el tiempo que se tarda por la distancia (entre 4 y 5 km/h en llano) y por el desnivel (unos 300 m de subida por hora). El tiempo total es el mayor de los dos más la mitad del menor, el mismo criterio que usa el método MIDE de la Federación de Montaña."),
+        ("¿Por qué no se suman los dos tiempos?", "Porque mientras subes también avanzas. Sumarlos daría tiempos demasiado largos; quedarse con el mayor, demasiado cortos. Sumar la mitad del menor se ajusta bien a la realidad."),
+        ("¿Qué velocidad elijo?", "4 km/h si vas con niños, con mochila pesada o por terreno malo; 4,5 km/h es un ritmo normal de senderista; 5 km/h si vas en forma y por buen camino."),
+        ("¿El tiempo incluye las paradas?", "No por defecto: es tiempo en movimiento. Marca «Sumar paradas» para añadir un 15 % para comer, hacer fotos y descansar."),
+        ("¿Qué archivos de track puedo subir?", "GPX (el más habitual en Wikiloc, Strava, Garmin, Komoot o Suunto), KML de Google Earth y TCX. El archivo se lee en tu propio móvil u ordenador: no se sube a ningún servidor."),
+        ("¿Por qué el desnivel puede diferir del de otras apps?", "Cada app filtra el ruido del GPS de una forma. Nosotros suavizamos las altitudes para no inflar el desnivel con pequeños saltos del GPS, así que suele salir algo menor que el desnivel «en bruto»."),
+    ]
+    body = (hero("Herramientas", "Calculadora de rutas de montaña", "Escribe la distancia y el desnivel y te decimos cuánto vas a tardar. O sube tu track GPX y te damos distancia, desnivel, perfil y mapa.", HERO, [("Inicio", "/"), ("Calculadora de rutas", "")],
+                 '<a class="btn btn-primary" href="#calculadora">Calcular duración</a><a class="btn btn-ghost" href="#track">Analizar un track</a>') +
+            '<section class="section" id="calculadora"><div class="wrap calc-grid">'
+            '<form class="panel calc-form" id="calc" novalidate><p class="eyebrow">Calculadora</p><h2 style="font-size:2.2rem">Duración de la ruta</h2>'
+            '<div class="field"><label for="c-km">Distancia</label><div class="unit-in"><input id="c-km" type="number" inputmode="decimal" min="0" step="0.1" value="12"><span>km</span></div></div>'
+            '<div class="row2"><div class="field"><label for="c-up">Desnivel de subida</label><div class="unit-in"><input id="c-up" type="number" inputmode="numeric" min="0" step="10" value="800"><span>m+</span></div></div>'
+            '<div class="field"><label for="c-down">Desnivel de bajada</label><div class="unit-in"><input id="c-down" type="number" inputmode="numeric" min="0" step="10" placeholder="igual que la subida"><span>m−</span></div></div></div>'
+            '<div id="ajustes" style="display:grid;gap:16px"><div class="field"><span class="label">Ritmo en llano</span><div class="seg" role="radiogroup" aria-label="Ritmo en llano">'
+            '<label><input type="radio" name="ritmo" value="4"><span>Tranquilo · 4 km/h</span></label><label><input type="radio" name="ritmo" value="4.5" checked><span>Normal · 4,5 km/h</span></label><label><input type="radio" name="ritmo" value="5"><span>Rápido · 5 km/h</span></label></div></div>'
+            '<label class="check"><input type="checkbox" id="c-paradas"> Sumar paradas (+15 % para comer, fotos y descansos)</label>'
+            '<details class="adv"><summary>Ajustes avanzados</summary><div class="row2"><div class="field"><label for="c-subida">Ritmo de subida</label><div class="unit-in"><input id="c-subida" type="number" min="100" max="800" step="10" value="300"><span>m/h</span></div></div>'
+            '<div class="field"><label for="c-bajada">Ritmo de bajada</label><div class="unit-in"><input id="c-bajada" type="number" min="0" max="1500" step="50" value="500"><span>m/h</span></div></div></div>'
+            '<p class="hint">Pon 0 en la bajada para no tenerla en cuenta. Estos ajustes se aplican también al análisis del track.</p></details></div></form>'
+            '<div class="calc-out" id="calc-out" aria-live="polite"></div></div></section>' +
+            '<section class="section alt" id="track"><div class="wrap" style="display:grid;grid-template-columns:minmax(0,1fr);gap:26px"><div class="section-head" style="margin:0"><p class="eyebrow">Analiza tu track</p><h2>Sube un GPX y mira el perfil</h2>'
+            '<p class="muted">Distancia, desnivel, altitudes, pendiente máxima, duración estimada, perfil interactivo y mapa. El archivo no sale de tu dispositivo.</p></div>'
+            '<label class="drop" id="trk-drop" for="trk-file"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#e9a53b" stroke-width="1.6" aria-hidden="true"><path d="M3 19l5-9 4 6 3-4 6 7z"/><path d="M12 3v8m-3-3 3 3 3-3"/></svg>'
+            '<b>Arrastra aquí tu track</b><span class="muted">o pulsa para elegirlo · GPX, KML o TCX</span><input type="file" id="trk-file" accept=".gpx,.kml,.tcx,application/gpx+xml,application/vnd.google-earth.kml+xml"></label>'
+            '<div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center"><button type="button" class="btn btn-ghost" id="trk-demo" data-src="/data/ejemplo-laguna-grande.gpx">Probar con un ejemplo de Gredos</button><p class="err" id="trk-err" role="alert"></p></div>'
+            '<div id="trk-res" hidden style="display:grid;gap:20px"><div class="trk-head"><h3 id="trk-name" style="font-size:2rem"></h3><a class="small" href="#calculadora">Cambiar ritmo ↑</a></div>'
+            '<dl class="trk-stats" id="trk-stats"></dl><div><p class="label" style="margin-bottom:10px">Perfil de altitud · pasa el dedo o el ratón por encima</p><div class="prof" id="trk-prof"></div></div>'
+            '<div id="trk-map" hidden></div><p class="hint" id="trk-note"></p></div></div></section>' +
+            '<section class="section"><div class="wrap split"><div class="stack" style="gap:0">' +
+            block("Cómo calculamos el tiempo", '<div style="display:grid;gap:18px">' + prose([
+                "Usamos el criterio del método MIDE, el sistema con el que la Federación Española de Deportes de Montaña valora las rutas, con los ritmos que usamos los guías en Gredos:"]) +
+                '<div class="formula"><b>Tiempo por distancia</b> = km ÷ 4–5 km/h<br><b>Tiempo por desnivel</b> = metros de subida ÷ 300 m/h + metros de bajada ÷ 500 m/h<br><b>Duración</b> = el mayor de los dos + la mitad del menor</div>' +
+                prose(["Ejemplo: 12 km con 800 m de subida y 800 de bajada a ritmo normal. Por distancia: 12 ÷ 4,5 = 2 h 40 min. Por desnivel: 800 ÷ 300 + 800 ÷ 500 = 4 h 15 min. Duración: 4 h 15 min + 1 h 20 min = unas 5 h 35 min sin paradas.",
+                       "Es una estimación para un grupo con forma normal en buen camino. Nieve, calor, piedra suelta, niños o mochilas pesadas pueden alargarla bastante. Sal siempre con margen de luz."]) + "</div>") +
+            block("Preguntas frecuentes", faq_html(faq)) +
+            '</div><div class="sticky"><div class="panel"><p class="eyebrow">¿Mejor con guía?</p><h3>Te llevamos nosotros</h3><p class="muted">Rutas guiadas por Gredos para todos los niveles, desde 15 € por persona.</p>'
+            '<a class="btn btn-primary" href="/actividades/senderismo-avila-gredos/">Senderismo en Gredos</a><a class="btn btn-ghost" href="/actividades/ascensiones-montana/">Ascensiones</a></div></div></div></section>')
+    ld = [crumbs_ld([("Inicio", "/"), ("Calculadora de rutas", path)]), faq_ld(faq),
+          {"@context": "https://schema.org", "@type": "WebApplication", "name": "Calculadora de rutas de montaña", "url": url(path), "applicationCategory": "TravelApplication", "operatingSystem": "Web",
+           "description": "Calcula la duración de una ruta de senderismo o montaña a partir de distancia y desnivel, y analiza tracks GPX con perfil de altitud.", "offers": {"@type": "Offer", "price": 0, "priceCurrency": "EUR"},
+           "provider": {"@id": D + "/#empresa"}}]
+    head = '<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">'
+    scripts = '<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="" defer></script><script src="/js/calculadora.js" defer></script>'
+    page(path, "Calculadora de tiempo de rutas de montaña y analizador de GPX | Guías Ad Astra",
+         "Calcula cuánto tardarás en una ruta de senderismo con la distancia y el desnivel (4-5 km/h y 300 m/h, método MIDE). Sube tu track GPX y obtén desnivel, perfil de altitud y mapa gratis.",
+         body, "otr", ld, priority="0.8", head=head, scripts=scripts)
+
 # ---------------------------------------------------------------- build
 def main():
     if os.path.exists(OUT):
@@ -601,7 +653,7 @@ def main():
     cfg = os.path.join(OUT, "config.js")
     c = open(cfg, encoding="utf-8").read().replace('calendarioURL: ""', 'calendarioURL: "",\n  // Carpeta donde está publicada la web ("" si está en la raíz del dominio)\n  base: "%s"' % BASE)
     open(cfg, "w", encoding="utf-8").write(c)
-    build_home(); build_activities_index(); build_courses_index(); build_calendar(); build_rental(); build_about(); build_contact(); build_404()
+    build_home(); build_activities_index(); build_courses_index(); build_calendar(); build_rental(); build_about(); build_contact(); build_404(); build_calculator()
     for a in ACTIVITIES:
         build_activity(a)
     for c in COURSES:

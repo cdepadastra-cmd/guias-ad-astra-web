@@ -338,3 +338,55 @@ body.has-mbar{padding-bottom:86px}
 #rgrid.grid.c4{grid-template-columns:repeat(3,minmax(0,1fr))}
 @media (max-width:860px){#rgrid.grid.c4{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:520px){#rgrid.grid.c4{grid-template-columns:1fr}}
+
+/* ---------- calculadora de rutas */
+.calc-grid{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:clamp(24px,4vw,44px);align-items:start}
+@media (max-width:900px){.calc-grid{grid-template-columns:minmax(0,1fr)}}
+.calc-form>*,.calc-out>*{min-width:0}
+.seg span{white-space:normal}
+.calc-form{display:grid;gap:16px}
+.unit-in{position:relative}
+.unit-in input{padding-right:52px;font-variant-numeric:tabular-nums}
+.unit-in span{position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--dim);font:600 .85rem/1 var(--label);letter-spacing:.08em}
+.seg{display:flex;flex-wrap:wrap;gap:8px}
+.seg label{cursor:pointer}
+.seg label{position:relative}
+.seg input{position:absolute;opacity:0;pointer-events:none;width:1px;height:1px;padding:0;left:0;top:0}
+.seg span{display:inline-block;font:600 .85rem/1 var(--label);letter-spacing:.1em;text-transform:uppercase;padding:11px 14px;border-radius:40px;border:1px solid var(--line-2);color:var(--muted)}
+.seg input:checked + span{background:var(--grad);color:#1a0d05;border-color:transparent}
+.seg input:focus-visible + span{outline:2px solid var(--gold);outline-offset:2px}
+.check{display:flex;gap:10px;align-items:center;color:var(--muted);font-size:.95rem;cursor:pointer}
+.check input{width:18px;height:18px;accent-color:var(--orange)}
+details.adv summary{cursor:pointer;color:var(--gold);font:600 .85rem/1 var(--label);letter-spacing:.12em;text-transform:uppercase}
+details.adv[open] summary{margin-bottom:14px}
+.calc-out{display:grid;gap:18px}
+.calc-big{display:grid;gap:6px;padding:24px;border:1px solid var(--line-2);border-radius:var(--r);background:var(--bg)}
+.calc-big strong{font-family:var(--display);font-weight:400;font-size:clamp(3.2rem,8vw,4.6rem);line-height:1;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.calc-parts{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;margin:0}
+.calc-parts div{padding:14px 16px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);margin:0 -1px -1px 0}
+.calc-parts dt{font:600 .72rem/1 var(--label);letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin-bottom:6px}
+.calc-parts dd{margin:0;font-weight:600;font-size:1.1rem}
+.calc-parts small{display:block;font-weight:400;font-size:.84rem;color:var(--muted);margin-top:3px;line-height:1.35}
+@media (max-width:460px){.calc-parts{grid-template-columns:1fr}}
+.formula{font-variant-numeric:tabular-nums;background:var(--bg);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;color:var(--fg);font-size:.98rem}
+.drop{display:grid;place-items:center;gap:10px;text-align:center;padding:clamp(28px,5vw,48px) 20px;border:2px dashed var(--line-2);border-radius:6px;background:var(--card);cursor:pointer;transition:border-color .2s,background .2s}
+.drop:hover,.drop.over{border-color:var(--gold);background:#2c1c12}
+.drop b{font-family:var(--display);font-weight:400;font-size:1.8rem;letter-spacing:.03em}
+.drop input{position:absolute;opacity:0;width:1px;height:1px}
+.trk-head{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:baseline}
+.trk-stats{display:grid;grid-template-columns:repeat(var(--cols,3),minmax(0,1fr));border:1px solid var(--line);border-radius:var(--r);overflow:hidden;background:var(--card);margin:0}
+.trk-stats div{padding:16px 18px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);margin:0 -1px -1px 0}
+.trk-stats dt{font:600 .72rem/1 var(--label);letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin-bottom:8px}
+.trk-stats dd{margin:0;font-family:var(--display);font-size:1.75rem;line-height:1;font-variant-numeric:tabular-nums}
+.prof{position:relative;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px 10px 6px}
+.prof-svg{width:100%;height:auto;display:block;touch-action:pan-y}
+.prof-svg .grid line{stroke:var(--line-2);stroke-width:1;stroke-dasharray:3 5}
+.prof-svg .axis text{fill:var(--dim);font:500 13px var(--label);letter-spacing:.04em}
+.prof-svg .peak{fill:var(--fg);font:600 14px var(--label)}
+.prof-svg .hover line{stroke:var(--fg);stroke-width:1;opacity:.6}
+.prof-svg .hover circle{fill:var(--gold);stroke:#160d09;stroke-width:2}
+.prof-tip{position:absolute;top:6px;transform:translateX(-50%);background:var(--bg);border:1px solid var(--line-2);border-radius:3px;padding:6px 10px;font-size:.88rem;white-space:nowrap;pointer-events:none;font-variant-numeric:tabular-nums}
+#trk-map{height:clamp(280px,45vw,440px);border:1px solid var(--line);border-radius:var(--r);background:var(--card);max-width:100%}
+.leaflet-container{font-family:var(--body)}
+#trk-demo{white-space:normal;text-align:center}
+@media (max-width:640px){.trk-stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
