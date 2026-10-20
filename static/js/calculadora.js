@@ -206,6 +206,8 @@
     }
     if (layer) layer.remove(); if (marker) marker.remove();
     var ll = A.pts.map(function (p) { return [p.lat, p.lon]; });
+    map.invalidateSize();
+    map.fitBounds(L.latLngBounds(ll), { padding: [24, 24], animate: false });
     layer = L.layerGroup([
       L.polyline(ll, { color: "#160d09", weight: 7, opacity: .6 }),
       L.polyline(ll, { color: "#f0b445", weight: 4 }),
@@ -213,8 +215,7 @@
       L.circleMarker(ll[ll.length - 1], { radius: 7, color: "#160d09", weight: 2, fillColor: "#c9533b", fillOpacity: 1 }).bindTooltip("Llegada")
     ]).addTo(map);
     marker = L.circleMarker(ll[0], { radius: 6, color: "#fff", weight: 2, fillColor: "#e9a53b", opacity: 0, fillOpacity: 0 }).addTo(map);
-    map.fitBounds(L.latLngBounds(ll), { padding: [24, 24] });
-    setTimeout(function () { map.invalidateSize(); }, 50);
+    setTimeout(function () { map.invalidateSize(); map.fitBounds(L.latLngBounds(ll), { padding: [24, 24], animate: false }); }, 60);
   }
 
   /* ---------- mostrar análisis ---------- */
