@@ -14,12 +14,13 @@
      En un track se calcula por tramos y se suman, como indica el método. */
   var METHODS = {
     mide: { kmh: 4, up: 400, down: 600, name: "MIDE oficial" },
-    guia: { kmh: 4.5, up: 300, down: 500, name: "ritmo de guía" }
+    guia: { kmh: 4.5, up: 300, down: 500, name: "ritmo de guía" },
+    naismith: { kmh: 5, up: 600, down: 0, name: "regla de Naismith", sum: true }
   };
-  function estimate(km, up, down, kmh, upRate, downRate) {
+  function estimate(km, up, down, kmh, upRate, downRate, sum) {
     var h = km / kmh;
     var v = (upRate > 0 ? up / upRate : 0) + (downRate > 0 ? down / downRate : 0);
-    var total = Math.max(h, v) + Math.min(h, v) / 2;
+    var total = sum ? h + v : Math.max(h, v) + Math.min(h, v) / 2; // Naismith suma; MIDE: mayor + mitad del menor
     return { h: h, v: v, total: total };
   }
   function hm(hours) {
@@ -43,24 +44,29 @@
       kmh: parseFloat(String($("#c-llano").value).replace(",", ".")) || METHODS[m].kmh,
       up: parseFloat($("#c-subida").value) || METHODS[m].up,
       down: parseFloat($("#c-bajada").value) || 0,
-      stops: $("#c-paradas").checked
+      sum: !!METHODS[m].sum,
+      stops: parseFloat($("#c-paradas").value) || 0
     };
   }
   function methodText(p) {
-    return (p.method === "mide" ? "Método MIDE" : "Ritmo de guía") + ": " + nf1.format(p.kmh) + " km/h en llano, " + nf0.format(p.up) + " m/h de subida" + (p.down ? " y " + nf0.format(p.down) + " m/h de bajada" : "");
+    var n = { mide: "Método MIDE", guia: "Ritmo de guía", naismith: "Regla de Naismith" }[p.method];
+    return n + ": " + nf1.format(p.kmh) + " km/h en llano, " + nf0.format(p.up) + " m/h de subida" + (p.down ? " y " + nf0.format(p.down) + " m/h de bajada" : "") + (p.sum ? " (tiempos sumados)" : "");
+  }
+  function stopsText(p, short) {
+    return p.stops ? (short ? ", con " + Math.round(p.stops * 100) + " % de paradas" : "Incluye un " + Math.round(p.stops * 100) + " % de margen para descansos, comer e imprevistos.") : (short ? ", sin paradas" : "Tiempo en movimiento, sin paradas.");
   }
 
   /* ---------- calculadora manual ---------- */
   var form = $("#calc");
   function renderResult(box, km, up, down, p) {
-    var r = estimate(km, up, down, p.kmh, p.up, p.down);
-    var total = p.stops ? r.total * 1.15 : r.total;
+    var r = estimate(km, up, down, p.kmh, p.up, p.down, p.sum);
+    var total = r.total * (1 + p.stops);
     var d = esfuerzo(r.total);
     var start = new Date(); start.setHours(9, 0, 0, 0);
     var end = new Date(start.getTime() + total * 3600e3);
     box.innerHTML =
       '<div class="calc-big"><span class="label">Duración aproximada</span><strong>' + hm(total) + "</strong>" +
-      '<span class="muted">' + (p.stops ? "Incluye un 15 % para paradas, fotos y comer." : "Tiempo en movimiento, sin paradas.") + " " + methodText(p) + ".</span></div>" +
+      '<span class="muted">' + stopsText(p) + " " + methodText(p) + ".</span></div>" +
       '<dl class="calc-parts">' +
       "<div><dt>Por distancia</dt><dd>" + hm(r.h) + "<small>" + nf1.format(km) + " km a " + nf1.format(p.kmh) + " km/h</small></dd></div>" +
       "<div><dt>Por desnivel</dt><dd>" + hm(r.v) + "<small>+" + nf0.format(up) + " m a " + nf0.format(p.up) + " m/h" + (p.down && down ? " · −" + nf0.format(down) + " m a " + nf0.format(p.down) + " m/h" : "") + "</small></dd></div>" +
@@ -91,6 +97,7 @@
     $$("[name=metodo]").forEach(function (i) { i.addEventListener("change", function () { applyMethod(); run(); }); });
     $$("[name=ritmo]").forEach(function (i) { i.addEventListener("change", function () { $("#c-llano").value = i.value; run(); }); });
     $$("#ajustes input:not([name=metodo]):not([name=ritmo])").forEach(function (i) { i.addEventListener("input", run); i.addEventListener("change", run); });
+    $("#c-paradas").addEventListener("change", run);
     applyMethod();
     form.addEventListener("submit", function (e) { e.preventDefault(); run(); });
     run();
@@ -177,7 +184,7 @@
     while (i < n - 1) {
       var j = i + 1; while (j < n - 1 && A.dist[j] - A.dist[i] < 250) j++;
       var km = (A.dist[j] - A.dist[i]) / 1000, dz = A.hasEle ? A.ele[j] - A.ele[i] : 0;
-      var r = estimate(km, Math.max(dz, 0), Math.max(-dz, 0), p.kmh, p.up, p.down);
+      var r = estimate(km, Math.max(dz, 0), Math.max(-dz, 0), p.kmh, p.up, p.down, p.sum);
       tot += r.total; th += r.h; tv += r.v; i = j;
     }
     return { total: tot, h: th, v: tv };
@@ -259,7 +266,7 @@
   function showTrack(A) {
     lastTrack = A;
     var p = params();
-    var r = trackTime(A, p), total = p.stops ? r.total * 1.15 : r.total;
+    var r = trackTime(A, p), total = r.total * (1 + p.stops);
     var d = esfuerzo(r.total);
     A.calc = { total: total, esfuerzo: d[0], p: p };
     var res = $("#trk-res"); res.hidden = false;
@@ -278,7 +285,7 @@
     if (A.real) stats.push(["Tiempo real del track", hm(A.real)]);
     var n = stats.length; $("#trk-stats").style.setProperty("--cols", n % 5 === 0 ? 5 : n % 4 === 0 ? 4 : 3);
     $("#trk-stats").innerHTML = stats.map(function (s) { return "<div><dt>" + s[0] + "</dt><dd>" + s[1] + "</dd></div>"; }).join("");
-    $("#trk-note").textContent = "Duración calculada por tramos de 250 m con el " + methodText(p).replace("Método MIDE", "método MIDE").replace("Ritmo de guía", "ritmo de guía") + (p.stops ? ", más un 15 % de paradas." : ", sin paradas.") + " Esfuerzo MIDE " + d[0] + ": " + d[1].toLowerCase();
+    $("#trk-note").textContent = "Duración calculada por tramos de 250 m. " + methodText(p) + stopsText(p, true) + ". Esfuerzo MIDE " + d[0] + ": " + d[1].toLowerCase();
     drawProfile(A, $("#trk-prof"), function (i) {
       if (!marker) return;
       if (i < 0) { marker.setStyle({ opacity: 0, fillOpacity: 0 }); return; }
@@ -383,7 +390,7 @@
         x.fillStyle = C.gold; x.font = 34 * k + "px " + DISP; x.textAlign = "right"; x.fillText("AD ASTRA", W - 32 * k, 56 * k);
         x.fillStyle = C.muted; x.font = "600 " + 12 * k + "px " + LAB; x.fillText("MONTAÑA Y AVENTURA", W - 32 * k, 76 * k); x.textAlign = "left";
         var st = [["DISTANCIA", nf1.format(A.km) + " km"], ["DESNIVEL +", A.hasEle ? nf0.format(A.up) + " m" : "—"], ["DESNIVEL −", A.hasEle ? nf0.format(A.down) + " m" : "—"], ["ALTITUD MÁX.", A.hasEle ? nf0.format(A.maxE) + " m" : "—"], ["ALTITUD MÍN.", A.hasEle ? nf0.format(A.minE) + " m" : "—"],
-                  ["DURACIÓN", hm(A.calc.total)], ["ESFUERZO MIDE", A.calc.esfuerzo + " de 5"], ["PENDIENTE MÁX.", A.hasEle ? nf0.format(A.maxSlope) + " %" : "—"], ["TIPO", A.loop ? "Circular" : "Lineal"], [A.real ? "TIEMPO REAL" : "MÉTODO", A.real ? hm(A.real) : (A.calc.p.method === "mide" ? "MIDE" : "Guía")]];
+                  ["DURACIÓN", hm(A.calc.total)], ["ESFUERZO MIDE", A.calc.esfuerzo + " de 5"], ["PENDIENTE MÁX.", A.hasEle ? nf0.format(A.maxSlope) + " %" : "—"], ["TIPO", A.loop ? "Circular" : "Lineal"], [A.real ? "TIEMPO REAL" : "MÉTODO", A.real ? hm(A.real) : ({ mide: "MIDE", guia: "Guía", naismith: "Naismith" })[A.calc.p.method]]];
         var cw = (W - 64 * k) / 5, ch = 82 * k, y0 = 130 * k;
         st.forEach(function (s, i) {
           var cx = 32 * k + (i % 5) * cw, cy = y0 + Math.floor(i / 5) * ch;
@@ -397,7 +404,7 @@
         if (hasMap) mapTo(x, 32 * k, my, W - 64 * k, mapH, A, tiles);
         x.textBaseline = "alphabetic"; x.fillStyle = C.gold; x.font = "600 " + 16 * k + "px " + LAB; x.textAlign = "right"; x.fillText("GUIASADASTRA.COM", W - 32 * k, H - 30 * k);
         var uw = x.measureText("GUIASADASTRA.COM").width; x.textAlign = "left"; x.fillStyle = C.dim;
-        x.fillText(fit(x, "Duración estimada con el " + methodText(A.calc.p).replace("Método MIDE", "método MIDE").replace("Ritmo de guía", "ritmo de guía") + (A.calc.p.stops ? ", con paradas" : ", sin paradas") + ". Orientativo: depende del terreno, la meteo y el grupo.", W - 64 * k - uw - 30 * k, 14 * k, 10 * k, BODY), 32 * k, H - 30 * k);
+        x.fillText(fit(x, "Duración estimada. " + methodText(A.calc.p) + stopsText(A.calc.p, true) + ". Orientativo: depende del terreno, la meteo y el grupo.", W - 64 * k - uw - 30 * k, 14 * k, 10 * k, BODY), 32 * k, H - 30 * k);
         return c;
       }), slug(A.name) + "-ficha.png");
     });
