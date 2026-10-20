@@ -132,7 +132,7 @@ def stepper(id_, val=2, mn=1, mx=40, label="Personas"):
     return ('<div class="field"><span class="label" id="%s-l">%s</span><div class="stepper" role="group" aria-labelledby="%s-l"><button type="button" data-step="-1" aria-label="Menos">−</button>'
             '<input id="%s" type="number" min="%d" max="%d" value="%d" inputmode="numeric"><button type="button" data-step="1" aria-label="Más">+</button></div></div>' % (id_, label, id_, id_, mn, mx, val))
 
-def book_form(title, options=None, base_price=0, date=True, heading="Reserva por WhatsApp", note="Te contestamos por WhatsApp para confirmar disponibilidad, punto de encuentro y pago.", opt_label="Opción", full=False):
+def book_form(title, options=None, base_price=0, date=True, heading="Reserva por WhatsApp", note="Te contestamos por WhatsApp para confirmar disponibilidad, punto de encuentro y pago.", opt_label="Opción", full=True, curso=False):
     sel = ""
     if options:
         sel = '<div class="field"><label for="b-opt">%s</label><select id="b-opt" name="opcion">%s</select></div>' % (opt_label, "".join(
@@ -148,7 +148,7 @@ def book_form(title, options=None, base_price=0, date=True, heading="Reserva por
             '<div class="field"><label for="b-com">Comentarios (opcional)</label><textarea id="b-com" placeholder="Edades, nivel, si necesitas alquilar material…"></textarea></div>'
             '<div class="total"><span class="label">Total estimado</span><strong data-total></strong></div><p class="err" role="alert"></p>'
             '<button class="btn btn-wa btn-block" type="submit">%s Enviar por WhatsApp</button><p class="hint">%s</p></form>'
-            % (" data-full" if full else "", e(title), base_price or "", heading, sel, dt, stepper("b-pers"), who, WA_SVG, note))
+            % ((" data-full" if full else "") + (" data-curso" if curso else ""), e(title), base_price or "", heading, sel, dt, stepper("b-pers"), who, WA_SVG, note))
 
 def upcoming(slug):
     return ('<section class="panel" data-upcoming="%s" hidden><p class="eyebrow">Próximas fechas</p><h3>Plazas disponibles</h3><div class="upcoming" data-uplist></div>'
@@ -374,7 +374,7 @@ def build_course(c):
            ("¿Cómo reservo plaza?", "Pulsa «Reservar plaza» en una fecha del calendario: tu plaza queda apartada y nos llega tu mensaje por WhatsApp para confirmar.")]
     left.append(block("Preguntas frecuentes", faq_html(faq)))
     opts = [{"name": n["name"], "price": n["price"]} for n in c["niveles"]] if c.get("niveles") else None
-    form = book_form(c["title"], opts, c["price"], heading="¿Otra fecha o grupo propio?", note="Para un grupo o una fecha que no está en el calendario. Te respondemos por WhatsApp.", opt_label="Curso", full=True)
+    form = book_form(c["title"], opts, c["price"], heading="¿Otra fecha o grupo propio?", note="Para un grupo o una fecha que no está en el calendario. Te respondemos por WhatsApp.", opt_label="Curso", full=True, curso=True)
     body = (hero("Formación · " + c["disc_label"], e(c["title"]), e(c["short"]), c["img"], crumbs, '<a class="btn btn-primary" href="#fechas">Ver fechas y plazas</a>') +
             '<section class="section tight"><div class="wrap"><dl class="ficha">%s</dl></div></section>' % "".join("<div><dt>%s</dt><dd>%s</dd></div>" % (e(k), e(v)) for k, v in c["ficha"]) +
             '<section class="section" style="padding-top:0" id="fechas"><div class="wrap split"><div class="stack" style="gap:0">%s</div><div class="sticky" style="display:grid;gap:18px">%s%s</div></div></section>' % ("".join(left), upcoming(c["slug"]), form))

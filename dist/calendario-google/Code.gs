@@ -76,8 +76,8 @@ function doPost(e) {
 
     var salida = leerSalidas_().filter(function (o) { return String(o.id) === String(d.id); })[0];
     if (!salida) return json_({ ok: false, error: 'Esta fecha ya no está disponible.' });
-    if (String(salida.tipo).toLowerCase().indexOf('curso') > -1 && (!apellidos || !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)))
-      return json_({ ok: false, error: 'Para los cursos necesitamos nombre, apellidos, correo y teléfono.' });
+    if ((!apellidos || !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)))
+      return json_({ ok: false, error: 'Necesitamos nombre, apellidos, correo y teléfono.' });
 
     var max = Number(salida.plazas_max) || 0, res = Number(salida.plazas_reservadas) || 0, libres = max - res;
     if (plazas > libres) return json_({ ok: false, error: libres > 0 ? 'Solo quedan ' + libres + ' plazas.' : 'Esta fecha está completa.', libres: Math.max(0, libres) });

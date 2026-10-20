@@ -86,7 +86,7 @@
         if (!EMAIL.test(val("email"))) return fail("email", "Revisa el correo electrónico (ejemplo: nombre@gmail.com).");
         if (!telOK(val("telefono"))) return fail("telefono", "Revisa el número de teléfono (9 cifras).");
       }
-      var lines = ["Hola, quiero reservar en Guías Ad Astra:", "", (f.hasAttribute("data-full") ? "• Curso: " : "• Actividad: ") + title];
+      var lines = ["Hola, quiero reservar en Guías Ad Astra:", "", (f.hasAttribute("data-curso") ? "• Curso: " : "• Actividad: ") + title];
       if (sel) lines.push("• Opción: " + sel.value);
       if (date) lines.push("• Fecha: " + fmtLong(date.value));
       var alt = $("input[name=fecha2]", f); if (alt && alt.value) lines.push("• Fecha alternativa: " + fmtLong(alt.value));
@@ -187,7 +187,7 @@
 
   /* modal de reserva con plazas */
   var dlg = document.createElement("dialog");
-  dlg.innerHTML = '<form class="dlg" method="dialog" id="ev-form"><div class="dlg-head"><div><p class="eyebrow" id="ev-type"></p><h2 id="ev-title"></h2></div><button type="button" class="icon-btn" data-x aria-label="Cerrar">×</button></div>' +
+  dlg.innerHTML = '<form class="dlg" method="dialog" id="ev-form" novalidate><div class="dlg-head"><div><p class="eyebrow" id="ev-type"></p><h2 id="ev-title"></h2></div><button type="button" class="icon-btn" data-x aria-label="Cerrar">×</button></div>' +
     '<p class="muted" id="ev-when"></p><div id="ev-seats"></div>' +
     '<div class="field"><label for="ev-pers">Plazas que quieres reservar</label><div class="stepper"><button type="button" data-step="-1" aria-label="Menos">−</button><input id="ev-pers" type="number" min="1" max="10" value="1" inputmode="numeric"><button type="button" data-step="1" aria-label="Más">+</button></div></div>' +
     '<div class="row2"><div class="field"><label for="ev-nombre">Nombre</label><input id="ev-nombre" autocomplete="given-name" required></div><div class="field" data-curso><label for="ev-ape">Apellidos</label><input id="ev-ape" autocomplete="family-name"></div></div>' +
@@ -207,21 +207,18 @@
     $("#ev-when").textContent = dateRange(cur) + (cur.hora ? " · " + cur.hora : "") + (cur.lugar ? " · " + cur.lugar : "");
     $("#ev-seats").innerHTML = seatsHTML(cur);
     $("#ev-pers").max = Math.max(1, cur.libres); setPers(1);
-    $$("[data-curso]", dlg).forEach(function (x) { x.hidden = cur.tipo !== "curso"; });
     $("#ev-err").textContent = ""; $("#ev-done").hidden = true; $("#ev-send").hidden = false; $("#ev-send").disabled = cur.libres === 0;
     dlg.showModal();
   }
   $("#ev-form", dlg).addEventListener("submit", function (e) {
     e.preventDefault();
     var nombre = $("#ev-nombre").value.trim(), ape = $("#ev-ape").value.trim(), email = $("#ev-email").value.trim(), tel = $("#ev-tel").value.trim(), err = $("#ev-err");
-    var curso = cur.tipo === "curso";
     err.textContent = "";
     var fail = function (id, m) { err.textContent = m; $(id).focus(); };
     if (!nombre) return fail("#ev-nombre", "Escribe tu nombre.");
-    if (curso && !ape) return fail("#ev-ape", "Escribe tus apellidos.");
-    if (curso && !EMAIL.test(email)) return fail("#ev-email", "Revisa el correo electrónico (ejemplo: nombre@gmail.com).");
+    if (!ape) return fail("#ev-ape", "Escribe tus apellidos.");
+    if (!EMAIL.test(email)) return fail("#ev-email", "Revisa el correo electrónico (ejemplo: nombre@gmail.com).");
     if (!telOK(tel)) return fail("#ev-tel", "Revisa el número de teléfono (9 cifras).");
-    if (!curso) { ape = ""; email = ""; }
     if (pers > cur.libres) { err.textContent = "Solo quedan " + cur.libres + " plazas."; return; }
     var msg = ["Hola, acabo de reservar desde el calendario de la web:", "", "• " + (cur.tipo === "curso" ? "Curso" : "Actividad") + ": " + cur.titulo, "• Fecha: " + dateRange(cur) + (cur.hora ? " a las " + cur.hora : ""), cur.lugar ? "• Lugar: " + cur.lugar : null, "• Plazas: " + pers, cur.precio ? "• Total: " + eur(cur.precio * pers) : null, "• Nombre: " + nombre + (ape ? " " + ape : ""), email ? "• Email: " + email : null, "• Teléfono: " + tel, "", "¿Me confirmáis la reserva?"].filter(Boolean).join("\n");
     var btn = $("#ev-send"); btn.disabled = true;
