@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /calendario-google/
+
+Sitemap: https://www.guiasadastra.com/sitemap.xml
