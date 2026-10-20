@@ -37,6 +37,8 @@ jobs:
         run: BASE=/NUEVA python3 build.py
 
       - name: Subir por FTP
+        id: ftp1
+        continue-on-error: true
         if: env.FTP_SERVER != ''
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
@@ -46,3 +48,20 @@ jobs:
           local-dir: ./dist-NUEVA/
           # Carpeta de la web guiasadastra.com en el servidor (Plesk)
           server-dir: /guiasadastra.com/NUEVA/
+          timeout: 120000
+
+      - name: Esperar unos segundos
+        if: env.FTP_SERVER != '' && steps.ftp1.outcome == 'failure'
+        run: sleep 20
+
+      - name: Reintentar si se cortó la conexión
+        if: env.FTP_SERVER != '' && steps.ftp1.outcome == 'failure'
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USER }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./dist-NUEVA/
+          # Carpeta de la web guiasadastra.com en el servidor (Plesk)
+          server-dir: /guiasadastra.com/NUEVA/
+          timeout: 120000
