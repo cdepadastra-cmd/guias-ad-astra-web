@@ -526,8 +526,11 @@ RENTAL = [
   {"id": "crampones", "name": "Crampones", "cats": ["Alpinismo"], "price": 15, "img": img("1beca0fb-51ca-436e-adcc-b0a672ab3052/otros-media-13.webp"), "desc": "Crampones de correas de 12 puntas, aptos para cualquier bota de montaña."},
 ]
 
+# Puntos de recogida del material de alquiler
+RENTAL_PICKUP = ["Fuentes de Béjar (Salamanca)", "Valladolid"]
+
 RENTAL_FAQ = [
-  ("¿Dónde se recoge el material de alquiler?", "En nuestras bases de Fuentes de Béjar (Salamanca), Vallespinoso de Cervera (Palencia) y Valladolid, o en el lugar que acordemos contigo. Se devuelve en el mismo sitio."),
+  ("¿Dónde se recoge el material de alquiler?", "En Fuentes de Béjar (Salamanca), junto a la Sierra de Béjar y Candelario, o en Valladolid. El material se devuelve en el mismo sitio donde lo recogiste."),
   ("¿Cómo se calcula el precio?", "El precio es por unidad y día, con IVA incluido. Si alquilas dos neoprenos tres días: 2 × 3 × 20 € = 120 €. Al enviar tu solicitud verás el total estimado."),
   ("¿Cómo reservo?", "Elige las fechas, añade las unidades de cada artículo y pulsa «Enviar por WhatsApp». Te confirmamos disponibilidad y punto de recogida por WhatsApp."),
   ("¿Cuándo se paga?", "En el momento de la entrega. Se firma un contrato de alquiler sencillo."),

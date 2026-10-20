@@ -56,8 +56,8 @@ def header(active=""):
     return ('<header class="site-header"><div class="wrap"><a class="brand" href="/" aria-label="Guías Ad Astra, inicio">AD ASTRA <small>Montaña y aventura</small></a>'
             '<button class="menu-toggle" aria-expanded="false" aria-controls="nav" aria-label="Abrir menú">☰</button>'
             '<nav class="nav" id="nav" aria-label="Principal">' + a("/", "Inicio", "inicio") +
-            dd("Actividades", NAV_ACT, "act", active) + dd("Formación–Cursos", NAV_CUR, "cur", active) + dd("Otros", NAV_OTR, "otr", active) +
-            a("/calendario/", "Calendario", "cal") + a("/actividades/alquiler-material-montana/", "Alquiler", "alq") +
+            dd("Actividades", NAV_ACT, "act", active) + dd("Formación–Cursos", NAV_CUR, "cur", active) +
+            a("/actividades/alquiler-material-montana/", "Alquiler", "alq") + a("/calendario/", "Calendario", "cal") + dd("Otros", NAV_OTR, "otr", active) +
             a("/sobre-nosotros/", "Nosotros", "nos") + a("/contacto/", "Contacto", "con") +
             '<a class="btn btn-primary" href="/calendario/">Reservar</a></nav></div></header>')
 
@@ -392,13 +392,13 @@ def build_rental():
         '<div class="body"><span class="tag">%s</span><h3>%s</h3><p>%s</p><div class="foot"><span class="price">%d€<small style="margin:0 0 0 4px">/día</small></span>'
         '<div class="stepper" role="group" aria-label="Unidades de %s"><button type="button" data-step="-1" aria-label="Quitar una">−</button><input type="number" min="0" max="20" value="0" inputmode="numeric" aria-label="Unidades"><button type="button" data-step="1" aria-label="Añadir una">+</button></div></div></div></article>'
         % (r["id"], e(r["name"]), r["price"], "|".join(r["cats"]), e(r["img"]), e(r["name"].lower()), e(" y ".join(r["cats"]).lower()), e(" · ".join(r["cats"])), e(r["name"]), e(r["desc"]), r["price"], e(r["name"])) for r in RENTAL)
-    puntos = "".join('<option>%s</option>' % b for b in SITE["bases"])
-    body = (hero("Alquiler", "Alquiler de material de montaña y barranquismo", "Neoprenos, arneses, cascos, disipadores de ferrata, piolets y crampones. Precio por día con IVA incluido. Recogida en Salamanca (Béjar), Palencia o Valladolid.",
+    puntos = "".join('<option>%s</option>' % b for b in RENTAL_PICKUP)
+    body = (hero("Alquiler", "Alquiler de material de montaña y barranquismo", "Neoprenos, arneses, cascos, disipadores de ferrata, piolets y crampones. Precio por día con IVA incluido. Recogida en Fuentes de Béjar (Salamanca) o en Valladolid.",
                  img("e3722879-d648-4dbe-b361-b365f07e1692/otros-media-5.webp"), [("Inicio", "/"), ("Alquiler de material", "")], '<a class="btn btn-primary" href="#catalogo">Elegir material</a>') +
-            keybar([("Precio", "Por unidad y día"), ("IVA", "Incluido"), ("Recogida", "Béjar · Palencia · Valladolid"), ("Reserva", "Por WhatsApp en 1 minuto")]) +
+            keybar([("Precio", "Por unidad y día"), ("IVA", "Incluido"), ("Recogida", "Fuentes de Béjar · Valladolid"), ("Reserva", "Por WhatsApp en 1 minuto")]) +
             '<section class="section" id="catalogo"><div class="wrap" id="alquiler-app"><div class="section-head"><p class="eyebrow">Catálogo</p><h2>Elige fechas y unidades</h2><p class="muted">Indica el día de recogida y el de devolución, suma las unidades que necesitas y envíanos la solicitud por WhatsApp. Te confirmamos disponibilidad al momento.</p></div>'
             '<div class="datebar"><div class="field"><label for="r-desde">Recogida</label><input id="r-desde" type="date"></div><div class="field"><label for="r-hasta">Devolución</label><input id="r-hasta" type="date"></div>'
-            '<div class="field"><span class="label">Días de alquiler</span><span class="days" id="r-dias">—</span></div><div class="field"><label for="r-punto">Recogida en</label><select id="r-punto">%s<option>Otro lugar (lo hablamos)</option></select></div></div>'
+            '<div class="field"><span class="label">Días de alquiler</span><span class="days" id="r-dias">—</span></div><div class="field"><label for="r-punto">Recogida en</label><select id="r-punto">%s</select></div></div>'
             '<div class="chips" data-filter="#rgrid" data-key="cat" style="margin-bottom:22px">%s</div><div class="grid c4" id="rgrid">%s</div></div></section>' % (puntos, chips, cards) +
             '<section class="section alt"><div class="wrap"><div class="section-head"><p class="eyebrow">Cómo funciona</p><h2>Alquilar es así de fácil</h2></div><ol class="steps3">'
             '<li><h3>Elige fechas</h3><p>Día de recogida y de devolución. Si es un solo día, deja la devolución igual.</p></li>'
@@ -414,7 +414,7 @@ def build_rental():
             block("Condiciones del alquiler", ticks(["Precios por unidad y día, IVA incluido.", "Se paga en el momento de la entrega y se firma un contrato de alquiler.", "El material se devuelve en el mismo lugar de entrega o donde indique la empresa.", "Un retraso en la devolución sin avisar se cobra como un día más de alquiler."])) +
             block("Preguntas frecuentes", faq_html(RENTAL_FAQ)) +
             '</div><div class="sticky"><div class="panel"><p class="eyebrow">Puntos de recogida</p><h3>Dónde recoger</h3>%s<a class="btn btn-wa" href="https://wa.me/%s?text=%s" target="_blank" rel="noopener">%s Preguntar por WhatsApp</a></div></div></div></section>'
-            % (ticks(SITE["bases"]), SITE["wa"], e("Hola, tengo una duda sobre el alquiler de material."), WA_SVG) +
+            % (ticks(RENTAL_PICKUP), SITE["wa"], e("Hola, tengo una duda sobre el alquiler de material."), WA_SVG) +
             '<div class="mbar" hidden><div class="wrap"><div class="sum"><b id="m-total">0 €</b><span id="m-info"></span></div><button class="btn btn-wa" id="m-open" type="button">%s Revisar y enviar</button></div></div>' % WA_SVG +
             '<dialog id="r-dlg"><form class="dlg" id="r-form" novalidate><div class="dlg-head"><div><p class="eyebrow">Tu alquiler</p><h2>Revisa y envía</h2></div><button type="button" class="icon-btn" data-close aria-label="Cerrar">×</button></div>'
             '<p class="muted" id="r-when"></p><ul class="basket-list" id="r-list"></ul><div class="total"><span class="label">Total estimado</span><strong id="r-sum"></strong></div>'
@@ -428,10 +428,10 @@ def build_rental():
                                                                   "priceSpecification": {"@type": "UnitPriceSpecification", "price": r["price"], "priceCurrency": "EUR", "unitCode": "DAY", "valueAddedTaxIncluded": True}, "seller": {"@id": D + "/#empresa"}}}}
         for i, r in enumerate(RENTAL)]}
     svc = {"@context": "https://schema.org", "@type": "Service", "serviceType": "Alquiler de material de montaña, barranquismo, vías ferratas y alpinismo", "provider": {"@id": D + "/#empresa"},
-           "areaServed": ["Salamanca", "Béjar", "Ávila", "Cáceres", "Palencia", "Valladolid", "León"], "url": url(path)}
+           "areaServed": ["Salamanca", "Béjar", "Fuentes de Béjar", "Ávila", "Cáceres", "Valladolid", "Zamora", "Segovia"], "url": url(path)}
     ld = [crumbs_ld([("Inicio", "/"), ("Alquiler de material", path)]), items_ld, svc, faq_ld(RENTAL_FAQ), {"@context": "https://schema.org", **ORG}]
-    page(path, "Alquiler de material de barranquismo, ferratas y alpinismo | Salamanca, Palencia y Valladolid",
-         "Alquila neopreno de barranquismo, arnés, casco, set de vía ferrata, piolet y crampones desde 4€/día con IVA. Recogida en Béjar (Salamanca), Palencia o Valladolid. Reserva por WhatsApp.",
+    page(path, "Alquiler de material de barranquismo, ferratas y alpinismo | Béjar (Salamanca) y Valladolid",
+         "Alquila neopreno de barranquismo, arnés, casco, set de vía ferrata, piolet y crampones desde 4€/día con IVA. Recogida en Fuentes de Béjar (Salamanca) o Valladolid. Reserva por WhatsApp.",
          body, "alq", ld, "website", img("e89d2f67-e4c0-4443-8f1f-9f4f13528f9f/otros-media-6.webp"), "0.9")
 
 # ---------------------------------------------------------------- listados
@@ -519,8 +519,75 @@ def build_contact():
          [crumbs_ld([("Inicio", "/"), ("Contacto", "/contacto/")]), {"@context": "https://schema.org", **ORG}], priority="0.6")
 
 def build_404():
-    body = hero("Error 404", "Te has salido del sendero", "Esta página no existe o ha cambiado de sitio.", HERO, None, '<a class="btn btn-primary" href="/">Volver al inicio</a><a class="btn btn-ghost" href="/actividades/">Ver actividades</a>')
-    page("/404", "Página no encontrada | Guías Ad Astra", "La página que buscas no existe.", body, "", noindex=True)
+    excusas = [
+        "Una cabra montés se ha comido esta página. Es lo que tiene dejarla al sol.",
+        "El guía jura que este sendero estaba aquí ayer.",
+        "Esta página se fue a hacer el Almanzor y todavía no ha bajado.",
+        "Hemos rapelado hasta aquí y resulta que la cuerda no llegaba.",
+        "La niebla de Gredos se ha tragado este enlace. Vuelve cuando levante.",
+        "Alguien movió el hito de piedras. Siempre hay alguien.",
+        "Esta página está en un barranco sin cobertura. Prueba más abajo.",
+        "Nos equivocamos de collado. Pasa hasta en las mejores cordadas.",
+    ]
+    links = [("Barranquismo", "/actividades/?categoria=Barranquismo"), ("Vías ferratas", "/actividades/?categoria=Vías ferratas"),
+             ("Cursos", "/formacion-cursos/"), ("Alquiler de material", "/actividades/alquiler-material-montana/"), ("Calendario", "/calendario/"), ("Contacto", "/contacto/")]
+    body = ("""<section class="lost"><canvas id="stars" aria-hidden="true"></canvas>
+<svg class="ridge" viewBox="0 0 1440 260" preserveAspectRatio="none" aria-hidden="true"><path d="M0 260V170l110-60 70 40 120-110 90 80 60-30 130 120 110-90 80 50 140-130 100 90 70-40 150 120 110-70 100 60V260z" fill="#1f130d"/><path d="M0 260v-40l160-50 120 40 200-70 140 60 180-50 160 50 200-60 140 50 140-30v100z" fill="#160d09"/></svg>
+<div class="wrap lost-in">
+  <p class="eyebrow">Error 404 · Altitud desconocida</p>
+  <div class="num" aria-label="404"><span>4</span>
+    <button class="compass" id="compass" type="button" aria-label="Agitar la brújula para otra excusa">
+      <svg viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="54" fill="none" stroke="currentColor" stroke-width="6"/><circle cx="60" cy="60" r="44" fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="2 6"/>
+      <text x="60" y="24" text-anchor="middle">N</text><text x="60" y="106" text-anchor="middle">S</text><text x="102" y="65" text-anchor="middle">E</text><text x="18" y="65" text-anchor="middle">O</text>
+      <g id="needle"><path d="M60 18 70 60H50z" fill="#e9a53b"/><path d="M60 102 50 60h20z" fill="#f3e9df"/><circle cx="60" cy="60" r="6" fill="#160d09" stroke="#f3e9df" stroke-width="2"/></g></svg>
+    </button><span>4</span></div>
+  <h1>Te has perdido en la montaña</h1>
+  <p class="lead excuse" id="excuse" aria-live="polite">""" + e(excusas[0]) + """</p>
+  <p class="hint">Pulsa la brújula si quieres otra excusa (tenemos muchas).</p>
+  <div class="actions"><a class="btn btn-primary" href="/">Volver al campamento base</a><a class="btn btn-ghost" href="https://wa.me/""" + SITE["wa"] + """" target="_blank" rel="noopener">Pedir rescate por WhatsApp</a></div>
+  <div class="paths"><span class="label">O sigue uno de estos senderos balizados</span><div class="chips">""" +
+        "".join('<a class="chip" href="%s">%s</a>' % (e(h), e(n)) for n, h in links) + """</div></div>
+</div></section>
+<style>
+.lost{position:relative;isolation:isolate;overflow:hidden;min-height:calc(100vh - 68px);display:flex;align-items:center;background:radial-gradient(120% 80% at 70% 0%,#2a1a12 0%,var(--bg) 60%)}
+.lost #stars{position:absolute;inset:0;width:100%;height:100%;z-index:-2}
+.lost .ridge{position:absolute;left:0;right:0;bottom:0;width:100%;height:32vh;z-index:-1}
+.lost-in{display:grid;gap:18px;justify-items:start;padding-block:60px 30vh}
+.lost .num{display:flex;align-items:center;gap:clamp(6px,2vw,18px);font-family:var(--display);font-size:clamp(7rem,22vw,15rem);line-height:.85;color:transparent;background:var(--grad);-webkit-background-clip:text;background-clip:text}
+.lost .num span{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.compass{width:clamp(5.6rem,17vw,11.5rem);height:clamp(5.6rem,17vw,11.5rem);border:0;background:none;padding:0;color:var(--gold);cursor:pointer;border-radius:50%}
+.compass svg{width:100%;height:100%;overflow:visible}
+.compass text{font:600 13px var(--label);fill:var(--muted)}
+#needle{transform-origin:60px 60px;animation:lost 3.2s ease-in-out infinite}
+.compass.spin #needle{animation:spin .9s cubic-bezier(.2,.7,.3,1)}
+@keyframes lost{0%{transform:rotate(-35deg)}25%{transform:rotate(50deg)}45%{transform:rotate(10deg)}70%{transform:rotate(140deg)}100%{transform:rotate(-35deg)}}
+@keyframes spin{to{transform:rotate(1080deg)}}
+.lost h1{font-size:clamp(2.2rem,6vw,4rem)}
+.excuse{min-height:3.3em;font-size:1.3rem;color:var(--fg)}
+.excuse.pop{animation:pop .4s ease}
+@keyframes pop{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.lost .actions{display:flex;flex-wrap:wrap;gap:12px}
+.paths{display:grid;gap:12px;margin-top:12px}
+.paths .chip{text-decoration:none}
+@media (prefers-reduced-motion:reduce){#needle,.compass.spin #needle,.excuse.pop{animation:none}}
+</style>
+<script>
+(function(){
+  var ex=""" + json.dumps(excusas, ensure_ascii=False) + """,i=0,c=document.getElementById("compass"),t=document.getElementById("excuse");
+  c.addEventListener("click",function(){i=(i+1+Math.floor(Math.random()*(ex.length-1)))%ex.length;c.classList.remove("spin");void c.offsetWidth;c.classList.add("spin");
+    t.classList.remove("pop");void t.offsetWidth;t.textContent=ex[i];t.classList.add("pop");});
+  var cv=document.getElementById("stars"),x=cv.getContext("2d"),s=[],shoot=null,still=matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function size(){cv.width=cv.offsetWidth*devicePixelRatio;cv.height=cv.offsetHeight*devicePixelRatio;s=[];for(var k=0;k<Math.min(260,cv.width*cv.height/9000);k++)s.push({x:Math.random()*cv.width,y:Math.random()*cv.height*.75,r:Math.random()*1.4*devicePixelRatio+.3,p:Math.random()*6});}
+  function draw(tm){x.clearRect(0,0,cv.width,cv.height);
+    s.forEach(function(a){var o=.35+.65*Math.abs(Math.sin(tm/1400+a.p));x.globalAlpha=o;x.fillStyle="#f3e9df";x.beginPath();x.arc(a.x,a.y,a.r,0,7);x.fill();});
+    if(!shoot&&Math.random()<.006)shoot={x:Math.random()*cv.width*.7,y:Math.random()*cv.height*.3,l:0};
+    if(shoot){shoot.l+=14*devicePixelRatio;var g=x.createLinearGradient(shoot.x+shoot.l,shoot.y+shoot.l*.4,shoot.x+shoot.l-120,shoot.y+shoot.l*.4-48);g.addColorStop(0,"rgba(240,180,69,.9)");g.addColorStop(1,"rgba(240,180,69,0)");
+      x.globalAlpha=1;x.strokeStyle=g;x.lineWidth=2*devicePixelRatio;x.beginPath();x.moveTo(shoot.x+shoot.l,shoot.y+shoot.l*.4);x.lineTo(shoot.x+shoot.l-120,shoot.y+shoot.l*.4-48);x.stroke();if(shoot.l>cv.width*.5)shoot=null;}
+    if(!still)requestAnimationFrame(draw);}
+  size();addEventListener("resize",size);requestAnimationFrame(draw);
+})();
+</script>""")
+    page("/404", "Te has perdido en la montaña | Guías Ad Astra", "La página que buscas no existe o ha cambiado de sitio.", body, "", noindex=True)
 
 # ---------------------------------------------------------------- build
 def main():
@@ -540,6 +607,7 @@ def main():
     open(os.path.join(OUT, "sitemap.xml"), "w").write(sm)
     if BASE:
         os.remove(os.path.join(OUT, "sitemap.xml")) if os.path.exists(os.path.join(OUT, "sitemap.xml")) else None
+        open(os.path.join(OUT, ".htaccess"), "w").write("ErrorDocument 404 %s/404.html\n" % BASE)
         print("Versión de prueba en", BASE, "(noindex, sin sitemap)"); return
     open(os.path.join(OUT, "robots.txt"), "w").write("User-agent: *\nAllow: /\nDisallow: /calendario-google/\n\nSitemap: %s/sitemap.xml\n" % D)
     print("Páginas generadas:", len(PAGES) + 1)
