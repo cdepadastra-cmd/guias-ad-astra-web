@@ -6,21 +6,17 @@
   var nf1 = new Intl.NumberFormat("es-ES", { maximumFractionDigits: 1, minimumFractionDigits: 1 });
   var nf0 = new Intl.NumberFormat("es-ES", { maximumFractionDigits: 0 });
 
-  /* ---------- método de cálculo (MIDE, FEDME) ----------
-     Horizontal: distancia / velocidad en llano.
-     Vertical:   metros de subida / ritmo de subida + metros de bajada / ritmo de bajada.
-     Total:      el mayor de los dos + la mitad del menor.
-     MIDE oficial: 4 km/h, 400 m/h de subida y 600 m/h de bajada (sin paradas).
-     En un track se calcula por tramos y se suman, como indica el método. */
-  var METHODS = {
-    mide: { kmh: 4, up: 400, down: 600, name: "MIDE oficial" },
-    guia: { kmh: 4.5, up: 300, down: 500, name: "ritmo de guía" },
-    naismith: { kmh: 5, up: 600, down: 0, name: "regla de Naismith", sum: true }
-  };
+  /* ---------- cálculo Guías Ad Astra, basado en el MIDE ----------
+     Horizontal: distancia / velocidad según el tipo de camino (pistas 5 km/h, sendas 4 km/h, malas sendas 3 km/h).
+     Vertical:   metros de subida / 400 m/h + metros de bajada / 600 m/h.
+     Total:      el mayor de los dos + la mitad del menor (marcha efectiva, sin paradas).
+     En un track se calcula por tramos de 250 m y se suman, como indica el MIDE. */
+  var FIRMES = { pista: { kmh: 5, name: "pistas y carreteras" }, senda: { kmh: 4, name: "sendas y caminos" }, mala: { kmh: 3, name: "malas sendas y canchales" } };
+  var UP = 400, DOWN = 600;
   function estimate(km, up, down, kmh, upRate, downRate, sum) {
     var h = km / kmh;
     var v = (upRate > 0 ? up / upRate : 0) + (downRate > 0 ? down / downRate : 0);
-    var total = sum ? h + v : Math.max(h, v) + Math.min(h, v) / 2; // Naismith suma; MIDE: mayor + mitad del menor
+    var total = sum ? h + v : Math.max(h, v) + Math.min(h, v) / 2; // MIDE: mayor + mitad del menor
     return { h: h, v: v, total: total };
   }
   function hm(hours) {
@@ -38,19 +34,11 @@
     return [5, "Más de 10 h de marcha efectiva."];
   }
   function params() {
-    var m = ($("[name=metodo]:checked") || {}).value || "mide";
-    return {
-      method: m,
-      kmh: parseFloat(String($("#c-llano").value).replace(",", ".")) || METHODS[m].kmh,
-      up: parseFloat($("#c-subida").value) || METHODS[m].up,
-      down: parseFloat($("#c-bajada").value) || 0,
-      sum: !!METHODS[m].sum,
-      stops: parseFloat($("#c-paradas").value) || 0
-    };
+    var f = ($("[name=firme]:checked") || {}).value || "senda";
+    return { method: "adastra", firme: f, kmh: FIRMES[f].kmh, up: UP, down: DOWN, sum: false, stops: parseFloat($("#c-paradas").value) || 0 };
   }
   function methodText(p) {
-    var n = { mide: "Método MIDE", guia: "Ritmo de guía", naismith: "Regla de Naismith" }[p.method];
-    return n + ": " + nf1.format(p.kmh) + " km/h en llano, " + nf0.format(p.up) + " m/h de subida" + (p.down ? " y " + nf0.format(p.down) + " m/h de bajada" : "") + (p.sum ? " (tiempos sumados)" : "");
+    return "Cálculo MIDE: " + FIRMES[p.firme].name + " a " + nf0.format(p.kmh) + " km/h, " + nf0.format(p.up) + " m/h de subida y " + nf0.format(p.down) + " m/h de bajada";
   }
   function stopsText(p, short) {
     return p.stops ? (short ? ", con " + Math.round(p.stops * 100) + " % de paradas" : "Incluye un " + Math.round(p.stops * 100) + " % de margen para descansos, comer e imprevistos.") : (short ? ", sin paradas" : "Tiempo en movimiento, sin paradas.");
@@ -87,18 +75,9 @@
       if (lastTrack) showTrack(lastTrack);
     };
     $$("input", form).forEach(function (i) { i.addEventListener("input", run); i.addEventListener("change", run); });
-    var applyMethod = function () {
-      var m = ($("[name=metodo]:checked") || {}).value || "mide", d = METHODS[m];
-      $("#ritmo-wrap").hidden = m !== "guia";
-      var r = $("[name=ritmo]:checked");
-      $("#c-llano").value = m === "guia" && r ? r.value : d.kmh;
-      $("#c-subida").value = d.up; $("#c-bajada").value = d.down;
-    };
-    $$("[name=metodo]").forEach(function (i) { i.addEventListener("change", function () { applyMethod(); run(); }); });
-    $$("[name=ritmo]").forEach(function (i) { i.addEventListener("change", function () { $("#c-llano").value = i.value; run(); }); });
-    $$("#ajustes input:not([name=metodo]):not([name=ritmo])").forEach(function (i) { i.addEventListener("input", run); i.addEventListener("change", run); });
+    $$("[name=firme]").forEach(function (i) { i.addEventListener("change", run); });
     $("#c-paradas").addEventListener("change", run);
-    applyMethod();
+
     form.addEventListener("submit", function (e) { e.preventDefault(); run(); });
     run();
   }
@@ -391,7 +370,7 @@
         x.fillStyle = C.gold; x.font = 34 * k + "px " + DISP; x.textAlign = "right"; x.fillText("AD ASTRA", W - 32 * k, 56 * k);
         x.fillStyle = C.muted; x.font = "600 " + 12 * k + "px " + LAB; x.fillText("MONTAÑA Y AVENTURA", W - 32 * k, 76 * k); x.textAlign = "left";
         var st = [["DISTANCIA", nf1.format(A.km) + " km"], ["DESNIVEL +", A.hasEle ? nf0.format(A.up) + " m" : "—"], ["DESNIVEL −", A.hasEle ? nf0.format(A.down) + " m" : "—"], ["ALTITUD MÁX.", A.hasEle ? nf0.format(A.maxE) + " m" : "—"], ["ALTITUD MÍN.", A.hasEle ? nf0.format(A.minE) + " m" : "—"],
-                  ["DURACIÓN", hm(A.calc.total)], ["ESFUERZO MIDE", A.calc.esfuerzo + " de 5"], ["PENDIENTE MÁX.", A.hasEle ? nf0.format(A.maxSlope) + " %" : "—"], ["TIPO", A.loop ? "Circular" : "Lineal"], [A.real ? "TIEMPO REAL" : "MÉTODO", A.real ? hm(A.real) : ({ mide: "MIDE", guia: "Guía", naismith: "Naismith" })[A.calc.p.method]]];
+                  ["DURACIÓN", hm(A.calc.total)], ["ESFUERZO MIDE", A.calc.esfuerzo + " de 5"], ["PENDIENTE MÁX.", A.hasEle ? nf0.format(A.maxSlope) + " %" : "—"], ["TIPO", A.loop ? "Circular" : "Lineal"], [A.real ? "TIEMPO REAL" : "CAMINO", A.real ? hm(A.real) : ({ pista: "Pistas", senda: "Sendas", mala: "Malas sendas" })[A.calc.p.firme]]];
         var cw = (W - 64 * k) / 5, ch = 82 * k, y0 = 130 * k;
         st.forEach(function (s, i) {
           var cx = 32 * k + (i % 5) * cw, cy = y0 + Math.floor(i / 5) * ch;
