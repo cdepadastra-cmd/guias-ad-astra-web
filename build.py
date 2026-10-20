@@ -602,25 +602,30 @@ def build_404():
 def build_calculator():
     path = "/calculadora-rutas/"
     faq = [
-        ("¿Cómo se calcula el tiempo de una ruta de montaña?", "Se calcula por separado el tiempo que se tarda por la distancia (entre 4 y 5 km/h en llano) y por el desnivel (unos 300 m de subida por hora). El tiempo total es el mayor de los dos más la mitad del menor, el mismo criterio que usa el método MIDE de la Federación de Montaña."),
+        ("¿Cómo se calcula el tiempo de una ruta de montaña con el MIDE?", "El método MIDE calcula por separado el tiempo por distancia (4 km/h en llano) y por desnivel (400 m/h de subida y 600 m/h de bajada). La duración es el mayor de los dos más la mitad del menor. Es tiempo de marcha efectiva, sin paradas."),
+        ("¿Qué es el esfuerzo MIDE?", "Es la valoración de 1 a 5 del esfuerzo necesario según las horas de marcha: 1 hasta 1 h, 2 de 1 a 3 h, 3 de 3 a 6 h, 4 de 6 a 10 h y 5 más de 10 h."),
         ("¿Por qué no se suman los dos tiempos?", "Porque mientras subes también avanzas. Sumarlos daría tiempos demasiado largos; quedarse con el mayor, demasiado cortos. Sumar la mitad del menor se ajusta bien a la realidad."),
-        ("¿Qué velocidad elijo?", "4 km/h si vas con niños, con mochila pesada o por terreno malo; 4,5 km/h es un ritmo normal de senderista; 5 km/h si vas en forma y por buen camino."),
+        ("¿MIDE o ritmo de guía?", "El MIDE es el estándar oficial y sirve para comparar rutas. El ritmo de guía (4–5 km/h y 300 m/h de subida) es más conservador y se acerca más a lo que tarda un grupo variado. Puedes cambiar de uno a otro y ajustar los ritmos en «Ajustes avanzados»."),
         ("¿El tiempo incluye las paradas?", "No por defecto: es tiempo en movimiento. Marca «Sumar paradas» para añadir un 15 % para comer, hacer fotos y descansar."),
         ("¿Qué archivos de track puedo subir?", "GPX (el más habitual en Wikiloc, Strava, Garmin, Komoot o Suunto), KML de Google Earth y TCX. El archivo se lee en tu propio móvil u ordenador: no se sube a ningún servidor."),
+        ("¿Puedo descargar el perfil y el mapa?", "Sí. Después de cargar el track, descarga en PNG el perfil de altitud, el mapa o una ficha completa con los datos, el perfil y el mapa juntos, lista para compartir."),
         ("¿Por qué el desnivel puede diferir del de otras apps?", "Cada app filtra el ruido del GPS de una forma. Nosotros suavizamos las altitudes para no inflar el desnivel con pequeños saltos del GPS, así que suele salir algo menor que el desnivel «en bruto»."),
     ]
-    body = (hero("Herramientas", "Calculadora de rutas de montaña", "Escribe la distancia y el desnivel y te decimos cuánto vas a tardar. O sube tu track GPX y te damos distancia, desnivel, perfil y mapa.", HERO, [("Inicio", "/"), ("Calculadora de rutas", "")],
+    body = (hero("Herramientas", "Calculadora de rutas de montaña", "Escribe la distancia y el desnivel y te decimos cuánto vas a tardar según el método MIDE. O sube tu track GPX y descarga su perfil, su mapa y la ficha de la ruta.", HERO, [("Inicio", "/"), ("Calculadora de rutas", "")],
                  '<a class="btn btn-primary" href="#calculadora">Calcular duración</a><a class="btn btn-ghost" href="#track">Analizar un track</a>') +
             '<section class="section" id="calculadora"><div class="wrap calc-grid">'
             '<form class="panel calc-form" id="calc" novalidate><p class="eyebrow">Calculadora</p><h2 style="font-size:2.2rem">Duración de la ruta</h2>'
             '<div class="field"><label for="c-km">Distancia</label><div class="unit-in"><input id="c-km" type="number" inputmode="decimal" min="0" step="0.1" value="12"><span>km</span></div></div>'
             '<div class="row2"><div class="field"><label for="c-up">Desnivel de subida</label><div class="unit-in"><input id="c-up" type="number" inputmode="numeric" min="0" step="10" value="800"><span>m+</span></div></div>'
             '<div class="field"><label for="c-down">Desnivel de bajada</label><div class="unit-in"><input id="c-down" type="number" inputmode="numeric" min="0" step="10" placeholder="igual que la subida"><span>m−</span></div></div></div>'
-            '<div id="ajustes" style="display:grid;gap:16px"><div class="field"><span class="label">Ritmo en llano</span><div class="seg" role="radiogroup" aria-label="Ritmo en llano">'
+            '<div id="ajustes" style="display:grid;gap:16px"><div class="field"><span class="label">Método de cálculo</span><div class="seg" role="radiogroup" aria-label="Método de cálculo">'
+            '<label><input type="radio" name="metodo" value="mide" checked><span>MIDE oficial</span></label><label><input type="radio" name="metodo" value="guia"><span>Ritmo de guía</span></label></div>'
+            '<p class="hint" id="metodo-hint">MIDE (Federación de Montaña): 4 km/h en llano, 400 m/h de subida y 600 m/h de bajada. Ritmo de guía: 4–5 km/h y 300 m/h de subida, más conservador.</p></div>'
+            '<div class="field" id="ritmo-wrap" hidden><span class="label">Ritmo en llano</span><div class="seg" role="radiogroup" aria-label="Ritmo en llano">'
             '<label><input type="radio" name="ritmo" value="4"><span>Tranquilo · 4 km/h</span></label><label><input type="radio" name="ritmo" value="4.5" checked><span>Normal · 4,5 km/h</span></label><label><input type="radio" name="ritmo" value="5"><span>Rápido · 5 km/h</span></label></div></div>'
             '<label class="check"><input type="checkbox" id="c-paradas"> Sumar paradas (+15 % para comer, fotos y descansos)</label>'
-            '<details class="adv"><summary>Ajustes avanzados</summary><div class="row2"><div class="field"><label for="c-subida">Ritmo de subida</label><div class="unit-in"><input id="c-subida" type="number" min="100" max="800" step="10" value="300"><span>m/h</span></div></div>'
-            '<div class="field"><label for="c-bajada">Ritmo de bajada</label><div class="unit-in"><input id="c-bajada" type="number" min="0" max="1500" step="50" value="500"><span>m/h</span></div></div></div>'
+            '<details class="adv"><summary>Ajustes avanzados</summary><div class="field" style="margin-bottom:12px"><label for="c-llano">Velocidad en llano</label><div class="unit-in"><input id="c-llano" type="number" min="2" max="7" step="0.1" value="4"><span>km/h</span></div></div><div class="row2"><div class="field"><label for="c-subida">Ritmo de subida</label><div class="unit-in"><input id="c-subida" type="number" min="100" max="800" step="10" value="400"><span>m/h</span></div></div>'
+            '<div class="field"><label for="c-bajada">Ritmo de bajada</label><div class="unit-in"><input id="c-bajada" type="number" min="0" max="1500" step="50" value="600"><span>m/h</span></div></div></div>'
             '<p class="hint">Pon 0 en la bajada para no tenerla en cuenta. Estos ajustes se aplican también al análisis del track.</p></details></div></form>'
             '<div class="calc-out" id="calc-out" aria-live="polite"></div></div></section>' +
             '<section class="section alt" id="track"><div class="wrap" style="display:grid;grid-template-columns:minmax(0,1fr);gap:26px"><div class="section-head" style="margin:0"><p class="eyebrow">Analiza tu track</p><h2>Sube un GPX y mira el perfil</h2>'
@@ -630,12 +635,16 @@ def build_calculator():
             '<div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center"><button type="button" class="btn btn-ghost" id="trk-demo" data-src="/data/ejemplo-laguna-grande.gpx">Probar con un ejemplo de Gredos</button><p class="err" id="trk-err" role="alert"></p></div>'
             '<div id="trk-res" hidden style="display:grid;gap:20px"><div class="trk-head"><h3 id="trk-name" style="font-size:2rem"></h3><a class="small" href="#calculadora">Cambiar ritmo ↑</a></div>'
             '<dl class="trk-stats" id="trk-stats"></dl><div><p class="label" style="margin-bottom:10px">Perfil de altitud · pasa el dedo o el ratón por encima</p><div class="prof" id="trk-prof"></div></div>'
-            '<div id="trk-map" hidden></div><p class="hint" id="trk-note"></p></div></div></section>' +
+            '<div id="trk-map" hidden></div><p class="hint" id="trk-note"></p>'
+            '<div class="dl-row"><span class="label">Descargar imagen</span><div style="display:flex;flex-wrap:wrap;gap:10px"><button type="button" class="btn btn-primary" data-dl="ficha">Ficha completa</button><button type="button" class="btn btn-ghost" data-dl="perfil">Perfil</button><button type="button" class="btn btn-ghost" data-dl="mapa" hidden>Mapa</button></div></div></div></div></section>' +
             '<section class="section"><div class="wrap split"><div class="stack" style="gap:0">' +
             block("Cómo calculamos el tiempo", '<div style="display:grid;gap:18px">' + prose([
-                "Usamos el criterio del método MIDE, el sistema con el que la Federación Española de Deportes de Montaña valora las rutas, con los ritmos que usamos los guías en Gredos:"]) +
-                '<div class="formula"><b>Tiempo por distancia</b> = km ÷ 4–5 km/h<br><b>Tiempo por desnivel</b> = metros de subida ÷ 300 m/h + metros de bajada ÷ 500 m/h<br><b>Duración</b> = el mayor de los dos + la mitad del menor</div>' +
-                prose(["Ejemplo: 12 km con 800 m de subida y 800 de bajada a ritmo normal. Por distancia: 12 ÷ 4,5 = 2 h 40 min. Por desnivel: 800 ÷ 300 + 800 ÷ 500 = 4 h 15 min. Duración: 4 h 15 min + 1 h 20 min = unas 5 h 35 min sin paradas.",
+                "Por defecto usamos el método MIDE (Método de Información de Excursiones), el sistema con el que la Federación Española de Deportes de Montaña valora las rutas. Calcula el tiempo de marcha efectiva, sin paradas:"]) +
+                '<div class="formula"><b>Tiempo por distancia</b> = km ÷ 4 km/h<br><b>Tiempo por desnivel</b> = metros de subida ÷ 400 m/h + metros de bajada ÷ 600 m/h<br><b>Duración</b> = el mayor de los dos + la mitad del menor</div>' +
+                prose(["Ejemplo: 12 km con 800 m de subida y 800 de bajada. Por distancia: 12 ÷ 4 = 3 h. Por desnivel: 800 ÷ 400 + 800 ÷ 600 = 3 h 20 min. Duración: 3 h 20 min + 1 h 30 min = unas 4 h 50 min de marcha efectiva.",
+                       "Con un track, el MIDE se calcula por tramos: dividimos la ruta en tramos de 250 m, aplicamos la fórmula a cada uno y sumamos. Así una ruta con subidas y bajadas fuertes sale más realista que con los totales.",
+                       "El tiempo da el «esfuerzo necesario» del MIDE, de 1 a 5: 1 hasta 1 h, 2 de 1 a 3 h, 3 de 3 a 6 h, 4 de 6 a 10 h y 5 más de 10 h. Las otras tres valoraciones del MIDE (medio, itinerario y desplazamiento) dependen del terreno y no se pueden sacar de un track.",
+                       "La opción «Ritmo de guía» usa 4–5 km/h y 300 m/h de subida, lo que solemos aplicar en Gredos con grupos: da tiempos algo más largos y conservadores.",
                        "Es una estimación para un grupo con forma normal en buen camino. Nieve, calor, piedra suelta, niños o mochilas pesadas pueden alargarla bastante. Sal siempre con margen de luz."]) + "</div>") +
             block("Preguntas frecuentes", faq_html(faq)) +
             '</div><div class="sticky"><div class="panel"><p class="eyebrow">¿Mejor con guía?</p><h3>Te llevamos nosotros</h3><p class="muted">Rutas guiadas por Gredos para todos los niveles, desde 15 € por persona.</p>'
@@ -646,8 +655,8 @@ def build_calculator():
            "provider": {"@id": D + "/#empresa"}}]
     head = '<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">'
     scripts = '<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="" defer></script><script src="/js/calculadora.js" defer></script>'
-    page(path, "Calculadora de tiempo de rutas de montaña y analizador de GPX | Guías Ad Astra",
-         "Calcula cuánto tardarás en una ruta de senderismo con la distancia y el desnivel (4-5 km/h y 300 m/h, método MIDE). Sube tu track GPX y obtén desnivel, perfil de altitud y mapa gratis.",
+    page(path, "Calculadora MIDE de tiempo de rutas y perfil de GPX | Guías Ad Astra",
+         "Calcula la duración de una ruta de senderismo con el método MIDE a partir de distancia y desnivel. Sube tu track GPX y descarga el perfil de altitud, el mapa y la ficha de la ruta gratis.",
          body, "otr", ld, priority="0.8", head=head, scripts=scripts)
 
 # ---------------------------------------------------------------- build
