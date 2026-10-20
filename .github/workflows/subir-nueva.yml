@@ -34,7 +34,7 @@ jobs:
         run: |
           sudo apt-get -qq install -y lftp >/dev/null 2>&1 || true
           echo "== Carpeta de destino configurada: $FTP_DIR"
-          lftp -u "$FTP_USER,$FTP_PASSWORD" -e "set ssl:verify-certificate no; set net:max-retries 1; pwd; echo '== Raíz FTP:'; cls -1 --sort=name; echo '== Contenido de la carpeta de destino:'; cls -1 $FTP_DIR | head -20; bye" "$FTP_SERVER" 2>&1 | head -80 || true
+          lftp -u "$FTP_USER,$FTP_PASSWORD" -e "set ssl:verify-certificate no; set net:max-retries 1; pwd; echo '== Raíz FTP:'; cls -1 --sort=name; echo '== httpdocs:'; cls -1 httpdocs | head -25; echo '== guiasadastra.com:'; cls -1 guiasadastra.com | head -25; echo '== public_html:'; cls -1 public_html | head -25; bye" "$FTP_SERVER" 2>&1 | head -80 || true
 
       - uses: actions/checkout@v4
         if: env.FTP_SERVER != ''
