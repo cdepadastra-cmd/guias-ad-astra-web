@@ -347,6 +347,37 @@
     });
     return tileCache[url];
   }
+  /* cola con máximo 6 descargas a la vez (los servidores de mapas cortan si se piden demasiadas) */
+  var qActive = 0, qList = [];
+  function queued(fn) {
+    return new Promise(function (res) {
+      qList.push(function () { qActive++; fn().then(function (v) { qActive--; res(v); next(); }); });
+      next();
+    });
+    function next() { while (qActive < 6 && qList.length) qList.shift()(); }
+  }
+  function exportable(im) { // comprueba que la imagen se puede exportar (CORS correcto)
+    if (!im) return false;
+    try { var c = document.createElement("canvas"); c.width = c.height = 2; var x = c.getContext("2d"); x.drawImage(im, 0, 0, 2, 2); x.getImageData(0, 0, 1, 1); return true; } catch (e) { return false; }
+  }
+  /* mosaico de mapa: OpenTopoMap (3 servidores, y sin caché) y, si falla, OpenStreetMap */
+  function mapTile(z, x, y) {
+    var s = ["a", "b", "c"], i = (x + y) % 3, n = Math.pow(2, z), xx = ((x % n) + n) % n;
+    var urls = [
+      "https://" + s[i] + ".tile.opentopomap.org/" + z + "/" + xx + "/" + y + ".png",
+      "https://" + s[(i + 1) % 3] + ".tile.opentopomap.org/" + z + "/" + xx + "/" + y + ".png?ad=1",
+      "https://tile.openstreetmap.org/" + z + "/" + xx + "/" + y + ".png"
+    ];
+    return queued(function () {
+      var k = 0;
+      function attempt() {
+        if (k >= urls.length) return Promise.resolve(null);
+        var u = urls[k++];
+        return loadTile(u).then(function (im) { return exportable(im) ? { im: im, osm: u.indexOf("openstreetmap") > -1 } : attempt(); });
+      }
+      return attempt();
+    });
+  }
 
   /* ---------- altitudes desde el modelo digital del terreno (AWS Terrain Tiles, Terrarium) ---------- */
   function fillElevations(tr) {
@@ -381,7 +412,7 @@
   function renderRouteMap(A, maxW, maxH) {
     var b = { n: -90, s: 90, e: -180, w: 180 };
     A.pts.forEach(function (p) { b.n = Math.max(b.n, p.lat); b.s = Math.min(b.s, p.lat); b.e = Math.max(b.e, p.lon); b.w = Math.min(b.w, p.lon); });
-    var z = 17, pad = 0.12, bw, bh;
+    var z = 16, pad = 0.12, bw, bh;
     for (; z > 3; z--) {
       bw = wx(b.e, z) - wx(b.w, z); bh = wy(b.s, z) - wy(b.n, z);
       if (bw * (1 + 2 * pad) <= maxW && bh * (1 + 2 * pad) <= maxH) break;
@@ -389,15 +420,16 @@
     var W = Math.round(Math.max(bw * (1 + 2 * pad), maxW * 0.75)), H = Math.round(Math.max(bh * (1 + 2 * pad), Math.min(maxH, W * 0.6)));
     W = Math.min(W, maxW); H = Math.min(H, maxH);
     var cx = (wx(b.e, z) + wx(b.w, z)) / 2, cy = (wy(b.s, z) + wy(b.n, z)) / 2, ox = cx - W / 2, oy = cy - H / 2;
-    var tiles = [], sub = ["a", "b", "c"];
+    var tiles = [];
     for (var tx = Math.floor(ox / 256); tx <= Math.floor((ox + W) / 256); tx++)
       for (var ty = Math.floor(oy / 256); ty <= Math.floor((oy + H) / 256); ty++)
-        tiles.push({ x: tx, y: ty, url: "https://" + sub[(tx + ty) % 3] + ".tile.opentopomap.org/" + z + "/" + tx + "/" + ty + ".png" });
-    return Promise.all(tiles.map(function (t) { return loadTile(t.url).then(function (im) { t.im = im; }); })).then(function () {
+        tiles.push({ x: tx, y: ty });
+    return Promise.all(tiles.map(function (t) { return mapTile(z, t.x, t.y).then(function (r) { t.r = r; }); })).then(function () {
+      var got = tiles.filter(function (t) { return t.r; }).length;
+      if (got < tiles.length * 0.5) throw new Error("tiles");
       var c = document.createElement("canvas"); c.width = W; c.height = H; var x = c.getContext("2d");
       x.fillStyle = "#e8e2d4"; x.fillRect(0, 0, W, H);
-      tiles.forEach(function (t) { if (t.im) x.drawImage(t.im, t.x * 256 - ox, t.y * 256 - oy, 256, 256); });
-      try { x.getImageData(0, 0, 1, 1); } catch (e) { x.fillStyle = "#e8e2d4"; x.fillRect(0, 0, W, H); }
+      tiles.forEach(function (t) { if (t.r) x.drawImage(t.r.im, t.x * 256 - ox, t.y * 256 - oy, 256, 256); });
       var u = Math.max(1.5, W / 1000);
       var P = function (p) { return [wx(p.lon, z) - ox, wy(p.lat, z) - oy]; };
       x.lineJoin = "round"; x.lineCap = "round";
@@ -433,7 +465,7 @@
       }, "image/png");
     } catch (e) { alertErr(); }
   }
-  function alertErr() { $("#trk-err").textContent = "No se pudo generar la imagen. Prueba de nuevo cuando el mapa termine de cargar."; }
+  function alertErr(e) { $("#trk-err").textContent = e && e.message === "tiles" ? "No hemos podido descargar el mapa topográfico (el servidor de mapas no responde). Prueba de nuevo en unos minutos." : "No se pudo generar la imagen. Prueba de nuevo en unos segundos."; }
   function profileTo(ctx, A, x, y, w, h, k) {
     ctx.save(); ctx.fillStyle = C.card; ctx.fillRect(x, y, w, h);
     if (!A.hasEle) { ctx.fillStyle = C.muted; ctx.font = 16 * k + "px " + BODY; ctx.fillText("Este track no tiene altitudes.", x + 20 * k, y + h / 2); ctx.restore(); return; }
