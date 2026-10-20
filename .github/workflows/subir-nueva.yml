@@ -1,0 +1,48 @@
+# Sube automáticamente la web a www.guiasadastra.com/NUEVA/ cada vez que hay un cambio en "main".
+# Los datos FTP se guardan en GitHub > Settings > Secrets and variables > Actions (nadie más los ve):
+#   FTP_SERVER   p. ej. ftp.guiasadastra.com
+#   FTP_USER     usuario FTP
+#   FTP_PASSWORD contraseña FTP
+#   FTP_DIR      carpeta de destino, p. ej. /public_html/NUEVA/  (acaba en /)
+name: Subir a guiasadastra.com/NUEVA
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ftp-nueva
+  cancel-in-progress: false
+
+jobs:
+  subir:
+    runs-on: ubuntu-latest
+    env:
+      FTP_SERVER: ${{ secrets.FTP_SERVER }}
+    steps:
+      - name: Avisar si faltan los datos FTP
+        if: env.FTP_SERVER == ''
+        run: echo "::warning::Faltan los datos FTP en Settings > Secrets and variables > Actions. No se sube nada."
+
+      - uses: actions/checkout@v4
+        if: env.FTP_SERVER != ''
+
+      - uses: actions/setup-python@v5
+        if: env.FTP_SERVER != ''
+        with:
+          python-version: "3.12"
+
+      - name: Generar la versión para /NUEVA
+        if: env.FTP_SERVER != ''
+        run: BASE=/NUEVA python3 build.py
+
+      - name: Subir por FTP
+        if: env.FTP_SERVER != ''
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USER }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./dist-NUEVA/
+          server-dir: ${{ secrets.FTP_DIR }}
