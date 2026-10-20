@@ -332,8 +332,8 @@
     ctx.fillStyle = C.fg; ctx.font = "600 " + 15 * k + "px " + LAB; ctx.fillText(nf0.format(A.maxE) + " m", Math.min(Math.max(mx, L + 40 * k), R - 40 * k), Math.max(my - 16 * k, y + 12 * k));
     ctx.restore();
   }
-  function mapTo(ctx, x, y, w, h, A, withTiles) {
-    var el = $("#trk-map"), rc = el.getBoundingClientRect(), sx = w / rc.width, sy = h / rc.height;
+  function mapTo(ctx, x, y, w, h, A, withTiles, k) {
+    var el = $("#trk-map"), rc = el.getBoundingClientRect(), sx = w / rc.width, sy = h / rc.height, u = k || 2;
     ctx.save(); ctx.beginPath(); ctx.rect(x, y, w, h); ctx.clip(); ctx.fillStyle = "#e8e2d4"; ctx.fillRect(x, y, w, h);
     if (withTiles) $$(".leaflet-tile-loaded", el).forEach(function (t) {
       var r = t.getBoundingClientRect(); ctx.drawImage(t, x + (r.left - rc.left) * sx, y + (r.top - rc.top) * sy, r.width * sx, r.height * sy);
@@ -342,11 +342,11 @@
     ctx.lineJoin = "round"; ctx.lineCap = "round";
     [[C.bg, 7, .6], ["#f0b445", 4, 1]].forEach(function (s) {
       ctx.beginPath(); A.pts.forEach(function (p, i) { var c = pt(p); i ? ctx.lineTo(c[0], c[1]) : ctx.moveTo(c[0], c[1]); });
-      ctx.strokeStyle = s[0]; ctx.globalAlpha = s[2]; ctx.lineWidth = s[1] * sx; ctx.stroke(); ctx.globalAlpha = 1;
+      ctx.strokeStyle = s[0]; ctx.globalAlpha = s[2]; ctx.lineWidth = s[1] * u; ctx.stroke(); ctx.globalAlpha = 1;
     });
-    [[A.pts[0], "#5cb87a"], [A.pts[A.pts.length - 1], "#c9533b"]].forEach(function (m) { var c = pt(m[0]); ctx.beginPath(); ctx.arc(c[0], c[1], 7 * sx, 0, 7); ctx.fillStyle = m[1]; ctx.fill(); ctx.lineWidth = 2 * sx; ctx.strokeStyle = C.bg; ctx.stroke(); });
-    var at = "© OpenStreetMap · © OpenTopoMap"; ctx.font = 12 * sx + "px " + BODY; var tw = ctx.measureText(at).width;
-    ctx.fillStyle = "rgba(255,255,255,.8)"; ctx.fillRect(x + w - tw - 14 * sx, y + h - 20 * sx, tw + 14 * sx, 20 * sx); ctx.fillStyle = "#333"; ctx.textBaseline = "middle"; ctx.textAlign = "left"; ctx.fillText(at, x + w - tw - 7 * sx, y + h - 10 * sx);
+    [[A.pts[0], "#5cb87a"], [A.pts[A.pts.length - 1], "#c9533b"]].forEach(function (m) { var c = pt(m[0]); ctx.beginPath(); ctx.arc(c[0], c[1], 7 * u, 0, 7); ctx.fillStyle = m[1]; ctx.fill(); ctx.lineWidth = 2 * u; ctx.strokeStyle = C.bg; ctx.stroke(); });
+    var at = "© OpenStreetMap · © OpenTopoMap"; ctx.font = 12 * u + "px " + BODY; var tw = ctx.measureText(at).width;
+    ctx.fillStyle = "rgba(255,255,255,.8)"; ctx.fillRect(x + w - tw - 14 * u, y + h - 20 * u, tw + 14 * u, 20 * u); ctx.fillStyle = "#333"; ctx.textBaseline = "middle"; ctx.textAlign = "left"; ctx.fillText(at, x + w - tw - 7 * u, y + h - 10 * u);
     ctx.restore();
   }
   function fit(ctx, text, maxW, size, minSize, family) {
@@ -375,12 +375,13 @@
   function dlMap() {
     var A = lastTrack; if (!A || !map) return;
     var rc = $("#trk-map").getBoundingClientRect(), k = 2;
-    save(tryCanvas(function (tiles) { var c = document.createElement("canvas"); c.width = rc.width * k; c.height = rc.height * k; mapTo(c.getContext("2d"), 0, 0, c.width, c.height, A, tiles); return c; }), slug(A.name) + "-mapa.png");
+    save(tryCanvas(function (tiles) { var c = document.createElement("canvas"); c.width = rc.width * k; c.height = rc.height * k; mapTo(c.getContext("2d"), 0, 0, c.width, c.height, A, tiles, k); return c; }), slug(A.name) + "-mapa.png");
   }
   function dlFicha() {
     var A = lastTrack; if (!A) return;
     fonts().then(function () {
-      var k = 2, W = 1200 * k, hasMap = map && !$("#trk-map").hidden, mapH = hasMap ? Math.round(W * 0.5) : 0, H = (300 + 400) * k + mapH + (hasMap ? 24 * k : 0) + 70 * k;
+      var k = 2, W = 1200 * k, hasMap = map && !$("#trk-map").hidden, mrc = $("#trk-map").getBoundingClientRect();
+      var mapW = hasMap ? Math.min(W - 64 * k, mrc.width * 3) : 0, mapH = hasMap ? Math.round(mapW * mrc.height / mrc.width) : 0, H = (300 + 400) * k + mapH + (hasMap ? 24 * k : 0) + 70 * k;
       save(tryCanvas(function (tiles) {
         var c = document.createElement("canvas"); c.width = W; c.height = H; var x = c.getContext("2d");
         x.fillStyle = C.bg; x.fillRect(0, 0, W, H);
@@ -401,7 +402,7 @@
         var py = y0 + 2 * ch + 18 * k;
         profileTo(x, A, 32 * k, py, W - 64 * k, 380 * k, k);
         var my = py + 380 * k + 24 * k;
-        if (hasMap) mapTo(x, 32 * k, my, W - 64 * k, mapH, A, tiles);
+        if (hasMap) mapTo(x, (W - mapW) / 2, my, mapW, mapH, A, tiles, k);
         x.textBaseline = "alphabetic"; x.fillStyle = C.gold; x.font = "600 " + 16 * k + "px " + LAB; x.textAlign = "right"; x.fillText("GUIASADASTRA.COM", W - 32 * k, H - 30 * k);
         var uw = x.measureText("GUIASADASTRA.COM").width; x.textAlign = "left"; x.fillStyle = C.dim;
         x.fillText(fit(x, "Duración estimada. " + methodText(A.calc.p) + stopsText(A.calc.p, true) + ". Orientativo: depende del terreno, la meteo y el grupo.", W - 64 * k - uw - 30 * k, 14 * k, 10 * k, BODY), 32 * k, H - 30 * k);
