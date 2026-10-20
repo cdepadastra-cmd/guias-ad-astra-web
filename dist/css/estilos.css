@@ -392,3 +392,7 @@ details.adv[open] summary{margin-bottom:14px}
 @media (max-width:640px){.trk-stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .dl-row{display:grid;gap:10px;padding-top:6px;border-top:1px solid var(--line)}
 #trk-status{padding:14px 16px;border:1px solid var(--line-2);border-radius:var(--r);background:var(--card);color:var(--fg)}
+.prof-svg .pin line{stroke:var(--gold);stroke-width:1.5;stroke-dasharray:4 3}
+.prof-svg .pin circle{fill:#f3e9df;stroke:#160d09;stroke-width:3}
+.leaflet-tooltip.pin-tip{background:#160d09;color:#f3e9df;border:1px solid #e9a53b;font:600 13px var(--label);letter-spacing:.04em;padding:5px 9px;box-shadow:0 4px 14px rgba(0,0,0,.35)}
+.leaflet-tooltip.pin-tip::before{border-top-color:#e9a53b}

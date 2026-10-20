@@ -174,7 +174,7 @@
     var raw = range / n, pow = Math.pow(10, Math.floor(Math.log10(raw))), f = raw / pow;
     return (f < 1.5 ? 1 : f < 3 ? 2 : f < 7 ? 5 : 10) * pow;
   }
-  function drawProfile(A, box, onHover) {
+  function drawProfile(A, box, onHover, onPin) {
     if (!A.hasEle) { box.innerHTML = '<p class="muted">Este track no tiene altitudes, así que no podemos dibujar el perfil. Puedes usar el desnivel de la ficha de la ruta en la calculadora de arriba.</p>'; return; }
     var W = 1000, H = 300, L = 54, R = 16, T = 16, B = 34;
     var kmMax = A.km, eMin = A.minE, eMax = A.maxE, pad = Math.max(20, (eMax - eMin) * 0.08);
@@ -194,29 +194,56 @@
       '<g class="grid">' + grid + "</g>" + '<path d="' + area + '" fill="url(#pg)"/><path d="' + line + '" fill="none" stroke="#f0b445" stroke-width="2.2" stroke-linejoin="round"/>' +
       '<circle cx="' + mx + '" cy="' + my + '" r="5" fill="#f3e9df" stroke="#160d09" stroke-width="2"/><text class="peak" x="' + Math.min(Math.max(mx, L + 40), W - R - 40) + '" y="' + Math.max(my - 12, 12) + '" text-anchor="middle">' + nf0.format(eMax) + " m</text>" +
       '<g class="axis">' + lab + '<text x="' + (W - R) + '" y="' + (H - 10) + '" text-anchor="end" class="unit"> km</text></g>' +
+      '<g class="pin" visibility="hidden"><line y1="' + T + '" y2="' + (H - B) + '"/><circle r="7"/></g>' +
       '<g class="hover" visibility="hidden"><line y1="' + T + '" y2="' + (H - B) + '"/><circle r="5"/></g>' +
       '<rect class="hit" x="' + L + '" y="' + T + '" width="' + (W - L - R) + '" height="' + (H - T - B) + '" fill="transparent"/></svg>' +
       '<div class="prof-tip" hidden></div>';
-    var svg = $("svg", box), hv = $(".hover", svg), tip = $(".prof-tip", box), hit = $(".hit", svg);
-    function move(ev) {
-      var rc = svg.getBoundingClientRect(), cx = ((ev.touches ? ev.touches[0].clientX : ev.clientX) - rc.left) / rc.width * W;
-      var km = Math.max(0, Math.min(kmMax, (cx - L) / (W - L - R) * kmMax)), m = km * 1000;
-      var lo = 0, hi = n - 1; while (hi - lo > 1) { var mid = (lo + hi) >> 1; if (A.dist[mid] < m) lo = mid; else hi = mid; }
-      var e = A.ele[hi], px = X(A.dist[hi] / 1000), py = Y(e);
-      hv.setAttribute("visibility", "visible"); $("line", hv).setAttribute("x1", px); $("line", hv).setAttribute("x2", px); $("circle", hv).setAttribute("cx", px); $("circle", hv).setAttribute("cy", py);
-      var back = Math.max(0, hi - 1); while (back > 0 && A.dist[hi] - A.dist[back] < 100) back--;
-      var sl = A.dist[hi] - A.dist[back] > 20 ? (A.ele[hi] - A.ele[back]) / (A.dist[hi] - A.dist[back]) * 100 : 0;
-      tip.hidden = false; tip.style.left = (px / W * 100) + "%";
-      tip.innerHTML = "<b>km " + nf1.format(A.dist[hi] / 1000) + "</b> · " + nf0.format(e) + " m · " + (sl >= 0 ? "+" : "") + nf0.format(sl) + " %";
-      onHover && onHover(hi);
+    var svg = $("svg", box), hv = $(".hover", svg), pg = $(".pin", svg), tip = $(".prof-tip", box), hit = $(".hit", svg), pinned = -1;
+    function place(g, i) {
+      var px = X(A.dist[i] / 1000), py = Y(A.ele[i]);
+      g.setAttribute("visibility", "visible"); $("line", g).setAttribute("x1", px); $("line", g).setAttribute("x2", px); $("circle", g).setAttribute("cx", px); $("circle", g).setAttribute("cy", py);
+      return px;
     }
-    hit.addEventListener("mousemove", move); hit.addEventListener("touchmove", function (e) { move(e); }, { passive: true });
-    hit.addEventListener("mouseleave", function () { hv.setAttribute("visibility", "hidden"); tip.hidden = true; onHover && onHover(-1); });
+    function showTip(i) {
+      var px = X(A.dist[i] / 1000);
+      tip.hidden = false; tip.style.left = (px / W * 100) + "%";
+      tip.innerHTML = (pinned === i ? "Fijado · " : "") + pointInfo(A, i, true);
+    }
+    function idxAt(ev) {
+      var t = ev.touches ? ev.touches[0] : (ev.changedTouches ? ev.changedTouches[0] : ev);
+      var rc = svg.getBoundingClientRect(), cx = (t.clientX - rc.left) / rc.width * W;
+      var m = Math.max(0, Math.min(kmMax, (cx - L) / (W - L - R) * kmMax)) * 1000;
+      var lo = 0, hi = n - 1; while (hi - lo > 1) { var mid = (lo + hi) >> 1; if (A.dist[mid] < m) lo = mid; else hi = mid; }
+      return hi;
+    }
+    var ctl = {
+      hover: function (i) { // i < 0 oculta
+        if (i < 0) { hv.setAttribute("visibility", "hidden"); if (pinned >= 0) showTip(pinned); else tip.hidden = true; return; }
+        place(hv, i); showTip(i);
+      },
+      pin: function (i) {
+        pinned = i;
+        if (i < 0) { pg.setAttribute("visibility", "hidden"); tip.hidden = true; return; }
+        place(pg, i); showTip(i);
+      }
+    };
+    hit.addEventListener("mousemove", function (e) { var i = idxAt(e); ctl.hover(i); onHover && onHover(i); });
+    hit.addEventListener("touchmove", function (e) { var i = idxAt(e); ctl.hover(i); onHover && onHover(i); }, { passive: true });
+    hit.addEventListener("mouseleave", function () { ctl.hover(-1); onHover && onHover(-1); });
+    hit.addEventListener("click", function (e) { var i = idxAt(e); ctl.pin(i); onPin && onPin(i); });
+    hit.style.cursor = "crosshair";
+    return ctl;
+  }
+  function pointInfo(A, i, html) {
+    var back = Math.max(0, i - 1); while (back > 0 && A.dist[i] - A.dist[back] < 100) back--;
+    var sl = A.hasEle && A.dist[i] - A.dist[back] > 20 ? (A.ele[i] - A.ele[back]) / (A.dist[i] - A.dist[back]) * 100 : 0;
+    var km = "km " + nf1.format(A.dist[i] / 1000);
+    return (html ? "<b>" + km + "</b>" : km) + (A.hasEle ? " · " + nf0.format(A.ele[i]) + " m · " + (sl >= 0 ? "+" : "") + nf0.format(sl) + " %" : "");
   }
 
   /* ---------- mapa (Leaflet si está disponible) ---------- */
-  var map, layer, marker;
-  function drawMap(A) {
+  var map, layer, marker, pinMk, near = null;
+  function drawMap(A, prof) {
     var el = $("#trk-map");
     if (!window.L) { el.hidden = true; return; }
     el.hidden = false;
@@ -224,7 +251,7 @@
       map = L.map(el, { scrollWheelZoom: false });
       L.tileLayer("https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png", { maxZoom: 17, crossOrigin: "anonymous", attribution: "© OpenStreetMap · © OpenTopoMap" }).addTo(map);
     }
-    if (layer) layer.remove(); if (marker) marker.remove();
+    if (layer) layer.remove(); if (marker) marker.remove(); if (pinMk) { pinMk.remove(); pinMk = null; }
     var ll = A.pts.map(function (p) { return [p.lat, p.lon]; });
     map.invalidateSize();
     map.fitBounds(L.latLngBounds(ll), { padding: [24, 24], animate: false });
@@ -234,8 +261,45 @@
       L.circleMarker(ll[0], { radius: 7, color: "#160d09", weight: 2, fillColor: "#5cb87a", fillOpacity: 1 }).bindTooltip("Salida"),
       L.circleMarker(ll[ll.length - 1], { radius: 7, color: "#160d09", weight: 2, fillColor: "#c9533b", fillOpacity: 1 }).bindTooltip("Llegada")
     ]).addTo(map);
-    marker = L.circleMarker(ll[0], { radius: 6, color: "#fff", weight: 2, fillColor: "#e9a53b", opacity: 0, fillOpacity: 0 }).addTo(map);
+    marker = L.circleMarker(ll[0], { radius: 6, color: "#fff", weight: 2, fillColor: "#e9a53b", opacity: 0, fillOpacity: 0, interactive: false }).addTo(map);
     setTimeout(function () { map.invalidateSize(); map.fitBounds(L.latLngBounds(ll), { padding: [24, 24], animate: false }); }, 60);
+    // del mapa al perfil: el punto del track más cercano al cursor (máx. 30 px)
+    var step = Math.max(1, Math.floor(A.pts.length / 4000));
+    near = function (latlng) {
+      var c = map.latLngToContainerPoint(latlng), best = -1, bd = 900;
+      for (var i = 0; i < A.pts.length; i += step) {
+        var q = map.latLngToContainerPoint([A.pts[i].lat, A.pts[i].lon]), d = (q.x - c.x) * (q.x - c.x) + (q.y - c.y) * (q.y - c.y);
+        if (d < bd) { bd = d; best = i; }
+      }
+      return best;
+    };
+    var raf = 0;
+    map.off("mousemove mouseout click");
+    map.on("mousemove", function (e) {
+      if (raf) return;
+      raf = requestAnimationFrame(function () {
+        raf = 0; var i = near(e.latlng);
+        mapHover(A, i); prof && prof.hover(i);
+        el.style.cursor = i >= 0 ? "crosshair" : "";
+      });
+    });
+    map.on("mouseout", function () { mapHover(A, -1); prof && prof.hover(-1); });
+    map.on("click", function (e) { var i = near(e.latlng); if (i >= 0) { setPin(A, i); prof && prof.pin(i); } });
+  }
+  function mapHover(A, i) {
+    if (!marker) return;
+    if (i < 0) { marker.setStyle({ opacity: 0, fillOpacity: 0 }); return; }
+    marker.setLatLng([A.pts[i].lat, A.pts[i].lon]); marker.setStyle({ opacity: 1, fillOpacity: 1 });
+  }
+  function setPin(A, i) {
+    var btn = $("#trk-unpin"); A.pin = i;
+    if (i < 0) { if (pinMk) { pinMk.remove(); pinMk = null; } if (btn) btn.hidden = true; return; }
+    if (btn) btn.hidden = false;
+    if (!map) return;
+    var ll = [A.pts[i].lat, A.pts[i].lon], txt = pointInfo(A, i, false);
+    if (!pinMk) pinMk = L.circleMarker(ll, { radius: 9, color: "#160d09", weight: 3, fillColor: "#f3e9df", fillOpacity: 1, interactive: false }).addTo(map);
+    pinMk.setLatLng(ll); pinMk.unbindTooltip(); pinMk.bindTooltip(txt, { permanent: true, direction: "top", offset: [0, -10], className: "pin-tip" }).openTooltip();
+    if (!map.getBounds().pad(-0.05).contains(ll)) map.panTo(ll);
   }
 
   /* ---------- mostrar análisis ---------- */
@@ -263,12 +327,11 @@
     var n = stats.length; $("#trk-stats").style.setProperty("--cols", n % 5 === 0 ? 5 : n % 4 === 0 ? 4 : 3);
     $("#trk-stats").innerHTML = stats.map(function (s) { return "<div><dt>" + s[0] + "</dt><dd>" + s[1] + "</dd></div>"; }).join("");
     $("#trk-note").textContent = (A.dem ? "Altitudes calculadas con el modelo digital del terreno (precisión aproximada ±10 m). " : "") + "Duración calculada por tramos de 250 m. " + methodText(p) + stopsText(p, true) + ". Esfuerzo MIDE " + d[0] + ": " + d[1].toLowerCase();
-    drawProfile(A, $("#trk-prof"), function (i) {
-      if (!marker) return;
-      if (i < 0) { marker.setStyle({ opacity: 0, fillOpacity: 0 }); return; }
-      marker.setLatLng([A.pts[i].lat, A.pts[i].lon]); marker.setStyle({ opacity: 1, fillOpacity: 1 });
-    });
-    drawMap(A);
+    var prof = drawProfile(A, $("#trk-prof"), function (i) { mapHover(A, i); }, function (i) { setPin(A, i); });
+    drawMap(A, prof);
+    setPin(A, -1);
+    var ub = $("#trk-unpin");
+    if (ub) ub.onclick = function () { setPin(A, -1); prof && prof.pin(-1); };
   }
   /* ---------- mosaicos (Web Mercator) ---------- */
   function wx(lon, z) { return (lon + 180) / 360 * 256 * Math.pow(2, z); }
@@ -349,6 +412,7 @@
       };
       var a = A.pts[0], e = A.pts[A.pts.length - 1];
       if (A.loop) flag(a, "#5cb87a", "SALIDA Y LLEGADA"); else { flag(e, "#c9533b", "LLEGADA"); flag(a, "#5cb87a", "SALIDA"); }
+      if (A.pin >= 0) flag(A.pts[A.pin], "#f3e9df", pointInfo(A, A.pin, false));
       var at = "© OpenStreetMap · © OpenTopoMap (CC-BY-SA)"; x.font = 11 * u + "px " + BODY; var aw = x.measureText(at).width;
       x.fillStyle = "rgba(255,255,255,.85)"; x.fillRect(W - aw - 12 * u, H - 18 * u, aw + 12 * u, 18 * u); x.fillStyle = "#333"; x.textBaseline = "middle"; x.fillText(at, W - aw - 6 * u, H - 9 * u);
       return c;
@@ -390,6 +454,13 @@
     ctx.lineTo(X(A.km), B); ctx.lineTo(X(0), B); ctx.closePath();
     var g = ctx.createLinearGradient(0, T, 0, B); g.addColorStop(0, "rgba(233,165,59,.55)"); g.addColorStop(1, "rgba(217,102,31,.05)"); ctx.fillStyle = g; ctx.fill();
     ctx.strokeStyle = "#f0b445"; ctx.lineWidth = 2.5 * k; ctx.lineJoin = "round"; ctx.stroke(line);
+    if (A.pin >= 0) {
+      var qx = X(A.dist[A.pin] / 1000), qy = Y(A.ele[A.pin]);
+      ctx.save(); ctx.setLineDash([4 * k, 3 * k]); ctx.strokeStyle = C.gold; ctx.lineWidth = 1.5 * k; ctx.beginPath(); ctx.moveTo(qx, T); ctx.lineTo(qx, B); ctx.stroke(); ctx.restore();
+      ctx.beginPath(); ctx.arc(qx, qy, 7 * k, 0, 7); ctx.fillStyle = C.fg; ctx.fill(); ctx.lineWidth = 3 * k; ctx.strokeStyle = C.bg; ctx.stroke();
+      ctx.font = "600 " + 13 * k + "px " + LAB; var pl = pointInfo(A, A.pin, false), pw = ctx.measureText(pl).width, plx = Math.min(Math.max(qx - pw / 2 - 6 * k, L), R - pw - 12 * k);
+      ctx.fillStyle = C.bg; ctx.fillRect(plx, T - 24 * k, pw + 12 * k, 20 * k); ctx.fillStyle = C.fg; ctx.textAlign = "left"; ctx.textBaseline = "middle"; ctx.fillText(pl, plx + 6 * k, T - 14 * k); ctx.textAlign = "center";
+    }
     var mx = X(A.dist[A.maxI] / 1000), my = Y(A.ele[A.maxI]);
     ctx.beginPath(); ctx.arc(mx, my, 5 * k, 0, 7); ctx.fillStyle = C.fg; ctx.fill(); ctx.lineWidth = 2 * k; ctx.strokeStyle = C.bg; ctx.stroke();
     ctx.fillStyle = C.fg; ctx.font = "600 " + 15 * k + "px " + LAB; ctx.fillText(nf0.format(A.maxE) + " m", Math.min(Math.max(mx, L + 40 * k), R - 40 * k), Math.max(my - 16 * k, y + 12 * k));
