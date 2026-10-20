@@ -154,7 +154,7 @@
     }
     var t0 = p[0].t, t1 = p[p.length - 1].t, real = isFinite(t0) && isFinite(t1) && t1 > t0 ? (t1 - t0) / 3600e3 : 0;
     var loop = hav(p[0], p[p.length - 1]) < 250;
-    return { name: tr.name, pts: p, dist: dist, ele: sm, hasEle: hasEle, km: dist[dist.length - 1] / 1000, up: up, down: down, maxE: maxE, minE: minE, maxI: maxI, minI: minI, maxSlope: maxSlope, real: real, loop: loop, startT: t0 };
+    return { dem: !!tr.dem, name: tr.name, pts: p, dist: dist, ele: sm, hasEle: hasEle, km: dist[dist.length - 1] / 1000, up: up, down: down, maxE: maxE, minE: minE, maxI: maxI, minI: minI, maxSlope: maxSlope, real: real, loop: loop, startT: t0 };
   }
 
   /* tiempo MIDE por tramos de ~250 m (más preciso que con los totales) */
@@ -218,9 +218,7 @@
   var map, layer, marker;
   function drawMap(A) {
     var el = $("#trk-map");
-    var mb = $("[data-dl=mapa]");
-    if (!window.L) { el.hidden = true; if (mb) mb.hidden = true; return; }
-    if (mb) mb.hidden = false;
+    if (!window.L) { el.hidden = true; return; }
     el.hidden = false;
     if (!map) {
       map = L.map(el, { scrollWheelZoom: false });
@@ -264,7 +262,7 @@
     if (A.real) stats.push(["Tiempo real del track", hm(A.real)]);
     var n = stats.length; $("#trk-stats").style.setProperty("--cols", n % 5 === 0 ? 5 : n % 4 === 0 ? 4 : 3);
     $("#trk-stats").innerHTML = stats.map(function (s) { return "<div><dt>" + s[0] + "</dt><dd>" + s[1] + "</dd></div>"; }).join("");
-    $("#trk-note").textContent = "Duración calculada por tramos de 250 m. " + methodText(p) + stopsText(p, true) + ". Esfuerzo MIDE " + d[0] + ": " + d[1].toLowerCase();
+    $("#trk-note").textContent = (A.dem ? "Altitudes calculadas con el modelo digital del terreno (precisión aproximada ±10 m). " : "") + "Duración calculada por tramos de 250 m. " + methodText(p) + stopsText(p, true) + ". Esfuerzo MIDE " + d[0] + ": " + d[1].toLowerCase();
     drawProfile(A, $("#trk-prof"), function (i) {
       if (!marker) return;
       if (i < 0) { marker.setStyle({ opacity: 0, fillOpacity: 0 }); return; }
@@ -272,6 +270,92 @@
     });
     drawMap(A);
   }
+  /* ---------- mosaicos (Web Mercator) ---------- */
+  function wx(lon, z) { return (lon + 180) / 360 * 256 * Math.pow(2, z); }
+  function wy(lat, z) { var r = lat * Math.PI / 180; return (1 - Math.log(Math.tan(r) + 1 / Math.cos(r)) / Math.PI) / 2 * 256 * Math.pow(2, z); }
+  var tileCache = {};
+  function loadTile(url) {
+    if (tileCache[url]) return tileCache[url];
+    tileCache[url] = new Promise(function (res) {
+      var im = new Image(), done = false; im.crossOrigin = "anonymous";
+      im.onload = function () { done = true; res(im); }; im.onerror = function () { done = true; res(null); };
+      setTimeout(function () { if (!done) res(null); }, 15000);
+      im.src = url;
+    });
+    return tileCache[url];
+  }
+
+  /* ---------- altitudes desde el modelo digital del terreno (AWS Terrain Tiles, Terrarium) ---------- */
+  function fillElevations(tr) {
+    var pts = tr.pts, z = 14, lat0 = pts[0].lat;
+    var minx = Infinity, maxx = -Infinity, miny = Infinity, maxy = -Infinity;
+    pts.forEach(function (p) { var x = wx(p.lon, z), y = wy(p.lat, z); minx = Math.min(minx, x); maxx = Math.max(maxx, x); miny = Math.min(miny, y); maxy = Math.max(maxy, y); });
+    while (z > 10 && (Math.floor(maxx / 256) - Math.floor(minx / 256) + 1) * (Math.floor(maxy / 256) - Math.floor(miny / 256) + 1) > 60) { z--; minx /= 2; maxx /= 2; miny /= 2; maxy /= 2; }
+    var need = {}, data = {};
+    pts.forEach(function (p) { var k = Math.floor(wx(p.lon, z) / 256) + "/" + Math.floor(wy(p.lat, z) / 256); need[k] = 1; });
+    return Promise.all(Object.keys(need).map(function (k) {
+      return loadTile("https://s3.amazonaws.com/elevation-tiles-prod/terrarium/" + z + "/" + k + ".png").then(function (im) {
+        if (!im) return;
+        var c = document.createElement("canvas"); c.width = c.height = 256; var x = c.getContext("2d"); x.drawImage(im, 0, 0);
+        data[k] = x.getImageData(0, 0, 256, 256).data;
+      });
+    })).then(function () {
+      var ok = 0;
+      pts.forEach(function (p) {
+        var gx = wx(p.lon, z), gy = wy(p.lat, z), k = Math.floor(gx / 256) + "/" + Math.floor(gy / 256), d = data[k];
+        if (!d) return;
+        var px = Math.min(255, Math.floor(gx % 256)), py = Math.min(255, Math.floor(gy % 256)), i = (py * 256 + px) * 4;
+        p.ele = d[i] * 256 + d[i + 1] + d[i + 2] / 256 - 32768; ok++;
+      });
+      if (ok < pts.length * 0.5) throw new Error("No hemos podido obtener las altitudes del terreno.");
+      tr.dem = true;
+      return tr;
+    });
+  }
+  function needsEle(tr) { return !tr.pts.some(function (p) { return isFinite(p.ele); }); }
+
+  /* ---------- mapa de alta resolución con toda la ruta ---------- */
+  function renderRouteMap(A, maxW, maxH) {
+    var b = { n: -90, s: 90, e: -180, w: 180 };
+    A.pts.forEach(function (p) { b.n = Math.max(b.n, p.lat); b.s = Math.min(b.s, p.lat); b.e = Math.max(b.e, p.lon); b.w = Math.min(b.w, p.lon); });
+    var z = 17, pad = 0.12, bw, bh;
+    for (; z > 3; z--) {
+      bw = wx(b.e, z) - wx(b.w, z); bh = wy(b.s, z) - wy(b.n, z);
+      if (bw * (1 + 2 * pad) <= maxW && bh * (1 + 2 * pad) <= maxH) break;
+    }
+    var W = Math.round(Math.max(bw * (1 + 2 * pad), maxW * 0.75)), H = Math.round(Math.max(bh * (1 + 2 * pad), Math.min(maxH, W * 0.6)));
+    W = Math.min(W, maxW); H = Math.min(H, maxH);
+    var cx = (wx(b.e, z) + wx(b.w, z)) / 2, cy = (wy(b.s, z) + wy(b.n, z)) / 2, ox = cx - W / 2, oy = cy - H / 2;
+    var tiles = [], sub = ["a", "b", "c"];
+    for (var tx = Math.floor(ox / 256); tx <= Math.floor((ox + W) / 256); tx++)
+      for (var ty = Math.floor(oy / 256); ty <= Math.floor((oy + H) / 256); ty++)
+        tiles.push({ x: tx, y: ty, url: "https://" + sub[(tx + ty) % 3] + ".tile.opentopomap.org/" + z + "/" + tx + "/" + ty + ".png" });
+    return Promise.all(tiles.map(function (t) { return loadTile(t.url).then(function (im) { t.im = im; }); })).then(function () {
+      var c = document.createElement("canvas"); c.width = W; c.height = H; var x = c.getContext("2d");
+      x.fillStyle = "#e8e2d4"; x.fillRect(0, 0, W, H);
+      tiles.forEach(function (t) { if (t.im) x.drawImage(t.im, t.x * 256 - ox, t.y * 256 - oy, 256, 256); });
+      try { x.getImageData(0, 0, 1, 1); } catch (e) { x.fillStyle = "#e8e2d4"; x.fillRect(0, 0, W, H); }
+      var u = Math.max(1.5, W / 1000);
+      var P = function (p) { return [wx(p.lon, z) - ox, wy(p.lat, z) - oy]; };
+      x.lineJoin = "round"; x.lineCap = "round";
+      [[C.bg, 7, .65], ["#f0b445", 4, 1]].forEach(function (st) {
+        x.beginPath(); A.pts.forEach(function (p, i) { var q = P(p); i ? x.lineTo(q[0], q[1]) : x.moveTo(q[0], q[1]); });
+        x.strokeStyle = st[0]; x.globalAlpha = st[2]; x.lineWidth = st[1] * u; x.stroke(); x.globalAlpha = 1;
+      });
+      var flag = function (p, col, txt) {
+        var q = P(p), r = 9 * u; x.beginPath(); x.arc(q[0], q[1], r, 0, 7); x.fillStyle = col; x.fill(); x.lineWidth = 2.5 * u; x.strokeStyle = "#fff"; x.stroke();
+        x.font = "600 " + 13 * u + "px " + LAB; var tw = x.measureText(txt).width, bx = Math.min(Math.max(q[0] - tw / 2 - 6 * u, 4), W - tw - 16 * u), by = q[1] - r - 26 * u < 4 ? q[1] + r + 6 * u : q[1] - r - 26 * u;
+        x.fillStyle = "rgba(22,13,9,.85)"; x.fillRect(bx, by, tw + 12 * u, 20 * u); x.fillStyle = "#fff"; x.textBaseline = "middle"; x.fillText(txt, bx + 6 * u, by + 10 * u);
+      };
+      var a = A.pts[0], e = A.pts[A.pts.length - 1];
+      if (A.loop) flag(a, "#5cb87a", "SALIDA Y LLEGADA"); else { flag(e, "#c9533b", "LLEGADA"); flag(a, "#5cb87a", "SALIDA"); }
+      var at = "© OpenStreetMap · © OpenTopoMap (CC-BY-SA)"; x.font = 11 * u + "px " + BODY; var aw = x.measureText(at).width;
+      x.fillStyle = "rgba(255,255,255,.85)"; x.fillRect(W - aw - 12 * u, H - 18 * u, aw + 12 * u, 18 * u); x.fillStyle = "#333"; x.textBaseline = "middle"; x.fillText(at, W - aw - 6 * u, H - 9 * u);
+      return c;
+    });
+  }
+  function busy(btn, on) { if (!btn) return; btn.disabled = on; if (on) { btn.dataset.t = btn.textContent; btn.textContent = "Generando…"; } else if (btn.dataset.t) btn.textContent = btn.dataset.t; }
+
   /* ---------- descargas (PNG) ---------- */
   var C = { bg: "#160d09", card: "#25170f", line: "#3a271b", fg: "#f3e9df", muted: "#b9a593", dim: "#8a7564", gold: "#e9a53b", orange: "#d9661f" };
   var DISP = '"Bebas Neue","Oswald","Arial Narrow",Impact,sans-serif', BODY = '"Barlow",system-ui,sans-serif', LAB = '"Barlow Condensed","Arial Narrow",sans-serif';
@@ -311,23 +395,6 @@
     ctx.fillStyle = C.fg; ctx.font = "600 " + 15 * k + "px " + LAB; ctx.fillText(nf0.format(A.maxE) + " m", Math.min(Math.max(mx, L + 40 * k), R - 40 * k), Math.max(my - 16 * k, y + 12 * k));
     ctx.restore();
   }
-  function mapTo(ctx, x, y, w, h, A, withTiles, k) {
-    var el = $("#trk-map"), rc = el.getBoundingClientRect(), sx = w / rc.width, sy = h / rc.height, u = k || 2;
-    ctx.save(); ctx.beginPath(); ctx.rect(x, y, w, h); ctx.clip(); ctx.fillStyle = "#e8e2d4"; ctx.fillRect(x, y, w, h);
-    if (withTiles) $$(".leaflet-tile-loaded", el).forEach(function (t) {
-      var r = t.getBoundingClientRect(); ctx.drawImage(t, x + (r.left - rc.left) * sx, y + (r.top - rc.top) * sy, r.width * sx, r.height * sy);
-    });
-    var pt = function (p) { var c = map.latLngToContainerPoint([p.lat, p.lon]); return [x + c.x * sx, y + c.y * sy]; };
-    ctx.lineJoin = "round"; ctx.lineCap = "round";
-    [[C.bg, 7, .6], ["#f0b445", 4, 1]].forEach(function (s) {
-      ctx.beginPath(); A.pts.forEach(function (p, i) { var c = pt(p); i ? ctx.lineTo(c[0], c[1]) : ctx.moveTo(c[0], c[1]); });
-      ctx.strokeStyle = s[0]; ctx.globalAlpha = s[2]; ctx.lineWidth = s[1] * u; ctx.stroke(); ctx.globalAlpha = 1;
-    });
-    [[A.pts[0], "#5cb87a"], [A.pts[A.pts.length - 1], "#c9533b"]].forEach(function (m) { var c = pt(m[0]); ctx.beginPath(); ctx.arc(c[0], c[1], 7 * u, 0, 7); ctx.fillStyle = m[1]; ctx.fill(); ctx.lineWidth = 2 * u; ctx.strokeStyle = C.bg; ctx.stroke(); });
-    var at = "© OpenStreetMap · © OpenTopoMap"; ctx.font = 12 * u + "px " + BODY; var tw = ctx.measureText(at).width;
-    ctx.fillStyle = "rgba(255,255,255,.8)"; ctx.fillRect(x + w - tw - 14 * u, y + h - 20 * u, tw + 14 * u, 20 * u); ctx.fillStyle = "#333"; ctx.textBaseline = "middle"; ctx.textAlign = "left"; ctx.fillText(at, x + w - tw - 7 * u, y + h - 10 * u);
-    ctx.restore();
-  }
   function fit(ctx, text, maxW, size, minSize, family) {
     var sz = size; ctx.font = sz + "px " + family;
     while (ctx.measureText(text).width > maxW && sz > minSize) { sz -= 2; ctx.font = sz + "px " + family; }
@@ -341,6 +408,7 @@
   function fonts() { return document.fonts && document.fonts.load ? Promise.all([document.fonts.load("40px 'Bebas Neue'"), document.fonts.load("16px Barlow"), document.fonts.load("600 14px 'Barlow Condensed'")]).catch(function () {}) : Promise.resolve(); }
   function dlProfile() {
     var A = lastTrack; if (!A) return;
+    if (!A.hasEle) { $("#trk-err").textContent = "Este track no tiene altitudes."; return; }
     fonts().then(function () {
       var k = 2, W = 1200 * k, H = 420 * k, c = document.createElement("canvas"); c.width = W; c.height = H; var x = c.getContext("2d");
       x.fillStyle = C.bg; x.fillRect(0, 0, W, H);
@@ -351,17 +419,18 @@
       save(c, slug(A.name) + "-perfil.png");
     });
   }
-  function dlMap() {
-    var A = lastTrack; if (!A || !map) return;
-    var rc = $("#trk-map").getBoundingClientRect(), k = 2;
-    save(tryCanvas(function (tiles) { var c = document.createElement("canvas"); c.width = rc.width * k; c.height = rc.height * k; mapTo(c.getContext("2d"), 0, 0, c.width, c.height, A, tiles, k); return c; }), slug(A.name) + "-mapa.png");
-  }
-  function dlFicha() {
+  function dlMap(btn) {
     var A = lastTrack; if (!A) return;
-    fonts().then(function () {
-      var k = 2, W = 1200 * k, hasMap = map && !$("#trk-map").hidden, mrc = $("#trk-map").getBoundingClientRect();
-      var mapW = hasMap ? Math.min(W - 64 * k, mrc.width * 3) : 0, mapH = hasMap ? Math.round(mapW * mrc.height / mrc.width) : 0, H = (300 + 400) * k + mapH + (hasMap ? 24 * k : 0) + 70 * k;
-      save(tryCanvas(function (tiles) {
+    busy(btn, true);
+    renderRouteMap(A, 2400, 1800).then(function (c) { save(c, slug(A.name) + "-mapa.png"); }).catch(alertErr).then(function () { busy(btn, false); });
+  }
+  function dlFicha(btn) {
+    var A = lastTrack; if (!A) return;
+    busy(btn, true);
+    Promise.all([fonts(), renderRouteMap(A, 2400 - 128, 1500).catch(function () { return null; })]).then(function (r) {
+      var mc = r[1], k = 2, W = 1200 * k, hasMap = !!mc;
+      var mapW = hasMap ? W - 64 * k : 0, mapH = hasMap ? Math.round(mapW * mc.height / mc.width) : 0, H = (300 + 400) * k + mapH + (hasMap ? 24 * k : 0) + 70 * k;
+      save(tryCanvas(function () {
         var c = document.createElement("canvas"); c.width = W; c.height = H; var x = c.getContext("2d");
         x.fillStyle = C.bg; x.fillRect(0, 0, W, H);
         var gr = x.createLinearGradient(0, 0, W, 0); gr.addColorStop(0, "#f0b445"); gr.addColorStop(1, "#d9661f"); x.fillStyle = gr; x.fillRect(0, 0, W, 8 * k);
@@ -381,24 +450,34 @@
         var py = y0 + 2 * ch + 18 * k;
         profileTo(x, A, 32 * k, py, W - 64 * k, 380 * k, k);
         var my = py + 380 * k + 24 * k;
-        if (hasMap) mapTo(x, (W - mapW) / 2, my, mapW, mapH, A, tiles, k);
+        if (hasMap) x.drawImage(mc, 32 * k, my, mapW, mapH);
         x.textBaseline = "alphabetic"; x.fillStyle = C.gold; x.font = "600 " + 16 * k + "px " + LAB; x.textAlign = "right"; x.fillText("GUIASADASTRA.COM", W - 32 * k, H - 30 * k);
         var uw = x.measureText("GUIASADASTRA.COM").width; x.textAlign = "left"; x.fillStyle = C.dim;
         x.fillText(fit(x, "Duración estimada. " + methodText(A.calc.p) + stopsText(A.calc.p, true) + ". Orientativo: depende del terreno, la meteo y el grupo.", W - 64 * k - uw - 30 * k, 14 * k, 10 * k, BODY), 32 * k, H - 30 * k);
         return c;
       }), slug(A.name) + "-ficha.png");
-    });
+    }).catch(alertErr).then(function () { busy(btn, false); });
   }
-  $$("[data-dl]").forEach(function (b) { b.addEventListener("click", function () { $("#trk-err").textContent = ""; ({ perfil: dlProfile, mapa: dlMap, ficha: dlFicha })[b.dataset.dl](); }); });
+  $$("[data-dl]").forEach(function (b) { b.addEventListener("click", function () { $("#trk-err").textContent = ""; ({ perfil: dlProfile, mapa: dlMap, ficha: dlFicha })[b.dataset.dl](b); }); });
 
+  function process(tr) {
+    var err = $("#trk-err"), st = $("#trk-status");
+    var go = function () { showTrack(analyse(tr)); $("#trk-res").scrollIntoView({ behavior: "smooth", block: "start" }); };
+    if (!needsEle(tr)) return go();
+    st.hidden = false; st.textContent = "Este track no trae altitudes. Las estamos calculando con el modelo digital del terreno…";
+    fillElevations(tr).then(function () { st.hidden = true; go(); })
+      .catch(function () { st.hidden = true; err.textContent = "No hemos podido calcular las altitudes del terreno (¿sin conexión?). Mostramos el recorrido sin perfil."; go(); });
+  }
   function loadFile(file) {
     var err = $("#trk-err"); err.textContent = "";
     if (!file) return;
     if (file.size > 25 * 1024 * 1024) { err.textContent = "El archivo es demasiado grande (máximo 25 MB)."; return; }
     var rd = new FileReader();
     rd.onload = function () {
-      try { showTrack(analyse(parseTrack(String(rd.result), file.name))); $("#trk-res").scrollIntoView({ behavior: "smooth", block: "start" }); }
-      catch (e) { err.textContent = e.message + " Prueba a exportarlo de nuevo en formato GPX desde Wikiloc, Strava, Garmin o tu app."; }
+      var tr;
+      try { tr = parseTrack(String(rd.result), file.name); }
+      catch (e) { err.textContent = e.message + " Prueba a exportarlo de nuevo en formato GPX desde Wikiloc, Strava, Garmin o tu app."; return; }
+      process(tr);
     };
     rd.onerror = function () { err.textContent = "No hemos podido leer el archivo."; };
     rd.readAsText(file);
@@ -411,7 +490,7 @@
     drop.addEventListener("drop", function (e) { loadFile(e.dataTransfer.files[0]); });
     var demo = $("#trk-demo");
     if (demo) demo.addEventListener("click", function () {
-      fetch(demo.dataset.src).then(function (r) { return r.text(); }).then(function (t) { showTrack(analyse(parseTrack(t, "ejemplo.gpx"))); $("#trk-res").scrollIntoView({ behavior: "smooth", block: "start" }); })
+      fetch(demo.dataset.src).then(function (r) { return r.text(); }).then(function (t) { process(parseTrack(t, "ejemplo.gpx")); })
         .catch(function () { $("#trk-err").textContent = "No se pudo cargar el ejemplo."; });
     });
   }
