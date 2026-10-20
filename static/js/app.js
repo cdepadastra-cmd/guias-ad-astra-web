@@ -20,6 +20,8 @@
     if (!w) location.href = url;
     return url;
   }
+  var EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+  function telOK(t) { return t.replace(/\D/g, "").length >= 9; }
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
 
   /* ---------------- menú */
@@ -74,16 +76,24 @@
     f.addEventListener("submit", function (e) {
       e.preventDefault();
       var err = $(".err", f); if (err) err.textContent = "";
-      var nombre = ($("input[name=nombre]", f) || {}).value || "";
+      var val = function (n) { var i = $("[name=" + n + "]", f); return i ? i.value.trim() : ""; };
+      var fail = function (n, m) { if (err) err.textContent = m; var i = $("[name=" + n + "]", f); if (i) i.focus(); };
+      var nombre = val("nombre"), full = f.hasAttribute("data-full");
       if (date && !date.value) { if (err) err.textContent = "Elige el día que quieres hacer la actividad."; date.focus(); return; }
-      if (!nombre.trim()) { if (err) err.textContent = "Escribe tu nombre para que sepamos quién reserva."; $("input[name=nombre]", f).focus(); return; }
-      var lines = ["Hola, quiero reservar en Guías Ad Astra:", "", "• Actividad: " + title];
+      if (!nombre) return fail("nombre", "Escribe tu nombre.");
+      if (full) {
+        if (!val("apellidos")) return fail("apellidos", "Escribe tus apellidos.");
+        if (!EMAIL.test(val("email"))) return fail("email", "Revisa el correo electrónico (ejemplo: nombre@gmail.com).");
+        if (!telOK(val("telefono"))) return fail("telefono", "Revisa el número de teléfono (9 cifras).");
+      }
+      var lines = ["Hola, quiero reservar en Guías Ad Astra:", "", (f.hasAttribute("data-full") ? "• Curso: " : "• Actividad: ") + title];
       if (sel) lines.push("• Opción: " + sel.value);
       if (date) lines.push("• Fecha: " + fmtLong(date.value));
       var alt = $("input[name=fecha2]", f); if (alt && alt.value) lines.push("• Fecha alternativa: " + fmtLong(alt.value));
       lines.push("• Personas: " + pers);
       if (price()) lines.push("• Total estimado: " + eur(price() * pers) + " (" + eur(price()) + "/persona)");
-      lines.push("• Nombre: " + nombre.trim());
+      lines.push("• Nombre: " + nombre + (full ? " " + val("apellidos") : ""));
+      if (full) { lines.push("• Email: " + val("email")); lines.push("• Teléfono: " + val("telefono")); }
       var com = $("textarea", f); if (com && com.value.trim()) lines.push("• Comentarios: " + com.value.trim());
       lines.push("", "¿Tenéis disponibilidad?");
       openWA(lines.join("\n"));
@@ -180,7 +190,8 @@
   dlg.innerHTML = '<form class="dlg" method="dialog" id="ev-form"><div class="dlg-head"><div><p class="eyebrow" id="ev-type"></p><h2 id="ev-title"></h2></div><button type="button" class="icon-btn" data-x aria-label="Cerrar">×</button></div>' +
     '<p class="muted" id="ev-when"></p><div id="ev-seats"></div>' +
     '<div class="field"><label for="ev-pers">Plazas que quieres reservar</label><div class="stepper"><button type="button" data-step="-1" aria-label="Menos">−</button><input id="ev-pers" type="number" min="1" max="10" value="1" inputmode="numeric"><button type="button" data-step="1" aria-label="Más">+</button></div></div>' +
-    '<div class="row2"><div class="field"><label for="ev-nombre">Nombre</label><input id="ev-nombre" autocomplete="name" required></div><div class="field"><label for="ev-tel">Teléfono</label><input id="ev-tel" type="tel" autocomplete="tel" required></div></div>' +
+    '<div class="row2"><div class="field"><label for="ev-nombre">Nombre</label><input id="ev-nombre" autocomplete="given-name" required></div><div class="field" data-curso><label for="ev-ape">Apellidos</label><input id="ev-ape" autocomplete="family-name"></div></div>' +
+    '<div class="row2"><div class="field" data-curso><label for="ev-email">Correo electrónico</label><input id="ev-email" type="email" autocomplete="email" inputmode="email"></div><div class="field"><label for="ev-tel">Teléfono</label><input id="ev-tel" type="tel" autocomplete="tel" inputmode="tel" required></div></div>' +
     '<div class="total"><span class="label">Total</span><strong id="ev-total"></strong></div>' +
     '<p class="err" id="ev-err"></p><div id="ev-done" hidden></div>' +
     '<button class="btn btn-wa btn-block" id="ev-send" type="submit">' + waIcon() + " Reservar y enviar por WhatsApp</button>" +
@@ -196,16 +207,23 @@
     $("#ev-when").textContent = dateRange(cur) + (cur.hora ? " · " + cur.hora : "") + (cur.lugar ? " · " + cur.lugar : "");
     $("#ev-seats").innerHTML = seatsHTML(cur);
     $("#ev-pers").max = Math.max(1, cur.libres); setPers(1);
+    $$("[data-curso]", dlg).forEach(function (x) { x.hidden = cur.tipo !== "curso"; });
     $("#ev-err").textContent = ""; $("#ev-done").hidden = true; $("#ev-send").hidden = false; $("#ev-send").disabled = cur.libres === 0;
     dlg.showModal();
   }
   $("#ev-form", dlg).addEventListener("submit", function (e) {
     e.preventDefault();
-    var nombre = $("#ev-nombre").value.trim(), tel = $("#ev-tel").value.trim(), err = $("#ev-err");
+    var nombre = $("#ev-nombre").value.trim(), ape = $("#ev-ape").value.trim(), email = $("#ev-email").value.trim(), tel = $("#ev-tel").value.trim(), err = $("#ev-err");
+    var curso = cur.tipo === "curso";
     err.textContent = "";
-    if (!nombre || !tel) { err.textContent = "Necesitamos tu nombre y teléfono para apartarte la plaza."; return; }
+    var fail = function (id, m) { err.textContent = m; $(id).focus(); };
+    if (!nombre) return fail("#ev-nombre", "Escribe tu nombre.");
+    if (curso && !ape) return fail("#ev-ape", "Escribe tus apellidos.");
+    if (curso && !EMAIL.test(email)) return fail("#ev-email", "Revisa el correo electrónico (ejemplo: nombre@gmail.com).");
+    if (!telOK(tel)) return fail("#ev-tel", "Revisa el número de teléfono (9 cifras).");
+    if (!curso) { ape = ""; email = ""; }
     if (pers > cur.libres) { err.textContent = "Solo quedan " + cur.libres + " plazas."; return; }
-    var msg = ["Hola, acabo de reservar desde el calendario de la web:", "", "• " + (cur.tipo === "curso" ? "Curso" : "Actividad") + ": " + cur.titulo, "• Fecha: " + dateRange(cur) + (cur.hora ? " a las " + cur.hora : ""), cur.lugar ? "• Lugar: " + cur.lugar : null, "• Plazas: " + pers, cur.precio ? "• Total: " + eur(cur.precio * pers) : null, "• Nombre: " + nombre, "• Teléfono: " + tel, "", "¿Me confirmáis la reserva?"].filter(Boolean).join("\n");
+    var msg = ["Hola, acabo de reservar desde el calendario de la web:", "", "• " + (cur.tipo === "curso" ? "Curso" : "Actividad") + ": " + cur.titulo, "• Fecha: " + dateRange(cur) + (cur.hora ? " a las " + cur.hora : ""), cur.lugar ? "• Lugar: " + cur.lugar : null, "• Plazas: " + pers, cur.precio ? "• Total: " + eur(cur.precio * pers) : null, "• Nombre: " + nombre + (ape ? " " + ape : ""), email ? "• Email: " + email : null, "• Teléfono: " + tel, "", "¿Me confirmáis la reserva?"].filter(Boolean).join("\n");
     var btn = $("#ev-send"); btn.disabled = true;
     var done = function (left) {
       if (left != null) { cur.libres = left; }
@@ -215,7 +233,7 @@
       $("#ev-done").hidden = false; btn.hidden = true; renderAll(); window.open(url, "_blank", "noopener");
     };
     if (!LIVE) { done(null); return; }
-    fetch(CFG.calendarioURL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ action: "reservar", id: cur.id, plazas: pers, nombre: nombre, telefono: tel }) })
+    fetch(CFG.calendarioURL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ action: "reservar", id: cur.id, plazas: pers, nombre: nombre, apellidos: ape, email: email, telefono: tel }) })
       .then(function (r) { return r.json(); })
       .then(function (j) { if (j.ok) done(j.libres); else { err.textContent = j.error || "No se pudo reservar."; if (j.libres != null) { cur.libres = j.libres; $("#ev-seats").innerHTML = seatsHTML(cur); renderAll(); } btn.disabled = false; } })
       .catch(function () { err.textContent = "No hemos podido conectar. Puedes reservar igualmente por WhatsApp."; btn.disabled = false; done(null); });

@@ -25,8 +25,8 @@ function configurar() {
   }
   var res = ss.getSheetByName(HOJA_RES) || ss.insertSheet(HOJA_RES);
   if (res.getLastRow() === 0) {
-    res.appendRow(['fecha_reserva', 'id_salida', 'titulo', 'fecha_salida', 'plazas', 'nombre', 'telefono', 'estado']);
-    res.getRange(1, 1, 1, 8).setFontWeight('bold').setBackground('#7fb3a3');
+    res.appendRow(['fecha_reserva', 'id_salida', 'titulo', 'fecha_salida', 'plazas', 'nombre', 'apellidos', 'email', 'telefono', 'estado']);
+    res.getRange(1, 1, 1, 10).setFontWeight('bold').setBackground('#7fb3a3');
     res.setFrozenRows(1);
   }
 }
@@ -69,11 +69,15 @@ function doPost(e) {
     var d = JSON.parse(e.postData.contents || '{}');
     var plazas = Math.max(1, Math.min(20, parseInt(d.plazas, 10) || 1));
     var nombre = String(d.nombre || '').slice(0, 80).trim();
+    var apellidos = String(d.apellidos || '').slice(0, 120).trim();
+    var email = String(d.email || '').slice(0, 120).trim();
     var tel = String(d.telefono || '').replace(/[^\d+ ]/g, '').slice(0, 20).trim();
     if (!nombre || tel.replace(/\D/g, '').length < 9) return json_({ ok: false, error: 'Revisa el nombre y el teléfono.' });
 
     var salida = leerSalidas_().filter(function (o) { return String(o.id) === String(d.id); })[0];
     if (!salida) return json_({ ok: false, error: 'Esta fecha ya no está disponible.' });
+    if (String(salida.tipo).toLowerCase().indexOf('curso') > -1 && (!apellidos || !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)))
+      return json_({ ok: false, error: 'Para los cursos necesitamos nombre, apellidos, correo y teléfono.' });
 
     var max = Number(salida.plazas_max) || 0, res = Number(salida.plazas_reservadas) || 0, libres = max - res;
     if (plazas > libres) return json_({ ok: false, error: libres > 0 ? 'Solo quedan ' + libres + ' plazas.' : 'Esta fecha está completa.', libres: Math.max(0, libres) });
@@ -81,12 +85,12 @@ function doPost(e) {
     var ss = SpreadsheetApp.getActiveSpreadsheet(), sh = ss.getSheetByName(HOJA_CAL);
     var col = sh.getRange(1, 1, 1, sh.getLastColumn()).getValues()[0].map(String).indexOf('plazas_reservadas') + 1;
     sh.getRange(salida._fila, col).setValue(res + plazas);
-    ss.getSheetByName(HOJA_RES).appendRow([new Date(), salida.id, salida.titulo, salida.fecha, plazas, nombre, tel, 'Pendiente de confirmar']);
+    ss.getSheetByName(HOJA_RES).appendRow([new Date(), salida.id, salida.titulo, salida.fecha, plazas, nombre, apellidos, email, tel, 'Pendiente de confirmar']);
 
     // Aviso por email (opcional). Cambia la dirección o borra estas líneas si no lo quieres.
     try {
       MailApp.sendEmail('guiasadastra@gmail.com', 'Nueva reserva: ' + salida.titulo + ' (' + salida.fecha + ')',
-        nombre + ' (' + tel + ') ha reservado ' + plazas + ' plaza(s).\nQuedan ' + (libres - plazas) + ' de ' + max + '.');
+        nombre + ' ' + apellidos + ' (' + tel + (email ? ', ' + email : '') + ') ha reservado ' + plazas + ' plaza(s).\nQuedan ' + (libres - plazas) + ' de ' + max + '.');
     } catch (err) {}
 
     return json_({ ok: true, libres: libres - plazas });
