@@ -25,6 +25,17 @@ jobs:
         if: env.FTP_SERVER == ''
         run: echo "::warning::Faltan los datos FTP en Settings > Secrets and variables > Actions. No se sube nada."
 
+      - name: Ver carpetas del servidor (diagnóstico)
+        if: env.FTP_SERVER != ''
+        env:
+          FTP_USER: ${{ secrets.FTP_USER }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+          FTP_DIR: ${{ secrets.FTP_DIR }}
+        run: |
+          sudo apt-get -qq install -y lftp >/dev/null 2>&1 || true
+          echo "== Carpeta de destino configurada: $FTP_DIR"
+          lftp -u "$FTP_USER,$FTP_PASSWORD" -e "set ssl:verify-certificate no; set net:max-retries 1; pwd; echo '== Raíz FTP:'; cls -1 --sort=name; echo '== Contenido de la carpeta de destino:'; cls -1 $FTP_DIR | head -20; bye" "$FTP_SERVER" 2>&1 | head -80 || true
+
       - uses: actions/checkout@v4
         if: env.FTP_SERVER != ''
 
