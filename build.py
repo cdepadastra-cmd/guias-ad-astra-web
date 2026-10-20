@@ -8,6 +8,9 @@ OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "dist" + (("-" + 
 D = SITE["domain"]
 TODAY = datetime.date.today().isoformat()
 PAGES = []  # (path, priority) para el sitemap
+import hashlib
+_ST = os.path.join(os.path.dirname(os.path.abspath(__file__)), "static")
+VER = {a: hashlib.md5(open(os.path.join(_ST, a), "rb").read()).hexdigest()[:8] for a in ("css/estilos.css", "js/app.js", "js/calculadora.js", "config.js")}
 
 def e(s):
     return html.escape(str(s), quote=True)
@@ -89,6 +92,8 @@ def page(path, title, desc, body, active="", ld=None, og_type="website", image=N
            '<link rel="stylesheet" href="/css/estilos.css"><link rel="icon" href="/favicon.svg" type="image/svg+xml">' + head + lds +
            '</head><body>' + header(active) + '<main id="contenido">' + body + '</main>' + footer() +
            '<script src="/config.js"></script><script src="/js/app.js" defer></script>' + scripts + '</body></html>')
+    for asset in ("css/estilos.css", "js/app.js", "js/calculadora.js", "config.js"):
+        doc = doc.replace('"/%s"' % asset, '"/%s?v=%s"' % (asset, VER.get(asset, "1")))
     if BASE:
         doc = doc.replace('href="/', 'href="%s/' % BASE).replace('src="/', 'src="%s/' % BASE)
     out = os.path.join(OUT, path.strip("/"), "index.html") if path != "/404" else os.path.join(OUT, "404.html")

@@ -268,7 +268,7 @@
     drop.addEventListener("drop", function (e) { loadFile(e.dataTransfer.files[0]); });
     var demo = $("#trk-demo");
     if (demo) demo.addEventListener("click", function () {
-      fetch(((window.ADASTRA_CONFIG || {}).base || "") + demo.dataset.src).then(function (r) { return r.text(); }).then(function (t) { showTrack(analyse(parseTrack(t, "ejemplo.gpx"))); $("#trk-res").scrollIntoView({ behavior: "smooth", block: "start" }); })
+      fetch(demo.dataset.src).then(function (r) { return r.text(); }).then(function (t) { showTrack(analyse(parseTrack(t, "ejemplo.gpx"))); $("#trk-res").scrollIntoView({ behavior: "smooth", block: "start" }); })
         .catch(function () { $("#trk-err").textContent = "No se pudo cargar el ejemplo."; });
     });
   }
