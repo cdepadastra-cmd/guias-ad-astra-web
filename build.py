@@ -24,7 +24,7 @@ CHEV = '<svg class="chev" viewBox="0 0 10 10" aria-hidden="true"><path d="M1 3l4
 ORG = {
     "@type": ["LocalBusiness", "SportsActivityLocation"], "@id": D + "/#empresa",
     "name": SITE["name"], "alternateName": "Ad Astra Montaña y Aventura", "url": D + "/",
-    "logo": SITE["og_image"], "image": HERO, "telephone": SITE["phone_intl"], "email": SITE["email"],
+    "logo": {"@type": "ImageObject", "url": D + "/img/logo-512.png", "width": 512, "height": 512}, "image": HERO, "telephone": SITE["phone_intl"], "email": SITE["email"],
     "priceRange": "15€ - 800€",
     "address": {"@type": "PostalAddress", "addressLocality": "Fuentes de Béjar", "addressRegion": "Salamanca", "postalCode": "37796", "addressCountry": "ES"},
     "areaServed": ["Ávila", "Salamanca", "Cáceres", "León", "Palencia", "Segovia", "Burgos", "Valladolid", "Madrid", "Sierra de Gredos", "Castilla y León"],
@@ -57,7 +57,7 @@ def dd(label, items, key, active):
 def header(active=""):
     def a(h, n, k):
         return '<a href="%s"%s>%s</a>' % (h, ' aria-current="page"' if active == k else "", n)
-    return ('<header class="site-header"><div class="wrap"><a class="brand" href="/" aria-label="Guías Ad Astra, inicio">AD ASTRA <small>Montaña y aventura</small></a>'
+    return ('<header class="site-header"><div class="wrap"><a class="brand" href="/" aria-label="Guías Ad Astra, inicio"><img src="/img/logo-adastra-112.png" width="42" height="56" alt="Logotipo de Guías Ad Astra"><span>AD ASTRA <small>Montaña y aventura</small></span></a>'
             '<button class="menu-toggle" aria-expanded="false" aria-controls="nav" aria-label="Abrir menú">☰</button>'
             '<nav class="nav" id="nav" aria-label="Principal">' + a("/", "Inicio", "inicio") +
             dd("Actividades", NAV_ACT, "act", active) + dd("Formación–Cursos", NAV_CUR, "cur", active) +
@@ -68,7 +68,7 @@ def header(active=""):
 def footer():
     acts = "".join('<li><a href="/actividades/%s/">%s</a></li>' % (a["slug"], e(a["title"])) for a in ACTIVITIES if a["cat"] in ("Barranquismo", "Vías ferratas", "Escalada"))[:2000]
     return ('<footer class="site-footer"><div class="wrap"><div class="foot-grid">'
-            '<div><a class="brand" href="/">AD ASTRA</a><p style="margin-top:14px;max-width:34ch">«Hacia las estrellas». Guías de montaña y aventura en Gredos, Castilla y León y el mundo.</p>'
+            '<div><a class="brand brand-foot" href="/" aria-label="Guías Ad Astra, inicio"><img src="/img/logo-adastra.png" width="93" height="124" alt="Guías Ad Astra · Guías de montaña y aventura" loading="lazy"></a><p style="margin-top:14px;max-width:34ch">«Hacia las estrellas». Guías de montaña y aventura en Gredos, Castilla y León y el mundo.</p>'
             '<p style="margin-top:14px"><a href="%s" rel="noopener" target="_blank">Instagram</a> · <a href="%s" rel="noopener" target="_blank">Facebook</a></p></div>' % (SITE["instagram"], SITE["facebook"]) +
             '<div><h4>Contacto</h4><ul><li><a href="tel:%s">%s</a></li><li><a href="mailto:%s">%s</a></li><li><a href="https://wa.me/%s" target="_blank" rel="noopener">WhatsApp</a></li><li>%s</li></ul></div>' % (SITE["phone_intl"], SITE["phone"], SITE["email"], SITE["email"], SITE["wa"], SITE["hours"]) +
             '<div><h4>Bases</h4><ul>%s</ul></div>' % "".join("<li>%s</li>" % b for b in SITE["bases"]) +
@@ -77,7 +77,9 @@ def footer():
             '<a class="wa-float" href="https://wa.me/%s" target="_blank" rel="noopener" aria-label="Escribir por WhatsApp">%s</a>' % (datetime.date.today().year, SITE["wa"], WA_SVG))
 
 def page(path, title, desc, body, active="", ld=None, og_type="website", image=None, priority="0.7", noindex=False, head="", scripts=""):
-    ld = ld or []
+    ld = list(ld or [])
+    if path != "/404" and not any(isinstance(x, dict) and x.get("@id") == D + "/#empresa" for x in ld):
+        ld.append({"@context": "https://schema.org", "@type": "Organization", "@id": D + "/#empresa", "name": SITE["name"], "url": D + "/", "logo": ORG["logo"], "sameAs": [SITE["instagram"], SITE["facebook"]]})
     image = image or SITE["og_image"]
     lds = "".join('<script type="application/ld+json">%s</script>' % json.dumps(x, ensure_ascii=False) for x in ld)
     doc = ('<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">'
@@ -85,12 +87,12 @@ def page(path, title, desc, body, active="", ld=None, og_type="website", image=N
            ('<meta name="robots" content="noindex">' if (noindex or BASE) else '<meta name="robots" content="index,follow,max-image-preview:large">') +
            '<link rel="canonical" href="%s">' % url(path) +
            '<meta property="og:type" content="%s"><meta property="og:site_name" content="Guías Ad Astra"><meta property="og:locale" content="es_ES">' % og_type +
-           '<meta property="og:title" content="%s"><meta property="og:description" content="%s"><meta property="og:url" content="%s"><meta property="og:image" content="%s">' % (e(title), e(desc), url(path), e(image)) +
+           '<meta property="og:title" content="%s"><meta property="og:description" content="%s"><meta property="og:url" content="%s"><meta property="og:image" content="%s"><meta property="og:image:alt" content="%s">' % (e(title), e(desc), url(path), e(image), e(title)) +
            '<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="%s"><meta name="twitter:description" content="%s"><meta name="twitter:image" content="%s">' % (e(title), e(desc), e(image)) +
            '<meta name="theme-color" content="#160d09"><meta name="geo.region" content="ES-CL"><meta name="geo.placename" content="Sierra de Gredos, Castilla y León">'
            '<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
            '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600&family=Barlow:wght@400;500;600&family=Bebas+Neue&display=swap">'
-           '<link rel="stylesheet" href="/css/estilos.css"><link rel="icon" href="/favicon.svg" type="image/svg+xml">' + head + lds +
+           '<link rel="stylesheet" href="/css/estilos.css"><link rel="icon" href="/img/favicon-32.png" type="image/png" sizes="32x32"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="/img/apple-touch-icon.png">' + head + lds +
            '</head><body>' + header(active) + '<main id="contenido">' + body + '</main>' + footer() +
            '<script src="/config.js"></script><script src="/js/app.js" defer></script>' + scripts + '</body></html>')
     for asset in ("css/estilos.css", "js/app.js", "js/calculadora.js", "config.js"):
@@ -313,15 +315,22 @@ def build_boulder(a, path):
     mapa = ('<iframe class="map" src="%s" loading="lazy" title="Mapa de sectores de %s" referrerpolicy="no-referrer-when-downgrade"></iframe>'
             '<div style="display:flex;flex-wrap:wrap;gap:12px"><a class="btn btn-ghost" href="%s" target="_blank" rel="noopener">Abrir en Google Maps</a>%s</div>'
             % (e(a["map_embed"]), e(a["title"]), e(a["map_link"]), ('<a class="btn btn-ghost" href="%s" target="_blank" rel="noopener">%s</a>' % (e(a["pdf"]), e(a["pdf_label"]))) if a.get("pdf") else ""))
-    left.append(block("Mapa de sectores", '<div style="display:grid;gap:16px">%s</div>' % mapa))
+    left.append('<div id="mapa-sectores"></div>' + block("Mapa de sectores", '<div style="display:grid;gap:16px">%s</div>' % mapa))
     left.append(block("Cómo es el boulder", '<div class="two"><div class="panel"><h3>Material</h3>%s</div><div class="panel"><h3>Buenas prácticas</h3>%s</div></div>' % (
         ticks(["Pies de gato", "Magnesio y cepillo", "Crash pad (colchoneta)", "Ropa cómoda y agua"]),
         ticks(["Aparca en los lugares habilitados", "Limpia el magnesio de las presas", "No dejes residuos ni marcas", "Respeta la fauna y la vegetación"]))))
-    left.append(block("Salidas guiadas de boulder", prose(["¿Primera vez? Te llevamos a los mejores bloques de tu nivel con crash pads, te enseñamos a caer y a hacer spotting y te ayudamos a leer los problemas. También hacemos sesiones para grupos y familias."])))
     left.append(block("Preguntas frecuentes", faq_html(a["faq"])))
-    form = book_form("Salida guiada de boulder · " + a["title"], None, 0, heading="Pide tu salida guiada", note="Precio según grupo y duración. Te respondemos por WhatsApp con la propuesta.")
-    body = (hero("Escalada · Boulder", e(a["h1"]), e(a["lead"]), a["img"], crumbs, '<a class="btn btn-primary" href="#mapa">Ver mapa de sectores</a><a class="btn btn-ghost" href="#reservar">Salida guiada</a>') + keybar(a["datos"]) +
-            '<section class="section" id="mapa"><div class="wrap split"><div class="stack" style="gap:0">%s</div><div class="sticky" style="display:grid;gap:18px">%s%s</div></div></section>' % ("".join(left), upcoming(a["slug"]), form) + related(a))
+    info = ('<aside class="panel infobox"><p class="eyebrow">Ficha de la zona</p><h2 class="h3">%s</h2><dl class="kv">%s</dl>'
+            '<div style="display:grid;gap:10px;margin-top:16px"><a class="btn btn-primary btn-block" href="#mapa-sectores">Ver mapa de sectores</a>'
+            '<a class="btn btn-ghost btn-block" href="%s" target="_blank" rel="noopener">Abrir en Google Maps</a>%s</div>'
+            '<p class="hint" style="margin-top:14px">Información orientativa. Respeta siempre la regulación de la zona y el entorno natural.</p></aside>'
+            % (e(a["title"]), "".join('<dt>%s</dt><dd>%s</dd>' % (e(k), e(v)) for k, v in [("Zona", a["zona"])] + list(a["datos"])), e(a["map_link"]),
+               ('<a class="btn btn-ghost btn-block" href="%s" target="_blank" rel="noopener">%s</a>' % (e(a["pdf"]), e(a["pdf_label"]))) if a.get("pdf") else ""))
+    otras = [x for x in ACTIVITIES if x.get("kind") == "boulder" and x["slug"] != a["slug"]]
+    if otras:
+        info += '<div class="panel"><p class="eyebrow">Más zonas de boulder</p>%s</div>' % "".join('<p style="margin-top:8px"><a href="/actividades/%s/">%s →</a></p>' % (x["slug"], e(x["title"])) for x in otras)
+    body = (hero("Escalada · Boulder", e(a["h1"]), e(a["lead"]), a["img"], crumbs, '<a class="btn btn-primary" href="#mapa-sectores">Ver mapa de sectores</a>' + ('<a class="btn btn-ghost" href="%s" target="_blank" rel="noopener">Croquis PDF</a>' % e(a["pdf"]) if a.get("pdf") else "")) + keybar(a["datos"]) +
+            '<section class="section" id="mapa"><div class="wrap split"><div class="stack" style="gap:0">%s</div><div class="sticky" style="display:grid;gap:18px">%s</div></div></section>' % ("".join(left), info) + related(a))
     ld = [crumbs_ld([("Inicio", "/"), ("Actividades", "/actividades/"), (a["title"], path)]), faq_ld(a["faq"]),
           {"@context": "https://schema.org", "@type": ["TouristAttraction", "Place"], "name": a["h1"], "description": a["seo_desc"], "image": a["img"], "url": url(path),
            "touristType": "Escaladores", "hasMap": a["map_link"], "address": {"@type": "PostalAddress", "addressRegion": a["zona"], "addressCountry": "ES"}},
@@ -333,7 +342,7 @@ def build_eventos(a, path):
             '<section class="section"><div class="wrap stack"><div><div class="section-head"><p class="eyebrow">Qué hacemos</p><h2>Te organizamos o asesoramos</h2><p class="lead">Nos encargamos de la organización y la seguridad de tu prueba, de principio a fin.</p></div><div class="two">%s</div></div>'
             % "".join('<div class="panel"><h3>%s</h3><p class="muted">%s</p></div>' % (e(n), e(d)) for n, d in a["servicios"]) +
             '<div><div class="section-head"><p class="eyebrow">Experiencia</p><h2>Eventos en los que trabajamos</h2></div><div class="evlist">%s</div></div></div></section>'
-            % "".join('<article class="evrow" style="grid-template-columns:minmax(0,1fr)"><div class="evinfo"><span class="tag">%s</span><h3>%s</h3><p class="meta">%s</p></div></article>' % (e(z), e(n), e(d)) for n, z, d in a["eventos"]))
+            % "".join('<article class="evrow" style="grid-template-columns:minmax(0,1fr)"><div class="evinfo"><span class="tag">%s</span><h3>%s</h3><p class="meta">%s</p>%s</div></article>' % (e(ev[1]), e(ev[0]), e(ev[2]), ('<p style="margin-top:8px"><a href="%s"%s>%s →</a></p>' % (e(ev[3]), ' target="_blank" rel="noopener"' if ev[3].startswith("http") else "", "Web oficial" if ev[3].startswith("http") else "Más información")) if len(ev) > 3 else "") for ev in a["eventos"]))
     page(path, a["seo_title"], a["seo_desc"], body, "otr", [crumbs_ld([("Inicio", "/"), (a["title"], path)]), {"@context": "https://schema.org", **ORG}], image=a["img"], priority="0.5")
 
 def build_gredos_limpio(a, path):
@@ -467,8 +476,8 @@ def build_rental():
     svc = {"@context": "https://schema.org", "@type": "Service", "serviceType": "Alquiler de material de montaña, barranquismo, vías ferratas y alpinismo", "provider": {"@id": D + "/#empresa"},
            "areaServed": ["Salamanca", "Béjar", "Fuentes de Béjar", "Ávila", "Cáceres", "Valladolid", "Zamora", "Segovia"], "url": url(path)}
     ld = [crumbs_ld([("Inicio", "/"), ("Alquiler de material", path)]), items_ld, svc, faq_ld(RENTAL_FAQ), {"@context": "https://schema.org", **ORG}]
-    page(path, "Alquiler de material de barranquismo, ferratas y alpinismo | Béjar (Salamanca) y Valladolid",
-         "Alquila neopreno de barranquismo, arnés, casco, set de vía ferrata, piolet y crampones desde 4€/día con IVA. Recogida en Fuentes de Béjar (Salamanca) o Valladolid. Reserva por WhatsApp.",
+    page(path, "Alquiler de material de montaña y barranquismo | Salamanca y Valladolid",
+         "Alquila neopreno, arnés, casco, set de vía ferrata, piolet y crampones desde 4 €/día. Recogida en Fuentes de Béjar (Salamanca) o Valladolid. Reserva por WhatsApp.",
          body, "alq", ld, "website", img("e89d2f67-e4c0-4443-8f1f-9f4f13528f9f/otros-media-6.webp"), "0.9")
 
 # ---------------------------------------------------------------- listados
@@ -489,7 +498,7 @@ def build_activities_index():
     body = (hero("Actividades", "Elige tu aventura", "Barranquismo, vías ferratas, espeleología, ascensiones, senderismo, escalada y viajes con guías titulados en Gredos, Castilla y León y el mundo.", HERO, [("Inicio", "/"), ("Actividades", "")]) +
             '<section class="section"><div class="wrap"><div class="chips" data-filter="#acts" data-key="cat" data-param="categoria" style="margin-bottom:36px">%s</div><div id="acts">%s</div></div></section>' % (chips, secs))
     ld = [crumbs_ld([("Inicio", "/"), ("Actividades", "/actividades/")]), {"@context": "https://schema.org", "@type": "ItemList", "itemListElement": [{"@type": "ListItem", "position": i + 1, "url": url("/actividades/%s/" % x["slug"]), "name": x["title"]} for i, x in enumerate(ACTIVITIES)]}]
-    page("/actividades/", "Actividades de aventura en Gredos y Castilla y León | Guías Ad Astra", "Barranquismo, vías ferratas, espeleología, ascensiones, senderismo, boulder y viajes en Ávila, Salamanca, Cáceres, León, Palencia, Segovia y Burgos. Reserva por WhatsApp.", body, "act", ld, priority="0.9")
+    page("/actividades/", "Actividades de aventura en Gredos y Castilla y León | Ad Astra", "Barranquismo, vías ferratas, espeleología, ascensiones, senderismo y viajes en Ávila, Salamanca, Cáceres, León, Palencia, Segovia y Burgos con guías titulados.", body, "act", ld, priority="0.9")
 
 def build_courses_index():
     chips = '<button class="chip" data-val="" aria-pressed="true">Todos</button>' + "".join('<button class="chip" data-val="%s" aria-pressed="false">%s</button>' % (c["disc"], c["disc_label"]) for c in COURSES)
@@ -501,7 +510,7 @@ def build_courses_index():
             block("Por qué formarte con nosotros", prose(["Somos guías de montaña titulados y diseñamos cada curso para que salgas siendo más autónomo y seguro en el monte.", "Trabajamos en grupos pequeños (de 6 a 10 personas según el curso), con material técnico común incluido y un dossier para que repases en casa."])) +
             '</div><div>%s</div></div></section>' % '<div class="panel"><p class="eyebrow">Calendario</p><h3>Fechas con plazas</h3><p class="muted">Consulta las próximas convocatorias y reserva tu plaza en un minuto.</p><a class="btn btn-primary" href="/calendario/">Ver calendario</a></div>')
     ld = [crumbs_ld([("Inicio", "/"), ("Formación y cursos", "/formacion-cursos/")]), {"@context": "https://schema.org", "@type": "ItemList", "itemListElement": [{"@type": "ListItem", "position": i + 1, "url": url("/actividades/%s/" % c["slug"]), "name": c["title"]} for i, c in enumerate(COURSES)]}]
-    page("/formacion-cursos/", "Cursos de montaña: barranquismo, escalada, alpinismo y ARVA | Guías Ad Astra", "Cursos de barranquismo, iniciación a la escalada, autorrescate, alpinismo y ARVA en Castilla y León con guías titulados. Consulta fechas y plazas.", body, "cur", ld, priority="0.9")
+    page("/formacion-cursos/", "Cursos de montaña: barranquismo, escalada, alpinismo y ARVA", "Cursos de barranquismo, iniciación a la escalada, autorrescate, alpinismo y ARVA en Castilla y León con guías titulados. Consulta fechas y plazas.", body, "cur", ld, priority="0.9")
 
 def build_calendar():
     body = (hero("Calendario", "Calendario de actividades y cursos", "Fechas confirmadas con plazas limitadas. Reserva tu plaza y te escribimos por WhatsApp para confirmar.", img("41645da1-a007-4ff0-8526-61ca467dddb5/curso-arva.webp"), [("Inicio", "/"), ("Calendario", "")]) +
@@ -512,7 +521,7 @@ def build_calendar():
             '<section class="section alt"><div class="wrap two"><div class="panel"><h3>¿No ves tu fecha?</h3><p class="muted">Organizamos cursos y actividades para grupos en el día que elijas.</p><a class="btn btn-wa" href="https://wa.me/%s?text=%s" target="_blank" rel="noopener">%s Pedir otra fecha</a></div>'
             '<div class="panel"><h3>Cómo funciona</h3>%s</div></div></section>' % (SITE["wa"], e("Hola, quería consultar fechas para un curso o actividad."), WA_SVG,
                                                                                  ticks(["Elige una fecha con plazas libres.", "Indica cuántas plazas quieres, tu nombre y teléfono.", "Tu plaza queda apartada y se abre WhatsApp para confirmar contigo."])))
-    page("/calendario/", "Calendario de cursos y actividades de montaña | Plazas disponibles", "Próximas fechas de cursos de barranquismo, alpinismo, escalada, ARVA y salidas guiadas en Gredos y Castilla y León. Consulta plazas libres y reserva online.", body, "cal",
+    page("/calendario/", "Calendario de cursos y actividades de montaña | Ad Astra", "Próximas fechas de cursos de barranquismo, alpinismo, escalada, ARVA y salidas guiadas en Gredos y Castilla y León. Consulta plazas libres y reserva online.", body, "cal",
          [crumbs_ld([("Inicio", "/"), ("Calendario", "/calendario/")])], priority="0.9")
 
 def build_home():
@@ -528,22 +537,22 @@ def build_home():
             '<section class="section"><div class="wrap"><div class="section-head row"><div><p class="eyebrow">Formación</p><h2>Cursos de montaña</h2></div><a class="btn btn-ghost" href="/calendario/">Fechas y plazas</a></div><div class="grid c3">%s</div></div></section>' % ccards +
             '<section class="section alt"><div class="wrap about"><img src="%s" alt="Material de alquiler: neopreno de barranquismo" loading="lazy" style="background:#e9e6e2;object-fit:contain"><div style="display:grid;gap:18px"><p class="eyebrow">Alquiler de material</p><h2>Equípate para tu aventura</h2>'
             '<p class="lead">Neoprenos, arneses, cascos, disipadores, piolets y crampones desde 4 € al día. Eliges fechas y unidades y nos lo envías por WhatsApp.</p><div><a class="btn btn-primary" href="/actividades/alquiler-material-montana/">Alquilar material</a></div></div></div></section>' % img("e89d2f67-e4c0-4443-8f1f-9f4f13528f9f/otros-media-6.webp") +
-            '<section class="section"><div class="wrap about"><img src="%s" alt="Jairo Hernández, guía de montaña de Guías Ad Astra" loading="lazy"><div style="display:grid;gap:18px"><p class="eyebrow">Quiénes somos</p><h2>Pasión por la montaña desde Gredos</h2>'
+            '<section class="section"><div class="wrap about"><img src="%s" alt="Jairo Hernández, guía de montaña de Guías Ad Astra" loading="lazy"><div style="display:grid;gap:18px"><img class="about-logo" src="/img/logo-adastra.png" width="140" height="187" alt="Logotipo de Guías Ad Astra, guías de montaña y aventura" loading="lazy" style="margin:0"><p class="eyebrow">Quiénes somos</p><h2>Pasión por la montaña desde Gredos</h2>'
             '<p class="lead">Guías Ad Astra («hacia las estrellas», en latín) nace de la pasión de Jairo Hernández por la montaña y todos los deportes que en ella se pueden practicar.</p><div><a class="btn btn-ghost" href="/sobre-nosotros/">Conócenos</a></div></div></div></section>' % JAIRO +
             '<section class="cta-band"><div class="wrap"><h2>Tu próxima cumbre te espera</h2><a class="btn" href="/calendario/">Ver fechas y reservar</a></div></section>')
     ld = [{"@context": "https://schema.org", **ORG}, {"@context": "https://schema.org", "@type": "WebSite", "name": "Guías Ad Astra", "url": D + "/", "inLanguage": "es"}]
-    page("/", "Guías Ad Astra | Barranquismo, vías ferratas y montaña en Gredos", "Aventura guiada en Gredos y Castilla y León: barranquismo, vías ferratas, escalada, espeleología, cursos y alquiler de material. Guías titulados. Reserva por WhatsApp.", body, "inicio", ld, priority="1.0")
+    page("/", "Guías Ad Astra | Barranquismo, vías ferratas y montaña en Gredos", "Aventura guiada en Gredos y Castilla y León: barranquismo, vías ferratas, escalada, espeleología, cursos y alquiler de material con guías titulados.", body, "inicio", ld, priority="1.0")
 
 def build_about():
     body = (hero("Nosotros", "Hacia las estrellas", "Pasión por la montaña desde la Sierra de Gredos.", JAIRO, [("Inicio", "/"), ("Sobre nosotros", "")]) +
-            '<section class="section"><div class="wrap about"><img src="%s" alt="Jairo Hernández, fundador de Guías Ad Astra" loading="lazy"><div class="prose" style="font-size:1.1rem">'
+            '<section class="section"><div class="wrap about"><img src="%s" alt="Jairo Hernández, fundador de Guías Ad Astra" loading="lazy"><div class="prose" style="font-size:1.1rem"><img class="about-logo" src="/img/logo-adastra.png" width="140" height="187" alt="Logotipo de Guías Ad Astra, guías de montaña y aventura" loading="lazy" style="margin:0">'
             '<p><strong>Guías Ad Astra</strong> («hacia las estrellas», en latín) nace de la pasión de Jairo Hernández por la montaña y por todos los deportes que en ella se pueden practicar.</p>'
             '<p>Diseñamos actividades en todos los ámbitos, adaptadas a cada nivel, para que vivas con nosotros una experiencia única: barrancos, ferratas, cuevas, cumbres, cursos de formación y viajes.</p>'
             '<p>Trabajamos desde nuestras bases de Fuentes de Béjar (Salamanca) y Valladolid, y guiamos en ocho provincias y fuera de España.</p>'
-            '<p>Además organizamos eventos como la Ultra de Gredos y las jornadas de voluntariado Gredos Limpio desde 2013.</p>'
+            '<p>Además organizamos eventos como la Ultra de Gredos, el Desafío Fuenterrico y las jornadas de voluntariado Gredos Limpio desde 2013.</p>'
             '<p><a class="btn btn-primary" href="/actividades/">Ver actividades</a></p></div></div></section>' % JAIRO)
     page("/sobre-nosotros/", "Sobre nosotros | Guías Ad Astra, guías de montaña en Gredos", "Jairo Hernández y el equipo de Guías Ad Astra: guías de montaña titulados en Gredos y Castilla y León, con actividades adaptadas a todos los niveles.", body, "nos",
-         [crumbs_ld([("Inicio", "/"), ("Sobre nosotros", "/sobre-nosotros/")])], priority="0.5")
+         [crumbs_ld([("Inicio", "/"), ("Sobre nosotros", "/sobre-nosotros/")]), {"@context": "https://schema.org", "@type": "AboutPage", "name": "Sobre Guías Ad Astra", "url": url("/sobre-nosotros/"), "about": {"@id": D + "/#empresa"}}, {"@context": "https://schema.org", **ORG}], priority="0.5")
 
 def build_contact():
     body = (hero("Contacto", "Hablemos de aventura", "Llámanos o escríbenos por WhatsApp para organizar tu actividad, curso o alquiler.", HERO, [("Inicio", "/"), ("Contacto", "")]) +
@@ -624,7 +633,7 @@ def build_404():
   size();addEventListener("resize",size);requestAnimationFrame(draw);
 })();
 </script>""")
-    page("/404", "Te has perdido en la montaña | Guías Ad Astra", "La página que buscas no existe o ha cambiado de sitio.", body, "", noindex=True)
+    page("/404", "Te has perdido en la montaña | Guías Ad Astra", "La página que buscas no existe o ha cambiado de sitio. Vuelve al inicio o explora nuestras actividades, cursos y alquiler de material de montaña.", body, "", noindex=True)
 
 
 def build_calculator():
@@ -679,8 +688,8 @@ def build_calculator():
            "provider": {"@id": D + "/#empresa"}}]
     head = '<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">'
     scripts = '<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="" defer></script><script src="/js/calculadora.js" defer></script>'
-    page(path, "Calculadora MIDE de tiempo de rutas y perfil de GPX | Guías Ad Astra",
-         "Calcula la duración de una ruta de senderismo con el método MIDE a partir de distancia y desnivel. Sube tu track GPX y descarga el perfil de altitud, el mapa y la ficha de la ruta gratis.",
+    page(path, "Calculadora MIDE de tiempo de rutas y perfil GPX | Ad Astra",
+         "Calcula gratis la duración de una ruta con el método MIDE según distancia y desnivel. Sube tu GPX y descarga el perfil de altitud, el mapa y la ficha de la ruta.",
          body, "otr", ld, priority="0.8", head=head, scripts=scripts)
 
 
@@ -730,8 +739,14 @@ def main():
         open(os.path.join(OUT, ".htaccess"), "w").write("ErrorDocument 404 %s/404.html\n" % BASE)
         print("Versión de prueba en", BASE, "(noindex, sin sitemap)"); return
     # redirecciones 301 desde las direcciones de la web antigua (para no perder posicionamiento al publicar en la raíz)
-    open(os.path.join(OUT, ".htaccess"), "w").write("ErrorDocument 404 /404.html\n" + "".join(
-        "Redirect 301 /%s.html /actividades/%s/\n" % (s, s) for s in ("via-verde-ruta-de-la-plata", "comarca-natural-oeste-de-gredos")))
+    old = {"%s.html" % x["slug"]: "/actividades/%s/" % x["slug"] for x in ACTIVITIES + COURSES}
+    old.update({"cursos-barranquismo.html": "/actividades/curso-barranquismo/", "contacto-reservas.html": "/contacto/", "contacto.html": "/contacto/",
+                "calendario-actividades-gredos.html": "/calendario/", "calendario.html": "/calendario/", "sobre-nosotros.html": "/sobre-nosotros/",
+                "actividades.html": "/actividades/", "formacion-cursos.html": "/formacion-cursos/", "cursos.html": "/formacion-cursos/",
+                "proximamente.html": "/", "blog.html": "/", "route-setting.html": "/route-setting/", "iniciativas-turismo-rural.html": "/iniciativas-turismo-rural/",
+                "creacion-mantenimiento-senderos.html": "/creacion-mantenimiento-senderos/", "calculadora-rutas.html": "/calculadora-rutas/"})
+    open(os.path.join(OUT, ".htaccess"), "w").write("ErrorDocument 404 /404.html\n# Direcciones de la web antigua -> nuevas (301)\n" + "".join(
+        "Redirect 301 /%s %s%s\n" % (k, D, v) for k, v in sorted(old.items())))
     open(os.path.join(OUT, "robots.txt"), "w").write("User-agent: *\nAllow: /\nDisallow: /calendario-google/\n\nSitemap: %s/sitemap.xml\n" % D)
     print("Páginas generadas:", len(PAGES) + 1)
 

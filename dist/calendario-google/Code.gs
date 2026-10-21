@@ -28,6 +28,7 @@ function configurar() {
     cal.getRange(1, 1, 1, COLUMNAS.length).setFontWeight('bold').setBackground('#f0b445');
     cal.setFrozenRows(1);
     cal.getRange('B:C').setNumberFormat('yyyy-mm-dd');
+    cal.getRange('D:D').setNumberFormat('@');
   }
   var res = ss.getSheetByName(HOJA_RES) || ss.insertSheet(HOJA_RES);
   if (res.getLastRow() === 0) {
@@ -49,15 +50,12 @@ function configurar() {
 
 function leerSalidas_() {
   var sh = libro_().getSheetByName(HOJA_CAL);
-  var datos = sh.getDataRange().getValues();
+  // Se leen los valores tal y como se ven en la hoja (evita desfases de zona horaria en fechas y horas)
+  var datos = sh.getDataRange().getDisplayValues();
   var cab = datos.shift().map(function (c) { return String(c).trim(); });
   return datos.map(function (fila, i) {
     var o = { _fila: i + 2 };
-    cab.forEach(function (c, j) {
-      var v = fila[j];
-      if (v instanceof Date) v = Utilities.formatDate(v, Session.getScriptTimeZone(), c === 'hora' ? 'HH:mm' : 'yyyy-MM-dd');
-      o[c] = v;
-    });
+    cab.forEach(function (c, j) { o[c] = String(fila[j]).trim(); });
     return o;
   }).filter(function (o) { return o.id && o.fecha && String(o.publicado || 'SI').toUpperCase() !== 'NO'; });
 }
@@ -134,4 +132,10 @@ function inscribir_(d) {
     MailApp.sendEmail('guiasadastra@gmail.com', 'Nueva inscripción: ' + t(d.edicion), nombre + ' ' + apellidos + ' (' + tel + ', ' + email + ') · ' + personas + ' persona(s).');
   } catch (err) {}
   return json_({ ok: true });
+}
+
+/** Ejecuta esta función una vez si necesitas volver a dar permisos (correo y hoja). */
+function autorizar() {
+  Logger.log(MailApp.getRemainingDailyQuota());
+  Logger.log(libro_().getName());
 }

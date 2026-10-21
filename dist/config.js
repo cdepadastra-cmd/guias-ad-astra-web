@@ -8,5 +8,5 @@ window.ADASTRA_CONFIG = {
   // Carpeta donde está publicada la web ("" si está en la raíz del dominio)
   base: "",
   // URL del mismo Apps Script para las inscripciones (Gredos Limpio). Si se deja vacía, usa la del calendario.
-  appsScriptURL: ""
+  appsScriptURL: "https://script.google.com/macros/s/AKfycbzFrVvrZSjkpPwdtD997mO5-2Y4Zz2GBSyoYSaRTvjot_F90a9taX_rfdRHkpsdHUzS/exec"
 };
