@@ -24,8 +24,9 @@ GREDOS_LIMPIO = {
     "abiertas": True,       # False para cerrar las inscripciones
 }
 
-# Las fotos siguen alojadas en Lovable. Si algún día dejas Lovable, descárgalas a /img/ y cambia esta ruta a "/img/".
-IMG = "https://ad-astra-adventures.lovable.app/__l5e/assets-v1/"
+# Las fotos están dentro de la propia web (carpeta static/media), ya no dependen de Lovable.
+import os as _os
+IMG = SITE["domain"] + _os.environ.get("BASE", "").rstrip("/") + "/media/"
 
 def img(p):
     return IMG + p
@@ -345,7 +346,7 @@ ACTIVITIES = [
   "sectores": [],
   "map_embed": "https://www.google.com/maps/d/embed?mid=1K_TqdmOYBGAmVTLCbk7nSNOWShJIsF8",
   "map_link": "https://www.google.com/maps/d/u/0/edit?mid=1K_TqdmOYBGAmVTLCbk7nSNOWShJIsF8&usp=sharing",
-  "pdf": "https://ad-astra-adventures.lovable.app/__l5e/assets-v1/b3fa4166-e520-42c1-b9f6-311b0b33ec26/otros-media-3.pdf",
+  "pdf": img("b3fa4166-e520-42c1-b9f6-311b0b33ec26/otros-media-3.pdf"),
   "pdf_label": "Descargar croquis de boulder (PDF)",
   "faq": [
     ("¿Dónde están Las Tuerces?", "En el término de Villaescusa de las Torres y Aguilar de Campoo, al norte de Palencia, a unos 90 minutos en coche de Valladolid y a una hora de Burgos y Santander."),
