@@ -781,6 +781,7 @@ def main():
     open(os.path.join(OUT, ".htaccess"), "w").write("ErrorDocument 404 /404.html\n"
         "# Las páginas se revisan siempre (así los cambios se ven al momento); fotos, CSS y JS sí se guardan en caché\n"
         "<IfModule mod_headers.c>\n<FilesMatch \"\\.(html|xml|txt)$\">\nHeader set Cache-Control \"no-cache\"\n</FilesMatch>\n</IfModule>\n"
+        "<Files \".ftp-deploy-sync-state.json\">\nRequire all denied\n</Files>\n"
         "# Direcciones de la web antigua -> nuevas (301)\n" + "".join(
         "RedirectMatch 301 ^/%s$ %s%s\n" % (k.replace(".", "\\."), D, v) for k, v in sorted(old.items())) +
         "# La versión de prueba /NUEVA ya no existe: lleva a la misma página en la web principal\nRedirectMatch 301 ^/NUEVA(/.*)?$ %s$1\n" % D)

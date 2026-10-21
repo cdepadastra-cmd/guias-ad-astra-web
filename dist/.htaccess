@@ -5,6 +5,9 @@ ErrorDocument 404 /404.html
 Header set Cache-Control "no-cache"
 </FilesMatch>
 </IfModule>
+<Files ".ftp-deploy-sync-state.json">
+Require all denied
+</Files>
 # Direcciones de la web antigua -> nuevas (301)
 RedirectMatch 301 ^/BOULDER-LAS-TUERCES-PALENCIA\.pdf$ https://www.guiasadastra.com/media/b3fa4166-e520-42c1-b9f6-311b0b33ec26/otros-media-3.pdf
 RedirectMatch 301 ^/actividades\.html$ https://www.guiasadastra.com/actividades/
