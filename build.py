@@ -734,6 +734,11 @@ def main():
     sm = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + "".join(
         "  <url><loc>%s</loc><lastmod>%s</lastmod><priority>%s</priority></url>\n" % (url(p), TODAY, pr) for p, pr in PAGES) + "</urlset>\n"
     open(os.path.join(OUT, "sitemap.xml"), "w").write(sm)
+    # Catálogo para el calendario: si en la hoja falta precio, título o tipo, la web los toma de aquí (por slug)
+    catalogo = {c["slug"]: {"titulo": c["title"], "tipo": "Curso", "precio": c["price"]} for c in COURSES}
+    catalogo.update({x["slug"]: {"titulo": x["title"], "tipo": "Actividad", "precio": min_price(x) or 0} for x in ACTIVITIES if x["slug"] not in catalogo})
+    os.makedirs(os.path.join(OUT, "data"), exist_ok=True)
+    json.dump(catalogo, open(os.path.join(OUT, "data", "catalogo.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
     if BASE:
         os.remove(os.path.join(OUT, "sitemap.xml")) if os.path.exists(os.path.join(OUT, "sitemap.xml")) else None
         open(os.path.join(OUT, ".htaccess"), "w").write("ErrorDocument 404 %s/404.html\n" % BASE)

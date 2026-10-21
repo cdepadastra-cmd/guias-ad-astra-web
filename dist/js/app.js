@@ -199,8 +199,14 @@
     if (m) return (m[3].length === 2 ? "20" + m[3] : m[3]) + "-" + ("0" + m[2]).slice(-2) + "-" + ("0" + m[1]).slice(-2);
     return v.slice(0, 10);
   }
+  var CAT = {};
   function norm(e) {
     var max = +e.plazas_max || 0, res = +e.plazas_reservadas || 0;
+    // Si en la hoja falta el precio, el título o el tipo, se copian de la página del curso/actividad (columna slug)
+    var c = CAT[String(e.slug || "").trim()] || {};
+    if (!(+e.precio)) e.precio = c.precio || 0;
+    if (!String(e.titulo || "").trim()) e.titulo = c.titulo || "";
+    if (!String(e.tipo || "").trim()) e.tipo = c.tipo || "";
     return {
       id: String(e.id), fecha: isoDate(e.fecha), fecha_fin: e.fecha_fin ? isoDate(e.fecha_fin) : "",
       hora: e.hora || "", titulo: e.titulo || "", tipo: (e.tipo || "Actividad").toLowerCase().indexOf("curso") > -1 ? "curso" : "actividad",
@@ -210,7 +216,8 @@
   }
   function load() {
     var url = LIVE ? CFG.calendarioURL + (CFG.calendarioURL.indexOf("?") > -1 ? "&" : "?") + "action=list&t=" + Date.now() : (CFG.base || "") + "/data/calendario.json";
-    return fetch(url).then(function (r) { return r.json(); }).then(function (j) {
+    var cat = fetch((CFG.base || "") + "/data/catalogo.json").then(function (r) { return r.json(); }).then(function (j) { CAT = j || {}; }).catch(function () {});
+    return cat.then(function () { return fetch(url); }).then(function (r) { return r.json(); }).then(function (j) {
       var arr = Array.isArray(j) ? j : (j.events || []);
       EVENTS = arr.map(norm).filter(function (e) { return e.fecha && (e.fecha_fin || e.fecha) >= todayISO(); }).sort(function (a, b) { return a.fecha < b.fecha ? -1 : 1; });
       return EVENTS;

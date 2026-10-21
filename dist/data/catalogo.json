@@ -1,0 +1,137 @@
+{
+ "curso-barranquismo": {
+  "titulo": "Curso de barranquismo",
+  "tipo": "Curso",
+  "precio": 150
+ },
+ "curso-iniciacion-escalada-en-roca": {
+  "titulo": "Curso de iniciación a la escalada en roca",
+  "tipo": "Curso",
+  "precio": 60
+ },
+ "curso-autorrescate": {
+  "titulo": "Curso de autorrescate",
+  "tipo": "Curso",
+  "precio": 130
+ },
+ "curso-arva": {
+  "titulo": "Curso de ARVA",
+  "tipo": "Curso",
+  "precio": 30
+ },
+ "cursos-alpinismo": {
+  "titulo": "Cursos de alpinismo",
+  "tipo": "Curso",
+  "precio": 30
+ },
+ "barranquismo-avila": {
+  "titulo": "Barranquismo en Ávila",
+  "tipo": "Actividad",
+  "precio": 35
+ },
+ "barranquismo-en-caceres": {
+  "titulo": "Barranquismo en Cáceres",
+  "tipo": "Actividad",
+  "precio": 40
+ },
+ "barranquismo-salamanca": {
+  "titulo": "Barranquismo en Salamanca",
+  "tipo": "Actividad",
+  "precio": 45
+ },
+ "barranquismo-leon": {
+  "titulo": "Barranquismo en León",
+  "tipo": "Actividad",
+  "precio": 50
+ },
+ "barranquismo-cueva-valporquero-sima-de-perlas": {
+  "titulo": "Barranquismo cueva de Valporquero",
+  "tipo": "Actividad",
+  "precio": 65
+ },
+ "barranquismo-madrid-segovia": {
+  "titulo": "Barranquismo en Madrid y Segovia",
+  "tipo": "Actividad",
+  "precio": 45
+ },
+ "barranquismo-palencia": {
+  "titulo": "Barranquismo en Palencia",
+  "tipo": "Actividad",
+  "precio": 50
+ },
+ "via-ferrata-salamanca": {
+  "titulo": "Vías ferratas en Salamanca",
+  "tipo": "Actividad",
+  "precio": 35
+ },
+ "via-ferrata-burgos": {
+  "titulo": "Vías ferratas Burgos",
+  "tipo": "Actividad",
+  "precio": 40
+ },
+ "vias-ferratas-leon": {
+  "titulo": "Vías ferratas León",
+  "tipo": "Actividad",
+  "precio": 45
+ },
+ "espeleologia-leon": {
+  "titulo": "Espeleología en León",
+  "tipo": "Actividad",
+  "precio": 40
+ },
+ "espeleologia-segovia": {
+  "titulo": "Espeleología en Segovia",
+  "tipo": "Actividad",
+  "precio": 35
+ },
+ "ascensiones-montana": {
+  "titulo": "Ascensiones",
+  "tipo": "Actividad",
+  "precio": 0
+ },
+ "senderismo-avila-gredos": {
+  "titulo": "Senderismo en Ávila, Gredos",
+  "tipo": "Actividad",
+  "precio": 15
+ },
+ "monte-olimpo": {
+  "titulo": "Trekking del Monte Olimpo",
+  "tipo": "Actividad",
+  "precio": 793
+ },
+ "trekking-carros-de-foc": {
+  "titulo": "Trekking de Carros de Foc",
+  "tipo": "Actividad",
+  "precio": 743
+ },
+ "boulder-las-tuerces": {
+  "titulo": "Boulder en Las Tuerces",
+  "tipo": "Actividad",
+  "precio": 0
+ },
+ "boulder-zona-centro-salamanca-caceres": {
+  "titulo": "Boulder en Zona Centro (Salamanca, Ávila y Cáceres)",
+  "tipo": "Actividad",
+  "precio": 0
+ },
+ "organizacion-eventos-deportivos": {
+  "titulo": "Organización de eventos",
+  "tipo": "Actividad",
+  "precio": 0
+ },
+ "gredos-limpio": {
+  "titulo": "Gredos Limpio",
+  "tipo": "Actividad",
+  "precio": 0
+ },
+ "comarca-natural-oeste-de-gredos": {
+  "titulo": "Comarca Natural Oeste de Gredos",
+  "tipo": "Actividad",
+  "precio": 20
+ },
+ "via-verde-ruta-de-la-plata": {
+  "titulo": "Vía Verde Ruta de la Plata",
+  "tipo": "Actividad",
+  "precio": 20
+ }
+}
