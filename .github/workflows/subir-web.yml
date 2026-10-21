@@ -66,3 +66,19 @@ jobs:
           # Carpeta de la web guiasadastra.com en el servidor (Plesk)
           server-dir: /guiasadastra.com/
           timeout: 120000
+
+      - name: Avisar a Bing y otros buscadores (IndexNow)
+        if: env.FTP_SERVER != ''
+        continue-on-error: true
+        run: |
+          python3 - <<'PY'
+          import json, re, urllib.request
+          key = "697f1ec93b9c9b8b29191ad035f6dd36"
+          urls = re.findall(r"<loc>([^<]+)</loc>", open("dist/sitemap.xml", encoding="utf-8").read())
+          body = json.dumps({"host": "www.guiasadastra.com", "key": key, "keyLocation": "https://www.guiasadastra.com/%s.txt" % key, "urlList": urls}).encode()
+          req = urllib.request.Request("https://api.indexnow.org/indexnow", data=body, headers={"Content-Type": "application/json; charset=utf-8"})
+          try:
+              print("IndexNow:", urllib.request.urlopen(req, timeout=30).status, len(urls), "direcciones")
+          except Exception as e:
+              print("IndexNow no respondió:", e)
+          PY
