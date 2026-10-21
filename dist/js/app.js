@@ -191,10 +191,18 @@
   if (!calRoots.length) return;
   var EVENTS = [], LIVE = !!CFG.calendarioURL;
 
+  // Acepta fechas 2026-12-12, 12/12/2026, 12-12-2026 o 12/12/26 (como las escribe Google Sheets en España)
+  function isoDate(v) {
+    v = String(v || "").trim(); var m = v.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+    if (m) return m[1] + "-" + ("0" + m[2]).slice(-2) + "-" + ("0" + m[3]).slice(-2);
+    m = v.match(/^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{2,4})/);
+    if (m) return (m[3].length === 2 ? "20" + m[3] : m[3]) + "-" + ("0" + m[2]).slice(-2) + "-" + ("0" + m[1]).slice(-2);
+    return v.slice(0, 10);
+  }
   function norm(e) {
     var max = +e.plazas_max || 0, res = +e.plazas_reservadas || 0;
     return {
-      id: String(e.id), fecha: String(e.fecha).slice(0, 10), fecha_fin: e.fecha_fin ? String(e.fecha_fin).slice(0, 10) : "",
+      id: String(e.id), fecha: isoDate(e.fecha), fecha_fin: e.fecha_fin ? isoDate(e.fecha_fin) : "",
       hora: e.hora || "", titulo: e.titulo || "", tipo: (e.tipo || "Actividad").toLowerCase().indexOf("curso") > -1 ? "curso" : "actividad",
       slug: e.slug || "", precio: +e.precio || 0, max: max, libres: Math.max(0, e.plazas_libres != null && e.plazas_libres !== "" ? +e.plazas_libres : max - res),
       lugar: e.lugar || "", notas: e.notas || ""
