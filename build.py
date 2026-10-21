@@ -92,7 +92,7 @@ def page(path, title, desc, body, active="", ld=None, og_type="website", image=N
            '<meta name="theme-color" content="#160d09"><meta name="geo.region" content="ES-CL"><meta name="geo.placename" content="Sierra de Gredos, Castilla y León">'
            '<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
            '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600&family=Barlow:wght@400;500;600&family=Bebas+Neue&display=swap">'
-           '<link rel="stylesheet" href="/css/estilos.css"><link rel="icon" href="/img/favicon-32.png" type="image/png" sizes="32x32"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="/img/apple-touch-icon.png">' + head + lds +
+           '<link rel="stylesheet" href="/css/estilos.css"><link rel="icon" href="/favicon.ico" sizes="any"><link rel="icon" href="/img/favicon-32.png" type="image/png" sizes="32x32"><link rel="icon" href="/img/favicon-48.png" type="image/png" sizes="48x48"><link rel="icon" href="/img/favicon-192.png" type="image/png" sizes="192x192"><link rel="apple-touch-icon" href="/img/apple-touch-icon.png">' + head + lds +
            '</head><body>' + header(active) + '<main id="contenido">' + body + '</main>' + footer() +
            '<script src="/config.js"></script><script src="/js/app.js" defer></script>' + scripts + '</body></html>')
     for asset in ("css/estilos.css", "js/app.js", "js/calculadora.js", "config.js"):
