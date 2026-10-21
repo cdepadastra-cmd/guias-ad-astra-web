@@ -336,10 +336,25 @@ def build_eventos(a, path):
     page(path, a["seo_title"], a["seo_desc"], body, "otr", [crumbs_ld([("Inicio", "/"), (a["title"], path)]), {"@context": "https://schema.org", **ORG}], image=a["img"], priority="0.5")
 
 def build_gredos_limpio(a, path):
-    prog = [("9:30", "Quedada en la Casa del Parque de Hoyos del Espino. Visita, instrucciones y subida juntos a la Plataforma."), ("10:00", "Comienzo de la limpieza desde la Plataforma de Gredos."), ("14:00", "Regreso a la Plataforma para terminar la jornada todos juntos.")]
+    G = GREDOS_LIMPIO
+    fecha = G["fecha"] or "Fecha por confirmar"
+    prog = [(G["hora"], "Quedada en la Casa del Parque de Hoyos del Espino. Visita, instrucciones y subida juntos a la Plataforma."), ("10:00", "Comienzo de la limpieza desde la Plataforma de Gredos."), ("14:00", "Regreso a la Plataforma para terminar la jornada todos juntos.")]
+    if G["abiertas"]:
+        form = ('<form class="book" id="inscripcion" data-inscripcion data-evento="Gredos Limpio" data-edicion="%s" novalidate><p class="eyebrow">Inscripción gratuita</p><h2>Apúntate</h2><p class="muted">%s · %s</p>'
+                '<div class="row2"><div class="field"><label for="i-nombre">Nombre</label><input id="i-nombre" name="nombre" autocomplete="given-name"></div><div class="field"><label for="i-ape">Apellidos</label><input id="i-ape" name="apellidos" autocomplete="family-name"></div></div>'
+                '<div class="field"><label for="i-email">Correo electrónico</label><input id="i-email" name="email" type="email" autocomplete="email" inputmode="email"></div>'
+                '<div class="row2"><div class="field"><label for="i-tel">Teléfono</label><input id="i-tel" name="telefono" type="tel" autocomplete="tel" inputmode="tel"></div><div class="field"><label for="i-loc">Localidad</label><input id="i-loc" name="localidad" autocomplete="address-level2"></div></div>'
+                '%s'
+                '<div class="field"><label for="i-com">Comentarios (opcional)</label><textarea id="i-com" name="comentarios" placeholder="Nombres de quienes vienen contigo, club o asociación…"></textarea></div>'
+                '<label class="check" style="align-items:flex-start"><input type="checkbox" name="privacidad" id="i-priv" style="margin-top:3px"> <span>Acepto que Guías Ad Astra guarde estos datos para gestionar mi inscripción y el seguro de la jornada.</span></label>'
+                '<p class="err" role="alert"></p><button class="btn btn-primary btn-block" type="submit">Enviar inscripción</button>'
+                '<div class="notice ok" data-ok hidden></div><p class="hint">Tus datos se guardan en nuestra lista de inscritos. No los compartimos con nadie salvo la aseguradora de la jornada.</p></form>'
+                % (e(G["edicion"]), e(G["edicion"]), e(fecha), stepper("i-pers", 1, 1, 20, "Personas (contándote a ti)")))
+    else:
+        form = '<div class="panel"><p class="eyebrow">Inscripciones</p><h3>Inscripciones cerradas</h3><p class="muted">Anunciaremos la próxima edición en esta página y en nuestras redes.</p></div>'
     body = (hero("Voluntariado ambiental", "Gredos Limpio", "Cada otoño, antes de que llegue la nieve, limpiamos el Circo de Gredos entre todos los amantes de la sierra. Desde 2013.", a["img"], [("Inicio", "/"), ("Otros", "")],
-                 '<a class="btn btn-wa" href="https://wa.me/%s?text=%s" target="_blank" rel="noopener">%s Apúntate</a>' % (SITE["wa"], e("Hola, quiero apuntarme a Gredos Limpio."), WA_SVG)) +
-            keybar([("Última edición", "XIII · 8 nov 2025"), ("Lugar", "Hoyos del Espino (Ávila)"), ("Inscripción", "Gratuita"), ("Quedada", "9:30 Casa del Parque")]) +
+                 '<a class="btn btn-primary" href="#inscripcion">Apúntate</a>') +
+            keybar([("Edición", G["edicion"]), ("Fecha", fecha), ("Lugar", "Hoyos del Espino (Ávila)"), ("Inscripción", "Gratuita")]) +
             '<section class="section"><div class="wrap split"><div class="stack" style="gap:0">' +
             block("Qué es", prose(["Gredos Limpio es una concentración para los amantes de Gredos y de la montaña. Intentamos limpiar todo lo posible la sierra antes de que las nieves tapen los residuos del verano.", "Los asistentes se mueven con libertad por las zonas de actuación, aunque siempre intentamos ir en grupos."])) +
             block("Zona de actuación", prose(["Entre la Plataforma de Gredos, el Puerto de Candeleda, Prao Pozas, el Morezón y la Laguna Grande, en el Circo de Gredos (Macizo Central)."])) +
@@ -347,15 +362,28 @@ def build_gredos_limpio(a, path):
             block("Qué ofrecemos y qué llevar", '<div class="two"><div class="panel"><h3>Te damos</h3>%s</div><div class="panel"><h3>Trae</h3>%s</div></div>' % (
                 ticks(["Seguro de accidentes (colaboración de Patrimonio Natural)", "Acceso gratuito a la Plataforma de Gredos", "Visita guiada a la Casa del Parque", "Bolsas de basura y guantes"]),
                 ticks(["Ropa de abrigo o impermeable según el tiempo", "Agua", "Algo de comer para durante y después"]))) +
-            '</div><div class="sticky">%s</div></div></section>' % upcoming(a["slug"]))
+            '</div><div class="sticky">%s</div></div></section>' % form)
     page(path, a["seo_title"], a["seo_desc"], body, "otr", [crumbs_ld([("Inicio", "/"), (a["title"], path)])], image=a["img"], priority="0.5")
 
 def build_zona(a, path):
-    items = [x for x in ACTIVITIES if x["slug"] in a["links"]]
-    cards = "".join(card("/actividades/%s/" % x["slug"], x["img"], x["cat"], x["title"], x["short"], min([o["price"] for o in x.get("options", []) if o.get("price")] or [x.get("price", 0)]) or 0) for x in items)
-    body = (hero("Zonas", e(a["title"]), e(a["lead"]), a["img"], [("Inicio", "/"), ("Otros", "")]) +
-            '<section class="section"><div class="wrap"><div class="section-head"><p class="eyebrow">Actividades en la zona</p><h2>Qué hacer</h2></div><div class="grid c3">%s</div></div></section>' % cards)
-    page(path, a["seo_title"], a["seo_desc"], body, "otr", [crumbs_ld([("Inicio", "/"), (a["title"], path)])], image=a["img"], priority="0.5")
+    items = [x for x in ACTIVITIES if x["slug"] in a["links"] and x["slug"] != a["slug"]]
+    cards = "".join(card("/actividades/%s/" % x["slug"], x["img"], x["cat"], x["title"], x["short"], min_price(x)) for x in items)
+    left = [block(t, prose(ps)) for t, ps in a["secciones"]]
+    left.insert(1, block("Lugares imprescindibles", '<div class="two">%s</div>' % "".join('<div class="panel"><h3>%s</h3><p class="muted">%s</p></div>' % (e(n), e(dsc)) for n, dsc in a["lugares"])))
+    left.append(block("Actividades guiadas en la zona", options_html(a["options"])))
+    left.append(block("Preguntas frecuentes", faq_html(a["faq"])))
+    form = book_form(a["title"], a["options"], 0, heading="Reserva tu actividad", opt_label="Actividad")
+    body = (hero("Zonas · Guías Ad Astra", e(a["h1"]), e(a["lead"]), a["img"], [("Inicio", "/"), (a["title"], "")], '<a class="btn btn-primary" href="#reservar">Reservar actividad</a><a class="btn btn-ghost" href="#actividades">Ver actividades</a>') +
+            keybar(a["keybar"]) +
+            '<section class="section"><div class="wrap split"><div class="stack" style="gap:0">%s</div><div class="sticky">%s</div></div></section>' % ("".join(left), form) +
+            '<section class="section alt" id="actividades"><div class="wrap"><div class="section-head"><p class="eyebrow">Más actividades cerca</p><h2>Aventura en la zona</h2></div><div class="grid c3">%s</div></div></section>' % cards)
+    pl = dict(a["place_ld"]); pl["@context"] = "https://schema.org"; pl["description"] = a["seo_desc"]; pl["url"] = url(path); pl["image"] = a["img"]
+    pl["containsPlace"] = [{"@type": "Place", "name": n} for n in pl.get("containsPlace", [])]
+    offers = {"@context": "https://schema.org", "@type": "ItemList", "name": "Actividades guiadas: " + a["title"], "itemListElement": [
+        {"@type": "ListItem", "position": i + 1, "item": {"@type": "Product", "name": o["name"], "description": o["desc"], "brand": {"@type": "Brand", "name": "Guías Ad Astra"},
+                                                       "offers": {"@type": "Offer", "price": o["price"], "priceCurrency": "EUR", "availability": "https://schema.org/InStock", "url": url(path) + "#reservar"}}} for i, o in enumerate(a["options"])]}
+    ld = [crumbs_ld([("Inicio", "/"), (a["title"], path)]), pl, offers, faq_ld(a["faq"]), {"@context": "https://schema.org", **ORG}]
+    page(path, a["seo_title"], a["seo_desc"], body, "otr", ld, "article", a["img"], "0.8")
 
 # ---------------------------------------------------------------- cursos
 def build_course(c):
@@ -511,7 +539,7 @@ def build_about():
             '<section class="section"><div class="wrap about"><img src="%s" alt="Jairo Hernández, fundador de Guías Ad Astra" loading="lazy"><div class="prose" style="font-size:1.1rem">'
             '<p><strong>Guías Ad Astra</strong> («hacia las estrellas», en latín) nace de la pasión de Jairo Hernández por la montaña y por todos los deportes que en ella se pueden practicar.</p>'
             '<p>Diseñamos actividades en todos los ámbitos, adaptadas a cada nivel, para que vivas con nosotros una experiencia única: barrancos, ferratas, cuevas, cumbres, cursos de formación y viajes.</p>'
-            '<p>Trabajamos desde tres bases, Fuentes de Béjar (Salamanca), Vallespinoso de Cervera (Palencia) y Valladolid, y guiamos en ocho provincias y fuera de España.</p>'
+            '<p>Trabajamos desde nuestras bases de Fuentes de Béjar (Salamanca) y Valladolid, y guiamos en ocho provincias y fuera de España.</p>'
             '<p>Además organizamos eventos como la Ultra de Gredos y las jornadas de voluntariado Gredos Limpio desde 2013.</p>'
             '<p><a class="btn btn-primary" href="/actividades/">Ver actividades</a></p></div></div></section>' % JAIRO)
     page("/sobre-nosotros/", "Sobre nosotros | Guías Ad Astra, guías de montaña en Gredos", "Jairo Hernández y el equipo de Guías Ad Astra: guías de montaña titulados en Gredos y Castilla y León, con actividades adaptadas a todos los niveles.", body, "nos",
@@ -524,7 +552,7 @@ def build_contact():
             '<div class="panel"><p class="eyebrow">Teléfono</p><b><a href="tel:%s" style="color:inherit">%s</a></b><p class="muted">%s</p></div>' % (SITE["phone_intl"], SITE["phone"], SITE["hours"]) +
             '<div class="panel"><p class="eyebrow">Email</p><b style="font-size:1.25rem"><a href="mailto:%s" style="color:inherit">%s</a></b></div>' % (SITE["email"], SITE["email"]) +
             '<div class="panel"><p class="eyebrow">Bases</p>%s</div></div></section>' % ticks(SITE["bases"]))
-    page("/contacto/", "Contacto y reservas | Guías Ad Astra", "Contacta con Guías Ad Astra: 621 075 048 · WhatsApp · guiasadastra@gmail.com. Bases en Fuentes de Béjar (Salamanca), Vallespinoso de Cervera (Palencia) y Valladolid.", body, "con",
+    page("/contacto/", "Contacto y reservas | Guías Ad Astra", "Contacta con Guías Ad Astra: 621 075 048 · WhatsApp · guiasadastra@gmail.com. Bases en Fuentes de Béjar (Salamanca) y Valladolid.", body, "con",
          [crumbs_ld([("Inicio", "/"), ("Contacto", "/contacto/")]), {"@context": "https://schema.org", **ORG}], priority="0.6")
 
 def build_404():
@@ -675,6 +703,9 @@ def main():
         os.remove(os.path.join(OUT, "sitemap.xml")) if os.path.exists(os.path.join(OUT, "sitemap.xml")) else None
         open(os.path.join(OUT, ".htaccess"), "w").write("ErrorDocument 404 %s/404.html\n" % BASE)
         print("Versión de prueba en", BASE, "(noindex, sin sitemap)"); return
+    # redirecciones 301 desde las direcciones de la web antigua (para no perder posicionamiento al publicar en la raíz)
+    open(os.path.join(OUT, ".htaccess"), "w").write("ErrorDocument 404 /404.html\n" + "".join(
+        "Redirect 301 /%s.html /actividades/%s/\n" % (s, s) for s in ("via-verde-ruta-de-la-plata", "comarca-natural-oeste-de-gredos")))
     open(os.path.join(OUT, "robots.txt"), "w").write("User-agent: *\nAllow: /\nDisallow: /calendario-google/\n\nSitemap: %s/sitemap.xml\n" % D)
     print("Páginas generadas:", len(PAGES) + 1)
 

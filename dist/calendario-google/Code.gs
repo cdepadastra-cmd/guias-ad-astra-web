@@ -3,12 +3,14 @@
  * ----------------------------------------------------------------
  * Pega este código en Extensiones > Apps Script de tu Google Sheet.
  * La hoja "Calendario" es tu panel de administración: cada fila es una salida.
+ * Las inscripciones a Gredos Limpio se guardan en la hoja "Inscripciones".
  * Cuando alguien reserva en la web, se suman sus plazas en "plazas_reservadas"
  * y se apunta en la hoja "Reservas". Si alguien cancela, baja el número a mano.
  */
 
 var HOJA_CAL = 'Calendario';
 var HOJA_RES = 'Reservas';
+var HOJA_INS = 'Inscripciones';
 var COLUMNAS = ['id', 'fecha', 'fecha_fin', 'hora', 'titulo', 'tipo', 'slug', 'precio', 'plazas_max', 'plazas_reservadas', 'lugar', 'notas', 'publicado'];
 
 /** Ejecútalo una vez (botón ▶) para crear las hojas con sus columnas y un ejemplo. */
@@ -28,6 +30,12 @@ function configurar() {
     res.appendRow(['fecha_reserva', 'id_salida', 'titulo', 'fecha_salida', 'plazas', 'nombre', 'apellidos', 'email', 'telefono', 'estado']);
     res.getRange(1, 1, 1, 10).setFontWeight('bold').setBackground('#7fb3a3');
     res.setFrozenRows(1);
+  }
+  var ins = ss.getSheetByName(HOJA_INS) || ss.insertSheet(HOJA_INS);
+  if (ins.getLastRow() === 0) {
+    ins.appendRow(['fecha_inscripcion', 'evento', 'edicion', 'nombre', 'apellidos', 'email', 'telefono', 'localidad', 'personas', 'comentarios']);
+    ins.getRange(1, 1, 1, 10).setFontWeight('bold').setBackground('#e9a53b');
+    ins.setFrozenRows(1);
   }
 }
 
@@ -67,6 +75,7 @@ function doPost(e) {
   lock.waitLock(20000);
   try {
     var d = JSON.parse(e.postData.contents || '{}');
+    if (d.action === 'inscripcion') return inscribir_(d);
     var plazas = Math.max(1, Math.min(20, parseInt(d.plazas, 10) || 1));
     var nombre = String(d.nombre || '').slice(0, 80).trim();
     var apellidos = String(d.apellidos || '').slice(0, 120).trim();
@@ -97,4 +106,24 @@ function doPost(e) {
   } finally {
     lock.releaseLock();
   }
+}
+
+/** Inscripción a un evento gratuito (Gredos Limpio): guarda una fila en la hoja "Inscripciones". */
+function inscribir_(d) {
+  var t = function (v, n) { return String(v || '').slice(0, n || 120).trim(); };
+  var nombre = t(d.nombre, 80), apellidos = t(d.apellidos), email = t(d.email), tel = t(d.telefono, 20).replace(/[^\d+ ]/g, '');
+  var personas = Math.max(1, Math.min(20, parseInt(d.personas, 10) || 1));
+  if (!nombre || !apellidos || !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email) || tel.replace(/\D/g, '').length < 9)
+    return json_({ ok: false, error: 'Revisa nombre, apellidos, correo y teléfono.' });
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sh = ss.getSheetByName(HOJA_INS);
+  if (!sh) { configurar(); sh = ss.getSheetByName(HOJA_INS); }
+  sh.appendRow([new Date(), t(d.evento), t(d.edicion), nombre, apellidos, email, tel, t(d.localidad), personas, t(d.comentarios, 500)]);
+  try {
+    MailApp.sendEmail(email, 'Inscripción recibida: ' + t(d.edicion),
+      'Hola ' + nombre + ',\n\nHemos recibido tu inscripción a ' + t(d.edicion) + (personas > 1 ? ' para ' + personas + ' personas' : '') + '.\n' +
+      'Te enviaremos los detalles de la jornada unos días antes.\n\n¡Gracias por cuidar Gredos!\nGuías Ad Astra · 621 075 048');
+    MailApp.sendEmail('guiasadastra@gmail.com', 'Nueva inscripción: ' + t(d.edicion), nombre + ' ' + apellidos + ' (' + tel + ', ' + email + ') · ' + personas + ' persona(s).');
+  } catch (err) {}
+  return json_({ ok: true });
 }

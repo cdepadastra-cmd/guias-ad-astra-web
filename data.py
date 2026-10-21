@@ -11,8 +11,17 @@ SITE = {
     "hours": "Lun–Vie 9:00–18:00 · Sáb–Dom por mensaje",
     "instagram": "https://www.instagram.com/guias_adastra/",
     "facebook": "https://www.facebook.com/guiasadastra/",
-    "bases": ["Fuentes de Béjar (Salamanca)", "Vallespinoso de Cervera (Palencia)", "Valladolid"],
+    "bases": ["Fuentes de Béjar (Salamanca)", "Valladolid"],
     "og_image": "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/lovp_5h0eg7gkx38kmrhpdqxcqzyn4c/3aab321b001e3a984488483f51b89d7f_1792454577431.png",
+}
+
+# Gredos Limpio: cambia aquí la edición y la fecha de cada año
+GREDOS_LIMPIO = {
+    "edicion": "XIV Gredos Limpio 2026",
+    "fecha": "",            # p. ej. "Sábado 7 de noviembre de 2026". Vacío = "Fecha por confirmar"
+    "hora": "9:30",
+    "lugar": "Casa del Parque de Hoyos del Espino (Ávila)",
+    "abiertas": True,       # False para cerrar las inscripciones
 }
 
 # Las fotos siguen alojadas en Lovable. Si algún día dejas Lovable, descárgalas a /img/ y cambia esta ruta a "/img/".
@@ -409,20 +418,98 @@ ACTIVITIES = [
  {
   "slug": "comarca-natural-oeste-de-gredos", "cat": "Otros", "kind": "zona",
   "title": "Comarca Natural Oeste de Gredos", "img": img("398c4c45-1d97-4c78-a790-e6efe5fea909/otros-media-1.webp"),
-  "short": "Actividades de montaña y aventura en el oeste de Gredos. Ávila, Cáceres y Salamanca.",
-  "seo_title": "Actividades de aventura en el Oeste de Gredos | Guías Ad Astra",
-  "seo_desc": "Vía ferrata de La Muela, barrancos y rutas en la Comarca Natural Oeste de Gredos, entre Ávila, Cáceres y Salamanca.",
-  "lead": "Las mejores actividades de montaña y aventura en la comarca natural del oeste de Gredos, entre Ávila, Cáceres y Salamanca.",
-  "links": ["via-ferrata-salamanca", "barranquismo-en-caceres", "barranquismo-avila", "boulder-zona-centro-salamanca-caceres", "senderismo-avila-gredos"],
+  "short": "Qué hacer en el Oeste de Gredos: barrancos, vía ferrata, escalada y rutas entre Béjar, Candelario, Hervás, Baños de Montemayor y El Barco de Ávila.",
+  "seo_title": "Comarca Natural Oeste de Gredos: qué hacer, rutas y aventura | Guías Ad Astra",
+  "seo_desc": "Qué hacer en la Comarca Natural Oeste de Gredos (Béjar, Candelario, Hervás, Baños de Montemayor y El Barco de Ávila): rutas, barranquismo, vía ferrata y escalada con guías locales.",
+  "h1": "Comarca Natural Oeste de Gredos",
+  "lead": "Béjar, Candelario, Hervás, Baños de Montemayor y El Barco de Ávila: el oeste de la Sierra de Gredos, entre Salamanca, Cáceres y Ávila. Montaña de más de 2.400 m, gargantas, lagunas glaciares y pueblos con historia, a pocos minutos de nuestra base de Fuentes de Béjar.",
+  "keybar": [("Municipios", "Béjar · Candelario · Hervás · Baños de Montemayor · El Barco de Ávila"), ("Provincias", "Salamanca, Cáceres y Ávila"), ("Techo", "Canchal de la Ceja, 2.428 m"), ("Base Ad Astra", "Fuentes de Béjar")],
+  "secciones": [
+    ("Qué es la Comarca Natural Oeste de Gredos", [
+      "La Comarca Natural Oeste de Gredos es la marca turística con la que cinco municipios del extremo occidental de la Sierra de Gredos promocionan juntos su territorio: Béjar y Candelario (Salamanca), Hervás y Baños de Montemayor (Cáceres) y El Barco de Ávila (Ávila). Se presentó en FITUR en enero de 2024 para unir fuerzas y dar a conocer un territorio que comparte sierra, paisaje y forma de vida aunque esté repartido entre tres provincias y dos comunidades autónomas.",
+      "Es la parte de Gredos menos masificada y, para muchos montañeros, la más variada: aquí están la Sierra de Béjar y la Sierra de Candelario, el Valle del Ambroz, el Alto Tormes y, a un paso, el Valle del Jerte y el corazón de Gredos. Montañas que superan los 2.400 metros, gargantas de agua cristalina, robledales, castañares y pueblos de arquitectura serrana.",
+    ]),
+    ("Qué hacer en el Oeste de Gredos", [
+      "Somos guías de montaña de la zona y trabajamos aquí todo el año. En verano, los barrancos del Valle del Jerte y de Gredos, la vía ferrata del Cancho de la Muela y las rutas a las lagunas glaciares. En invierno, el montañismo invernal en la Sierra de Béjar y Candelario, con raquetas o piolet y crampones. Y en cualquier época, la escalada y el boulder en el granito de Candelario, Valdesangil o La Hoya.",
+      "Muchas actividades se pueden combinar en un mismo fin de semana: una ferrata por la mañana y un barranco por la tarde, o una ascensión al Canchal de la Ceja y un paseo por Candelario. Te ayudamos a montar el plan y te recomendamos alojamiento en la comarca.",
+    ]),
+  ],
+  "lugares": [
+    ("Candelario", "Uno de los pueblos más bonitos de la Sierra de Béjar, con sus casas serranas, sus regaderas y las «batipuertas». Punto de partida hacia el Canchal de la Ceja y la vía ferrata del Cancho de la Muela."),
+    ("Béjar", "Ciudad textil a los pies de la sierra, con su casco histórico sobre un espolón rocoso y la villa renacentista de El Bosque. La Vía Verde de la Ruta de la Plata llega hasta su antigua estación."),
+    ("Hervás", "Capital del Valle del Ambroz, famosa por su barrio judío y por los castañares que se tiñen de ocre en otoño."),
+    ("Baños de Montemayor", "Villa termal en la vieja calzada romana de la Ruta de la Plata, con balneario y restos de las termas romanas."),
+    ("El Barco de Ávila", "Puerta del Alto Tormes, con su castillo de Valdecorneja y sus famosas judías. Muy cerca, la Laguna del Barco y la Laguna del Duque."),
+    ("Sierra de Béjar y Candelario", "El techo de la comarca: el Canchal de la Ceja (2.428 m) es la cima más alta de Salamanca y el Calvitero, la más alta de Extremadura."),
+  ],
+  "options": [
+    {"name": "Ascensión al Canchal de la Ceja y el Calvitero", "place": "Candelario (Salamanca)", "dur": "4-6 horas", "price": 45, "specs": ["Techo de Salamanca 2.428 m", "Techo de Extremadura", "Alta montaña"], "desc": "Subida al Canchal de la Ceja, la cima más alta de Salamanca, y al Calvitero, la más alta de Extremadura, en una ruta de alta montaña por la Sierra de Candelario."},
+    {"name": "Ruta a la Laguna del Barco", "place": "Nava del Barco (Ávila)", "dur": "4-5 horas", "price": 40, "specs": ["Laguna glaciar", "Senderismo", "Primavera y verano"], "desc": "Un clásico de Gredos: senda entre montañas hasta una laguna glaciar de postal en lo alto de la garganta."},
+    {"name": "Ascensión a la Laguna del Duque", "place": "Solana de Ávila (Ávila)", "dur": "4 horas", "price": 30, "specs": ["Senderismo", "Laguna de montaña", "Todos los niveles"], "desc": "Ruta asequible por un enorme paredón de roca que parece inaccesible y que se sube cómodamente entre arroyos hasta la laguna."},
+    {"name": "Vía ferrata de La Muela", "place": "La Garganta (Cáceres) / Candelario (Salamanca)", "dur": "2-4 horas", "price": 35, "specs": ["K1 a K4", "Rápel final", "Familias y expertos"], "desc": "Dos murallas de granito de hasta 70 m con recorridos de K1 a K4: desde familias hasta montañeros con experiencia."},
+    {"name": "Escalada en La Muela", "place": "La Garganta (Cáceres)", "dur": "2 horas", "price": 20, "specs": ["Bautismo de escalada", "Granito", "Material incluido"], "desc": "Bautismo de escalada en el granito del Cancho de la Muela, con vistas al Valle del Ambroz. Perfecto para combinar con la ferrata."},
+    {"name": "Barranco de Solana", "place": "Solana de Ávila (Ávila)", "dur": "4-5 horas", "price": 60, "specs": ["9 rápeles", "Rápel de 40 m", "Saltos"], "desc": "Un entorno sobrecogedor junto al gran paredón que cae desde la Laguna del Duque."},
+  ],
+  "faq": [
+    ("¿Qué pueblos forman la Comarca Natural Oeste de Gredos?", "Béjar y Candelario (Salamanca), Hervás y Baños de Montemayor (Cáceres) y El Barco de Ávila (Ávila). Se unieron en 2024 para promocionar juntos el oeste de la Sierra de Gredos."),
+    ("¿Qué hacer en el Oeste de Gredos?", "Rutas de senderismo a lagunas glaciares, ascensiones como el Canchal de la Ceja, barranquismo en verano, la vía ferrata del Cancho de la Muela, escalada y boulder en granito, montañismo invernal y la Vía Verde de la Ruta de la Plata. Además de visitar Candelario, Béjar, Hervás, Baños de Montemayor y El Barco de Ávila."),
+    ("¿Cuál es la montaña más alta de la zona?", "El Canchal de la Ceja (2.428 m), en la Sierra de Candelario, es la cima más alta de la provincia de Salamanca. Muy cerca está el Calvitero, el techo de Extremadura."),
+    ("¿Cuándo es mejor ir?", "Primavera y otoño son ideales para senderismo y ascensiones; el verano, para barrancos y lagunas; y el invierno, para el montañismo con nieve. En otoño, los castañares del Ambroz son espectaculares."),
+    ("¿Hacéis actividades guiadas en la comarca?", "Sí. Tenemos base en Fuentes de Béjar, muy cerca de Béjar y Candelario. Organizamos rutas, ascensiones, ferratas, escalada, barrancos y cursos para particulares, familias, grupos y colegios. Reserva desde esta página o por WhatsApp."),
+    ("¿Se puede alquilar material de montaña en la zona?", "Sí: alquilamos neoprenos, arneses, cascos, sets de ferrata, piolets y crampones con recogida en Fuentes de Béjar."),
+  ],
+  "links": ["via-ferrata-salamanca", "barranquismo-en-caceres", "barranquismo-avila", "boulder-zona-centro-salamanca-caceres", "senderismo-avila-gredos", "via-verde-ruta-de-la-plata"],
+  "place_ld": {"@type": "TouristDestination", "name": "Comarca Natural Oeste de Gredos", "containsPlace": ["Béjar", "Candelario", "Hervás", "Baños de Montemayor", "El Barco de Ávila"]},
  },
  {
   "slug": "via-verde-ruta-de-la-plata", "cat": "Otros", "kind": "zona",
   "title": "Vía Verde Ruta de la Plata", "img": img("398c4c45-1d97-4c78-a790-e6efe5fea909/otros-media-1.webp"),
-  "short": "Actividades de montaña y aventura alrededor de la Vía Verde de la Ruta de la Plata. Cáceres y Salamanca.",
-  "seo_title": "Actividades de aventura en la Vía Verde Ruta de la Plata | Guías Ad Astra",
-  "seo_desc": "Barranquismo, vía ferrata y boulder cerca de la Vía Verde de la Ruta de la Plata, entre Cáceres y Salamanca.",
-  "lead": "Las mejores actividades de montaña y aventura alrededor de la Vía Verde de la Ruta de la Plata, entre Cáceres y Salamanca.",
-  "links": ["via-ferrata-salamanca", "barranquismo-en-caceres", "barranquismo-salamanca", "boulder-zona-centro-salamanca-caceres"],
+  "short": "La Vía Verde de la Ruta de la Plata entre Plasencia y Béjar: recorrido, qué ver y las mejores actividades de aventura junto a ella.",
+  "seo_title": "Vía Verde Ruta de la Plata (Plasencia–Hervás–Béjar): recorrido y aventura",
+  "seo_desc": "Vía Verde de la Ruta de la Plata entre Plasencia, Hervás, Baños de Montemayor y Béjar: recorrido, qué ver y actividades de aventura cerca (vía ferrata, escalada, barrancos y rutas).",
+  "h1": "Vía Verde de la Ruta de la Plata",
+  "lead": "Unos 66 km por el antiguo trazado del tren entre Plasencia y Béjar, cruzando el Valle del Ambroz y el Puerto de Béjar. Te contamos el recorrido y todo lo que puedes hacer a su alrededor: vía ferrata, escalada, barrancos y montaña.",
+  "keybar": [("Recorrido", "Plasencia – Hervás – Béjar"), ("Longitud", "Unos 66 km"), ("Provincias", "Cáceres y Salamanca"), ("Para", "A pie y en bicicleta")],
+  "secciones": [
+    ("Qué es la Vía Verde de la Ruta de la Plata", [
+      "La Vía Verde de la Ruta de la Plata aprovecha el antiguo ferrocarril que unía Plasencia con Astorga, cerrado al tráfico de viajeros en 1985. El tramo acondicionado recorre unos 66 km desde la estación de Plasencia, en Cáceres, hasta Béjar y el límite de Navalmoral de Béjar, ya en Salamanca. En 2024 recibió el distintivo de Sendero Azul.",
+      "Al ser un antiguo trazado ferroviario, las pendientes son suaves y se puede recorrer a pie o en bicicleta, por tramos o entera en varias jornadas. Conserva túneles, puentes de hierro y estaciones restauradas, y atraviesa paisajes muy distintos: las dehesas del norte de Cáceres, los castañares del Valle del Ambroz y la entrada a la Sierra de Béjar por el Puerto de Béjar.",
+    ]),
+    ("Recorrido y qué ver", [
+      "Desde Plasencia, la vía verde pasa por el túnel de San Lázaro y el puente de hierro de Gastón Bertier, y sigue por las estaciones de Oliva de Plasencia, Villar de Plasencia, Jarilla, Casas del Monte y Aldeanueva del Camino hasta Hervás, capital del Valle del Ambroz y famosa por su barrio judío.",
+      "Desde Hervás sube hacia Baños de Montemayor, villa termal en la calzada romana, y La Garganta, para cruzar el túnel del Puerto de Béjar y entrar en Salamanca. Pasa por Cantagallo y termina en Béjar, donde la antigua estación se ha recuperado como «Béjar Verde» y la vía cruza dos túneles antes de seguir hacia Navalmoral de Béjar.",
+      "La vía verde coincide en buena parte con la Ruta de la Plata, la antigua calzada romana y Camino de Santiago, y está dentro de la ruta ciclista EuroVelo 1.",
+    ]),
+    ("Aventura junto a la vía verde", [
+      "La vía verde es la excusa perfecta para conocer la zona, pero a pocos minutos tienes mucho más: la vía ferrata del Cancho de la Muela, sobre La Garganta y Candelario; escalada en granito; los barrancos del Valle del Jerte; y las cumbres de la Sierra de Béjar y Candelario, con el Canchal de la Ceja como techo de Salamanca.",
+      "Nuestra base está en Fuentes de Béjar, a pocos minutos de Béjar. Organizamos actividades guiadas para quienes recorren la vía verde y quieren completar el viaje con un día de aventura, y alquilamos material técnico de montaña.",
+    ]),
+  ],
+  "lugares": [
+    ("Plasencia", "Inicio de la vía verde, en la estación. Capital del Valle del Jerte."),
+    ("Hervás", "Estación restaurada, puente de hierro sobre el Ambroz y el barrio judío."),
+    ("Baños de Montemayor", "Villa termal de la Ruta de la Plata, con restos de termas romanas."),
+    ("Puerto de Béjar", "Estación restaurada y túnel curvo que marca el paso de Cáceres a Salamanca."),
+    ("La Garganta y el Cancho de la Muela", "Murallas de granito con vía ferrata y escalada, junto a la vía verde."),
+    ("Béjar", "Final del tramo, con la estación «Béjar Verde» y la villa renacentista de El Bosque."),
+  ],
+  "options": [
+    {"name": "Vía ferrata de La Muela", "place": "La Garganta (Cáceres) / Candelario (Salamanca)", "dur": "2-4 horas", "price": 35, "specs": ["K1 a K4", "Rápel final", "Junto a la vía verde"], "desc": "La única vía ferrata de Salamanca y norte de Cáceres, a un paso del Puerto de Béjar. Recorridos para familias y para expertos."},
+    {"name": "Escalada en La Muela", "place": "La Garganta (Cáceres)", "dur": "2 horas", "price": 20, "specs": ["Bautismo de escalada", "Granito", "Material incluido"], "desc": "Bautismo de escalada en el Cancho de la Muela con vistas al Valle del Ambroz."},
+    {"name": "Barranco de los Hoyos", "place": "Jerte (Cáceres)", "dur": "2 horas", "price": 40, "specs": ["Iniciación", "Saltos opcionales", "Toboganes"], "desc": "El barranco perfecto para empezar, en el Valle del Jerte, muy cerca de Plasencia."},
+    {"name": "Barranco de los Papúos", "place": "Jerte (Cáceres)", "dur": "4 horas", "price": 60, "specs": ["9 rápeles", "Saltos", "Toboganes"], "desc": "Para nosotros, el mejor barranco de la zona centro: rápeles, saltos y toboganes entre cerezos."},
+    {"name": "Ascensión al Canchal de la Ceja y el Calvitero", "place": "Candelario (Salamanca)", "dur": "4-6 horas", "price": 45, "specs": ["Techo de Salamanca", "Techo de Extremadura", "Alta montaña"], "desc": "Las dos cimas más altas de Salamanca y Extremadura en una misma jornada, sobre Béjar y Candelario."},
+  ],
+  "faq": [
+    ("¿Dónde empieza y dónde termina la Vía Verde de la Ruta de la Plata?", "El tramo acondicionado empieza en la estación de Plasencia (Cáceres) y termina en Béjar y el límite de Navalmoral de Béjar (Salamanca), pasando por Hervás y Baños de Montemayor."),
+    ("¿Cuántos kilómetros tiene?", "Unos 66 km entre Plasencia y el límite de Navalmoral de Béjar. Se puede hacer entera en bici en una o dos jornadas, o por tramos a pie."),
+    ("¿Se puede hacer andando y en bicicleta?", "Sí. Al ser un antiguo trazado de tren, las pendientes son suaves. Hay tramos muy cómodos para familias, como los alrededores de Hervás, y otros más largos para ciclistas."),
+    ("¿Qué ver en la vía verde?", "Túneles y puentes de hierro del antiguo ferrocarril, las estaciones restauradas de Hervás, Puerto de Béjar y Béjar, el barrio judío de Hervás, la villa termal de Baños de Montemayor y los castañares del Valle del Ambroz."),
+    ("¿Qué actividades de aventura hay cerca?", "La vía ferrata y la escalada del Cancho de la Muela, junto a La Garganta y Candelario; los barrancos del Valle del Jerte; y las ascensiones de la Sierra de Béjar y Candelario. Las organizamos con guía y todo el material."),
+    ("¿Dónde puedo alquilar material de montaña?", "Alquilamos material técnico de montaña (cascos, arneses, sets de ferrata, neoprenos, piolets y crampones) con recogida en Fuentes de Béjar, muy cerca de Béjar."),
+  ],
+  "links": ["via-ferrata-salamanca", "barranquismo-en-caceres", "boulder-zona-centro-salamanca-caceres", "ascensiones-montana", "comarca-natural-oeste-de-gredos"],
+  "place_ld": {"@type": "TouristAttraction", "name": "Vía Verde de la Ruta de la Plata", "touristType": ["Senderistas", "Ciclistas"], "containsPlace": ["Plasencia", "Hervás", "Baños de Montemayor", "Puerto de Béjar", "Béjar"]},
  },
 ]
 

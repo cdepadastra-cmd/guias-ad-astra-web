@@ -100,6 +100,35 @@
     });
   });
 
+  /* ---------------- inscripciones (Gredos Limpio) → Google Sheets */
+  $$("form[data-inscripcion]").forEach(function (f) {
+    var pers = 1, st = $(".stepper", f); if (st) bindStepper(st, function (v) { pers = v; });
+    var err = $(".err", f), ok = $("[data-ok]", f), btn = $("button[type=submit]", f);
+    f.addEventListener("submit", function (e) {
+      e.preventDefault(); err.textContent = "";
+      var v = function (n) { var i = $("[name=" + n + "]", f); return i ? i.value.trim() : ""; };
+      var fail = function (n, m) { err.textContent = m; var i = $("[name=" + n + "]", f); if (i) i.focus(); };
+      if (!v("nombre")) return fail("nombre", "Escribe tu nombre.");
+      if (!v("apellidos")) return fail("apellidos", "Escribe tus apellidos.");
+      if (!EMAIL.test(v("email"))) return fail("email", "Revisa el correo electrónico (ejemplo: nombre@gmail.com).");
+      if (!telOK(v("telefono"))) return fail("telefono", "Revisa el número de teléfono (9 cifras).");
+      if (!$("[name=privacidad]", f).checked) return fail("privacidad", "Marca la casilla de protección de datos para poder inscribirte.");
+      var url = CFG.appsScriptURL || CFG.calendarioURL;
+      if (!url) { err.textContent = "Las inscripciones online todavía no están activas. Inténtalo de nuevo más tarde."; return; }
+      btn.disabled = true; btn.textContent = "Enviando…";
+      var data = { action: "inscripcion", evento: f.dataset.evento, edicion: f.dataset.edicion, nombre: v("nombre"), apellidos: v("apellidos"), email: v("email"), telefono: v("telefono"), localidad: v("localidad"), personas: pers, comentarios: v("comentarios") };
+      fetch(url, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(data) })
+        .then(function (r) { return r.json(); })
+        .then(function (j) {
+          if (!j.ok) throw new Error(j.error || "No se pudo guardar la inscripción.");
+          $$(".field, .row2, .check, button[type=submit]", f).forEach(function (x) { x.hidden = true; });
+          ok.hidden = false;
+          ok.innerHTML = "<b>¡Inscripción recibida, " + esc(data.nombre) + "!</b><br>Te hemos apuntado " + (pers > 1 ? "con " + pers + " personas " : "") + "a " + esc(data.edicion) + ". Recibirás un correo de confirmación en " + esc(data.email) + ".";
+        })
+        .catch(function (x) { err.textContent = (x && x.message && x.message.indexOf("JSON") < 0 ? x.message : "No hemos podido enviar la inscripción. Revisa tu conexión e inténtalo de nuevo."); btn.disabled = false; btn.textContent = "Enviar inscripción"; });
+    });
+  });
+
   /* ---------------- alquiler */
   var rent = $("#alquiler-app");
   if (rent) (function () {

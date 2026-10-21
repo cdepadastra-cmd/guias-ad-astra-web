@@ -46,6 +46,11 @@ Hasta que lo actives, el calendario muestra unas **fechas de ejemplo** (marcadas
 
 Cada reserva queda apuntada en la pestaña *Reservas* (nombre, teléfono, plazas) y te llega un email de aviso. El sistema no deja reservar más plazas de las que quedan.
 
+### Inscripciones de Gredos Limpio
+El mismo Apps Script guarda las inscripciones de Gredos Limpio en la pestaña **Inscripciones** (fecha, edición, nombre, apellidos, email, teléfono, localidad, personas y comentarios). Cada inscrito recibe un correo de confirmación y a ti te llega un aviso.
+Para activarlo basta con tener desplegado el Apps Script y pegar su URL en `config.js` (`calendarioURL` o `appsScriptURL`). Si ya lo tenías desplegado antes de este cambio, vuelve a pegar el código nuevo de `Code.gs`, ejecuta `configurar` y haz **Implementar → Gestionar implementaciones → Editar → Nueva versión**.
+La edición y la fecha se cambian en `data.py` (`GREDOS_LIMPIO`).
+
 ## 3. Después de publicar (SEO)
 
 1. Da de alta el dominio en **Google Search Console** y envía `https://www.guiasadastra.com/sitemap.xml`.

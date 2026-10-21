@@ -1,9 +1,83 @@
-{"events":[
- {"id":"ej-arva-1","fecha":"2026-12-12","hora":"09:30","titulo":"Curso de ARVA","tipo":"Curso","slug":"curso-arva","precio":30,"plazas_max":10,"plazas_libres":7,"lugar":"Plataforma de Gredos (Ávila)","notas":"Fecha de ejemplo"},
- {"id":"ej-alp-1","fecha":"2027-01-09","hora":"09:00","titulo":"Iniciación al alpinismo (Nivel 1)","tipo":"Curso","slug":"cursos-alpinismo","precio":65,"plazas_max":8,"plazas_libres":2,"lugar":"Sierra de Gredos (Ávila)","notas":"Fecha de ejemplo"},
- {"id":"ej-auto-1","fecha":"2026-11-21","fecha_fin":"2026-11-22","hora":"09:00","titulo":"Curso de autorrescate","tipo":"Curso","slug":"curso-autorrescate","precio":130,"plazas_max":6,"plazas_libres":6,"lugar":"La Pedriza (Madrid)","notas":"Fecha de ejemplo"},
- {"id":"ej-esc-1","fecha":"2026-11-14","hora":"10:00","titulo":"Iniciación a la escalada en roca","tipo":"Curso","slug":"curso-iniciacion-escalada-en-roca","precio":60,"plazas_max":6,"plazas_libres":0,"lugar":"Candelario (Salamanca)","notas":"Fecha de ejemplo"},
- {"id":"ej-sen-1","fecha":"2026-11-08","hora":"09:30","titulo":"Gredos Limpio · voluntariado","tipo":"Actividad","slug":"gredos-limpio","precio":0,"plazas_max":60,"plazas_libres":41,"lugar":"Hoyos del Espino (Ávila)","notas":"Fecha de ejemplo"},
- {"id":"ej-esp-1","fecha":"2026-11-29","hora":"10:00","titulo":"Espeleología Cueva del Burro","tipo":"Actividad","slug":"espeleologia-leon","precio":40,"plazas_max":8,"plazas_libres":5,"lugar":"Vegacervera (León)","notas":"Fecha de ejemplo"},
- {"id":"ej-fer-1","fecha":"2026-11-15","hora":"10:00","titulo":"Vía ferrata Cancho de la Muela","tipo":"Actividad","slug":"via-ferrata-salamanca","precio":35,"plazas_max":10,"plazas_libres":4,"lugar":"Candelario (Salamanca)","notas":"Fecha de ejemplo"}
-]}
+{
+ "events": [
+  {
+   "id": "ej-arva-1",
+   "fecha": "2026-12-12",
+   "hora": "09:30",
+   "titulo": "Curso de ARVA",
+   "tipo": "Curso",
+   "slug": "curso-arva",
+   "precio": 30,
+   "plazas_max": 10,
+   "plazas_libres": 7,
+   "lugar": "Plataforma de Gredos (Ávila)",
+   "notas": "Fecha de ejemplo"
+  },
+  {
+   "id": "ej-alp-1",
+   "fecha": "2027-01-09",
+   "hora": "09:00",
+   "titulo": "Iniciación al alpinismo (Nivel 1)",
+   "tipo": "Curso",
+   "slug": "cursos-alpinismo",
+   "precio": 65,
+   "plazas_max": 8,
+   "plazas_libres": 2,
+   "lugar": "Sierra de Gredos (Ávila)",
+   "notas": "Fecha de ejemplo"
+  },
+  {
+   "id": "ej-auto-1",
+   "fecha": "2026-11-21",
+   "fecha_fin": "2026-11-22",
+   "hora": "09:00",
+   "titulo": "Curso de autorrescate",
+   "tipo": "Curso",
+   "slug": "curso-autorrescate",
+   "precio": 130,
+   "plazas_max": 6,
+   "plazas_libres": 6,
+   "lugar": "La Pedriza (Madrid)",
+   "notas": "Fecha de ejemplo"
+  },
+  {
+   "id": "ej-esc-1",
+   "fecha": "2026-11-14",
+   "hora": "10:00",
+   "titulo": "Iniciación a la escalada en roca",
+   "tipo": "Curso",
+   "slug": "curso-iniciacion-escalada-en-roca",
+   "precio": 60,
+   "plazas_max": 6,
+   "plazas_libres": 0,
+   "lugar": "Candelario (Salamanca)",
+   "notas": "Fecha de ejemplo"
+  },
+  {
+   "id": "ej-esp-1",
+   "fecha": "2026-11-29",
+   "hora": "10:00",
+   "titulo": "Espeleología Cueva del Burro",
+   "tipo": "Actividad",
+   "slug": "espeleologia-leon",
+   "precio": 40,
+   "plazas_max": 8,
+   "plazas_libres": 5,
+   "lugar": "Vegacervera (León)",
+   "notas": "Fecha de ejemplo"
+  },
+  {
+   "id": "ej-fer-1",
+   "fecha": "2026-11-15",
+   "hora": "10:00",
+   "titulo": "Vía ferrata Cancho de la Muela",
+   "tipo": "Actividad",
+   "slug": "via-ferrata-salamanca",
+   "precio": 35,
+   "plazas_max": 10,
+   "plazas_libres": 4,
+   "lugar": "Candelario (Salamanca)",
+   "notas": "Fecha de ejemplo"
+  }
+ ]
+}

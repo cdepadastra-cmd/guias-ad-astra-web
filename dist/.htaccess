@@ -1,0 +1,3 @@
+ErrorDocument 404 /404.html
+Redirect 301 /via-verde-ruta-de-la-plata.html /actividades/via-verde-ruta-de-la-plata/
+Redirect 301 /comarca-natural-oeste-de-gredos.html /actividades/comarca-natural-oeste-de-gredos/

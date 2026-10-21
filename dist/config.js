@@ -6,5 +6,7 @@ window.ADASTRA_CONFIG = {
   // Mientras esté vacío, la web muestra las fechas de ejemplo de /data/calendario.json.
   calendarioURL: "",
   // Carpeta donde está publicada la web ("" si está en la raíz del dominio)
-  base: ""
+  base: "",
+  // URL del mismo Apps Script para las inscripciones (Gredos Limpio). Si se deja vacía, usa la del calendario.
+  appsScriptURL: ""
 };
