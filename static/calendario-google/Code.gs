@@ -8,6 +8,10 @@
  * y se apunta en la hoja "Reservas". Si alguien cancela, baja el número a mano.
  */
 
+// ID de la hoja de Google. Si el script está dentro de la propia hoja (Extensiones > Apps Script) puede quedarse vacío.
+var HOJA_ID = '';
+function libro_() { return HOJA_ID ? SpreadsheetApp.openById(HOJA_ID) : SpreadsheetApp.getActiveSpreadsheet(); }
+
 var HOJA_CAL = 'Calendario';
 var HOJA_RES = 'Reservas';
 var HOJA_INS = 'Inscripciones';
@@ -15,7 +19,7 @@ var COLUMNAS = ['id', 'fecha', 'fecha_fin', 'hora', 'titulo', 'tipo', 'slug', 'p
 
 /** Ejecútalo una vez (botón ▶) para crear las hojas con sus columnas y un ejemplo. */
 function configurar() {
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var ss = libro_();
   var cal = ss.getSheetByName(HOJA_CAL) || ss.insertSheet(HOJA_CAL);
   if (cal.getLastRow() === 0) {
     cal.appendRow(COLUMNAS);
@@ -31,7 +35,11 @@ function configurar() {
     res.getRange(1, 1, 1, 10).setFontWeight('bold').setBackground('#7fb3a3');
     res.setFrozenRows(1);
   }
-  var ins = ss.getSheetByName(HOJA_INS) || ss.insertSheet(HOJA_INS);
+  var ins = ss.getSheetByName(HOJA_INS);
+  if (!ins) { // si la primera pestaña ya tiene la cabecera de inscripciones, se reutiliza
+    ss.getSheets().forEach(function (s) { if (!ins && String(s.getRange(1, 1).getValue()) === 'fecha_inscripcion') { s.setName(HOJA_INS); ins = s; } });
+    if (!ins) ins = ss.insertSheet(HOJA_INS);
+  }
   if (ins.getLastRow() === 0) {
     ins.appendRow(['fecha_inscripcion', 'evento', 'edicion', 'nombre', 'apellidos', 'email', 'telefono', 'localidad', 'personas', 'comentarios']);
     ins.getRange(1, 1, 1, 10).setFontWeight('bold').setBackground('#e9a53b');
@@ -40,7 +48,7 @@ function configurar() {
 }
 
 function leerSalidas_() {
-  var sh = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(HOJA_CAL);
+  var sh = libro_().getSheetByName(HOJA_CAL);
   var datos = sh.getDataRange().getValues();
   var cab = datos.shift().map(function (c) { return String(c).trim(); });
   return datos.map(function (fila, i) {
@@ -91,7 +99,7 @@ function doPost(e) {
     var max = Number(salida.plazas_max) || 0, res = Number(salida.plazas_reservadas) || 0, libres = max - res;
     if (plazas > libres) return json_({ ok: false, error: libres > 0 ? 'Solo quedan ' + libres + ' plazas.' : 'Esta fecha está completa.', libres: Math.max(0, libres) });
 
-    var ss = SpreadsheetApp.getActiveSpreadsheet(), sh = ss.getSheetByName(HOJA_CAL);
+    var ss = libro_(), sh = ss.getSheetByName(HOJA_CAL);
     var col = sh.getRange(1, 1, 1, sh.getLastColumn()).getValues()[0].map(String).indexOf('plazas_reservadas') + 1;
     sh.getRange(salida._fila, col).setValue(res + plazas);
     ss.getSheetByName(HOJA_RES).appendRow([new Date(), salida.id, salida.titulo, salida.fecha, plazas, nombre, apellidos, email, tel, 'Pendiente de confirmar']);
@@ -115,7 +123,7 @@ function inscribir_(d) {
   var personas = Math.max(1, Math.min(20, parseInt(d.personas, 10) || 1));
   if (!nombre || !apellidos || !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email) || tel.replace(/\D/g, '').length < 9)
     return json_({ ok: false, error: 'Revisa nombre, apellidos, correo y teléfono.' });
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var ss = libro_();
   var sh = ss.getSheetByName(HOJA_INS);
   if (!sh) { configurar(); sh = ss.getSheetByName(HOJA_INS); }
   sh.appendRow([new Date(), t(d.evento), t(d.edicion), nombre, apellidos, email, tel, t(d.localidad), personas, t(d.comentarios, 500)]);
