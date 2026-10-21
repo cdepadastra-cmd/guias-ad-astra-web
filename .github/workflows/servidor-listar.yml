@@ -1,6 +1,9 @@
-# Solo lectura: lista lo que hay en la carpeta de la web en el servidor (no cambia nada).
+# Solo lectura: lista lo que hay en la carpeta de la web en el servidor (no cambia nada en el servidor).
+# El resultado se guarda en la rama "diagnostico" (archivo servidor.txt).
 name: Servidor - listar carpeta web
 on: workflow_dispatch
+permissions:
+  contents: write
 jobs:
   listar:
     runs-on: ubuntu-latest
@@ -12,4 +15,9 @@ jobs:
           U: ${{ secrets.FTP_USER }}
           P: ${{ secrets.FTP_PASSWORD }}
         run: |
-          lftp -u "$U","$P" "$H" -e "set ssl:verify-certificate no; set net:max-retries 3; echo '== raiz FTP =='; cls -la /; echo '== web =='; cls -la /guiasadastra.com/; echo '== tamano =='; du -s --block-size=1M /guiasadastra.com/ ; bye" 2>&1 | sed 's/^/  /'
+          lftp -u "$U","$P" "$H" -e "set ssl:verify-certificate no; set net:max-retries 3; echo '== raiz FTP =='; cls -la /; echo '== web =='; cls -la /guiasadastra.com/; echo '== htaccess =='; cat /guiasadastra.com/.htaccess; echo '== assets =='; cls -la /guiasadastra.com/assets/; bye" > servidor.txt 2>&1 || true
+          grep -v -i "pass" servidor.txt > s.txt; mv s.txt servidor.txt; wc -l servidor.txt
+      - name: Guardar resultado
+        run: |
+          git config user.name "github-actions[bot]"; git config user.email "41898699+github-actions[bot]@users.noreply.github.com"
+          git checkout --orphan diagnostico; git rm -rq --cached . ; git add servidor.txt; git commit -qm "Listado del servidor"; git push -f origin diagnostico
