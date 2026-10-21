@@ -772,9 +772,15 @@ def main():
         "reservas-barranquismo.html": "/calendario/", "reservas-vias-ferratas.html": "/calendario/", "reservas-escalada.html": "/calendario/",
         "reservas-senderismo.html": "/calendario/", "reservas-espeleologia.html": "/calendario/", "reservas-travesias.html": "/calendario/",
         "reservas-rutas-invernales.html": "/calendario/",
+        # páginas antiguas que existían en el servidor aunque no estaban en el sitemap
+        "alquiler-material.html": A + "alquiler-material-montana/", "barrancos-avila.html": A + "barranquismo-avila/",
+        "curso-alpinismo.html": A + "cursos-alpinismo/", "cursos-escalada.html": A + "curso-iniciacion-escalada-en-roca/",
+        "cursos-escalada2.html": A + "curso-iniciacion-escalada-en-roca/", "senderismo-salamanca-bejar-alberca.html": A + "senderismo-avila-gredos/",
+        "BOULDER-LAS-TUERCES-PALENCIA.pdf": "/media/b3fa4166-e520-42c1-b9f6-311b0b33ec26/otros-media-3.pdf",
     })
     open(os.path.join(OUT, ".htaccess"), "w").write("ErrorDocument 404 /404.html\n# Direcciones de la web antigua -> nuevas (301)\n" + "".join(
-        "RedirectMatch 301 ^/%s$ %s%s\n" % (k.replace(".", "\\."), D, v) for k, v in sorted(old.items())))
+        "RedirectMatch 301 ^/%s$ %s%s\n" % (k.replace(".", "\\."), D, v) for k, v in sorted(old.items())) +
+        "# La versión de prueba /NUEVA ya no existe: lleva a la misma página en la web principal\nRedirectMatch 301 ^/NUEVA(/.*)?$ %s$1\n" % D)
     # Resumen para buscadores con IA (ChatGPT, Perplexity, Gemini, Claude…): https://llmstxt.org
     L = ["# Guías Ad Astra · Montaña y Aventura", "",
          "> Empresa de turismo activo y guías de montaña titulados con bases en Fuentes de Béjar (Salamanca) y Valladolid. "

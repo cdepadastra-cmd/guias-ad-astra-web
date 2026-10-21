@@ -1,10 +1,13 @@
 ErrorDocument 404 /404.html
 # Direcciones de la web antigua -> nuevas (301)
+RedirectMatch 301 ^/BOULDER-LAS-TUERCES-PALENCIA\.pdf$ https://www.guiasadastra.com/media/b3fa4166-e520-42c1-b9f6-311b0b33ec26/otros-media-3.pdf
 RedirectMatch 301 ^/actividades\.html$ https://www.guiasadastra.com/actividades/
 RedirectMatch 301 ^/alquiler-material-montana\.html$ https://www.guiasadastra.com/actividades/alquiler-material-montana/
+RedirectMatch 301 ^/alquiler-material\.html$ https://www.guiasadastra.com/actividades/alquiler-material-montana/
 RedirectMatch 301 ^/ascensiones-montana\.html$ https://www.guiasadastra.com/actividades/ascensiones-montana/
 RedirectMatch 301 ^/barranco-de-papuos\.html$ https://www.guiasadastra.com/actividades/barranquismo-avila/
 RedirectMatch 301 ^/barranco-del-arbillas\.html$ https://www.guiasadastra.com/actividades/barranquismo-avila/
+RedirectMatch 301 ^/barrancos-avila\.html$ https://www.guiasadastra.com/actividades/barranquismo-avila/
 RedirectMatch 301 ^/barranquismo-avila-gredos\.html$ https://www.guiasadastra.com/actividades/barranquismo-avila/
 RedirectMatch 301 ^/barranquismo-avila\.html$ https://www.guiasadastra.com/actividades/barranquismo-avila/
 RedirectMatch 301 ^/barranquismo-cueva-valporquero-sima-de-perlas\.html$ https://www.guiasadastra.com/actividades/barranquismo-cueva-valporquero-sima-de-perlas/
@@ -30,6 +33,7 @@ RedirectMatch 301 ^/creacion-mantenimiento-inventario-de-senderos\.html$ https:/
 RedirectMatch 301 ^/creacion-mantenimiento-senderos\.html$ https://www.guiasadastra.com/creacion-mantenimiento-senderos/
 RedirectMatch 301 ^/curso-alpinismo-nivel1\.html$ https://www.guiasadastra.com/actividades/cursos-alpinismo/
 RedirectMatch 301 ^/curso-alpinismo-nivel2\.html$ https://www.guiasadastra.com/actividades/cursos-alpinismo/
+RedirectMatch 301 ^/curso-alpinismo\.html$ https://www.guiasadastra.com/actividades/cursos-alpinismo/
 RedirectMatch 301 ^/curso-arva\.html$ https://www.guiasadastra.com/actividades/curso-arva/
 RedirectMatch 301 ^/curso-autodetenciones\.html$ https://www.guiasadastra.com/actividades/cursos-alpinismo/
 RedirectMatch 301 ^/curso-autorrescate\.html$ https://www.guiasadastra.com/actividades/curso-autorrescate/
@@ -38,6 +42,8 @@ RedirectMatch 301 ^/curso-iniciacion-escalada-en-roca\.html$ https://www.guiasad
 RedirectMatch 301 ^/curso-vias-ferratas\.html$ https://www.guiasadastra.com/formacion-cursos/
 RedirectMatch 301 ^/cursos-alpinismo\.html$ https://www.guiasadastra.com/actividades/cursos-alpinismo/
 RedirectMatch 301 ^/cursos-barranquismo\.html$ https://www.guiasadastra.com/actividades/curso-barranquismo/
+RedirectMatch 301 ^/cursos-escalada\.html$ https://www.guiasadastra.com/actividades/curso-iniciacion-escalada-en-roca/
+RedirectMatch 301 ^/cursos-escalada2\.html$ https://www.guiasadastra.com/actividades/curso-iniciacion-escalada-en-roca/
 RedirectMatch 301 ^/cursos-formacion\.html$ https://www.guiasadastra.com/formacion-cursos/
 RedirectMatch 301 ^/cursos-orientacion\.html$ https://www.guiasadastra.com/formacion-cursos/
 RedirectMatch 301 ^/cursos\.html$ https://www.guiasadastra.com/formacion-cursos/
@@ -75,6 +81,7 @@ RedirectMatch 301 ^/reservas-vias-ferratas\.html$ https://www.guiasadastra.com/c
 RedirectMatch 301 ^/route-setting\.html$ https://www.guiasadastra.com/route-setting/
 RedirectMatch 301 ^/senderismo-avila-gredo\.html$ https://www.guiasadastra.com/actividades/senderismo-avila-gredos/
 RedirectMatch 301 ^/senderismo-avila-gredos\.html$ https://www.guiasadastra.com/actividades/senderismo-avila-gredos/
+RedirectMatch 301 ^/senderismo-salamanca-bejar-alberca\.html$ https://www.guiasadastra.com/actividades/senderismo-avila-gredos/
 RedirectMatch 301 ^/senderismo\.html$ https://www.guiasadastra.com/actividades/senderismo-avila-gredos/
 RedirectMatch 301 ^/servicio-routte-setting-equipador\.html$ https://www.guiasadastra.com/route-setting/
 RedirectMatch 301 ^/sobre-nosotros\.html$ https://www.guiasadastra.com/sobre-nosotros/
@@ -84,3 +91,5 @@ RedirectMatch 301 ^/via-ferrata-salamanca\.html$ https://www.guiasadastra.com/ac
 RedirectMatch 301 ^/via-verde-ruta-de-la-plata\.html$ https://www.guiasadastra.com/actividades/via-verde-ruta-de-la-plata/
 RedirectMatch 301 ^/vias-ferratas-leon\.html$ https://www.guiasadastra.com/actividades/vias-ferratas-leon/
 RedirectMatch 301 ^/vias-ferratas-valladolid\.html$ https://www.guiasadastra.com/actividades/via-ferrata-burgos/
+# La versión de prueba /NUEVA ya no existe: lleva a la misma página en la web principal
+RedirectMatch 301 ^/NUEVA(/.*)?$ https://www.guiasadastra.com$1

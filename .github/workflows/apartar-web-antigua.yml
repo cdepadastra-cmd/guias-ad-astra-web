@@ -1,0 +1,22 @@
+# Aparta (mueve, no borra) los archivos de la web antigua fuera de la carpeta pública,
+# a /COPIA_WEB_ANTIGUA_2026-10-21/ en la raíz del FTP. También aparta la carpeta de pruebas /NUEVA.
+# No toca las subcarpetas de otras webs (APP_TRACKRUN, Web_*, assets, fonts...) ni el archivo de verificación de Google.
+# Además hay copia completa en la rama "copia-web-antigua" de este repositorio.
+name: Apartar la web antigua
+on: workflow_dispatch
+jobs:
+  apartar:
+    runs-on: ubuntu-latest
+    steps:
+      - run: sudo apt-get update -qq && sudo apt-get install -y -qq lftp >/dev/null
+      - name: Mover archivos antiguos a la copia
+        env:
+          H: ${{ secrets.FTP_SERVER }}
+          U: ${{ secrets.FTP_USER }}
+          P: ${{ secrets.FTP_PASSWORD }}
+        run: |
+          DEST=/COPIA_WEB_ANTIGUA_2026-10-21
+          CMDS="set ssl:verify-certificate no; set net:max-retries 5; mkdir -p $DEST; mkdir -p $DEST/web;"
+          for f in BOULDER-LAS-TUERCES-PALENCIA.pdf alquiler-material-montana.html alquiler-material.html ascensiones-montana.html barranco-de-papuos.html barranco-del-arbillas.html barrancos-avila.html barranquismo-avila-gredos.html barranquismo-avila.html barranquismo-cueva-valporquero-sima-de-perlas.html barranquismo-en-caceres.html barranquismo-en-madrid.html barranquismo-en-salamanca.html barranquismo-leon.html barranquismo-madrid-segovia.html barranquismo-palencia.html barranquismo-salamanca.html barranquismo.html base.html blog.html boulder-las-tuerces.html boulder-zona-centro-salamanca-caceres.html calendario-actividades-gredos.html comarca-natural-oeste-de-gredos.html contacto-reservas.html contacto.html creacion-mantenimiento-inventario-de-senderos.html curso-alpinismo-nivel1.html curso-alpinismo-nivel2.html curso-alpinismo.html curso-arva.html curso-autodetenciones.html curso-autorrescate.html curso-barranquismo.html curso-iniciacion-escalada-en-roca.html curso-vias-ferratas.html cursos-alpinismo.html cursos-barranquismo.html cursos-escalada.html cursos-escalada2.html cursos-formacion.html cursos-orientacion.html el-desafio-de-los-galayos.html escalada-leon.html escalada-palencia.html escalada-salamanca.html escalada-segovia.html escalada-zamora.html espeleologia-leon.html espeleologia-segovia.html espeleologia-valladolid.html grandes-travesias-espana.html grandes-travesias.html gredos-infinito.html gredos-limpio.html gredos-oeste.html guias-de-gredos.html iniciativas-turismo-rural.html monte-olimpo.html multiaventura-gredos.html organizacion-eventos-deportivos.html page22.html page46.html page54.html project.mobirise proximamente.html publish-hashes.json reservas-barranquismo.html reservas-escalada.html reservas-espeleologia.html reservas-rutas-invernales.html reservas-senderismo.html reservas-travesias.html reservas-vias-ferratas.html screenshot.png senderismo-avila-gredo.html senderismo-avila-gredos.html senderismo-salamanca-bejar-alberca.html senderismo.html servicio-routte-setting-equipador.html trekking-carros-de-foc.html via-ferrata-burgos.html via-ferrata-salamanca.html via-verde-ruta-de-la-plata.html vias-ferratas-leon.html vias-ferratas-valladolid.html ; do CMDS="$CMDS mv /guiasadastra.com/$f $DEST/web/$f;"; done
+          CMDS="$CMDS mv /guiasadastra.com/NUEVA $DEST/NUEVA; mv /NUEVA $DEST/NUEVA-raiz-ftp; cls -la /guiasadastra.com/; cls $DEST/web | wc -l; bye"
+          lftp -u "$U","$P" "$H" -e "$CMDS" 2>&1 | grep -v -i pass || true

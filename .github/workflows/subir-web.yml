@@ -1,9 +1,10 @@
-# Sube automáticamente la web a www.guiasadastra.com/NUEVA/ cada vez que hay un cambio en "main".
+# Sube automáticamente la web a www.guiasadastra.com cada vez que hay un cambio en "main".
+# Solo sube y actualiza sus propios archivos: no toca las demás carpetas del servidor (otras webs, assets antiguos, etc.).
 # Los datos FTP se guardan en GitHub > Settings > Secrets and variables > Actions (nadie más los ve):
 #   FTP_SERVER   p. ej. ftp.guiasadastra.com
 #   FTP_USER     usuario FTP
 #   FTP_PASSWORD contraseña FTP
-name: Subir a guiasadastra.com/NUEVA
+name: Subir la web a guiasadastra.com
 
 on:
   push:
@@ -11,7 +12,7 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: ftp-nueva
+  group: ftp-web
   cancel-in-progress: false
 
 jobs:
@@ -32,9 +33,9 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Generar la versión para /NUEVA
+      - name: Generar la web
         if: env.FTP_SERVER != ''
-        run: BASE=/NUEVA python3 build.py
+        run: python3 build.py
 
       - name: Subir por FTP
         id: ftp1
@@ -45,9 +46,9 @@ jobs:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USER }}
           password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: ./dist-NUEVA/
+          local-dir: ./dist/
           # Carpeta de la web guiasadastra.com en el servidor (Plesk)
-          server-dir: /guiasadastra.com/NUEVA/
+          server-dir: /guiasadastra.com/
           timeout: 120000
 
       - name: Esperar unos segundos
@@ -61,7 +62,7 @@ jobs:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USER }}
           password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: ./dist-NUEVA/
+          local-dir: ./dist/
           # Carpeta de la web guiasadastra.com en el servidor (Plesk)
-          server-dir: /guiasadastra.com/NUEVA/
+          server-dir: /guiasadastra.com/
           timeout: 120000
