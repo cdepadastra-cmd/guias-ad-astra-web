@@ -104,7 +104,7 @@
 
   /* ---------------- inscripciones (Gredos Limpio) → Google Sheets */
   $$("form[data-inscripcion]").forEach(function (f) {
-    var pers = 1, st = $(".stepper", f); if (st) bindStepper(st, function (v) { pers = v; });
+    var pers = 1; // inscripción individual
     var err = $(".err", f), ok = $("[data-ok]", f), btn = $("button[type=submit]", f);
     f.addEventListener("submit", function (e) {
       e.preventDefault(); err.textContent = "";
