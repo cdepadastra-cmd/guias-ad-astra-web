@@ -86,16 +86,18 @@
         if (!EMAIL.test(val("email"))) return fail("email", "Revisa el correo electrónico (ejemplo: nombre@gmail.com).");
         if (!telOK(val("telefono"))) return fail("telefono", "Revisa el número de teléfono (9 cifras).");
       }
-      var lines = ["Hola, quiero reservar en Guías Ad Astra:", "", (f.hasAttribute("data-curso") ? "• Curso: " : "• Actividad: ") + title];
+      var quote = f.hasAttribute("data-presupuesto");
+      var lines = quote ? ["Hola, quiero pedir información / presupuesto a Guías Ad Astra:", "", "• Servicio: " + title] : ["Hola, quiero reservar en Guías Ad Astra:", "", (f.hasAttribute("data-curso") ? "• Curso: " : "• Actividad: ") + title];
       if (sel) lines.push("• Opción: " + sel.value);
       if (date) lines.push("• Fecha: " + fmtLong(date.value));
       var alt = $("input[name=fecha2]", f); if (alt && alt.value) lines.push("• Fecha alternativa: " + fmtLong(alt.value));
-      lines.push("• Personas: " + pers);
+      if (!quote) lines.push("• Personas: " + pers);
+      if (val("entidad")) lines.push("• Entidad: " + val("entidad"));
       if (price()) lines.push("• Total estimado: " + eur(price() * pers) + " (" + eur(price()) + "/persona)");
       lines.push("• Nombre: " + nombre + (full ? " " + val("apellidos") : ""));
       if (full) { lines.push("• Email: " + val("email")); lines.push("• Teléfono: " + val("telefono")); }
       var com = $("textarea", f); if (com && com.value.trim()) lines.push("• Comentarios: " + com.value.trim());
-      lines.push("", "¿Tenéis disponibilidad?");
+      lines.push("", quote ? "Gracias." : "¿Tenéis disponibilidad?");
       openWA(lines.join("\n"));
     });
   });

@@ -625,3 +625,89 @@ RENTAL_FAQ = [
   ("¿Puedo alquilar material para un barranco o una ferrata sin guía?", "Sí. El material de alquiler es para cualquier persona. Si no tienes experiencia, te recomendamos hacer la actividad o un curso con nosotros."),
   ("¿Tenéis tallas de neopreno para niños?", "Pregúntanos por WhatsApp indicando la altura y te decimos qué tallas tenemos disponibles."),
 ]
+
+
+# ---------------------------------------------------------------- SERVICIOS PROFESIONALES (menú Otros)
+SERVICES = [
+ {
+  "slug": "iniciativas-turismo-rural", "title": "Iniciativas de turismo rural",
+  "img": img("398c4c45-1d97-4c78-a790-e6efe5fea909/otros-media-1.webp"),
+  "short": "Diseñamos y guiamos experiencias de naturaleza para ayuntamientos, comarcas, alojamientos rurales y asociaciones.",
+  "seo_title": "Iniciativas de turismo rural y activo en Gredos y Castilla y León | Guías Ad Astra",
+  "seo_desc": "Diseño de experiencias de turismo activo y de naturaleza para ayuntamientos, comarcas, casas rurales y asociaciones en Gredos, Béjar y Castilla y León. Rutas, actividades y dinamización.",
+  "lead": "Ayudamos a pueblos, comarcas y alojamientos rurales a convertir su naturaleza en experiencias que atraen visitantes: rutas guiadas, actividades de aventura y jornadas temáticas diseñadas y guiadas por profesionales de la montaña.",
+  "intro": [
+    "El turismo activo es una de las mejores formas de dar vida a los pueblos de montaña fuera de temporada. Conocemos bien el territorio, sobre todo el Oeste de Gredos, la Sierra de Béjar y Candelario, y sabemos qué funciona: actividades seguras, bien explicadas y adaptadas a familias, grupos y visitantes que vienen por primera vez.",
+    "Trabajamos con ayuntamientos, mancomunidades, grupos de acción local, casas rurales, hoteles y asociaciones culturales o deportivas. Nos adaptamos a proyectos pequeños, como una ruta guiada para las fiestas del pueblo, y a programas completos de varias jornadas.",
+  ],
+  "servicios": [
+    ("Diseño de experiencias", "Creamos productos de turismo activo a medida de tu territorio: rutas temáticas, ascensiones, barranquismo, vías ferratas, escalada o raquetas de nieve."),
+    ("Rutas guiadas y jornadas", "Guiamos rutas interpretativas y jornadas para vecinos y visitantes: setas, castaños, patrimonio, astronomía, fauna o paisaje glaciar."),
+    ("Paquetes para alojamientos", "Preparamos actividades para que casas rurales y hoteles puedan ofrecer a sus clientes experiencias de aventura con guía titulado y seguro."),
+    ("Dinamización y eventos", "Organizamos jornadas de voluntariado ambiental como Gredos Limpio, marchas populares y actividades para fiestas y semanas culturales."),
+    ("Programas escolares", "Salidas de naturaleza y aventura para colegios e institutos, con objetivos educativos y todas las medidas de seguridad."),
+    ("Asesoramiento", "Te ayudamos a valorar el potencial de tu zona, preparar fichas MIDE de rutas y planificar la temporada de actividades."),
+  ],
+  "para": ["Ayuntamientos y mancomunidades", "Grupos de acción local y comarcas turísticas", "Casas rurales, hoteles y campings", "Asociaciones culturales, deportivas y de vecinos", "Colegios, institutos y AMPAS"],
+  "proceso": [("Nos cuentas tu idea", "Una llamada o reunión para conocer el territorio, el público y el presupuesto."), ("Diseñamos la propuesta", "Te enviamos actividades, calendario, logística, seguros y precio cerrado."), ("Lo hacemos realidad", "Guiamos las actividades y te enviamos un resumen con fotos y participación.")],
+  "faq": [
+    ("¿Trabajáis con ayuntamientos pequeños?", "Sí. Muchos de nuestros proyectos son para pueblos pequeños de la Sierra de Béjar, Candelario y Gredos. Nos adaptamos al presupuesto y a la escala del proyecto."),
+    ("¿Las actividades incluyen seguro?", "Sí. Todas nuestras actividades se guían con guías titulados y seguros de responsabilidad civil y accidentes."),
+    ("¿Dónde trabajáis?", "Sobre todo en Salamanca, Ávila, Cáceres y el resto de Castilla y León, con base en Fuentes de Béjar y Valladolid. Consúltanos para otras zonas."),
+  ],
+ },
+ {
+  "slug": "creacion-mantenimiento-senderos", "title": "Creación y mantenimiento de senderos",
+  "img": img("afe67801-cf88-4cef-a3ac-e25e4e971634/senderismo-avila-gredos.webp"),
+  "short": "Diseño, señalización y mantenimiento de senderos y rutas para ayuntamientos y entidades.",
+  "seo_title": "Creación, señalización y mantenimiento de senderos | Guías Ad Astra",
+  "seo_desc": "Diseñamos, señalizamos y mantenemos senderos y rutas de montaña para ayuntamientos y entidades en Salamanca, Ávila, Cáceres y Castilla y León: trazado, balizado, fichas MIDE y revisiones.",
+  "lead": "Un buen sendero atrae visitantes y les devuelve sanos y salvos a casa. Diseñamos rutas atractivas y seguras, las señalizamos y las mantenemos en buen estado temporada tras temporada.",
+  "intro": [
+    "Como guías de montaña recorremos senderos cada semana y sabemos qué hace que una ruta funcione: un trazado lógico, buena señalización en los cruces, información clara en el inicio y un mantenimiento regular de la vegetación, los pasos de agua y las marcas.",
+    "Además, llevamos años balizando y desbalizando recorridos de carreras de montaña como la Ultra de Gredos, así que conocemos bien el trabajo de campo y la coordinación con propietarios y administraciones.",
+  ],
+  "servicios": [
+    ("Estudio y diseño de rutas", "Analizamos el terreno, los puntos de interés y los accesos, y proponemos trazados circulares o lineales para distintos niveles."),
+    ("Señalización y balizado", "Colocación de marcas de pintura, balizas, flechas y paneles de inicio. Te asesoramos sobre la señalización homologada de senderos."),
+    ("Fichas MIDE y documentación", "Preparamos la ficha MIDE de cada ruta, el track GPX, el perfil y los textos para paneles, folletos y webs."),
+    ("Mantenimiento periódico", "Revisiones de estado, repaso de marcas, pequeñas labores de desbroce y limpieza, e informe de incidencias."),
+    ("Rutas para eventos", "Diseño, balizado y desbalizado de recorridos para carreras de montaña, marchas y pruebas de BTT."),
+    ("Publicación digital", "Subimos las rutas a plataformas como Wikiloc y te entregamos los tracks y mapas listos para tu web."),
+  ],
+  "para": ["Ayuntamientos y diputaciones", "Mancomunidades y comarcas", "Espacios naturales y entidades de gestión", "Clubes de montaña y organizadores de carreras", "Fincas y alojamientos rurales"],
+  "proceso": [("Visita al terreno", "Recorremos la zona contigo y vemos qué rutas tienen más interés."), ("Propuesta y presupuesto", "Trazados, materiales, señalización y calendario de trabajo."), ("Ejecución y mantenimiento", "Señalizamos, documentamos y, si quieres, nos encargamos del mantenimiento anual.")],
+  "faq": [
+    ("¿Hacéis también el track GPX y la ficha MIDE?", "Sí. Entregamos el track, el perfil de altitud y la ficha MIDE con la valoración del medio, el itinerario, el desplazamiento y el esfuerzo."),
+    ("¿Os encargáis del mantenimiento anual?", "Sí, podemos hacer revisiones periódicas y repasar marcas y señales, con un informe de cada visita."),
+    ("¿Balizáis carreras de montaña?", "Sí. Llevamos años balizando y coordinando la seguridad de carreras como la Ultra de Gredos."),
+  ],
+ },
+ {
+  "slug": "route-setting", "title": "Servicio de route setting",
+  "img": img("ad7c9424-1340-4b52-8333-4f3db832aeae/otros-media-2.webp"),
+  "short": "Apertura de bloques y vías en rocódromos y competiciones: route setting para gimnasios de escalada, clubes y eventos.",
+  "seo_title": "Route setting: apertura de bloques y vías en rocódromos | Guías Ad Astra",
+  "seo_desc": "Servicio de route setting para rocódromos, clubes, colegios y competiciones de escalada en Castilla y León: apertura de bloques y vías, renovación periódica y montaje de competiciones.",
+  "lead": "Abrimos bloques y vías en rocódromos para que escalar en ellos sea variado, motivador y seguro. Para gimnasios de escalada, clubes, centros deportivos, colegios y competiciones.",
+  "intro": [
+    "El route setting, la apertura de vías y bloques, es lo que hace que la gente vuelva a un rocódromo: problemas nuevos cada pocas semanas, con grados bien repartidos y movimientos que enseñan a escalar.",
+    "Abrimos para todos los niveles, desde bloques de iniciación para niños hasta problemas exigentes para escaladores avanzados, cuidando siempre la seguridad: zonas de caída, presas bien apretadas y vías sin riesgos innecesarios.",
+  ],
+  "servicios": [
+    ("Renovación periódica", "Desmontaje, limpieza de presas y apertura de nuevos bloques y vías con la frecuencia que necesites."),
+    ("Rocódromos nuevos", "Primer montaje de presas y volúmenes y distribución de líneas en función del muro y del público."),
+    ("Competiciones y eventos", "Apertura de bloques para competiciones, ligas locales y festivales de escalada, con jueces y logística si hace falta."),
+    ("Colegios y centros deportivos", "Bloques de iniciación y juegos de escalada para clases de educación física y actividades extraescolares."),
+    ("Revisión de seguridad", "Revisión del apriete de presas y volúmenes, de las zonas de caída y del estado general del muro."),
+    ("Formación", "Talleres de iniciación al route setting para monitores y personal de rocódromos."),
+  ],
+  "para": ["Rocódromos y gimnasios de escalada", "Clubes de montaña y escalada", "Ayuntamientos y polideportivos", "Colegios e institutos", "Organizadores de competiciones y eventos"],
+  "proceso": [("Visita al muro", "Vemos el rocódromo, las presas disponibles y el tipo de usuarios."), ("Plan de apertura", "Proponemos el número de bloques o vías, los grados y la frecuencia de renovación."), ("Apertura y prueba", "Abrimos, probamos cada línea y dejamos el muro listo para escalar.")],
+  "faq": [
+    ("¿Cada cuánto conviene renovar los bloques?", "Depende del uso, pero en un rocódromo con usuarios habituales lo ideal es renovar una parte del muro cada 3 o 4 semanas."),
+    ("¿Ponéis vosotros las presas?", "Trabajamos con las presas y volúmenes del rocódromo. Si necesitas ampliar el material, te asesoramos en la compra."),
+    ("¿Abrís para competiciones?", "Sí, abrimos bloques y vías para competiciones y ligas, y podemos ayudarte con la organización del evento."),
+  ],
+ },
+]

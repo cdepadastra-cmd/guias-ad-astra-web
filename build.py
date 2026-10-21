@@ -45,7 +45,8 @@ NAV_ACT = [("Todas las actividades", "/actividades/"), ("Barranquismo", "/activi
            ("Alpinismo y ascensiones", "/actividades/?categoria=Ascensiones"), ("Espeleología", "/actividades/?categoria=Espeleología"), ("Escalada y boulder", "/actividades/?categoria=Escalada"),
            ("Senderismo", "/actividades/?categoria=Senderismo"), ("Travesías y viajes", "/actividades/?categoria=Viajes")]
 NAV_CUR = [("Todos los cursos", "/formacion-cursos/")] + [(c["disc_label"], "/actividades/%s/" % c["slug"]) for c in COURSES]
-NAV_OTR = [("Calculadora de rutas", "/calculadora-rutas/"), ("Organización de eventos", "/actividades/organizacion-eventos-deportivos/"), ("Gredos Limpio", "/actividades/gredos-limpio/"),
+NAV_OTR = [("Calculadora de rutas", "/calculadora-rutas/"), ("Boulder en Las Tuerces", "/actividades/boulder-las-tuerces/"), ("Boulder en Zona Centro", "/actividades/boulder-zona-centro-salamanca-caceres/"),
+           ("Iniciativas de turismo rural", "/iniciativas-turismo-rural/"), ("Creación y mantenimiento de senderos", "/creacion-mantenimiento-senderos/"), ("Route setting", "/route-setting/"), ("Organización de eventos", "/actividades/organizacion-eventos-deportivos/"), ("Gredos Limpio", "/actividades/gredos-limpio/"),
            ("Oeste de Gredos", "/actividades/comarca-natural-oeste-de-gredos/"), ("Vía Verde Ruta de la Plata", "/actividades/via-verde-ruta-de-la-plata/")]
 
 def dd(label, items, key, active):
@@ -340,16 +341,15 @@ def build_gredos_limpio(a, path):
     fecha = G["fecha"] or "Fecha por confirmar"
     prog = [(G["hora"], "Quedada en la Casa del Parque de Hoyos del Espino. Visita, instrucciones y subida juntos a la Plataforma."), ("10:00", "Comienzo de la limpieza desde la Plataforma de Gredos."), ("14:00", "Regreso a la Plataforma para terminar la jornada todos juntos.")]
     if G["abiertas"]:
-        form = ('<form class="book" id="inscripcion" data-inscripcion data-evento="Gredos Limpio" data-edicion="%s" novalidate><p class="eyebrow">Inscripción gratuita</p><h2>Apúntate</h2><p class="muted">%s · %s</p>'
+        form = ('<form class="book" id="inscripcion" data-inscripcion data-evento="Gredos Limpio" data-edicion="%s" novalidate><p class="eyebrow">Inscripción gratuita</p><h2>Apúntate</h2><p class="muted">%s · %s</p><p class="hint">La inscripción es individual: si venís varias personas, cada una debe inscribirse con sus datos.</p>'
                 '<div class="row2"><div class="field"><label for="i-nombre">Nombre</label><input id="i-nombre" name="nombre" autocomplete="given-name"></div><div class="field"><label for="i-ape">Apellidos</label><input id="i-ape" name="apellidos" autocomplete="family-name"></div></div>'
                 '<div class="field"><label for="i-email">Correo electrónico</label><input id="i-email" name="email" type="email" autocomplete="email" inputmode="email"></div>'
                 '<div class="row2"><div class="field"><label for="i-tel">Teléfono</label><input id="i-tel" name="telefono" type="tel" autocomplete="tel" inputmode="tel"></div><div class="field"><label for="i-loc">Localidad</label><input id="i-loc" name="localidad" autocomplete="address-level2"></div></div>'
-                '%s'
-                '<div class="field"><label for="i-com">Comentarios (opcional)</label><textarea id="i-com" name="comentarios" placeholder="Nombres de quienes vienen contigo, club o asociación…"></textarea></div>'
+                '<div class="field"><label for="i-com">Comentarios (opcional)</label><textarea id="i-com" name="comentarios" placeholder="Club o asociación, si vienes con alguno…"></textarea></div>'
                 '<label class="check" style="align-items:flex-start"><input type="checkbox" name="privacidad" id="i-priv" style="margin-top:3px"> <span>Acepto que Guías Ad Astra guarde estos datos para gestionar mi inscripción y el seguro de la jornada.</span></label>'
                 '<p class="err" role="alert"></p><button class="btn btn-primary btn-block" type="submit">Enviar inscripción</button>'
                 '<div class="notice ok" data-ok hidden></div><p class="hint">Tus datos se guardan en nuestra lista de inscritos. No los compartimos con nadie salvo la aseguradora de la jornada.</p></form>'
-                % (e(G["edicion"]), e(G["edicion"]), e(fecha), stepper("i-pers", 1, 1, 20, "Personas (contándote a ti)")))
+                % (e(G["edicion"]), e(G["edicion"]), e(fecha)))
     else:
         form = '<div class="panel"><p class="eyebrow">Inscripciones</p><h3>Inscripciones cerradas</h3><p class="muted">Anunciaremos la próxima edición en esta página y en nuestras redes.</p></div>'
     body = (hero("Voluntariado ambiental", "Gredos Limpio", "Cada otoño, antes de que llegue la nieve, limpiamos el Circo de Gredos entre todos los amantes de la sierra. Desde 2013.", a["img"], [("Inicio", "/"), ("Otros", "")],
@@ -683,6 +683,30 @@ def build_calculator():
          "Calcula la duración de una ruta de senderismo con el método MIDE a partir de distancia y desnivel. Sube tu track GPX y descarga el perfil de altitud, el mapa y la ficha de la ruta gratis.",
          body, "otr", ld, priority="0.8", head=head, scripts=scripts)
 
+
+def build_service(s):
+    path = "/%s/" % s["slug"]
+    form = ('<form class="book" data-book data-presupuesto data-full data-title="%s" data-price="" id="reservar" novalidate><p class="eyebrow">Sin compromiso</p><h2>Pide información</h2>'
+            '<div class="row2"><div class="field"><label for="s-nombre">Nombre</label><input id="s-nombre" name="nombre" autocomplete="given-name"></div><div class="field"><label for="s-ape">Apellidos</label><input id="s-ape" name="apellidos" autocomplete="family-name"></div></div>'
+            '<div class="field"><label for="s-ent">Entidad (opcional)</label><input id="s-ent" name="entidad" autocomplete="organization" placeholder="Ayuntamiento, club, empresa…"></div>'
+            '<div class="field"><label for="s-email">Correo electrónico</label><input id="s-email" name="email" type="email" autocomplete="email" inputmode="email"></div>'
+            '<div class="field"><label for="s-tel">Teléfono</label><input id="s-tel" name="telefono" type="tel" autocomplete="tel" inputmode="tel"></div>'
+            '<div class="field"><label for="s-com">Cuéntanos tu proyecto</label><textarea id="s-com" placeholder="Zona, fechas, número de personas o lo que necesites…"></textarea></div>'
+            '<p class="err" role="alert"></p><button class="btn btn-wa btn-block" type="submit">%s Enviar por WhatsApp</button><p class="hint">Te respondemos en 24-48 horas con una propuesta.</p></form>' % (e(s["title"]), WA_SVG))
+    left = [block("Qué hacemos", prose(s["intro"])),
+            block("Servicios", '<div class="two">%s</div>' % "".join('<div class="panel"><h3>%s</h3><p class="muted">%s</p></div>' % (e(t), e(x)) for t, x in s["servicios"])),
+            block("Para quién", ticks(s["para"], "cols")),
+            block("Cómo trabajamos", '<ol class="stages">%s</ol>' % "".join('<li><span class="d">Paso %d</span><h4>%s</h4><p>%s</p></li>' % (i + 1, e(t), e(x)) for i, (t, x) in enumerate(s["proceso"]))),
+            block("Preguntas frecuentes", faq_html(s["faq"]))]
+    body = (hero("Servicios profesionales", e(s["title"]), e(s["lead"]), s["img"], [("Inicio", "/"), ("Otros", ""), (s["title"], "")], '<a class="btn btn-primary" href="#reservar">Pedir información</a>') +
+            '<section class="section"><div class="wrap split"><div class="stack" style="gap:0">%s</div><div class="sticky">%s</div></div></section>' % ("".join(left), form))
+    ld = [crumbs_ld([("Inicio", "/"), (s["title"], path)]), faq_ld(s["faq"]),
+          {"@context": "https://schema.org", "@type": "Service", "name": s["title"], "description": s["seo_desc"], "serviceType": s["title"], "provider": {"@id": D + "/#empresa"},
+           "areaServed": ["Salamanca", "Ávila", "Cáceres", "Valladolid", "Castilla y León"], "url": url(path),
+           "hasOfferCatalog": {"@type": "OfferCatalog", "name": s["title"], "itemListElement": [{"@type": "Offer", "itemOffered": {"@type": "Service", "name": t, "description": x}} for t, x in s["servicios"]]}},
+          {"@context": "https://schema.org", **ORG}]
+    page(path, s["seo_title"], s["seo_desc"], body, "otr", ld, image=s["img"], priority="0.6")
+
 # ---------------------------------------------------------------- build
 def main():
     if os.path.exists(OUT):
@@ -696,6 +720,8 @@ def main():
         build_activity(a)
     for c in COURSES:
         build_course(c)
+    for s in SERVICES:
+        build_service(s)
     sm = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + "".join(
         "  <url><loc>%s</loc><lastmod>%s</lastmod><priority>%s</priority></url>\n" % (url(p), TODAY, pr) for p, pr in PAGES) + "</urlset>\n"
     open(os.path.join(OUT, "sitemap.xml"), "w").write(sm)
