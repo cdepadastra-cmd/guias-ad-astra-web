@@ -750,8 +750,52 @@ def main():
                 "actividades.html": "/actividades/", "formacion-cursos.html": "/formacion-cursos/", "cursos.html": "/formacion-cursos/",
                 "proximamente.html": "/", "blog.html": "/", "route-setting.html": "/route-setting/", "iniciativas-turismo-rural.html": "/iniciativas-turismo-rural/",
                 "creacion-mantenimiento-senderos.html": "/creacion-mantenimiento-senderos/", "calculadora-rutas.html": "/calculadora-rutas/"})
+    # Resto de direcciones del sitemap de la web antigua (www.guiasadastra.com/sitemap.xml, 77 páginas)
+    A, CU = "/actividades/", "/formacion-cursos/"
+    old.update({
+        "base.html": "/", "page22.html": "/", "page46.html": "/", "page54.html": "/", "gredos-infinito.html": "/", "guias-de-gredos.html": "/sobre-nosotros/",
+        "multiaventura-gredos.html": A, "gredos-oeste.html": A + "comarca-natural-oeste-de-gredos/",
+        "alquiler-material-montana.html": A + "alquiler-material-montana/",
+        "barranquismo.html": A + "barranquismo-avila/", "barranquismo-avila-gredos.html": A + "barranquismo-avila/",
+        "barranco-de-papuos.html": A + "barranquismo-avila/", "barranco-del-arbillas.html": A + "barranquismo-avila/",
+        "barranquismo-en-salamanca.html": A + "barranquismo-salamanca/", "barranquismo-en-madrid.html": A + "barranquismo-madrid-segovia/",
+        "senderismo.html": A + "senderismo-avila-gredos/", "senderismo-avila-gredo.html": A + "senderismo-avila-gredos/",
+        "el-desafio-de-los-galayos.html": A + "senderismo-avila-gredos/",
+        "grandes-travesias.html": A + "trekking-carros-de-foc/", "grandes-travesias-espana.html": A + "trekking-carros-de-foc/",
+        "vias-ferratas-valladolid.html": A + "via-ferrata-burgos/", "espeleologia-valladolid.html": A + "espeleologia-segovia/",
+        "escalada-palencia.html": A + "boulder-las-tuerces/", "escalada-salamanca.html": A + "boulder-zona-centro-salamanca-caceres/",
+        "escalada-leon.html": A + "curso-iniciacion-escalada-en-roca/", "escalada-zamora.html": A + "curso-iniciacion-escalada-en-roca/",
+        "escalada-segovia.html": A + "curso-iniciacion-escalada-en-roca/",
+        "servicio-routte-setting-equipador.html": "/route-setting/", "creacion-mantenimiento-inventario-de-senderos.html": "/creacion-mantenimiento-senderos/",
+        "cursos-formacion.html": CU, "cursos-orientacion.html": CU, "curso-vias-ferratas.html": CU,
+        "curso-alpinismo-nivel1.html": A + "cursos-alpinismo/", "curso-alpinismo-nivel2.html": A + "cursos-alpinismo/", "curso-autodetenciones.html": A + "cursos-alpinismo/",
+        "reservas-barranquismo.html": "/calendario/", "reservas-vias-ferratas.html": "/calendario/", "reservas-escalada.html": "/calendario/",
+        "reservas-senderismo.html": "/calendario/", "reservas-espeleologia.html": "/calendario/", "reservas-travesias.html": "/calendario/",
+        "reservas-rutas-invernales.html": "/calendario/",
+    })
     open(os.path.join(OUT, ".htaccess"), "w").write("ErrorDocument 404 /404.html\n# Direcciones de la web antigua -> nuevas (301)\n" + "".join(
-        "Redirect 301 /%s %s%s\n" % (k, D, v) for k, v in sorted(old.items())))
+        "RedirectMatch 301 ^/%s$ %s%s\n" % (k.replace(".", "\\."), D, v) for k, v in sorted(old.items())))
+    # Resumen para buscadores con IA (ChatGPT, Perplexity, Gemini, Claude…): https://llmstxt.org
+    L = ["# Guías Ad Astra · Montaña y Aventura", "",
+         "> Empresa de turismo activo y guías de montaña titulados con bases en Fuentes de Béjar (Salamanca) y Valladolid. "
+         "Barranquismo, vías ferratas, espeleología, escalada, ascensiones, senderismo, trekking, cursos de montaña y alquiler de material "
+         "en Ávila, Salamanca, Cáceres, León, Palencia, Segovia, Burgos y Madrid. Reservas por WhatsApp en el %s." % SITE["phone"], "",
+         "- Teléfono y WhatsApp: %s · Email: %s · Horario: %s" % (SITE["phone"], SITE["email"], SITE["hours"]),
+         "- Instagram: %s · Facebook: %s" % (SITE["instagram"], SITE["facebook"]),
+         "- Organizan la Ultra de Gredos, el Desafío Fuenterrico y las jornadas de voluntariado Gredos Limpio (desde 2013).", "",
+         "## Actividades guiadas"]
+    L += ["- [%s](%s/actividades/%s/): %s%s" % (x["title"], D, x["slug"], x["short"], (" Desde %s €." % min_price(x)) if min_price(x) else "") for x in ACTIVITIES if x["cat"] != "Otros"]
+    L += ["", "## Cursos de formación"]
+    L += ["- [%s](%s/actividades/%s/): %s Desde %s €." % (c["title"], D, c["slug"], c["short"], c["price"]) for c in COURSES]
+    L += ["", "## Alquiler de material", "- [Alquiler de material de montaña y barranquismo](%s/actividades/alquiler-material-montana/): neoprenos, arneses, cascos, sets de vía ferrata, piolets y crampones desde 4 €/día. Recogida en Fuentes de Béjar (Salamanca) o Valladolid." % D,
+          "", "## Servicios para entidades"]
+    L += ["- [%s](%s/%s/): %s" % (s["title"], D, s["slug"], s["short"]) for s in SERVICES]
+    L += ["- [Organización de eventos deportivos](%s/actividades/organizacion-eventos-deportivos/)" % D,
+          "", "## Información útil", "- [Calendario de cursos y salidas con plazas libres](%s/calendario/)" % D,
+          "- [Calculadora de tiempo de rutas (método MIDE) y perfil de GPX](%s/calculadora-rutas/)" % D,
+          "- [Boulder en Las Tuerces (Palencia)](%s/actividades/boulder-las-tuerces/) y [boulder en Salamanca, Ávila y Cáceres](%s/actividades/boulder-zona-centro-salamanca-caceres/): mapas de sectores y croquis." % (D, D),
+          "- [Contacto](%s/contacto/) · [Sobre nosotros](%s/sobre-nosotros/)" % (D, D), ""]
+    open(os.path.join(OUT, "llms.txt"), "w", encoding="utf-8").write("\n".join(L))
     open(os.path.join(OUT, "robots.txt"), "w").write("User-agent: *\nAllow: /\nDisallow: /calendario-google/\n\nSitemap: %s/sitemap.xml\n" % D)
     print("Páginas generadas:", len(PAGES) + 1)
 

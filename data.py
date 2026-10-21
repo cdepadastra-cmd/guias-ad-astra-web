@@ -290,10 +290,10 @@ ACTIVITIES = [
  {
   "slug": "monte-olimpo", "cat": "Viajes", "kind": "trip", "price": 793,
   "title": "Trekking del Monte Olimpo", "img": img("4539531d-0da2-43d5-a826-5048938c6bec/monte-olimpo.webp"),
-  "short": "La montaña de los dioses, Grecia. Del 5 al 11 de septiembre de 2026.",
+  "short": "La montaña de los dioses, Grecia. Viaje guiado de 6 días con ascensión al Mitikas.",
   "seo_title": "Trekking al Monte Olimpo (Grecia) con guías | Viaje 793€",
   "seo_desc": "Viaje de trekking al Monte Olimpo con guías de montaña titulados: ascensión al Mitikas (2.918 m) y Eskolio, refugios, vuelos y traslados incluidos.",
-  "ficha": [("Fechas", "5 al 11 de septiembre de 2026"), ("Duración", "6 días y 5 noches"), ("Precio", "793 € por persona"), ("Grupo", "De 7 a 15 personas")],
+  "ficha": [("Fechas", "Próxima salida por confirmar"), ("Duración", "6 días y 5 noches"), ("Precio", "793 € por persona"), ("Grupo", "De 7 a 15 personas")],
   "intro": [
     "El Monte Olimpo es la montaña más alta de Grecia, Reserva de la Biosfera, Parque Nacional desde 1938 y hogar de los dioses del panteón clásico.",
     "En seis días subiremos al Mitikas (2.918 m) y al Eskolio (2.912 m), partiendo casi a nivel del mar desde Litokoro y atravesando todos los pisos de vegetación de este rincón del Mediterráneo, con el golfo de Tesalónica a nuestros pies.",
@@ -314,10 +314,10 @@ ACTIVITIES = [
  {
   "slug": "trekking-carros-de-foc", "cat": "Travesías", "kind": "trip", "price": 743,
   "title": "Trekking de Carros de Foc", "img": img("34a2d34b-b1c7-4e46-84c9-d86f2f3b63f8/trekking-carros-de-foc.webp"),
-  "short": "Uno de los trekkings más bonitos del Pirineo. Del 5 al 11 de agosto de 2026.",
+  "short": "Uno de los trekkings más bonitos del Pirineo: 9 refugios en 6 días por Aigüestortes.",
   "seo_title": "Trekking Carros de Foc guiado (Aigüestortes) | 6 días 743€",
   "seo_desc": "Carros de Foc con guías titulados: 65 km y 5.700 m de desnivel por los 9 refugios del Parque Nacional de Aigüestortes. Media pensión en refugios incluida.",
-  "ficha": [("Fechas", "5 al 11 de agosto de 2026"), ("Duración", "6 días y 5 noches"), ("Precio", "743 € por persona"), ("Grupo", "De 5 a 20 personas")],
+  "ficha": [("Fechas", "Próxima salida por confirmar"), ("Duración", "6 días y 5 noches"), ("Precio", "743 € por persona"), ("Grupo", "De 5 a 20 personas")],
   "intro": [
     "Carros de Foc es una ruta circular de 65 km y 5.700 m de desnivel positivo que une los nueve refugios del Parque Nacional de Aigüestortes i Estany de Sant Maurici, entre el Pallars Sobirà, la Val d'Aran, la Alta Ribagorça y el Pallars Jussà.",
     "Los refugios están entre 1.900 y 2.400 m. La altura media es de 2.400 m y el punto más alto es el collado de Contraix (2.748 m).",
