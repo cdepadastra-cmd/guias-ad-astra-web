@@ -1,0 +1,204 @@
+== raiz FTP ==
+drwx--x--- 10284    1003              Oct 21 17:59 /./
+drwx--x--- 10284    1003              Oct 21 17:59 /../
+drwx------ 10284    1004              Jul 15  2025 /.clwpos/
+-rw-r--r-- 10284    1003          106 Sep 15  2025 /.imunify_patch_id
+drwx------ 10284    1004              Jun  8 14:55 /.lve/
+-rw-r--r-- 10284    1003          102 Jul 15  2025 /.myimunify_id
+-rw-rw---- 10284    1004          103 Nov 21  2022 /.secure_site_id
+drwxr-xr-x 10284    1004              Jan 18  2023 /.ssh/
+-rw-r--r-- 10284    1003       913878 Jul 24 06:32 /39155033.servicio-online.net_estadisticas.zip
+drwxr-xr-x 10284    1004              Oct 21 17:59 /COPIA_WEB_ANTIGUA_2026-10-21/
+drwxr-xr-x 10284    1004              Oct  1  2019 /error_docs/
+drwxr-x--- 10284    1003              Oct 21 17:59 /guiasadastra.com/
+-rw-r--r-- 10284    1003      2987407 Jul 24 06:37 /guiasadastra.com_estadisticas.zip
+drwxr-x--- 10284    1003              Oct  1  2019 /httpdocs/
+-rw-r--r-- 0        0             299 Oct 13 12:03 /inodos.txt
+-rw-r--r-- 10284    1004        33597 Apr  3  2023 /inscripciones.html
+drwx------ 10284    0                 Oct 21 03:05 /logs/
+drwxr-xr-x 10284    1004              Oct 20 18:04 /public_html/
+drwxr-x--- 10284    1003              Oct  8 17:00 /ultratrailgredos.com/
+-rw-r--r-- 10284    1003      4798076 Jul 24 06:41 /ultratrailgredos.com_estadisticas.zip
+== web ==
+drwxr-x--- 10284    1003              Oct 21 17:59 /guiasadastra.com/./
+drwx--x--- 10284    1003              Oct 21 17:59 /guiasadastra.com/../
+-rw-r--r-- 10284    1004        30974 Oct 21 17:57 /guiasadastra.com/.ftp-deploy-sync-state.json
+-rw-r--r-- 10284    1004         9987 Oct 21 17:57 /guiasadastra.com/.htaccess
+-rw-r--r-- 10284    1004          858 Oct 21 17:20 /guiasadastra.com/.user.ini
+-rw-r--r-- 10284    1004        14485 Oct 21 17:54 /guiasadastra.com/404.html
+drwxr-xr-x 10284    1004              Jun 19 08:05 /guiasadastra.com/APP_TRACKRUN/
+drwxr-xr-x 10284    1004              Apr 19  2025 /guiasadastra.com/COPIAS_WEB/
+drwxr-xr-x 10284    1004              May 21  2020 /guiasadastra.com/WEB_El_Anillo_de_Gredos_turismo/
+drwxr-xr-x 10284    1004              May 21  2020 /guiasadastra.com/Web_ADASTRA_EVENTOS_DEPORTIVOS/
+drwxr-xr-x 10284    1004              Apr 15  2020 /guiasadastra.com/Web_El_Anillo_de_Gredos_BTT/
+drwxr-xr-x 10284    1004              May 21  2020 /guiasadastra.com/Web_Gredos_Summits_Race/
+drwxr-xr-x 10284    1004              May 21  2020 /guiasadastra.com/Web_Illurbeda_BTT/
+drwxr-xr-x 10284    1004              Oct 21 17:54 /guiasadastra.com/actividades/
+drwxr-xr-x 10284    1004              Jan  3  2025 /guiasadastra.com/assets/
+drwxr-xr-x 10284    1004              Oct 21 17:54 /guiasadastra.com/calculadora-rutas/
+drwxr-xr-x 10284    1004              Oct 21 17:54 /guiasadastra.com/calendario/
+drwxr-xr-x 10284    1004              Oct 21 17:54 /guiasadastra.com/calendario-google/
+-rw-r--r-- 10284    1004          742 Oct 21 17:54 /guiasadastra.com/config.js
+drwxr-xr-x 10284    1004              Oct 21 17:54 /guiasadastra.com/contacto/
+drwxr-xr-x 10284    1004              Oct 21 17:54 /guiasadastra.com/creacion-mantenimiento-senderos/
+drwxr-xr-x 10284    1004              Oct 21 17:54 /guiasadastra.com/css/
+drwxr-xr-x 10284    1004              Oct 21 17:54 /guiasadastra.com/data/
+-rw-r--r-- 10284    1004        10871 Oct 21 17:54 /guiasadastra.com/favicon.ico
+-rw-r--r-- 10284    1004          260 Oct 21 17:54 /guiasadastra.com/favicon.svg
+drwxr-xr-x 10284    1004              Jul  6  2025 /guiasadastra.com/fonts/
+drwxr-xr-x 10284    1004              Oct 21 17:54 /guiasadastra.com/formacion-cursos/
+-rw-r--r-- 10284    1004           53 Feb  3  2020 /guiasadastra.com/google14967d1584826c27.html
+drwxr-xr-x 10284    1004              Jan 14  2026 /guiasadastra.com/history/
+drwxr-xr-x 10284    1004              Oct 21 17:54 /guiasadastra.com/img/
+-rw-r--r-- 10284    1004        18076 Oct 21 17:54 /guiasadastra.com/index.html
+drwxr-xr-x 10284    1004              Oct 21 17:54 /guiasadastra.com/iniciativas-turismo-rural/
+drwxr-xr-x 10284    1004              Oct 21 17:54 /guiasadastra.com/js/
+-rw-r--r-- 10284    1004         6561 Oct 21 17:54 /guiasadastra.com/llms.txt
+drwxr-xr-x 10284    1004              Oct 21 17:54 /guiasadastra.com/media/
+-rw-r--r-- 10284    1004          104 Oct 21 17:55 /guiasadastra.com/robots.txt
+drwxr-xr-x 10284    1004              Oct 21 17:55 /guiasadastra.com/route-setting/
+-rw-r--r-- 10284    1004         5314 Oct 21 17:55 /guiasadastra.com/sitemap.xml
+drwxr-xr-x 10284    1004              Oct 21 17:55 /guiasadastra.com/sobre-nosotros/
+== htaccess ==
+ErrorDocument 404 /404.html
+# Las páginas se revisan siempre (así los cambios se ven al momento); fotos, CSS y JS sí se guardan en caché
+<IfModule mod_headers.c>
+<FilesMatch "\.(html|xml|txt)$">
+Header set Cache-Control "no-cache"
+</FilesMatch>
+</IfModule>
+# Direcciones de la web antigua -> nuevas (301)
+RedirectMatch 301 ^/BOULDER-LAS-TUERCES-PALENCIA\.pdf$ https://www.guiasadastra.com/media/b3fa4166-e520-42c1-b9f6-311b0b33ec26/otros-media-3.pdf
+RedirectMatch 301 ^/actividades\.html$ https://www.guiasadastra.com/actividades/
+RedirectMatch 301 ^/alquiler-material-montana\.html$ https://www.guiasadastra.com/actividades/alquiler-material-montana/
+RedirectMatch 301 ^/alquiler-material\.html$ https://www.guiasadastra.com/actividades/alquiler-material-montana/
+RedirectMatch 301 ^/ascensiones-montana\.html$ https://www.guiasadastra.com/actividades/ascensiones-montana/
+RedirectMatch 301 ^/barranco-de-papuos\.html$ https://www.guiasadastra.com/actividades/barranquismo-avila/
+RedirectMatch 301 ^/barranco-del-arbillas\.html$ https://www.guiasadastra.com/actividades/barranquismo-avila/
+RedirectMatch 301 ^/barrancos-avila\.html$ https://www.guiasadastra.com/actividades/barranquismo-avila/
+RedirectMatch 301 ^/barranquismo-avila-gredos\.html$ https://www.guiasadastra.com/actividades/barranquismo-avila/
+RedirectMatch 301 ^/barranquismo-avila\.html$ https://www.guiasadastra.com/actividades/barranquismo-avila/
+RedirectMatch 301 ^/barranquismo-cueva-valporquero-sima-de-perlas\.html$ https://www.guiasadastra.com/actividades/barranquismo-cueva-valporquero-sima-de-perlas/
+RedirectMatch 301 ^/barranquismo-en-caceres\.html$ https://www.guiasadastra.com/actividades/barranquismo-en-caceres/
+RedirectMatch 301 ^/barranquismo-en-madrid\.html$ https://www.guiasadastra.com/actividades/barranquismo-madrid-segovia/
+RedirectMatch 301 ^/barranquismo-en-salamanca\.html$ https://www.guiasadastra.com/actividades/barranquismo-salamanca/
+RedirectMatch 301 ^/barranquismo-leon\.html$ https://www.guiasadastra.com/actividades/barranquismo-leon/
+RedirectMatch 301 ^/barranquismo-madrid-segovia\.html$ https://www.guiasadastra.com/actividades/barranquismo-madrid-segovia/
+RedirectMatch 301 ^/barranquismo-palencia\.html$ https://www.guiasadastra.com/actividades/barranquismo-palencia/
+RedirectMatch 301 ^/barranquismo-salamanca\.html$ https://www.guiasadastra.com/actividades/barranquismo-salamanca/
+RedirectMatch 301 ^/barranquismo\.html$ https://www.guiasadastra.com/actividades/barranquismo-avila/
+RedirectMatch 301 ^/base\.html$ https://www.guiasadastra.com/
+RedirectMatch 301 ^/blog\.html$ https://www.guiasadastra.com/
+RedirectMatch 301 ^/boulder-las-tuerces\.html$ https://www.guiasadastra.com/actividades/boulder-las-tuerces/
+RedirectMatch 301 ^/boulder-zona-centro-salamanca-caceres\.html$ https://www.guiasadastra.com/actividades/boulder-zona-centro-salamanca-caceres/
+RedirectMatch 301 ^/calculadora-rutas\.html$ https://www.guiasadastra.com/calculadora-rutas/
+RedirectMatch 301 ^/calendario-actividades-gredos\.html$ https://www.guiasadastra.com/calendario/
+RedirectMatch 301 ^/calendario\.html$ https://www.guiasadastra.com/calendario/
+RedirectMatch 301 ^/comarca-natural-oeste-de-gredos\.html$ https://www.guiasadastra.com/actividades/comarca-natural-oeste-de-gredos/
+RedirectMatch 301 ^/contacto-reservas\.html$ https://www.guiasadastra.com/contacto/
+RedirectMatch 301 ^/contacto\.html$ https://www.guiasadastra.com/contacto/
+RedirectMatch 301 ^/creacion-mantenimiento-inventario-de-senderos\.html$ https://www.guiasadastra.com/creacion-mantenimiento-senderos/
+RedirectMatch 301 ^/creacion-mantenimiento-senderos\.html$ https://www.guiasadastra.com/creacion-mantenimiento-senderos/
+RedirectMatch 301 ^/curso-alpinismo-nivel1\.html$ https://www.guiasadastra.com/actividades/cursos-alpinismo/
+RedirectMatch 301 ^/curso-alpinismo-nivel2\.html$ https://www.guiasadastra.com/actividades/cursos-alpinismo/
+RedirectMatch 301 ^/curso-alpinismo\.html$ https://www.guiasadastra.com/actividades/cursos-alpinismo/
+RedirectMatch 301 ^/curso-arva\.html$ https://www.guiasadastra.com/actividades/curso-arva/
+RedirectMatch 301 ^/curso-autodetenciones\.html$ https://www.guiasadastra.com/actividades/cursos-alpinismo/
+RedirectMatch 301 ^/curso-autorrescate\.html$ https://www.guiasadastra.com/actividades/curso-autorrescate/
+RedirectMatch 301 ^/curso-barranquismo\.html$ https://www.guiasadastra.com/actividades/curso-barranquismo/
+RedirectMatch 301 ^/curso-iniciacion-escalada-en-roca\.html$ https://www.guiasadastra.com/actividades/curso-iniciacion-escalada-en-roca/
+RedirectMatch 301 ^/curso-vias-ferratas\.html$ https://www.guiasadastra.com/formacion-cursos/
+RedirectMatch 301 ^/cursos-alpinismo\.html$ https://www.guiasadastra.com/actividades/cursos-alpinismo/
+RedirectMatch 301 ^/cursos-barranquismo\.html$ https://www.guiasadastra.com/actividades/curso-barranquismo/
+RedirectMatch 301 ^/cursos-escalada\.html$ https://www.guiasadastra.com/actividades/curso-iniciacion-escalada-en-roca/
+RedirectMatch 301 ^/cursos-escalada2\.html$ https://www.guiasadastra.com/actividades/curso-iniciacion-escalada-en-roca/
+RedirectMatch 301 ^/cursos-formacion\.html$ https://www.guiasadastra.com/formacion-cursos/
+RedirectMatch 301 ^/cursos-orientacion\.html$ https://www.guiasadastra.com/formacion-cursos/
+RedirectMatch 301 ^/cursos\.html$ https://www.guiasadastra.com/formacion-cursos/
+RedirectMatch 301 ^/el-desafio-de-los-galayos\.html$ https://www.guiasadastra.com/actividades/senderismo-avila-gredos/
+RedirectMatch 301 ^/escalada-leon\.html$ https://www.guiasadastra.com/actividades/curso-iniciacion-escalada-en-roca/
+RedirectMatch 301 ^/escalada-palencia\.html$ https://www.guiasadastra.com/actividades/boulder-las-tuerces/
+RedirectMatch 301 ^/escalada-salamanca\.html$ https://www.guiasadastra.com/actividades/boulder-zona-centro-salamanca-caceres/
+RedirectMatch 301 ^/escalada-segovia\.html$ https://www.guiasadastra.com/actividades/curso-iniciacion-escalada-en-roca/
+RedirectMatch 301 ^/escalada-zamora\.html$ https://www.guiasadastra.com/actividades/curso-iniciacion-escalada-en-roca/
+RedirectMatch 301 ^/espeleologia-leon\.html$ https://www.guiasadastra.com/actividades/espeleologia-leon/
+RedirectMatch 301 ^/espeleologia-segovia\.html$ https://www.guiasadastra.com/actividades/espeleologia-segovia/
+RedirectMatch 301 ^/espeleologia-valladolid\.html$ https://www.guiasadastra.com/actividades/espeleologia-segovia/
+RedirectMatch 301 ^/formacion-cursos\.html$ https://www.guiasadastra.com/formacion-cursos/
+RedirectMatch 301 ^/grandes-travesias-espana\.html$ https://www.guiasadastra.com/actividades/trekking-carros-de-foc/
+RedirectMatch 301 ^/grandes-travesias\.html$ https://www.guiasadastra.com/actividades/trekking-carros-de-foc/
+RedirectMatch 301 ^/gredos-infinito\.html$ https://www.guiasadastra.com/
+RedirectMatch 301 ^/gredos-limpio\.html$ https://www.guiasadastra.com/actividades/gredos-limpio/
+RedirectMatch 301 ^/gredos-oeste\.html$ https://www.guiasadastra.com/actividades/comarca-natural-oeste-de-gredos/
+RedirectMatch 301 ^/guias-de-gredos\.html$ https://www.guiasadastra.com/sobre-nosotros/
+RedirectMatch 301 ^/iniciativas-turismo-rural\.html$ https://www.guiasadastra.com/iniciativas-turismo-rural/
+RedirectMatch 301 ^/monte-olimpo\.html$ https://www.guiasadastra.com/actividades/monte-olimpo/
+RedirectMatch 301 ^/multiaventura-gredos\.html$ https://www.guiasadastra.com/actividades/
+RedirectMatch 301 ^/organizacion-eventos-deportivos\.html$ https://www.guiasadastra.com/actividades/organizacion-eventos-deportivos/
+RedirectMatch 301 ^/page22\.html$ https://www.guiasadastra.com/
+RedirectMatch 301 ^/page46\.html$ https://www.guiasadastra.com/
+RedirectMatch 301 ^/page54\.html$ https://www.guiasadastra.com/
+RedirectMatch 301 ^/proximamente\.html$ https://www.guiasadastra.com/
+RedirectMatch 301 ^/reservas-barranquismo\.html$ https://www.guiasadastra.com/calendario/
+RedirectMatch 301 ^/reservas-escalada\.html$ https://www.guiasadastra.com/calendario/
+RedirectMatch 301 ^/reservas-espeleologia\.html$ https://www.guiasadastra.com/calendario/
+RedirectMatch 301 ^/reservas-rutas-invernales\.html$ https://www.guiasadastra.com/calendario/
+RedirectMatch 301 ^/reservas-senderismo\.html$ https://www.guiasadastra.com/calendario/
+RedirectMatch 301 ^/reservas-travesias\.html$ https://www.guiasadastra.com/calendario/
+RedirectMatch 301 ^/reservas-vias-ferratas\.html$ https://www.guiasadastra.com/calendario/
+RedirectMatch 301 ^/route-setting\.html$ https://www.guiasadastra.com/route-setting/
+RedirectMatch 301 ^/senderismo-avila-gredo\.html$ https://www.guiasadastra.com/actividades/senderismo-avila-gredos/
+RedirectMatch 301 ^/senderismo-avila-gredos\.html$ https://www.guiasadastra.com/actividades/senderismo-avila-gredos/
+RedirectMatch 301 ^/senderismo-salamanca-bejar-alberca\.html$ https://www.guiasadastra.com/actividades/senderismo-avila-gredos/
+RedirectMatch 301 ^/senderismo\.html$ https://www.guiasadastra.com/actividades/senderismo-avila-gredos/
+RedirectMatch 301 ^/servicio-routte-setting-equipador\.html$ https://www.guiasadastra.com/route-setting/
+RedirectMatch 301 ^/sobre-nosotros\.html$ https://www.guiasadastra.com/sobre-nosotros/
+RedirectMatch 301 ^/trekking-carros-de-foc\.html$ https://www.guiasadastra.com/actividades/trekking-carros-de-foc/
+RedirectMatch 301 ^/via-ferrata-burgos\.html$ https://www.guiasadastra.com/actividades/via-ferrata-burgos/
+RedirectMatch 301 ^/via-ferrata-salamanca\.html$ https://www.guiasadastra.com/actividades/via-ferrata-salamanca/
+RedirectMatch 301 ^/via-verde-ruta-de-la-plata\.html$ https://www.guiasadastra.com/actividades/via-verde-ruta-de-la-plata/
+RedirectMatch 301 ^/vias-ferratas-leon\.html$ https://www.guiasadastra.com/actividades/vias-ferratas-leon/
+RedirectMatch 301 ^/vias-ferratas-valladolid\.html$ https://www.guiasadastra.com/actividades/via-ferrata-burgos/
+# La versión de prueba /NUEVA ya no existe: lleva a la misma página en la web principal
+RedirectMatch 301 ^/NUEVA(/.*)?$ https://www.guiasadastra.com$1
+== assets ==
+drwxr-xr-x 10284    1004              Jan  3  2025 /guiasadastra.com/assets/./
+drwxr-x--- 10284    1003              Oct 21 17:59 /guiasadastra.com/assets/../
+drwxr-xr-x 10284    1004              Jan  4  2024 /guiasadastra.com/assets/FontAwesome/
+drwxr-xr-x 10284    1004              Jan  4  2024 /guiasadastra.com/assets/Material-Design-Icons/
+drwxr-xr-x 10284    1004              Jan  4  2024 /guiasadastra.com/assets/bootstrap/
+drwxr-xr-x 10284    1004              Jan  4  2024 /guiasadastra.com/assets/bootstrapcarouselswipe/
+drwxr-xr-x 10284    1004              Jan  4  2024 /guiasadastra.com/assets/datepicker/
+drwxr-xr-x 10284    1004              Jan  4  2024 /guiasadastra.com/assets/dropdown/
+drwxr-xr-x 10284    1004              Jan  4  2024 /guiasadastra.com/assets/facebook-plugin/
+drwxr-xr-x 10284    1004              Jan  3  2025 /guiasadastra.com/assets/files/
+drwxr-xr-x 10284    1004              Jan  4  2024 /guiasadastra.com/assets/formoid/
+-rw-r--r-- 10284    1004        12389 Feb 21  2025 /guiasadastra.com/assets/formoid.min.js
+drwxr-xr-x 10284    1004              Jan  4  2024 /guiasadastra.com/assets/formstyler/
+drwxr-xr-x 10284    1004              Jan  4  2024 /guiasadastra.com/assets/gallery/
+drwxr-xr-x 10284    1004              Jan  4  2024 /guiasadastra.com/assets/icon54/
+drwxr-xr-x 10284    1004              Jan  4  2024 /guiasadastra.com/assets/icon54-v2/
+drwxr-xr-x 10284    1004              Jan  4  2024 /guiasadastra.com/assets/icon54-v4/
+drwxr-xr-x 10284    1004              Jan  4  2024 /guiasadastra.com/assets/iconsMind/
+drwxr-xr-x 10284    1004              Oct  6  2025 /guiasadastra.com/assets/images/
+drwxr-xr-x 10284    1004              Jan  4  2024 /guiasadastra.com/assets/imagesloaded/
+drwxr-xr-x 10284    1004              Jan  4  2024 /guiasadastra.com/assets/masonry/
+drwxr-xr-x 10284    1004              Jan  4  2024 /guiasadastra.com/assets/mbr-switch-arrow/
+drwxr-xr-x 10284    1004              Feb  2  2024 /guiasadastra.com/assets/mbr-tabs/
+drwxr-xr-x 10284    1004              Jan  4  2024 /guiasadastra.com/assets/mobirise/
+drwxr-xr-x 10284    1004              Jan  4  2024 /guiasadastra.com/assets/parallax/
+drwxr-xr-x 10284    1004              Jan  4  2024 /guiasadastra.com/assets/popper/
+drwxr-xr-x 10284    1004              Jan  4  2024 /guiasadastra.com/assets/popup-overlay-plugin/
+-rw-r--r-- 10284    1004           56 Feb 21  2025 /guiasadastra.com/assets/recaptcha.css
+drwxr-xr-x 10284    1004              Jan  4  2024 /guiasadastra.com/assets/shopping-cart/
+drwxr-xr-x 10284    1004              Jan  4  2024 /guiasadastra.com/assets/slidervideo/
+drwxr-xr-x 10284    1004              Jan  4  2024 /guiasadastra.com/assets/smart-cart/
+drwxr-xr-x 10284    1004              Jan  4  2024 /guiasadastra.com/assets/smoothscroll/
+drwxr-xr-x 10284    1004              Jan  4  2024 /guiasadastra.com/assets/socicon/
+drwxr-xr-x 10284    1004              Jan  4  2024 /guiasadastra.com/assets/tether/
+drwxr-xr-x 10284    1004              Jan  4  2024 /guiasadastra.com/assets/theme/
+drwxr-xr-x 10284    1004              Jan  4  2024 /guiasadastra.com/assets/touchswipe/
+drwxr-xr-x 10284    1004              Jan  4  2024 /guiasadastra.com/assets/viewportchecker/
+drwxr-xr-x 10284    1004              Jan  4  2024 /guiasadastra.com/assets/vimeoplayer/
+drwxr-xr-x 10284    1004              Jan  4  2024 /guiasadastra.com/assets/web/
+drwxr-xr-x 10284    1004              Jan  4  2024 /guiasadastra.com/assets/ytplayer/
