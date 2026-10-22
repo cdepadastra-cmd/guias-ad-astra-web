@@ -1,6 +1,6 @@
 # Web de Guías Ad Astra
 
-La carpeta **`dist/`** es la web completa, lista para subir a cualquier hosting. Las URLs son las mismas que en tu web de Lovable (`/actividades/...`, `/formacion-cursos/`, etc.), así que no pierdes enlaces.
+La carpeta **`dist/`** es la web completa que se publica en www.guiasadastra.com. Las direcciones de la web antigua (`.html`) redirigen a las nuevas.
 
 ## Qué ha cambiado
 
@@ -12,11 +12,9 @@ La carpeta **`dist/`** es la web completa, lista para subir a cualquier hosting.
 
 ## 1. Publicar la web
 
-**Opción fácil (gratis): Netlify**
-1. Entra en app.netlify.com/drop y arrastra la carpeta `dist`.
-2. En *Domain settings* añade `www.guiasadastra.com` y sigue los pasos para cambiar los DNS donde tengas el dominio.
+La web se publica sola: cada cambio que se sube a la rama `main` de GitHub se genera con `build.py` y se sube por FTP a **www.guiasadastra.com** (workflow `.github/workflows/subir-web.yml`). Los datos del FTP están en GitHub → Settings → Secrets and variables → Actions (`FTP_SERVER`, `FTP_USER`, `FTP_PASSWORD`); nunca en el código.
 
-También vale cualquier hosting (sube el contenido de `dist` a la carpeta pública por FTP).
+Servicios que usa la web (todos gratis y sin claves): Google Sheets + Apps Script (calendario, reservas e inscripciones), Google Fonts, mapas de Google My Maps, Leaflet + OpenTopoMap/OpenStreetMap y relieve de AWS Terrain Tiles (calculadora) e IndexNow (aviso a Bing). No usa ningún servicio de IA ni de pago.
 
 ## 2. Activar el calendario con plazas reales (Google Sheets, 10 minutos)
 
@@ -63,8 +61,8 @@ Todo el contenido está en `data.py`. Edítalo y ejecuta `python3 build.py`; se 
 
 ## Revisa antes de publicar
 
-- **Fechas pasadas**: Monte Olimpo (5–11 sep 2026) y Carros de Foc (5–11 ago 2026) ya han pasado; actualiza las fechas en `data.py`. Gredos Limpio muestra la última edición (8 nov 2025).
+- **Fechas de viajes**: Monte Olimpo y Carros de Foc muestran «Próxima salida por confirmar»; pon las nuevas fechas en `data.py` cuando las tengas.
 - En Monte Olimpo la ficha original decía 782 € y el precio 793 €; he dejado 793 €.
 - He corregido errores del texto original (Senderismo mencionaba Alicante; Espeleología en Segovia tenía el texto de barranquismo de Gredos).
 - Las descripciones de cada sector de **boulder en Zona Centro** y los textos ampliados de alquiler y boulder los he redactado yo para SEO: confirma que todo es correcto.
-- Las **fotos** siguen alojadas en Lovable. Si cierras ese proyecto, descárgalas a una carpeta `img/` y cambia la línea `IMG = ...` de `data.py`.
+- Las **fotos** están en `static/media/` dentro de la propia web (ya no dependen de Lovable).
