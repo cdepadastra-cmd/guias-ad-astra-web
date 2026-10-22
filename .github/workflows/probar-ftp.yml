@@ -12,7 +12,8 @@ jobs:
           P: ${{ secrets.FTP_PASSWORD }}
         run: |
           IP=$(curl -s https://api.ipify.org); echo "::warning::IP del servidor de GitHub: $IP"
-          if timeout 15 bash -c "echo > /dev/tcp/$H/21" 2>/dev/null; then echo "::warning::Puerto 21 ABIERTO"; else echo "::warning::Puerto 21 SIN RESPUESTA (bloqueado o caído)"; fi
+          for port in 21 22 80 443 990 8443; do if timeout 10 bash -c "echo > /dev/tcp/$H/$port" 2>/dev/null; then echo "::warning::Puerto $port ABIERTO"; else echo "::warning::Puerto $port SIN RESPUESTA"; fi; done
+          W=$(dig +short www.guiasadastra.com | tail -1); F=$(dig +short "$H" | tail -1); [ "$W" = "$F" ] && echo "::warning::El FTP y la web están en el mismo servidor" || echo "::warning::El FTP y la web están en servidores distintos"
           sudo apt-get install -y -qq lftp >/dev/null 2>&1
           OUT=$(timeout 60 lftp -u "$U","$P" "$H" -e "set ssl:verify-certificate no; set net:max-retries 1; set net:timeout 20; cls /guiasadastra.com/index.html; bye" 2>&1 | grep -v -i pass | head -3)
           echo "::warning::Prueba de login y listado: ${OUT:-sin respuesta}"
