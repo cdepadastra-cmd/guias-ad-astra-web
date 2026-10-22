@@ -1,0 +1,18 @@
+# Prueba de conexión con el FTP (solo comprueba, no sube ni cambia nada)
+name: Probar conexión FTP
+on: workflow_dispatch
+jobs:
+  probar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Probar
+        env:
+          H: ${{ secrets.FTP_SERVER }}
+          U: ${{ secrets.FTP_USER }}
+          P: ${{ secrets.FTP_PASSWORD }}
+        run: |
+          IP=$(curl -s https://api.ipify.org); echo "::warning::IP del servidor de GitHub: $IP"
+          if timeout 15 bash -c "echo > /dev/tcp/$H/21" 2>/dev/null; then echo "::warning::Puerto 21 ABIERTO"; else echo "::warning::Puerto 21 SIN RESPUESTA (bloqueado o caído)"; fi
+          sudo apt-get install -y -qq lftp >/dev/null 2>&1
+          OUT=$(timeout 60 lftp -u "$U","$P" "$H" -e "set ssl:verify-certificate no; set net:max-retries 1; set net:timeout 20; cls /guiasadastra.com/index.html; bye" 2>&1 | grep -v -i pass | head -3)
+          echo "::warning::Prueba de login y listado: ${OUT:-sin respuesta}"
