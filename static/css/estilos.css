@@ -442,3 +442,8 @@ details.adv[open] summary{margin-bottom:14px}
 .tp-warn{display:inline-grid;place-items:center;width:20px;height:18px;background:#ffd21f;color:#1b1a19;font-weight:900;font-size:.8rem;clip-path:polygon(50% 0,100% 100%,0 100%);padding-top:4px}
 .tp-ico{font-size:1rem}
 .tp-aviso{flex:1 1 100%!important}
+.tp-sym{display:inline-block;width:16px;height:16px;border-radius:50%;vertical-align:-3px}
+.tp-dest{background:#7b3fa0}
+.tp-nr{background:#fff;border:3px solid #c62828;position:relative}
+.tp-nr::after{content:"";position:absolute;left:1px;right:1px;top:4px;height:3px;background:#c62828}
+.tp-row.tp-p{border-left-color:#24408e}
