@@ -410,3 +410,32 @@ details.adv[open] summary{margin-bottom:14px}
 .brand.brand-foot img{height:110px}
 
 .trampa{position:absolute!important;left:-9999px!important;width:1px;height:1px;opacity:0}
+/* ---------- topografía de barrancos ---------- */
+.topo-grid{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:clamp(24px,4vw,44px);align-items:start}
+.topo-grid>*{min-width:0}
+@media (max-width:1000px){.topo-grid{grid-template-columns:minmax(0,1fr)}}
+.topo-ed{display:grid;gap:16px}
+.tp-list{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.tp-row{display:grid;grid-template-columns:24px minmax(0,1fr) minmax(0,1fr) auto;gap:10px;align-items:end;padding:12px;border:1px solid var(--line-2);border-radius:var(--r);background:var(--bg);border-left:4px solid var(--gold)}
+.tp-row.tp-d{border-left-color:#7fb3a3}.tp-row.tp-a{border-left-color:var(--line-2)}
+.tp-n{font:600 1rem/1 var(--label);color:var(--muted);align-self:center}
+.tp-f{display:grid;gap:5px;min-width:0}
+.tp-f span{font:600 .68rem/1 var(--label);letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.tp-f select,.tp-f input{width:100%;min-width:0}
+.tp-extra{grid-column:2/-1;display:flex;flex-wrap:wrap;gap:10px;align-items:end}
+.tp-extra:empty{display:none}
+.tp-extra .tp-f{flex:1 1 130px}
+.tp-chk{display:flex;gap:8px;align-items:center;font-size:.92rem;color:var(--fg);cursor:pointer}
+.tp-chk input{width:18px;height:18px;accent-color:#e9a53b}
+.tp-act{grid-column:4;grid-row:1;display:flex;gap:4px}
+.tp-act button{width:32px;height:36px;border-radius:8px;border:1px solid var(--line-2);background:transparent;color:var(--fg);cursor:pointer;font-size:1rem}
+.tp-act button:hover{border-color:var(--gold);color:var(--gold)}
+.tp-empty{padding:18px;border:1px dashed var(--line-2);border-radius:var(--r);color:var(--muted);text-align:center}
+.tp-add{display:flex;flex-wrap:wrap;gap:10px}
+.tp-tools{display:flex;gap:18px;flex-wrap:wrap}
+.link-btn{background:none;border:0;padding:0;color:var(--gold);cursor:pointer;font:inherit;text-decoration:underline;text-underline-offset:3px}
+.topo-out{display:grid;gap:18px;position:sticky;top:90px}
+@media (max-width:1000px){.topo-out{position:static;order:-1}}
+.topo-view{background:#fff;border-radius:var(--r);overflow:auto;border:1px solid var(--line-2)}
+.topo-view svg{display:block;width:100%;height:auto;min-width:520px}
+@media (max-width:560px){.tp-row{grid-template-columns:24px minmax(0,1fr) minmax(0,1fr)}.tp-act{grid-column:1/-1;grid-row:auto;justify-content:flex-end}.tp-extra{grid-column:1/-1}}

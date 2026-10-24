@@ -10,7 +10,7 @@ TODAY = datetime.date.today().isoformat()
 PAGES = []  # (path, priority) para el sitemap
 import hashlib
 _ST = os.path.join(os.path.dirname(os.path.abspath(__file__)), "static")
-VER = {a: hashlib.md5(open(os.path.join(_ST, a), "rb").read()).hexdigest()[:8] for a in ("css/estilos.css", "js/app.js", "js/calculadora.js", "config.js")}
+VER = {a: hashlib.md5(open(os.path.join(_ST, a), "rb").read()).hexdigest()[:8] for a in ("css/estilos.css", "js/app.js", "js/calculadora.js", "js/topografia.js", "config.js")}
 
 def e(s):
     return html.escape(str(s), quote=True)
@@ -46,7 +46,7 @@ NAV_ACT = [("Todas las actividades", "/actividades/"), ("Barranquismo", "/activi
            ("Alpinismo y ascensiones", "/actividades/?categoria=Ascensiones"), ("Espeleología", "/actividades/?categoria=Espeleología"), ("Escalada y boulder", "/actividades/?categoria=Escalada"),
            ("Senderismo", "/actividades/?categoria=Senderismo"), ("Travesías y viajes", "/actividades/?categoria=Viajes")]
 NAV_CUR = [("Todos los cursos", "/formacion-cursos/")] + [(c["disc_label"], "/actividades/%s/" % c["slug"]) for c in COURSES]
-NAV_OTR = [("Calculadora de rutas", "/calculadora-rutas/"), ("Boulder en Las Tuerces", "/actividades/boulder-las-tuerces/"), ("Boulder en Zona Centro", "/actividades/boulder-zona-centro-salamanca-caceres/"),
+NAV_OTR = [("Calculadora de rutas", "/calculadora-rutas/"), ("Topografía de barrancos", "/topografia-barrancos/"), ("Boulder en Las Tuerces", "/actividades/boulder-las-tuerces/"), ("Boulder en Zona Centro", "/actividades/boulder-zona-centro-salamanca-caceres/"),
            ("Iniciativas de turismo rural", "/iniciativas-turismo-rural/"), ("Creación y mantenimiento de senderos", "/creacion-mantenimiento-senderos/"), ("Route setting", "/route-setting/"), ("Organización de eventos", "/actividades/organizacion-eventos-deportivos/"), ("Gredos Limpio", "/actividades/gredos-limpio/"),
            ("Oeste de Gredos", "/actividades/comarca-natural-oeste-de-gredos/"), ("Vía Verde Ruta de la Plata", "/actividades/via-verde-ruta-de-la-plata/")]
 
@@ -96,7 +96,7 @@ def page(path, title, desc, body, active="", ld=None, og_type="website", image=N
            '<link rel="stylesheet" href="/css/estilos.css"><link rel="icon" href="/favicon.ico" sizes="any"><link rel="icon" href="/img/favicon-32.png" type="image/png" sizes="32x32"><link rel="icon" href="/img/favicon-48.png" type="image/png" sizes="48x48"><link rel="icon" href="/img/favicon-192.png" type="image/png" sizes="192x192"><link rel="apple-touch-icon" href="/img/apple-touch-icon.png">' + head + lds +
            '</head><body>' + header(active) + '<main id="contenido">' + body + '</main>' + footer() +
            '<script src="/config.js"></script><script src="/js/app.js" defer></script>' + scripts + '</body></html>')
-    for asset in ("css/estilos.css", "js/app.js", "js/calculadora.js", "config.js"):
+    for asset in ("css/estilos.css", "js/app.js", "js/calculadora.js", "js/topografia.js", "config.js"):
         doc = doc.replace('"/%s"' % asset, '"/%s?v=%s"' % (asset, VER.get(asset, "1")))
     if BASE:
         doc = doc.replace('href="/', 'href="%s/' % BASE).replace('src="/', 'src="%s/' % BASE)
@@ -708,6 +708,46 @@ def build_calculator():
          body, "otr", ld, priority="0.8", head=head, scripts=scripts)
 
 
+def build_topografia():
+    path = "/topografia-barrancos/"
+    faq = [
+        ("¿Qué es la topografía de un barranco?", "Es el croquis del descenso: un perfil del cauce de arriba abajo con cada rápel, destrepe y tramo andando, su altura y su instalación. Es lo primero que se consulta para preparar un barranco y saber cuánta cuerda llevar."),
+        ("¿Qué significan R, D y A?", "R es un rápel y el número son sus metros (R13 = rápel de 13 m). D es un destrepe, un paso que se baja sin cuerda o con ayuda (D3 = destrepe de 3 m). A es un tramo andando por el cauce, y solo se indica cuando es largo (A250 = 250 m andando)."),
+        ("¿Cuánta cuerda necesito para un barranco?", "Como mínimo el doble del rápel más largo, porque la cuerda se monta doble para poder recuperarla desde abajo, más un par de metros de margen. La herramienta te lo calcula. Lleva siempre una cuerda de reserva."),
+        ("¿Qué pongo en instalación y lado?", "La instalación es el tipo de anclaje de la cabecera (químicos, parabolts, spits, cadena o natural) y el lado indica dónde está mirando aguas abajo: izquierda, centro o derecha. Así aparece como en los croquis: «R13 - químicos, centro»."),
+        ("¿Se guarda lo que hago?", "Sí, en tu propio navegador: si cierras la página y vuelves, la topografía sigue ahí. Con «Copiar enlace» puedes compartirla con quien quieras, y con las descargas la guardas en PNG o SVG."),
+        ("¿Puedo usarla para mis propios barrancos?", "Claro. Es gratuita y no hace falta registrarse. Si quieres hacer el barranco con guía, también te llevamos nosotros."),
+    ]
+    body = (hero("Herramientas", "Topografía de barrancos", "Añade los tramos del barranco (rápeles, destrepes y tramos andando) y se dibuja la topografía al momento, lista para descargar y compartir.", img("8bb5ab91-bfa6-4c71-b8e0-37ba64a982bd/barranquismo-avila.webp"), [("Inicio", "/"), ("Topografía de barrancos", "")],
+                 '<a class="btn btn-primary" href="#topo">Empezar</a><a class="btn btn-ghost" href="/calculadora-rutas/">Calculadora de rutas</a>') +
+            '<section class="section" id="topo"><div class="wrap topo-grid">'
+            '<div class="panel topo-ed"><p class="eyebrow">Datos del barranco</p>'
+            '<div class="row2"><div class="field"><label for="topo-nombre">Nombre</label><input id="topo-nombre" placeholder="Barranco de…"></div><div class="field"><label for="topo-zona">Zona</label><input id="topo-zona" placeholder="Pueblo, provincia"></div></div>'
+            '<div class="row2"><div class="field"><label for="topo-etq">Etiqueta de los rápeles</label><select id="topo-etq"><option value="metros">Metros (R13)</option><option value="numero">Número y metros (R1 · 13 m)</option></select></div>'
+            '<label class="tp-chk" style="align-self:end;padding-bottom:12px"><input type="checkbox" id="topo-anc" checked> Dibujar anclaje y flecha</label></div>'
+            '<p class="eyebrow" style="margin-top:8px">Tramos de arriba abajo</p><ol class="tp-list" id="topo-list"></ol>'
+            '<div class="tp-add"><button type="button" class="btn btn-primary" data-add="r">+ Rápel</button><button type="button" class="btn btn-ghost" data-add="d">+ Destrepe</button><button type="button" class="btn btn-ghost" data-add="a">+ Tramo andando</button></div>'
+            '<div class="tp-tools"><button type="button" class="link-btn" id="topo-ejemplo">Cargar ejemplo</button><button type="button" class="link-btn" id="topo-nuevo">Empezar de cero</button></div></div>'
+            '<div class="topo-out"><div class="topo-view" id="topo-svg" aria-live="polite"></div><dl class="trk-stats" id="topo-stats"></dl>'
+            '<div class="dl-row"><span class="label">Descargar y compartir</span><div style="display:flex;flex-wrap:wrap;gap:10px"><button type="button" class="btn btn-primary" id="topo-png">Imagen PNG</button><button type="button" class="btn btn-ghost" id="topo-svgdl">SVG</button><button type="button" class="btn btn-ghost" id="topo-link">Copiar enlace</button></div></div>'
+            '<p class="hint" id="topo-msg" role="status"></p></div></div></section>' +
+            '<section class="section alt"><div class="wrap split"><div class="stack" style="gap:0">' +
+            block("Cómo se lee una topografía", prose([
+                "Cada rápel lleva una R seguida de sus metros (R13 es un rápel de 13 m), con el anclaje dibujado arriba y una flecha que marca la bajada. Al lado se indica la instalación y el lado de la cabecera mirando aguas abajo: «R13 - químicos, centro».",
+                "Los destrepes llevan una D y su altura (D3). Son pasos que se bajan sin cuerda o con una cuerda de ayuda.",
+                "Los tramos andando por el cauce no llevan nada, salvo los largos, que llevan una A y la distancia (A250). Si un rápel acaba en una poza, se dibuja en azul.",
+                "Para saber cuánta cuerda llevar, cuenta el doble del rápel más largo: la herramienta te lo calcula. Lleva siempre una cuerda de reserva y revisa el estado de las instalaciones antes de colgarte."])) +
+            block("Preguntas frecuentes", faq_html(faq)) +
+            '</div><div class="sticky"><div class="panel"><p class="eyebrow">¿Mejor con guía?</p><h3>Barrancos guiados</h3><p class="muted">Ponemos el material, el seguro y la experiencia. Desde 35 € por persona.</p>'
+            '<a class="btn btn-primary" href="/actividades/barranquismo-avila/">Barranquismo en Gredos</a><a class="btn btn-ghost" href="/actividades/curso-barranquismo/">Curso de barranquismo</a></div></div></div></section>')
+    ld = [crumbs_ld([("Inicio", "/"), ("Topografía de barrancos", path)]), faq_ld(faq),
+          {"@context": "https://schema.org", "@type": "WebApplication", "name": "Topografía de barrancos", "url": url(path), "applicationCategory": "DesignApplication", "operatingSystem": "Web",
+           "description": "Dibuja la topografía de un barranco añadiendo rápeles, destrepes y tramos andando. Calcula la cuerda necesaria y descarga el croquis en PNG o SVG.",
+           "offers": {"@type": "Offer", "price": 0, "priceCurrency": "EUR"}, "provider": {"@id": D + "/#empresa"}}]
+    page(path, "Topografía de barrancos: crea el croquis de rápeles | Ad Astra",
+         "Crea gratis la topografía de un barranco: añade rápeles (R), destrepes (D) y tramos andando, calcula la cuerda necesaria y descarga el croquis en PNG.",
+         body, "otr", ld, priority="0.7", scripts='<script src="/js/topografia.js" defer></script>')
+
 def build_service(s):
     path = "/%s/" % s["slug"]
     form = ('<form class="book" data-book data-presupuesto data-full data-title="%s" data-price="" id="reservar" novalidate><p class="eyebrow">Sin compromiso</p><h2>Pide información</h2>'
@@ -820,7 +860,7 @@ def main():
     cfg = os.path.join(OUT, "config.js")
     c = open(cfg, encoding="utf-8").read().replace('calendarioURL: ""', 'calendarioURL: "",\n  // Carpeta donde está publicada la web ("" si está en la raíz del dominio)\n  base: "%s"' % BASE)
     open(cfg, "w", encoding="utf-8").write(c)
-    build_home(); build_activities_index(); build_courses_index(); build_calendar(); build_rental(); build_about(); build_contact(); build_404(); build_calculator()
+    build_home(); build_activities_index(); build_courses_index(); build_calendar(); build_rental(); build_about(); build_contact(); build_404(); build_calculator(); build_topografia()
     for a in ACTIVITIES:
         build_activity(a)
     for a, o, p in OPTION_PAGES:
