@@ -118,7 +118,7 @@
       var url = CFG.appsScriptURL || CFG.calendarioURL;
       if (!url) { err.textContent = "Las inscripciones online todavía no están activas. Inténtalo de nuevo más tarde."; return; }
       btn.disabled = true; btn.textContent = "Enviando…";
-      var data = { action: "inscripcion", evento: f.dataset.evento, edicion: f.dataset.edicion, nombre: v("nombre"), apellidos: v("apellidos"), email: v("email"), telefono: v("telefono"), localidad: v("localidad"), personas: pers, comentarios: v("comentarios") };
+      var data = { action: "inscripcion", evento: f.dataset.evento, edicion: f.dataset.edicion, nombre: v("nombre"), apellidos: v("apellidos"), email: v("email"), telefono: v("telefono"), localidad: v("localidad"), personas: pers, comentarios: v("comentarios"), web: v("web") };
       fetch(url, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(data) })
         .then(function (r) { return r.json(); })
         .then(function (j) {
@@ -233,7 +233,7 @@
 
   /* modal de reserva con plazas */
   var dlg = document.createElement("dialog");
-  dlg.innerHTML = '<form class="dlg" method="dialog" id="ev-form" novalidate><div class="dlg-head"><div><p class="eyebrow" id="ev-type"></p><h2 id="ev-title"></h2></div><button type="button" class="icon-btn" data-x aria-label="Cerrar">×</button></div>' +
+  dlg.innerHTML = '<form class="dlg" method="dialog" id="ev-form" novalidate><input type="text" name="web" id="ev-web" class="trampa" tabindex="-1" autocomplete="off" aria-hidden="true"><div class="dlg-head"><div><p class="eyebrow" id="ev-type"></p><h2 id="ev-title"></h2></div><button type="button" class="icon-btn" data-x aria-label="Cerrar">×</button></div>' +
     '<p class="muted" id="ev-when"></p><div id="ev-seats"></div>' +
     '<div class="field"><label for="ev-pers">Plazas que quieres reservar</label><div class="stepper"><button type="button" data-step="-1" aria-label="Menos">−</button><input id="ev-pers" type="number" min="1" max="10" value="1" inputmode="numeric"><button type="button" data-step="1" aria-label="Más">+</button></div></div>' +
     '<div class="row2"><div class="field"><label for="ev-nombre">Nombre</label><input id="ev-nombre" autocomplete="given-name" required></div><div class="field" data-curso><label for="ev-ape">Apellidos</label><input id="ev-ape" autocomplete="family-name"></div></div>' +
@@ -276,7 +276,7 @@
       $("#ev-done").hidden = false; btn.hidden = true; renderAll(); window.open(url, "_blank", "noopener");
     };
     if (!LIVE) { done(null); return; }
-    fetch(CFG.calendarioURL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ action: "reservar", id: cur.id, plazas: pers, nombre: nombre, apellidos: ape, email: email, telefono: tel }) })
+    fetch(CFG.calendarioURL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ action: "reservar", web: ($("#ev-web") || {}).value || "", id: cur.id, plazas: pers, nombre: nombre, apellidos: ape, email: email, telefono: tel }) })
       .then(function (r) { return r.json(); })
       .then(function (j) { if (j.ok) done(j.libres); else { err.textContent = j.error || "No se pudo reservar."; if (j.libres != null) { cur.libres = j.libres; $("#ev-seats").innerHTML = seatsHTML(cur); renderAll(); } btn.disabled = false; } })
       .catch(function () { err.textContent = "No hemos podido conectar. Puedes reservar igualmente por WhatsApp."; btn.disabled = false; done(null); });

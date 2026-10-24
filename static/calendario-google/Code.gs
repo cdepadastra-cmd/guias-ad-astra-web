@@ -60,6 +60,13 @@ function leerSalidas_() {
   }).filter(function (o) { return o.id && o.fecha && String(o.publicado || 'SI').toUpperCase() !== 'NO'; });
 }
 
+/** Evita que un texto escrito en la web se convierta en fórmula al guardarlo en la hoja (=, +, -, @). */
+function celda_(v) {
+  var x = String(v == null ? '' : v);
+  return /^[=+\-@\t\r]/.test(x) ? "'" + x : x;
+}
+function filaSegura_(fila) { return fila.map(function (v) { return v instanceof Date || typeof v === 'number' ? v : celda_(v); }); }
+
 function json_(obj) {
   return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON);
 }
@@ -81,6 +88,7 @@ function doPost(e) {
   lock.waitLock(20000);
   try {
     var d = JSON.parse(e.postData.contents || '{}');
+    if (d.web) return json_({ ok: true }); // campo trampa: solo lo rellenan los robots de spam
     if (d.action === 'inscripcion') return inscribir_(d);
     var plazas = Math.max(1, Math.min(20, parseInt(d.plazas, 10) || 1));
     var nombre = String(d.nombre || '').slice(0, 80).trim();
@@ -100,7 +108,7 @@ function doPost(e) {
     var ss = libro_(), sh = ss.getSheetByName(HOJA_CAL);
     var col = sh.getRange(1, 1, 1, sh.getLastColumn()).getValues()[0].map(String).indexOf('plazas_reservadas') + 1;
     sh.getRange(salida._fila, col).setValue(res + plazas);
-    ss.getSheetByName(HOJA_RES).appendRow([new Date(), salida.id, salida.titulo, salida.fecha, plazas, nombre, apellidos, email, tel, 'Pendiente de confirmar']);
+    ss.getSheetByName(HOJA_RES).appendRow(filaSegura_([new Date(), salida.id, salida.titulo, salida.fecha, plazas, nombre, apellidos, email, tel, 'Pendiente de confirmar']));
 
     // Aviso por email (opcional). Cambia la dirección o borra estas líneas si no lo quieres.
     try {
@@ -124,7 +132,7 @@ function inscribir_(d) {
   var ss = libro_();
   var sh = ss.getSheetByName(HOJA_INS);
   if (!sh) { configurar(); sh = ss.getSheetByName(HOJA_INS); }
-  sh.appendRow([new Date(), t(d.evento), t(d.edicion), nombre, apellidos, email, tel, t(d.localidad), personas, t(d.comentarios, 500)]);
+  sh.appendRow(filaSegura_([new Date(), t(d.evento), t(d.edicion), nombre, apellidos, email, tel, t(d.localidad), personas, t(d.comentarios, 500)]));
   try {
     MailApp.sendEmail(email, 'Inscripción recibida: ' + t(d.edicion),
       'Hola ' + nombre + ',\n\nHemos recibido tu inscripción a ' + t(d.edicion) + (personas > 1 ? ' para ' + personas + ' personas' : '') + '.\n' +

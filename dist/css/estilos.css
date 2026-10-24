@@ -408,3 +408,5 @@ details.adv[open] summary{margin-bottom:14px}
 @media (max-width:1320px){.brand{font-size:1.45rem}.brand img{height:40px}}
 @media (min-width:1181px) and (max-width:1500px){.nav a,.nav button{padding:12px 6px;letter-spacing:.07em;font-size:.82rem}.nav .btn{margin-left:6px;padding:.8em 1em}}
 .brand.brand-foot img{height:110px}
+
+.trampa{position:absolute!important;left:-9999px!important;width:1px;height:1px;opacity:0}

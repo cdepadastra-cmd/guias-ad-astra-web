@@ -367,7 +367,7 @@ def build_gredos_limpio(a, path):
                 '<div class="row2"><div class="field"><label for="i-nombre">Nombre</label><input id="i-nombre" name="nombre" autocomplete="given-name"></div><div class="field"><label for="i-ape">Apellidos</label><input id="i-ape" name="apellidos" autocomplete="family-name"></div></div>'
                 '<div class="field"><label for="i-email">Correo electrónico</label><input id="i-email" name="email" type="email" autocomplete="email" inputmode="email"></div>'
                 '<div class="row2"><div class="field"><label for="i-tel">Teléfono</label><input id="i-tel" name="telefono" type="tel" autocomplete="tel" inputmode="tel"></div><div class="field"><label for="i-loc">Localidad</label><input id="i-loc" name="localidad" autocomplete="address-level2"></div></div>'
-                '<div class="field"><label for="i-com">Comentarios (opcional)</label><textarea id="i-com" name="comentarios" placeholder="Club o asociación, si vienes con alguno…"></textarea></div>'
+                '<input type="text" name="web" class="trampa" tabindex="-1" autocomplete="off" aria-hidden="true"><div class="field"><label for="i-com">Comentarios (opcional)</label><textarea id="i-com" name="comentarios" placeholder="Club o asociación, si vienes con alguno…"></textarea></div>'
                 '<label class="check" style="align-items:flex-start"><input type="checkbox" name="privacidad" id="i-priv" style="margin-top:3px"> <span>Acepto que Guías Ad Astra guarde estos datos para gestionar mi inscripción y el seguro de la jornada.</span></label>'
                 '<p class="err" role="alert"></p><button class="btn btn-primary btn-block" type="submit">Enviar inscripción</button>'
                 '<div class="notice ok" data-ok hidden></div><p class="hint">Tus datos se guardan en nuestra lista de inscritos. No los compartimos con nadie salvo la aseguradora de la jornada.</p></form>'
@@ -878,7 +878,9 @@ def main():
     })
     open(os.path.join(OUT, ".htaccess"), "w").write("ErrorDocument 404 /404.html\n"
         "# Las páginas se revisan siempre (así los cambios se ven al momento); fotos, CSS y JS sí se guardan en caché\n"
-        "<IfModule mod_headers.c>\n<FilesMatch \"\\.(html|xml|txt)$\">\nHeader set Cache-Control \"no-cache\"\n</FilesMatch>\n</IfModule>\n"
+        "<IfModule mod_headers.c>\n<FilesMatch \"\\.(html|xml|txt)$\">\nHeader set Cache-Control \"no-cache\"\n</FilesMatch>\n"
+        "# Cabeceras de seguridad\nHeader always set X-Content-Type-Options \"nosniff\"\nHeader always set Referrer-Policy \"strict-origin-when-cross-origin\"\n"
+        "Header always set X-Frame-Options \"SAMEORIGIN\"\nHeader always set Permissions-Policy \"camera=(), microphone=(), geolocation=()\"\n</IfModule>\n"
         "<Files \".ftp-deploy-sync-state.json\">\nRequire all denied\n</Files>\n"
         "# Direcciones de la web antigua -> nuevas (301)\n" + "".join(
         "RedirectMatch 301 ^/%s$ %s%s\n" % (k.replace(".", "\\."), D, v) for k, v in sorted(old.items())) +
