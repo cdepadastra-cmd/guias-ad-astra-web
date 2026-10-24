@@ -26,6 +26,7 @@ ORG = {
     "name": SITE["name"], "alternateName": "Ad Astra Montaña y Aventura", "url": D + "/",
     "logo": {"@type": "ImageObject", "url": D + "/img/logo-512.png", "width": 512, "height": 512}, "image": HERO, "telephone": SITE["phone_intl"], "email": SITE["email"],
     "priceRange": "15€ - 800€",
+    "openingHoursSpecification": [{"@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"], "opens": "09:00", "closes": "18:00"}],
     "address": {"@type": "PostalAddress", "addressLocality": "Fuentes de Béjar", "addressRegion": "Salamanca", "postalCode": "37796", "addressCountry": "ES"},
     "areaServed": ["Ávila", "Salamanca", "Cáceres", "León", "Palencia", "Segovia", "Burgos", "Valladolid", "Madrid", "Sierra de Gredos", "Castilla y León"],
     "openingHoursSpecification": [{"@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"], "opens": "09:00", "closes": "18:00"}],
@@ -170,6 +171,9 @@ def extras_block():
                  '<div class="panel quiet"><h3>Desayuno o comida</h3><p class="muted">Un desayuno completo antes de empezar o comida en un restaurante al terminar.</p></div>'
                  '<div class="panel quiet"><h3>Combina actividades</h3><p class="muted">Compatible con multiactividad y escalada en roca. Pregúntanos por un pack.</p></div></div>')
 
+def a_secs(a):
+    return a.get("secciones", [])
+
 def auto_faq(a):
     t = a["title"]; f = []
     prices = [o["price"] for o in a.get("options", []) if o.get("price")] or ([a["price"]] if a.get("price") else [])
@@ -199,8 +203,9 @@ def options_html(opts):
     out = []
     for o in opts:
         out.append('<article class="option"><div><h3>%s</h3><p class="meta">%s · %s</p></div><span class="price">%d€</span><div class="specs">%s</div><p>%s</p>'
-                   '<button type="button" class="btn btn-ghost pick" data-pick="%s">Elegir esta opción</button></article>'
-                   % (e(o["name"]), e(o["place"]), e(o["dur"]), o["price"], "".join("<span>%s</span>" % e(s) for s in o["specs"]), e(o["desc"]), e(o["name"])))
+                   '<div style="display:flex;gap:10px;flex-wrap:wrap"><button type="button" class="btn btn-ghost pick" data-pick="%s">Elegir esta opción</button>%s</div></article>'
+                   % (e(o["name"]), e(o["place"]), e(o["dur"]), o["price"], "".join("<span>%s</span>" % e(s) for s in o["specs"]), e(o["desc"]), e(o["name"]),
+                      ('<a class="btn btn-ghost" href="%s">Ver %s</a>' % (OPTION_URL[o["name"]], "detalles")) if o["name"] in OPTION_URL else ""))
     return '<div class="options">%s</div>' % "".join(out)
 
 # ---------------------------------------------------------------- páginas de actividad
@@ -252,6 +257,8 @@ def build_activity(a):
         intro.append('<div><h3 style="margin-bottom:14px">Requisitos</h3>%s</div>' % ticks(a["req"]))
     if intro:
         left.append(block("La actividad", '<div style="display:grid;gap:28px">%s</div>' % "".join(intro)))
+    for t, ps in a_secs(a):
+        left.append(block(t, prose(ps)))
     if k in ("options", "senderismo"):
         left.append(block("Elige tu opción", options_html(opts)))
     if k == "senderismo":
@@ -277,7 +284,7 @@ def build_activity(a):
     if a.get("packs"):
         left.append(block("Packs de aventura", '<div class="two">%s</div>' % "".join(
             '<div class="panel"><div style="display:flex;justify-content:space-between;gap:12px;align-items:baseline"><h3>%s</h3><span class="price">+%d€</span></div><p class="muted">%s</p></div>' % (e(n), p, e(d)) for n, d, p in a["packs"])))
-    faq = auto_faq(a) if k != "list" else [("¿Cuánto cuesta una ascensión guiada?", "Desde 20 € por persona según la cumbre y el tamaño del grupo. Elige la cumbre en la tabla y te enviamos el precio exacto."), ("¿Puedo proponer otra montaña?", "Sí. Escríbenos con la cumbre que te apetece y la fecha y preparamos la ascensión."), ("¿Qué incluye?", "Guía de montaña titulado y seguro. En ascensiones invernales también te asesoramos sobre material, que puedes alquilarnos.")]
+    faq = list(a.get("faq", [])) + (auto_faq(a) if k != "list" else [("¿Cuánto cuesta una ascensión guiada?", "Desde 20 € por persona según la cumbre y el tamaño del grupo. Elige la cumbre en la tabla y te enviamos el precio exacto."), ("¿Puedo proponer otra montaña?", "Sí. Escríbenos con la cumbre que te apetece y la fecha y preparamos la ascensión."), ("¿Qué incluye?", "Guía de montaña titulado y seguro. En ascensiones invernales también te asesoramos sobre material, que puedes alquilarnos.")])
     left.append(block("Preguntas frecuentes", faq_html(faq)))
     form = book_form(a["title"], opts if opts else None, a.get("price", 0), opt_label="Cumbre" if k == "list" else ("Nivel" if k == "senderismo" else "Opción"))
     right = '<div class="sticky" style="display:grid;gap:18px">%s%s</div>' % (upcoming(a["slug"]), form)
@@ -294,6 +301,10 @@ def build_trip(a, path):
     left.append(block("Requisitos", ticks(a["req"])))
     left.append(block("Material necesario", ticks(a["material"], "cols")))
     left.append(block("Qué incluye", '<div class="two"><div class="panel"><h3>Incluye</h3>%s</div><div class="panel"><h3>No incluye</h3>%s</div></div>' % (ticks(a["incluye"]), ticks(a["noincluye"], "cross"))))
+    for t, ps in a_secs(a):
+        left.append(block(t, prose(ps)))
+    if a.get("faq"):
+        left.append(block("Preguntas frecuentes", faq_html(a["faq"])))
     fechas = dict(a["ficha"]).get("Fechas", "")
     form = book_form("%s (%s)" % (a["title"], fechas), None, a["price"], date=False, heading="Reserva tu plaza", note="Plazas limitadas. Te enviamos el dossier completo y las condiciones de pago por WhatsApp.")
     body = (hero(a["cat"], e(a["title"]), e(a["short"]), a["img"], crumbs, '<a class="btn btn-primary" href="#reservar">Reservar plaza</a>') +
@@ -304,6 +315,8 @@ def build_trip(a, path):
            "provider": {"@id": D + "/#empresa"}, "offers": {"@type": "Offer", "price": a["price"], "priceCurrency": "EUR", "availability": "https://schema.org/LimitedAvailability"},
            "itinerary": {"@type": "ItemList", "itemListElement": [{"@type": "ListItem", "position": i + 1, "name": t} for i, (_, t, _) in enumerate(a.get("etapas", []))]}},
           {"@context": "https://schema.org", **ORG}]
+    if a.get("faq"):
+        ld.append(faq_ld(a["faq"]))
     page(path, a["seo_title"], a["seo_desc"], body, "act", ld, "product", a["img"], "0.7")
 
 def build_boulder(a, path):
@@ -496,7 +509,9 @@ def build_activities_index():
             continue
         secs += '<section class="cat-section"><h2>%s</h2><div class="grid c3">%s</div></section>' % (c, "".join(card("/actividades/%s/" % x["slug"], x["img"], x["cat"], x["title"], x["short"], min_price(x), 'data-cat="%s"' % c) for x in items))
     body = (hero("Actividades", "Elige tu aventura", "Barranquismo, vías ferratas, espeleología, ascensiones, senderismo, escalada y viajes con guías titulados en Gredos, Castilla y León y el mundo.", HERO, [("Inicio", "/"), ("Actividades", "")]) +
-            '<section class="section"><div class="wrap"><div class="chips" data-filter="#acts" data-key="cat" data-param="categoria" style="margin-bottom:36px">%s</div><div id="acts">%s</div></div></section>' % (chips, secs))
+            '<section class="section"><div class="wrap"><div class="chips" data-filter="#acts" data-key="cat" data-param="categoria" style="margin-bottom:36px">%s</div><div id="acts">%s</div></div></section>' % (chips, secs) +
+            '<section class="section alt"><div class="wrap"><div class="section-head"><p class="eyebrow">Recorridos</p><h2>Barrancos, ferratas, cuevas y rutas</h2><p class="muted">Todos los recorridos que guiamos, con su precio y duración.</p></div><div class="two">%s</div></div></section>'
+            % "".join('<a class="panel" href="%s" style="display:block"><h3>%s</h3><p class="muted">%s · %s · %d€</p></a>' % (p_, e(o["name"]), e(o["place"]), e(o["dur"]), o["price"]) for _, o, p_ in OPTION_PAGES))
     ld = [crumbs_ld([("Inicio", "/"), ("Actividades", "/actividades/")]), {"@context": "https://schema.org", "@type": "ItemList", "itemListElement": [{"@type": "ListItem", "position": i + 1, "url": url("/actividades/%s/" % x["slug"]), "name": x["title"]} for i, x in enumerate(ACTIVITIES)]}]
     page("/actividades/", "Actividades de aventura en Gredos y Castilla y León | Ad Astra", "Barranquismo, vías ferratas, espeleología, ascensiones, senderismo y viajes en Ávila, Salamanca, Cáceres, León, Palencia, Segovia y Burgos con guías titulados.", body, "act", ld, priority="0.9")
 
@@ -717,6 +732,87 @@ def build_service(s):
     page(path, s["seo_title"], s["seo_desc"], body, "otr", ld, image=s["img"], priority="0.6")
 
 # ---------------------------------------------------------------- build
+# ---------------------------------------------------------------- páginas de cada barranco, ferrata, cueva o ruta
+import unicodedata as _ud
+def slugify(t):
+    t = _ud.normalize("NFKD", t).encode("ascii", "ignore").decode().lower()
+    return "-".join("".join(c if c.isalnum() else " " for c in t).split())
+
+def _option_pages():
+    """Una página por cada recorrido con nombre propio (barranco, ferrata, cueva, ruta), dentro de su actividad."""
+    out, seen = [], set()
+    for a in ACTIVITIES:
+        if a.get("kind") not in ("options", "zona") or a["slug"] in ("via-ferrata-salamanca", "barranquismo-cueva-valporquero-sima-de-perlas"):
+            continue
+        for o in a.get("options", []):
+            n = o["name"]
+            if n.startswith("Cueva de Valporquero") or n.startswith("Cancho de la Muela") or n.startswith("Vía ferrata de La Muela") or n.startswith("Nivel "):
+                continue
+            k = slugify(n)
+            if k in seen:
+                continue
+            seen.add(k)
+            out.append((a, o, "/actividades/%s/%s/" % (a["slug"], k)))
+    return out
+OPTION_PAGES = _option_pages()
+OPTION_URL = {o["name"]: p for _, o, p in OPTION_PAGES}
+
+def _short(t, n):
+    return t if len(t) <= n else t[: n - 1].rsplit(" ", 1)[0] + "…"
+
+def build_option(a, o, path):
+    n, place, region = o["name"], o["place"], o["place"].split("(")[-1].rstrip(")") if "(" in o["place"] else o["place"]
+    tipo = ("barranco" if "arranco" in n else "vía ferrata" if "ferrata" in n.lower() else "cueva" if n.startswith("Cueva") else "ruta")
+    h1 = "%s con guía" % n
+    crumbs = [("Inicio", "/"), ("Actividades", "/actividades/"), (a["title"], "/actividades/%s/" % a["slug"]), (n, "")]
+    specs = list(o.get("specs", []))
+    kb = [("Dónde", place), ("Duración", o["dur"]), ("Precio", "%d € / persona" % o["price"]), ("Incluye", "Guía titulado, material y seguro")]
+    art = ("el " if n.startswith("Barranco") else "la " if n.startswith(("Cueva", "Vía", "Ruta", "Ascensión", "Escalada")) else "") + (n[0].lower() + n[1:] if n.startswith(("Barranco", "Cueva", "Vía", "Ruta", "Ascensión", "Escalada")) else n)
+    left = [block("Cómo es", prose([o["desc"]]) + (ticks(specs) if specs else ""))]
+    if a.get("intro"):
+        left.append(block("La actividad", prose(a["intro"])))
+    if a.get("incluye") or a.get("traer"):
+        inner = '<div class="two">'
+        if a.get("incluye"):
+            inner += '<div class="panel"><h3>Nosotros ponemos</h3>%s</div>' % ticks(a["incluye"])
+        if a.get("traer"):
+            inner += '<div class="panel"><h3>Tienes que traer</h3>%s</div>' % ticks(a["traer"])
+        left.append(block("Qué incluye", inner + "</div>"))
+    if a.get("epoca"):
+        left.append(block("Mejor época", prose([a["epoca"]])))
+    faq = [("¿Dónde es %s?" % art,
+            "En %s. Te enviamos el punto de encuentro exacto y cómo llegar al confirmar la reserva." % place),
+           ("¿Cuánto dura?", "Unas %s en total, contando aproximación, actividad y regreso." % o["dur"].replace(" aprox.", "")),
+           ("¿Cuánto cuesta %s con guía?" % art,
+            "%d € por persona, con guía titulado, seguro y el material técnico." % o["price"]),
+           ("¿Hace falta experiencia?", o["desc"] + " Te asesoramos al reservar para elegir la opción que mejor encaja con tu grupo."),
+           ("¿Cómo reservo?", "Elige el día y el número de personas en el formulario y envíanos la solicitud por WhatsApp. Te confirmamos disponibilidad y punto de encuentro.")]
+    left.append(block("Preguntas frecuentes", faq_html(faq)))
+    sib = [(oo, pp) for aa, oo, pp in OPTION_PAGES if aa is a and pp != path]
+    if sib:
+        left.append(block("Otras opciones: %s" % a["title"], '<div class="two">%s</div>' % "".join(
+            '<a class="panel" href="%s" style="display:block"><h3>%s</h3><p class="muted">%s · %s · %d€</p></a>' % (pp, e(oo["name"]), e(oo["place"]), e(oo["dur"]), oo["price"]) for oo, pp in sib)))
+    form = book_form("%s (%s)" % (n, a["title"]), [o], o["price"], opt_label="Opción")
+    body = (hero(a["cat"], e(h1), e(o["desc"]), a["img"], crumbs, '<a class="btn btn-primary" href="#reservar">Reservar</a><a class="btn btn-ghost" href="/actividades/%s/">Ver todas las opciones</a>' % a["slug"]) + keybar(kb) +
+            '<section class="section"><div class="wrap split"><div class="stack" style="gap:0">%s</div><div class="sticky" style="display:grid;gap:18px">%s</div></div></section>' % ("".join(left), form) + related(a))
+    pf = place.replace(" (", ", ").rstrip(")")
+    title = "%s con guía (%s) | %d€" % (n, pf, o["price"])
+    if len(title) > 62:
+        title = "%s con guía, %s | %d€" % (n, region, o["price"])
+    if len(title) > 62:
+        title = "%s con guía | %d€" % (n, o["price"])
+    first = o["desc"].split(". ")[0].rstrip(".") + "."
+    desc = "%s con guías titulados en %s: %s, %d € por persona con material y seguro. %s" % (n, pf, o["dur"], o["price"], first)
+    if len(desc) > 160:
+        desc = _short(desc, 158)
+    ld = [crumbs_ld([("Inicio", "/"), ("Actividades", "/actividades/"), (a["title"], "/actividades/%s/" % a["slug"]), (n, path)]),
+          {"@context": "https://schema.org", "@type": "Product", "name": h1, "description": desc, "image": a["img"], "category": a["cat"], "url": url(path),
+           "brand": {"@type": "Brand", "name": "Guías Ad Astra"},
+           "offers": {"@type": "Offer", "price": o["price"], "priceCurrency": "EUR", "availability": "https://schema.org/InStock", "url": url(path) + "#reservar", "seller": {"@id": D + "/#empresa"}}},
+          {"@context": "https://schema.org", "@type": "TouristAttraction", "name": n, "address": {"@type": "PostalAddress", "addressLocality": place.split("(")[0].strip(), "addressRegion": region, "addressCountry": "ES"}},
+          faq_ld(faq)]
+    page(path, title, desc, body, "act", ld, "product", a["img"], "0.7")
+
 def main():
     if os.path.exists(OUT):
         shutil.rmtree(OUT)
@@ -727,6 +823,8 @@ def main():
     build_home(); build_activities_index(); build_courses_index(); build_calendar(); build_rental(); build_about(); build_contact(); build_404(); build_calculator()
     for a in ACTIVITIES:
         build_activity(a)
+    for a, o, p in OPTION_PAGES:
+        build_option(a, o, p)
     for c in COURSES:
         build_course(c)
     for s in SERVICES:
@@ -795,6 +893,8 @@ def main():
          "- Organizan la Ultra de Gredos, el Desafío Fuenterrico y las jornadas de voluntariado Gredos Limpio (desde 2013).", "",
          "## Actividades guiadas"]
     L += ["- [%s](%s/actividades/%s/): %s%s" % (x["title"], D, x["slug"], x["short"], (" Desde %s €." % min_price(x)) if min_price(x) else "") for x in ACTIVITIES if x["cat"] != "Otros"]
+    L += ["", "## Barrancos, vías ferratas, cuevas y rutas concretas"]
+    L += ["- [%s](%s%s): %s, %s, %d €." % (o["name"], D, p_, o["place"], o["dur"], o["price"]) for _, o, p_ in OPTION_PAGES]
     L += ["", "## Cursos de formación"]
     L += ["- [%s](%s/actividades/%s/): %s Desde %s €." % (c["title"], D, c["slug"], c["short"], c["price"]) for c in COURSES]
     L += ["", "## Alquiler de material", "- [Alquiler de material de montaña y barranquismo](%s/actividades/alquiler-material-montana/): neoprenos, arneses, cascos, sets de vía ferrata, piolets y crampones desde 4 €/día. Recogida en Fuentes de Béjar (Salamanca) o Valladolid." % D,

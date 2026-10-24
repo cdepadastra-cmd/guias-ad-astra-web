@@ -26,6 +26,31 @@
 - [Boulder en Las Tuerces](https://www.guiasadastra.com/actividades/boulder-las-tuerces/): Mapa de sectores, croquis y accesos para hacer boulder en Las Tuerces (Palencia).
 - [Boulder en Zona Centro (Salamanca, Ávila y Cáceres)](https://www.guiasadastra.com/actividades/boulder-zona-centro-salamanca-caceres/): Sectores de boulder en Valcorchero, Candelario, Valdesangil, Vallejera, La Hoya y Becedas.
 
+## Barrancos, vías ferratas, cuevas y rutas concretas
+- [Barranco del Río Mayor](https://www.guiasadastra.com/actividades/barranquismo-avila/barranco-del-rio-mayor/): Riofrío (Ávila), 2 horas, 35 €.
+- [Barranco del Arbillas](https://www.guiasadastra.com/actividades/barranquismo-avila/barranco-del-arbillas/): Poyales del Hoyo (Ávila), 3-4 horas, 45 €.
+- [Barranco de Solana](https://www.guiasadastra.com/actividades/barranquismo-avila/barranco-de-solana/): Solana de Ávila, 4-5 horas, 60 €.
+- [Barranco de los Hoyos](https://www.guiasadastra.com/actividades/barranquismo-en-caceres/barranco-de-los-hoyos/): Jerte (Cáceres), 2 horas, 40 €.
+- [Barranco de las Nogaleas](https://www.guiasadastra.com/actividades/barranquismo-en-caceres/barranco-de-las-nogaleas/): Navaconcejo (Cáceres), 3 horas, 50 €.
+- [Barranco de los Papúos](https://www.guiasadastra.com/actividades/barranquismo-en-caceres/barranco-de-los-papuos/): Jerte (Cáceres), 4 horas, 60 €.
+- [Barranco del Pozo Airón](https://www.guiasadastra.com/actividades/barranquismo-salamanca/barranco-del-pozo-airon/): Pereña de la Ribera (Salamanca), 3 horas, 45 €.
+- [Barranco de Rupurupay](https://www.guiasadastra.com/actividades/barranquismo-salamanca/barranco-de-rupurupay/): Aldeadávila de la Ribera (Salamanca), 3 horas, 45 €.
+- [Barranco del 40 Aniversario](https://www.guiasadastra.com/actividades/barranquismo-leon/barranco-del-40-aniversario/): Valporquero (León), 2-3 horas, 50 €.
+- [Vía ferrata de Arauzo de Miel](https://www.guiasadastra.com/actividades/via-ferrata-burgos/via-ferrata-de-arauzo-de-miel/): Arauzo de Miel (Burgos), 1h30-2h, 40 €.
+- [Vía ferrata de Huerta del Rey](https://www.guiasadastra.com/actividades/via-ferrata-burgos/via-ferrata-de-huerta-del-rey/): Huerta del Rey (Burgos), 2 horas, 40 €.
+- [Vía ferrata de Espeja](https://www.guiasadastra.com/actividades/via-ferrata-burgos/via-ferrata-de-espeja/): Espeja de San Marcelino (Burgos), 2 horas, 45 €.
+- [Vía ferrata del Valle de Arbás](https://www.guiasadastra.com/actividades/vias-ferratas-leon/via-ferrata-del-valle-de-arbas/): Arbás (León), 2 horas, 45 €.
+- [Vía ferrata de Cistierna](https://www.guiasadastra.com/actividades/vias-ferratas-leon/via-ferrata-de-cistierna/): Cistierna (León), 2 horas, 50 €.
+- [Vía ferrata de Sabero](https://www.guiasadastra.com/actividades/vias-ferratas-leon/via-ferrata-de-sabero/): Sabero (León), 3 horas, 60 €.
+- [Cueva del Burro](https://www.guiasadastra.com/actividades/espeleologia-leon/cueva-del-burro/): Vegacervera (León), 1h30, 40 €.
+- [Cueva del Arenal](https://www.guiasadastra.com/actividades/espeleologia-leon/cueva-del-arenal/): Valdeteja (León), 1h30, 40 €.
+- [Cueva de la Cantera](https://www.guiasadastra.com/actividades/espeleologia-segovia/cueva-de-la-cantera/): Fuentidueña (Segovia), 1h30, 35 €.
+- [Cueva de las Mesillas](https://www.guiasadastra.com/actividades/espeleologia-segovia/cueva-de-las-mesillas/): Casla (Segovia), 1h30, 35 €.
+- [Ascensión al Canchal de la Ceja y el Calvitero](https://www.guiasadastra.com/actividades/comarca-natural-oeste-de-gredos/ascension-al-canchal-de-la-ceja-y-el-calvitero/): Candelario (Salamanca), 4-6 horas, 45 €.
+- [Ruta a la Laguna del Barco](https://www.guiasadastra.com/actividades/comarca-natural-oeste-de-gredos/ruta-a-la-laguna-del-barco/): Nava del Barco (Ávila), 4-5 horas, 40 €.
+- [Ascensión a la Laguna del Duque](https://www.guiasadastra.com/actividades/comarca-natural-oeste-de-gredos/ascension-a-la-laguna-del-duque/): Solana de Ávila (Ávila), 4 horas, 30 €.
+- [Escalada en La Muela](https://www.guiasadastra.com/actividades/comarca-natural-oeste-de-gredos/escalada-en-la-muela/): La Garganta (Cáceres), 2 horas, 20 €.
+
 ## Cursos de formación
 - [Curso de barranquismo](https://www.guiasadastra.com/actividades/curso-barranquismo/): Aprende las técnicas para ser autosuficiente en los descensos de barrancos. Desde 150 €.
 - [Curso de iniciación a la escalada en roca](https://www.guiasadastra.com/actividades/curso-iniciacion-escalada-en-roca/): Formación técnica básica para empezar a escalar y hacer rápel con seguridad. Desde 60 €.
