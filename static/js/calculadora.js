@@ -456,7 +456,21 @@
   var C = { bg: "#160d09", card: "#25170f", line: "#3a271b", fg: "#f3e9df", muted: "#b9a593", dim: "#8a7564", gold: "#e9a53b", orange: "#d9661f" };
   var DISP = '"Bebas Neue","Oswald","Arial Narrow",Impact,sans-serif', BODY = '"Barlow",system-ui,sans-serif', LAB = '"Barlow Condensed","Arial Narrow",sans-serif';
   function slug(s) { return (s || "ruta").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 60) || "ruta"; }
-  function save(canvas, name) {
+  /* marca de agua sutil con el logo de Guías Ad Astra (esquina inferior derecha) */
+  var WM = new Image(); WM.src = (window.ADASTRA_CONFIG && window.ADASTRA_CONFIG.base || "") + "/img/logo-adastra.png";
+  function watermark(canvas, bottom) {
+    var x = canvas.getContext("2d"), W = canvas.width, H = canvas.height, h = Math.round(Math.max(70, Math.min(W, H) * 0.11)), w = Math.round(h * 186 / 249);
+    var m = Math.round(Math.min(W, H) * 0.03), bx = W - w - m, by = H - h - m - (bottom || 0);
+    x.save();
+    if (WM.complete && WM.naturalWidth) { x.globalAlpha = 0.2; x.drawImage(WM, bx, by, w, h); }
+    if (bottom) { x.restore(); return; }
+    x.globalAlpha = 0.38; x.fillStyle = "#ffffff"; x.strokeStyle = "rgba(0,0,0,.55)"; x.lineWidth = Math.max(2, h * 0.03);
+    x.font = "600 " + Math.round(h * 0.16) + 'px "Barlow Condensed","Arial Narrow",sans-serif'; x.textAlign = "right"; x.textBaseline = "alphabetic";
+    x.strokeText("GUIASADASTRA.COM", bx - h * 0.12, by + h * 0.92); x.fillText("GUIASADASTRA.COM", bx - h * 0.12, by + h * 0.92);
+    x.restore();
+  }
+  function save(canvas, name, bottom) {
+    try { watermark(canvas, bottom); } catch (e) {}
     try {
       canvas.toBlob(function (b) {
         if (!b) return alertErr();
@@ -558,7 +572,7 @@
         var uw = x.measureText("GUIASADASTRA.COM").width; x.textAlign = "left"; x.fillStyle = C.dim;
         x.fillText(fit(x, "Duración estimada. " + methodText(A.calc.p) + stopsText(A.calc.p, true) + ". Orientativo: depende del terreno, la meteo y el grupo.", W - 64 * k - uw - 30 * k, 14 * k, 10 * k, BODY), 32 * k, H - 30 * k);
         return c;
-      }), slug(A.name) + "-ficha.png");
+      }), slug(A.name) + "-ficha.png", 46 * 2);
     }).catch(alertErr).then(function () { busy(btn, false); });
   }
   $$("[data-dl]").forEach(function (b) { b.addEventListener("click", function () { $("#trk-err").textContent = ""; ({ perfil: dlProfile, mapa: dlMap, ficha: dlFicha })[b.dataset.dl](b); }); });

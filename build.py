@@ -729,7 +729,7 @@ def build_topografia():
             '<div class="tp-add"><button type="button" class="btn btn-primary" data-add="r">+ Rápel</button><button type="button" class="btn btn-ghost" data-add="d">+ Destrepe</button><button type="button" class="btn btn-ghost" data-add="p">+ Pasamanos</button><button type="button" class="btn btn-ghost" data-add="a">+ Tramo andando</button></div>'
             '<div class="tp-tools"><button type="button" class="link-btn" id="topo-ejemplo">Cargar ejemplo</button><button type="button" class="link-btn" id="topo-nuevo">Empezar de cero</button></div></div>'
             '<div class="topo-out"><div class="topo-view" id="topo-svg" aria-live="polite"></div><dl class="trk-stats" id="topo-stats"></dl>'
-            '<div class="dl-row"><span class="label">Descargar y compartir</span><div style="display:flex;flex-wrap:wrap;gap:10px"><button type="button" class="btn btn-primary" id="topo-png">Imagen PNG</button><button type="button" class="btn btn-ghost" id="topo-svgdl">SVG</button><button type="button" class="btn btn-ghost" id="topo-link">Copiar enlace</button></div></div>'
+            '<div class="dl-row"><span class="label">Descargar y compartir</span><div style="display:flex;flex-wrap:wrap;gap:10px"><button type="button" class="btn btn-primary" id="topo-png">PNG</button><button type="button" class="btn btn-ghost" id="topo-jpg">JPG</button><button type="button" class="btn btn-ghost" id="topo-svgdl">SVG</button><button type="button" class="btn btn-ghost" id="topo-link">Copiar enlace</button></div></div>'
             '<p class="hint" id="topo-msg" role="status"></p></div></div></section>' +
             '<section class="section alt"><div class="wrap split"><div class="stack" style="gap:0">' +
             block("Cómo se lee una topografía", prose([
@@ -747,7 +747,7 @@ def build_topografia():
            "description": "Dibuja la topografía de un barranco añadiendo rápeles, destrepes y tramos andando. Calcula la cuerda necesaria y descarga el croquis en PNG o SVG.",
            "offers": {"@type": "Offer", "price": 0, "priceCurrency": "EUR"}, "provider": {"@id": D + "/#empresa"}}]
     page(path, "Topografía de barrancos: crea el croquis de rápeles | Ad Astra",
-         "Crea gratis la topografía de un barranco: añade rápeles (R), destrepes (D) y tramos andando, calcula la cuerda necesaria y descarga el croquis en PNG.",
+         "Crea gratis la topografía de un barranco: añade rápeles (R), destrepes (D) y tramos andando, calcula la cuerda necesaria y descarga el croquis en PNG o JPG.",
          body, "otr", ld, priority="0.7", scripts='<script src="/js/topografia.js" defer></script>')
 
 def build_service(s):

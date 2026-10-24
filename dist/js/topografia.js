@@ -395,8 +395,19 @@
     if (st.walk) info.push(fmt(Math.round(st.walk)) + " m de cauce");
     o.push('<text x="24" y="' + (H - 18) + '" font-size="12.5" fill="#444">' + esc(info.join(" · ")) + "</text>");
     o.push('<text x="' + (W - 20) + '" y="' + (H - 18) + '" font-size="12" fill="#888" text-anchor="end">Hecho con la topografía de barrancos de guiasadastra.com</text>');
-    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + Math.round(W) + " " + Math.round(H) + '" width="' + Math.round(W) + '" height="' + Math.round(H) + '" font-family="Arial,Helvetica,sans-serif"><rect width="100%" height="100%" fill="#fff"/>' + o.join("") + "</svg>";
+    if (LOGO) {                                                      // marca de agua sutil con el logo
+      var lh = 92, lw = Math.round(lh * 186 / 249);
+      o.push('<image href="' + LOGO + '" x="' + (W - lw - 28) + '" y="18" width="' + lw + '" height="' + lh + '" opacity="0.16"/>');
+    }
+    return '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 ' + Math.round(W) + " " + Math.round(H) + '" width="' + Math.round(W) + '" height="' + Math.round(H) + '" font-family="Arial,Helvetica,sans-serif"><rect width="100%" height="100%" fill="#fff"/>' + o.join("") + "</svg>";
   }
+
+  var LOGO = "";                                                       // logo en data URI para que vaya dentro del SVG y de las imágenes
+  try {
+    fetch((window.ADASTRA_CONFIG && window.ADASTRA_CONFIG.base || "") + "/img/logo-adastra.png").then(function (r) { return r.blob(); }).then(function (b) {
+      var fr = new FileReader(); fr.onload = function () { LOGO = fr.result; update(); }; fr.readAsDataURL(b);
+    }).catch(function () {});
+  } catch (e) {}
 
   var view = $("#topo-svg", root), out = $("#topo-stats", root);
   var raf = 0;
@@ -416,15 +427,17 @@
   function fileName(ext) { return (S.nombre || "topografia-barranco").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") + "." + ext; }
   function dl(blob, name) { var a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 800); }
   $("#topo-svgdl", root).addEventListener("click", function () { dl(new Blob([svg()], { type: "image/svg+xml" }), fileName("svg")); });
-  $("#topo-png", root).addEventListener("click", function () {
+  function raster(type, ext) {
     var s = svg(), img = new Image(), m = s.match(/viewBox="0 0 (\d+) (\d+)"/), w = +m[1], h = +m[2], k = 2;
     img.onload = function () {
       var c = document.createElement("canvas"); c.width = w * k; c.height = h * k;
       var g = c.getContext("2d"); g.fillStyle = "#fff"; g.fillRect(0, 0, c.width, c.height); g.drawImage(img, 0, 0, c.width, c.height);
-      c.toBlob(function (b) { dl(b, fileName("png")); }, "image/png");
+      c.toBlob(function (b) { dl(b, fileName(ext)); }, type, 0.92);
     };
     img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(s);
-  });
+  }
+  $("#topo-png", root).addEventListener("click", function () { raster("image/png", "png"); });
+  $("#topo-jpg", root).addEventListener("click", function () { raster("image/jpeg", "jpg"); });
   $("#topo-link", root).addEventListener("click", function () {
     var u = location.origin + location.pathname + "#t=" + btoa(unescape(encodeURIComponent(JSON.stringify(S))));
     var msg = $("#topo-msg", root);
