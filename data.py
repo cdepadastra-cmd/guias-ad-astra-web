@@ -291,12 +291,29 @@ ACTIVITIES = [
   "slug": "monte-olimpo", "cat": "Viajes", "kind": "trip", "price": 793,
   "title": "Trekking del Monte Olimpo", "img": img("4539531d-0da2-43d5-a826-5048938c6bec/monte-olimpo.webp"),
   "short": "La montaña de los dioses, Grecia. Viaje guiado de 6 días con ascensión al Mitikas.",
-  "seo_title": "Trekking al Monte Olimpo (Grecia) con guías | Viaje 793€",
-  "seo_desc": "Viaje de trekking al Monte Olimpo con guías de montaña titulados: ascensión al Mitikas (2.918 m) y Eskolio, refugios, vuelos y traslados incluidos.",
+  "seo_title": "Monte Olimpo (Grecia): trekking guiado al Mitikas | 793€",
+  "seo_desc": "Monte Olimpo (Grecia): dónde está, cuánto mide (Mitikas, 2.918 m) y trekking guiado de 6 días con refugios, vuelos y traslados incluidos.",
   "ficha": [("Fechas", "Próxima salida por confirmar"), ("Duración", "6 días y 5 noches"), ("Precio", "793 € por persona"), ("Grupo", "De 7 a 15 personas")],
   "intro": [
     "El Monte Olimpo es la montaña más alta de Grecia, Reserva de la Biosfera, Parque Nacional desde 1938 y hogar de los dioses del panteón clásico.",
     "En seis días subiremos al Mitikas (2.918 m) y al Eskolio (2.912 m), partiendo casi a nivel del mar desde Litokoro y atravesando todos los pisos de vegetación de este rincón del Mediterráneo, con el golfo de Tesalónica a nuestros pies.",
+  ],
+  "secciones": [
+    ("Dónde está el Monte Olimpo", [
+      "El Monte Olimpo está en el norte de Grecia, en el límite entre las regiones de Tesalia y Macedonia Central, a unos 80 km al suroeste de Tesalónica y muy cerca del mar Egeo. El pueblo de referencia para subir es Litokoro, al pie de la montaña, desde donde salen los senderos hacia los refugios.",
+      "Es el macizo más alto de Grecia y fue el primer Parque Nacional del país (1938). Para la mitología griega era el hogar de los doce dioses del Olimpo, con Zeus a la cabeza.",
+    ]),
+    ("Cuánto mide el Monte Olimpo", [
+      "Su cima más alta es el Mitikas, de 2.918 m, la montaña más alta de Grecia. Muy cerca están el Eskolio (2.912 m) y el Stefani o Trono de Zeus (2.909 m). La subida empieza casi al nivel del mar, así que el desnivel total supera los 2.800 m.",
+      "En nuestro viaje subimos al Mitikas y al Eskolio en un trekking de varios días con noches en refugio, con guías titulados y material técnico para los pasos de trepada final.",
+    ]),
+  ],
+  "faq": [
+    ("¿Dónde está el Monte Olimpo?", "En el norte de Grecia, entre Tesalia y Macedonia Central, a unos 80 km de Tesalónica. Se sube desde Litokoro."),
+    ("¿Cuánto mide el Monte Olimpo?", "Su cima principal, el Mitikas, mide 2.918 m: es la montaña más alta de Grecia."),
+    ("¿Es difícil subir al Monte Olimpo?", "El trekking es exigente por el desnivel (más de 2.800 m desde el mar), pero sin dificultad técnica salvo la trepada final al Mitikas, donde usamos casco y cuerda. Hace falta buena forma y costumbre de caminar 8-9 horas."),
+    ("¿Cuándo es mejor subir?", "De mediados de junio a septiembre, cuando no hay nieve en la cumbre y los refugios están abiertos."),
+    ("¿Qué incluye el viaje?", "Vuelos, guías de montaña titulados, refugios en media pensión, hoteles en Litokoro y Atenas, traslados, seguro y el material técnico de la ascensión."),
   ],
   "req": ["Ropa de montaña adecuada a la estación.", "Condición física aceptable y costumbre de caminar 8-9 horas por terreno rocoso.", "No tener vértigo y estar habituado a pequeñas trepadas.", "Respetar las indicaciones del guía."],
   "material": ["Mochila de unos 35 litros (máx. 8 kg recomendado)", "Pantalón largo de caminar", "Botas de montaña cómodas", "Camiseta de manga larga", "Forro polar o Primaloft", "Impermeable tipo Gore-Tex", "Pantalón impermeable (recomendable)", "Una muda completa", "Gorra o sombrero", "Gorro y guantes", "Cantimplora", "Protector solar y gafas de sol", "Linterna frontal", "Saco ligero", "Neceser básico", "Bastones", "Bañador"],
@@ -618,6 +635,8 @@ RENTAL = [
 RENTAL_PICKUP = ["Fuentes de Béjar (Salamanca)", "Valladolid"]
 
 RENTAL_FAQ = [
+    ("¿Alquiláis material para vía ferrata?", "Sí: set disipador homologado (10 €/día), arnés de escalada y ferratas (10 €/día) y casco (8 €/día). Con esas tres piezas tienes todo el equipo de vía ferrata por 28 € al día."),
+    ("¿Se pueden alquilar piolet y crampones?", "Sí: piolet de travesía de 54 cm (10 €/día) y crampones de correas de 12 puntas que valen para cualquier bota de montaña (15 €/día). Ideal para Gredos, Guadarrama o Picos en invierno."),
   ("¿Dónde se recoge el material de alquiler?", "En Fuentes de Béjar (Salamanca), junto a la Sierra de Béjar y Candelario, o en Valladolid. El material se devuelve en el mismo sitio donde lo recogiste."),
   ("¿Cómo se calcula el precio?", "El precio es por unidad y día, con IVA incluido. Si alquilas dos neoprenos tres días: 2 × 3 × 20 € = 120 €. Al enviar tu solicitud verás el total estimado."),
   ("¿Cómo reservo?", "Elige las fechas, añade las unidades de cada artículo y pulsa «Enviar por WhatsApp». Te confirmamos disponibilidad y punto de recogida por WhatsApp."),
