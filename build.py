@@ -735,7 +735,7 @@ def build_topografia():
             block("Cómo se lee una topografía", prose([
                 "Cada rápel lleva una R seguida de sus metros (R13 es un rápel de 13 m), con el anclaje dibujado arriba y una flecha que marca la bajada. Al lado se indica la instalación y el lado de la cabecera mirando aguas abajo: «R13 - químicos, centro».",
                 "Los destrepes llevan una D y su altura (D3). Son pasos que se bajan sin cuerda o con una cuerda de ayuda.",
-                "Los tramos andando por el cauce no llevan nada, salvo los largos, que llevan una A y la distancia (A250). Si un rápel acaba en una poza, se dibuja en azul.",
+                "Los tramos andando por el cauce no llevan nada, salvo los largos, que llevan una A y la distancia (A250). Si un rápel acaba en una poza, se dibuja en azul; si en la poza hay un remolino se marca con una espiral, y cualquier peligro o incidencia (un rebufo, un sifón, un tronco atascado…) con una señal de exclamación y una nota.",
                 "Para saber cuánta cuerda llevar, cuenta el doble del rápel más largo: la herramienta te lo calcula. Lleva siempre una cuerda de reserva y revisa el estado de las instalaciones antes de colgarte."])) +
             block("Preguntas frecuentes", faq_html(faq)) +
             '</div><div class="sticky"><div class="panel"><p class="eyebrow">¿Mejor con guía?</p><h3>Barrancos guiados</h3><p class="muted">Ponemos el material, el seguro y la experiencia. Desde 35 € por persona.</p>'

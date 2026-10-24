@@ -17,7 +17,7 @@
     tramos: [
       { t: "a", m: 40 }, { t: "r", m: 9, inst: "químicos", lado: "centro" }, { t: "a", m: 60 },
       { t: "r", m: 9, inst: "químicos", lado: "izq" }, { t: "a", m: 220, ver: true }, { t: "d", m: 3 },
-      { t: "r", m: 11, inst: "químicos", lado: "dcha" }, { t: "a", m: 260, ver: true }, { t: "r", m: 5, inst: "natural", poza: true }, { t: "a", m: 30 }
+      { t: "r", m: 11, inst: "químicos", lado: "dcha" }, { t: "a", m: 260, ver: true }, { t: "r", m: 5, inst: "natural", poza: true, remolino: true, peligro: true, aviso: "rebufo" }, { t: "a", m: 30 }
     ]
   };
   var S;
@@ -51,8 +51,13 @@
       extras = '<label class="tp-f"><span>Instalación</span><select data-k="inst">' + opt(INST, t.inst, ["—", "Químicos", "Parabolts", "Spits", "Cadena", "Natural", "Árbol"]) + "</select></label>" +
         '<label class="tp-f"><span>Lado</span><select data-k="lado">' + opt(LADOS, t.lado, ["—", "Izquierda", "Centro", "Derecha"]) + "</select></label>";
     }
-    if (t.t !== "a") extras += '<label class="tp-chk"><input type="checkbox" data-k="poza"' + (t.poza ? " checked" : "") + "> Poza abajo</label>";
+    if (t.t !== "a") {
+      extras += '<label class="tp-chk"><input type="checkbox" data-k="poza"' + (t.poza ? " checked" : "") + "> Poza abajo</label>";
+      if (t.poza) extras += '<label class="tp-chk"><input type="checkbox" data-k="remolino"' + (t.remolino ? " checked" : "") + '> Remolino en la poza <span class="tp-ico" aria-hidden="true">🌀</span></label>';
+    }
     if (t.t === "a") extras += '<label class="tp-chk"><input type="checkbox" data-k="ver"' + (verDist(t) ? " checked" : "") + "> Poner la distancia (A" + fmt(t.m || 0) + ")</label>";
+    extras += '<label class="tp-chk"><input type="checkbox" data-k="peligro"' + (t.peligro ? " checked" : "") + '> Peligro / incidencia <span class="tp-warn" aria-hidden="true">!</span></label>';
+    if (t.peligro) extras += '<label class="tp-f tp-aviso"><span>¿Qué pasa? (opcional)</span><input type="text" maxlength="40" data-k="aviso" placeholder="Rebufo, sifón, tronco atascado…" value="' + esc(t.aviso || "") + '"></label>';
     var unit = t.t === "a" ? "Metros de cauce" : "Metros de altura";
     return '<li class="tp-row tp-' + t.t + '" data-i="' + i + '">' +
       '<span class="tp-n">' + (i + 1) + "</span>" +
@@ -76,8 +81,9 @@
     var el = e.target, li = el.closest(".tp-row"); if (!li) return;
     var t = S.tramos[+li.dataset.i], k = el.dataset.k;
     if (k === "m") t.m = num(el.value);
-    else if (k === "poza" || k === "ver") t[k] = el.checked;
-    else if (k === "t") { t.t = el.value; if (t.t === "a") { delete t.inst; delete t.lado; delete t.poza; } renderList(); }
+    else if (k === "ver" || k === "remolino") t[k] = el.checked;
+    else if (k === "poza" || k === "peligro") { t[k] = el.checked; if (k === "poza" && !t.poza) delete t.remolino; renderList(); }
+    else if (k === "t") { t.t = el.value; if (t.t === "a") { delete t.inst; delete t.lado; delete t.poza; delete t.remolino; } renderList(); }
     else t[k] = el.value;
     if (k === "m" && t.t === "a") { var c = $('[data-k="ver"]', li); if (c && t.ver == null) c.checked = verDist(t); if (c) c.parentNode.lastChild.textContent = " Poner la distancia (A" + fmt(t.m || 0) + ")"; }
     update();
@@ -135,6 +141,7 @@
       if (t.t === "a") {
         var x0 = x, y0 = y, w = walk(t.m);
         if (verDist(t)) ann.push({ k: "a", x: x0 + w / 2, y: (y0 + y) / 2 + 26, txt: label(t) });
+        if (t.peligro) ann.push({ k: "p", x: x0 + w / 2, y: (y0 + y) / 2 - 30, txt: t.aviso || "" });
         return;
       }
       var h = Math.max(t.t === "r" ? 30 : 16, t.m * kv);
@@ -156,11 +163,12 @@
         x += w2; y += h;
       }
       if (t.poza) {                                                  // poza al pie: el cauce baja y vuelve a subir
-        var pw = 64, pd = 20, px = x;
+        var pw = 78, pd = 26, px = x;
         P.push([x + 6, y + pd * 0.6], [x + pw * 0.35, y + pd], [x + pw * 0.7, y + pd * 0.85], [x + pw, y - 2]);
-        pools.push({ x: px, y: y, w: pw, d: pd });
+        pools.push({ x: px, y: y, w: pw, d: pd, rem: !!t.remolino });
+        if (t.peligro) ann.push({ k: "p", x: px + pw * 0.9, y: y - 26, txt: t.aviso || "" });
         x += pw; y -= 2;
-      }
+      } else if (t.peligro) ann.push({ k: "p", x: x + 22, y: y - 34, txt: t.aviso || "" });
     });
     walk(40);
     return { P: P, ann: ann, pools: pools, nR: nR, w: x, h: y };
@@ -183,6 +191,20 @@
     return { nR: r.length, nD: d.length, maxR: maxR, cuerda: Math.ceil(maxR * 2 + 2), vert: vert, walk: walk };
   }
 
+  function spiral(cx, cy, r) {                                         // remolino: espiral azul dentro de la poza
+    var d = "", turns = 2.6, n = 46;
+    for (var i = 0; i <= n; i++) {
+      var a = i / n * turns * 2 * Math.PI, rr = r * i / n;
+      d += (i ? " L" : "M") + (cx + rr * Math.cos(a)).toFixed(1) + " " + (cy + rr * Math.sin(a) * 0.62).toFixed(1);
+    }
+    return '<path d="' + d + '" fill="none" stroke="#1f4fa3" stroke-width="2.4" stroke-linecap="round"/>';
+  }
+  function warn(cx, cy) {                                              // incidencia: señal triangular con exclamación
+    var s = 13;
+    return '<path d="M' + cx.toFixed(1) + " " + (cy - s).toFixed(1) + " L" + (cx + s).toFixed(1) + " " + (cy + s * 0.75).toFixed(1) + " L" + (cx - s).toFixed(1) + " " + (cy + s * 0.75).toFixed(1) + ' Z" fill="#ffd21f" stroke="#c62828" stroke-width="2.6" stroke-linejoin="round"/>' +
+      '<text x="' + cx.toFixed(1) + '" y="' + (cy + s * 0.55).toFixed(1) + '" font-size="15" font-weight="900" fill="#1b1a19" text-anchor="middle">!</text>';
+  }
+
   function svg(forExport) {
     var G = build(), st = stats();
     var W = Math.max(640, G.w + 260), H = Math.max(320, G.h + 80);
@@ -194,6 +216,7 @@
     if (S.zona) o.push('<text x="24" y="54" font-size="13" fill="#555">' + esc(S.zona) + "</text>");
     G.pools.forEach(function (p) {
       o.push('<path d="M' + (p.x + 2) + " " + (p.y + 1) + " Q" + (p.x + p.w * 0.35) + " " + (p.y + p.d + 2) + " " + (p.x + p.w * 0.7) + " " + (p.y + p.d * 0.85) + " L" + (p.x + p.w - 2) + " " + (p.y + 1) + ' Z" fill="#9fd8ea" stroke="none"/>');
+      if (p.rem) o.push(spiral(p.x + p.w * 0.42, p.y + p.d * 0.45, 12));
     });
     o.push('<path d="' + smooth(G.P) + '" fill="none" stroke="' + ink + '" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>');
     G.ann.forEach(function (a) {
@@ -207,6 +230,9 @@
         var lx = Math.max(a.x0, a.x1) + 14, ly = a.y0 + Math.min(40, (a.y1 - a.y0) * 0.35) + 10;
         o.push('<text x="' + lx.toFixed(1) + '" y="' + ly.toFixed(1) + '" font-size="21" font-weight="700" fill="' + ink + '">' + esc(a.txt) +
           (a.sub ? '<tspan font-size="14" font-weight="600" fill="#333"> - ' + esc(a.sub) + "</tspan>" : "") + "</text>");
+      } else if (a.k === "p") {
+        o.push(warn(a.x, a.y));
+        if (a.txt) o.push('<text x="' + (a.x + 16).toFixed(1) + '" y="' + (a.y + 5).toFixed(1) + '" font-size="13" font-weight="700" fill="#c62828">' + esc(a.txt) + "</text>");
       } else if (a.k === "d") {
         o.push('<text x="' + a.x.toFixed(1) + '" y="' + a.y.toFixed(1) + '" font-size="18" font-weight="700" fill="' + ink + '" text-anchor="end">' + esc(a.txt) + "</text>");
       } else {
@@ -218,6 +244,9 @@
     if (st.nD) info.push(st.nD + (st.nD === 1 ? " destrepe" : " destrepes"));
     if (st.vert) info.push("desnivel vertical " + fmt(Math.round(st.vert)) + " m");
     if (st.walk) info.push(fmt(Math.round(st.walk)) + " m de cauce");
+    var nP = S.tramos.filter(function (t) { return t.peligro && t.m > 0; }).length, nW = S.tramos.filter(function (t) { return t.remolino && t.poza && t.m > 0; }).length;
+    if (nW) info.push(nW + (nW === 1 ? " remolino" : " remolinos"));
+    if (nP) info.push(nP + (nP === 1 ? " punto de peligro" : " puntos de peligro"));
     o.push('<text x="24" y="' + (H - 22) + '" font-size="12.5" fill="#444">' + esc(info.join(" · ")) + "</text>");
     o.push('<text x="' + (W - 20) + '" y="' + (H - 22) + '" font-size="12" fill="#888" text-anchor="end">Hecho con la topografía de barrancos de guiasadastra.com</text>');
     o.push("</svg>");

@@ -439,3 +439,6 @@ details.adv[open] summary{margin-bottom:14px}
 .topo-view{background:#fff;border-radius:var(--r);overflow:auto;border:1px solid var(--line-2)}
 .topo-view svg{display:block;width:100%;height:auto;min-width:520px}
 @media (max-width:560px){.tp-row{grid-template-columns:24px minmax(0,1fr) minmax(0,1fr)}.tp-act{grid-column:1/-1;grid-row:auto;justify-content:flex-end}.tp-extra{grid-column:1/-1}}
+.tp-warn{display:inline-grid;place-items:center;width:20px;height:18px;background:#ffd21f;color:#1b1a19;font-weight:900;font-size:.8rem;clip-path:polygon(50% 0,100% 100%,0 100%);padding-top:4px}
+.tp-ico{font-size:1rem}
+.tp-aviso{flex:1 1 100%!important}
