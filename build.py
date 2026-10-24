@@ -879,8 +879,8 @@ def main():
     open(os.path.join(OUT, ".htaccess"), "w").write("ErrorDocument 404 /404.html\n"
         "# Las páginas se revisan siempre (así los cambios se ven al momento); fotos, CSS y JS sí se guardan en caché\n"
         "<IfModule mod_headers.c>\n<FilesMatch \"\\.(html|xml|txt)$\">\nHeader set Cache-Control \"no-cache\"\n</FilesMatch>\n"
-        "# Cabeceras de seguridad\nHeader always set X-Content-Type-Options \"nosniff\"\nHeader always set Referrer-Policy \"strict-origin-when-cross-origin\"\n"
-        "Header always set X-Frame-Options \"SAMEORIGIN\"\nHeader always set Permissions-Policy \"camera=(), microphone=(), geolocation=()\"\n</IfModule>\n"
+        "# Cabeceras de seguridad\nHeader set X-Content-Type-Options \"nosniff\"\nHeader set Referrer-Policy \"strict-origin-when-cross-origin\"\n"
+        "Header set X-Frame-Options \"SAMEORIGIN\"\nHeader set Permissions-Policy \"camera=(), microphone=(), geolocation=()\"\n</IfModule>\n"
         "<Files \".ftp-deploy-sync-state.json\">\nRequire all denied\n</Files>\n"
         "# Direcciones de la web antigua -> nuevas (301)\n" + "".join(
         "RedirectMatch 301 ^/%s$ %s%s\n" % (k.replace(".", "\\."), D, v) for k, v in sorted(old.items())) +

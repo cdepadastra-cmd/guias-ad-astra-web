@@ -5,10 +5,10 @@ ErrorDocument 404 /404.html
 Header set Cache-Control "no-cache"
 </FilesMatch>
 # Cabeceras de seguridad
-Header always set X-Content-Type-Options "nosniff"
-Header always set Referrer-Policy "strict-origin-when-cross-origin"
-Header always set X-Frame-Options "SAMEORIGIN"
-Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"
+Header set X-Content-Type-Options "nosniff"
+Header set Referrer-Policy "strict-origin-when-cross-origin"
+Header set X-Frame-Options "SAMEORIGIN"
+Header set Permissions-Policy "camera=(), microphone=(), geolocation=()"
 </IfModule>
 <Files ".ftp-deploy-sync-state.json">
 Require all denied
