@@ -12,11 +12,11 @@
   var TIPOS = { r: "Rápel", d: "Destrepe", p: "Pasamanos", a: "Andando" };
   // anclajes: código, nombre en el desplegable, texto corto, símbolo (letra pequeña bajo la X)
   var ANC = [
-    ["", "—", "", ""], ["x", "Parabolt (X)", "parabolt", ""], ["xo", "Parabolt + anilla (Xo)", "parabolt + anilla", "o"],
-    ["xm", "Parabolt + maillón (Xm)", "parabolt + maillón", "m"], ["xu", "Parabolt + eslabón en U (XU)", "parabolt + eslabón", "U"],
-    ["quimico", "Químicos", "químicos", "q"], ["cadena", "Reunión de cadena", "cadena", "c"], ["natural", "Anclaje natural", "natural", ""], ["arbol", "Árbol", "árbol", ""]
+    ["", "—", "", ""], ["quimico", "Químicos", "químicos", "q"], ["natural", "Natural", "natural", ""],
+    ["x", "Parabolt", "parabolt", ""], ["spit", "Spits", "spits", "s"]
   ];
-  var ANC_OLD = { "químicos": "quimico", parabolts: "x", spits: "x", "árbol": "arbol" };
+  // valores de versiones anteriores
+  var ANC_OLD = { "químicos": "quimico", parabolts: "x", spits: "spit", "árbol": "natural", arbol: "natural", xo: "x", xm: "x", xu: "x", cadena: "x" };
   var UNION = [["1", "1 anclaje"], ["2", "2 anclajes sin unir"], ["2c", "2 unidos por cadena"], ["2k", "2 unidos por cordino"]];
   var LADOS = [["", "—"], ["I", "Izquierda (I)"], ["C", "Centro (C)"], ["D", "Derecha (D)"]];
   var LADO_TXT = { I: "izq", C: "centro", D: "dcha" };
@@ -26,9 +26,9 @@
     nombre: "Barranco de ejemplo", zona: "Sierra de Gredos (Ávila)", etiqueta: "metros", anclajes: true, leyenda: true, parkIni: true, parkFin: false,
     tramos: [
       { t: "a", m: 40 }, { t: "r", m: 9, inst: "quimico", union: "2c", lado: "C", destrepable: true }, { t: "a", m: 60, esc: "N" },
-      { t: "r", m: 9, inst: "xm", union: "2c", lado: "I" }, { t: "a", m: 220, ver: true }, { t: "d", m: 3 }, { t: "p", m: 6, lado: "D" },
-      { t: "r", m: 11, inst: "xo", union: "2k", lado: "D", sinretorno: true }, { t: "a", m: 360, ver: true, esc: "I" },
-      { t: "r", m: 5, inst: "arbol", union: "1", poza: true, remolino: true, peligro: true, aviso: "rebufo" }, { t: "a", m: 30 }
+      { t: "r", m: 9, inst: "x", union: "2c", lado: "I" }, { t: "a", m: 220, ver: true }, { t: "d", m: 3 }, { t: "p", m: 6, lado: "D" },
+      { t: "r", m: 11, inst: "spit", union: "2k", lado: "D", sinretorno: true }, { t: "a", m: 360, ver: true, esc: "I" },
+      { t: "r", m: 5, inst: "natural", union: "1", poza: true, remolino: true, peligro: true, aviso: "rebufo" }, { t: "a", m: 30 }
     ]
   };
   var S;
@@ -395,11 +395,11 @@
     if (st.walk) info.push(fmt(Math.round(st.walk)) + " m de cauce");
     o.push('<text x="24" y="' + (H - 18) + '" font-size="12.5" fill="#444">' + esc(info.join(" · ")) + "</text>");
     o.push('<text x="' + (W - 20) + '" y="' + (H - 18) + '" font-size="12" fill="#888" text-anchor="end">Hecho con la topografía de barrancos de guiasadastra.com</text>');
-    if (LOGO) {                                                      // marca de agua sutil con el logo
-      var lh = 92, lw = Math.round(lh * 186 / 249);
-      o.push('<image href="' + LOGO + '" x="' + (W - lw - 28) + '" y="18" width="' + lw + '" height="' + lh + '" opacity="0.16"/>');
-    }
-    return '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 ' + Math.round(W) + " " + Math.round(H) + '" width="' + Math.round(W) + '" height="' + Math.round(H) + '" font-family="Arial,Helvetica,sans-serif"><rect width="100%" height="100%" fill="#fff"/>' + o.join("") + "</svg>";
+    // marca de agua de fondo: logo grande y «GUÍAS AD ASTRA» muy suaves, detrás del dibujo
+    var wm = "", wh = Math.min(drawH * 0.62, W * 0.42), ww = Math.round(wh * 186 / 249), wcx = W / 2, wcy = drawH / 2 + 10;
+    if (LOGO) wm += '<image href="' + LOGO + '" x="' + f1(wcx - ww / 2) + '" y="' + f1(wcy - wh / 2 - 18) + '" width="' + ww + '" height="' + f1(wh) + '" opacity="0.07"/>';
+    wm += '<text x="' + f1(wcx) + '" y="' + f1(wcy + wh / 2 + 22) + '" font-size="' + f1(Math.max(24, wh * 0.16)) + '" font-weight="800" fill="#1b1a19" opacity="0.07" text-anchor="middle" letter-spacing="4">GUÍAS AD ASTRA</text>';
+    return '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 ' + Math.round(W) + " " + Math.round(H) + '" width="' + Math.round(W) + '" height="' + Math.round(H) + '" font-family="Arial,Helvetica,sans-serif"><rect width="100%" height="100%" fill="#fff"/>' + wm + o.join("") + "</svg>";
   }
 
   var LOGO = "";                                                       // logo en data URI para que vaya dentro del SVG y de las imágenes
