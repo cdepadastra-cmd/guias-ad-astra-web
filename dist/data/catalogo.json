@@ -2,136 +2,190 @@
  "curso-barranquismo": {
   "titulo": "Curso de barranquismo",
   "tipo": "Curso",
-  "precio": 150
+  "precio": 150,
+  "img": "https://www.guiasadastra.com/media/c6816940-02ae-429b-aab8-2edf7016d9c7/curso-barranquismo.webp",
+  "desc": "Curso de barranquismo de 2 días en Ávila, Salamanca, Palencia y Cáceres: rápel, cabuyería, pasamanos, lectura del caudal y autorrescate. Guía titulado. 150€."
  },
  "curso-iniciacion-escalada-en-roca": {
   "titulo": "Curso de iniciación a la escalada en roca",
   "tipo": "Curso",
-  "precio": 60
+  "precio": 60,
+  "img": "https://www.guiasadastra.com/media/7d11c597-caa3-4128-a7f5-68709771380b/curso-iniciacion-escalada-en-roca.webp",
+  "desc": "Curso de iniciación a la escalada deportiva en Ávila, Salamanca, Segovia, Palencia y Valladolid: nudos, aseguramiento, top-rope y rápel. Material incluido. 60€."
  },
  "curso-autorrescate": {
   "titulo": "Curso de autorrescate",
   "tipo": "Curso",
-  "precio": 130
+  "precio": 130,
+  "img": "https://www.guiasadastra.com/media/052618bc-b465-47b0-bb3d-0583d186f366/curso-autorrescate.webp",
+  "desc": "Curso de autorrescate de 2 días: nudos autobloqueantes, ascenso y descenso de cuerda, paso de nudos, polipastos y rescate de accidentado en pared. 130€."
  },
  "curso-arva": {
   "titulo": "Curso de ARVA",
   "tipo": "Curso",
-  "precio": 30
+  "precio": 30,
+  "img": "https://www.guiasadastra.com/media/41645da1-a007-4ff0-8526-61ca467dddb5/curso-arva.webp",
+  "desc": "Curso de ARVA, pala y sonda para el rescate de víctimas de avalanchas en Ávila, León, Madrid, Palencia, Salamanca, Segovia y Valladolid. De diciembre a abril. 30€."
  },
  "cursos-alpinismo": {
   "titulo": "Cursos de alpinismo",
   "tipo": "Curso",
-  "precio": 30
+  "precio": 30,
+  "img": "https://www.guiasadastra.com/media/0c5376bd-2231-4c62-b798-6f0139e73cd7/cursos-alpinismo.webp",
+  "desc": "Cursos de alpinismo invernal en Gredos, León, Madrid, Palencia y Segovia: iniciación, nivel avanzado, autodetenciones y ARVA con guías titulados. Desde 30€."
  },
  "barranquismo-avila": {
   "titulo": "Barranquismo en Ávila",
   "tipo": "Actividad",
-  "precio": 35
+  "precio": 35,
+  "img": "https://www.guiasadastra.com/media/8bb5ab91-bfa6-4c71-b8e0-37ba64a982bd/barranquismo-avila.webp",
+  "desc": "Barranquismo en la Sierra de Gredos (Ávila): Río Mayor, Arbillas y Solana con guía titulado, neopreno y seguro incluidos. Reserva por WhatsApp desde 35€."
  },
  "barranquismo-en-caceres": {
   "titulo": "Barranquismo en Cáceres",
   "tipo": "Actividad",
-  "precio": 40
+  "precio": 40,
+  "img": "https://www.guiasadastra.com/media/99ae7d6e-7918-4fc2-8550-26a844c55625/barranquismo-en-caceres.webp",
+  "desc": "Barranquismo en el Valle del Jerte: Los Hoyos, Las Nogaleas y Los Papúos con guía titulado. Neopreno, casco y seguro incluidos. Cerca de Salamanca, Ávila y Madrid."
  },
  "barranquismo-salamanca": {
   "titulo": "Barranquismo en Salamanca",
   "tipo": "Actividad",
-  "precio": 45
+  "precio": 45,
+  "img": "https://www.guiasadastra.com/media/7799d5f5-381c-4393-9be5-c7f96dec1cbf/barranquismo-salamanca.webp",
+  "desc": "Barranquismo en Salamanca: Pozo Airón y Rupurupay en las Arribes del Duero, con guía titulado y todo el material incluido. Reserva tu barranco por WhatsApp."
  },
  "barranquismo-leon": {
   "titulo": "Barranquismo en León",
   "tipo": "Actividad",
-  "precio": 50
+  "precio": 50,
+  "img": "https://www.guiasadastra.com/media/013bc4ff-2ed9-44e2-ae2b-f642590c3e6e/barranquismo-leon.webp",
+  "desc": "Barranquismo en León: barranco del 40 Aniversario, Cueva de Valporquero y Sima de Perlas con guía titulado. Muy cerca de Valladolid y Palencia."
  },
  "barranquismo-cueva-valporquero-sima-de-perlas": {
   "titulo": "Barranquismo cueva de Valporquero",
   "tipo": "Actividad",
-  "precio": 65
+  "precio": 65,
+  "img": "https://www.guiasadastra.com/media/abd10400-5131-4432-8f77-97fd28b477ab/barranquismo-cueva-valporquero-sima-de-perlas.webp",
+  "desc": "Descenso guiado de la Cueva de Valporquero (León) y travesía por la Sima de Perlas: rápeles y toboganes bajo tierra. Grupos reducidos, material incluido."
  },
  "barranquismo-madrid-segovia": {
   "titulo": "Barranquismo en Madrid y Segovia",
   "tipo": "Actividad",
-  "precio": 45
+  "precio": 45,
+  "img": "https://www.guiasadastra.com/media/2632ebe7-e733-474c-90e4-0a7ed4b96481/barranquismo-madrid-segovia.webp",
+  "desc": "Barranquismo en el barranco de Somosierra, nacimiento del río Duratón, entre Madrid y Segovia. Guía titulado y material incluido por 45€."
  },
  "barranquismo-palencia": {
   "titulo": "Barranquismo en Palencia",
   "tipo": "Actividad",
-  "precio": 50
+  "precio": 50,
+  "img": "https://www.guiasadastra.com/media/4d31602a-23f0-4ac4-900a-0662fcb05b90/barranquismo-palencia.webp",
+  "desc": "Barranquismo en la Montaña Palentina, bajo la cara norte del Espigüete. Guía titulado, neopreno y seguro incluidos. Muy cerca de Valladolid."
  },
  "via-ferrata-salamanca": {
   "titulo": "Vías ferratas en Salamanca",
   "tipo": "Actividad",
-  "precio": 35
+  "precio": 35,
+  "img": "https://www.guiasadastra.com/media/24195f49-7868-4e49-a166-35003ba5de58/via-ferrata-salamanca.webp",
+  "desc": "Vía ferrata guiada del Cancho de la Muela, en Candelario y la Sierra de Béjar (Salamanca). Recorridos K1 a K4 con rápel. Material y seguro incluidos."
  },
  "via-ferrata-burgos": {
   "titulo": "Vías ferratas Burgos",
   "tipo": "Actividad",
-  "precio": 40
+  "precio": 40,
+  "img": "https://www.guiasadastra.com/media/9ec618e7-ead6-457a-b4d7-9b4153c4e9dc/via-ferrata-burgos.webp",
+  "desc": "Vías ferratas guiadas en Burgos, junto al Cañón del Río Lobos: Arauzo de Miel, Huerta del Rey y Espeja. Para familias e iniciación. Material incluido."
  },
  "vias-ferratas-leon": {
   "titulo": "Vías ferratas León",
   "tipo": "Actividad",
-  "precio": 45
+  "precio": 45,
+  "img": "https://www.guiasadastra.com/media/aeb9b4e2-f247-4249-9fbd-5f31ae3575fd/vias-ferratas-leon.webp",
+  "desc": "Vías ferratas guiadas en León: Valle de Arbás, Cistierna (puente de 40 m) y Sabero (puente de 100 m y paso por cueva). Material y seguro incluidos."
  },
  "espeleologia-leon": {
   "titulo": "Espeleología en León",
   "tipo": "Actividad",
-  "precio": 40
+  "precio": 40,
+  "img": "https://www.guiasadastra.com/media/7a848726-9459-4eb2-a042-b1e78bb77b41/espeleologia-leon.webp",
+  "desc": "Espeleología guiada en León, cerca de Valladolid: Cueva del Burro (Vegacervera) y Cueva del Arenal (Valdeteja). Mono, casco y frontal incluidos."
  },
  "espeleologia-segovia": {
   "titulo": "Espeleología en Segovia",
   "tipo": "Actividad",
-  "precio": 35
+  "precio": 35,
+  "img": "https://www.guiasadastra.com/media/2bd54281-5443-439f-969a-0df17027ecca/espeleologia-segovia.webp",
+  "desc": "Espeleología guiada en Segovia, cerca de Valladolid, Ávila y Madrid: Cueva de la Cantera (Fuentidueña) y Cueva de las Mesillas (Casla). Material incluido."
  },
  "ascensiones-montana": {
   "titulo": "Ascensiones",
   "tipo": "Actividad",
-  "precio": 0
+  "precio": 0,
+  "img": "https://www.guiasadastra.com/media/de73cca8-eaef-4fab-a071-db2620f835db/ascensiones-montana.jpg",
+  "desc": "Ascensiones guiadas a cumbres de Gredos, Guadarrama, Montaña Palentina, Picos de Europa, Sanabria y Pirineos: Almanzor, Curavacas, Aneto, Monte Perdido y más."
  },
  "senderismo-avila-gredos": {
   "titulo": "Senderismo en Ávila, Gredos",
   "tipo": "Actividad",
-  "precio": 15
+  "precio": 15,
+  "img": "https://www.guiasadastra.com/media/afe67801-cf88-4cef-a3ac-e25e4e971634/senderismo-avila-gredos.webp",
+  "desc": "Rutas de senderismo guiadas por la Sierra de Gredos: Laguna Grande, Pico Morezón, Cinco Lagunas y Los Galayos. Tres niveles desde 15€. Guía y seguro incluidos."
  },
  "monte-olimpo": {
   "titulo": "Trekking del Monte Olimpo",
   "tipo": "Actividad",
-  "precio": 793
+  "precio": 793,
+  "img": "https://www.guiasadastra.com/media/4539531d-0da2-43d5-a826-5048938c6bec/monte-olimpo.webp",
+  "desc": "Monte Olimpo (Grecia): dónde está, cuánto mide (Mitikas, 2.918 m) y trekking guiado de 6 días con refugios, vuelos y traslados incluidos."
  },
  "trekking-carros-de-foc": {
   "titulo": "Trekking de Carros de Foc",
   "tipo": "Actividad",
-  "precio": 743
+  "precio": 743,
+  "img": "https://www.guiasadastra.com/media/34a2d34b-b1c7-4e46-84c9-d86f2f3b63f8/trekking-carros-de-foc.webp",
+  "desc": "Carros de Foc con guías titulados: 65 km y 5.700 m de desnivel por los 9 refugios del Parque Nacional de Aigüestortes. Media pensión en refugios incluida."
  },
  "boulder-las-tuerces": {
   "titulo": "Boulder en Las Tuerces",
   "tipo": "Actividad",
-  "precio": 0
+  "precio": 0,
+  "img": "https://www.guiasadastra.com/media/ad7c9424-1340-4b52-8333-4f3db832aeae/otros-media-2.webp",
+  "desc": "Guía de boulder en Las Tuerces, Aguilar de Campoo (Palencia): mapa de sectores, croquis en PDF, accesos, tipo de roca y mejor época para escalar."
  },
  "boulder-zona-centro-salamanca-caceres": {
   "titulo": "Boulder en Zona Centro (Salamanca, Ávila y Cáceres)",
   "tipo": "Actividad",
-  "precio": 0
+  "precio": 0,
+  "img": "https://www.guiasadastra.com/media/ad7c9424-1340-4b52-8333-4f3db832aeae/otros-media-2.webp",
+  "desc": "Mapa de sectores de boulder en granito en la zona centro: Valcorchero (Plasencia), Candelario, Valdesangil, Vallejera, La Hoya y Becedas. Accesos y época."
  },
  "organizacion-eventos-deportivos": {
   "titulo": "Organización de eventos",
   "tipo": "Actividad",
-  "precio": 0
+  "precio": 0,
+  "img": "https://www.guiasadastra.com/media/473cbf94-ed59-492c-93a1-93d4d9a89df9/otros-media-4.webp",
+  "desc": "Organizamos carreras de montaña y eventos deportivos (Ultra de Gredos, Desafío Fuenterrico): permisos, recorridos, plan de seguridad, voluntariado y balizado."
  },
  "gredos-limpio": {
   "titulo": "Gredos Limpio",
   "tipo": "Actividad",
-  "precio": 0
+  "precio": 0,
+  "img": "https://www.guiasadastra.com/media/9f0580d4-4530-4464-b59b-4d4c0ef96a04/otros-media-14.webp",
+  "desc": "Gredos Limpio, jornada gratuita de voluntariado para limpiar la Sierra de Gredos antes de las nieves. Seguro, acceso a la Plataforma y visita a la Casa del Parque."
  },
  "comarca-natural-oeste-de-gredos": {
   "titulo": "Comarca Natural Oeste de Gredos",
   "tipo": "Actividad",
-  "precio": 20
+  "precio": 20,
+  "img": "https://www.guiasadastra.com/media/398c4c45-1d97-4c78-a790-e6efe5fea909/otros-media-1.webp",
+  "desc": "Qué hacer en la Comarca Oeste de Gredos (Béjar, Candelario, Hervás, El Barco de Ávila): rutas, barranquismo, vía ferrata y escalada con guías locales."
  },
  "via-verde-ruta-de-la-plata": {
   "titulo": "Vía Verde Ruta de la Plata",
   "tipo": "Actividad",
-  "precio": 20
+  "precio": 20,
+  "img": "https://www.guiasadastra.com/media/398c4c45-1d97-4c78-a790-e6efe5fea909/otros-media-1.webp",
+  "desc": "Vía Verde de la Ruta de la Plata entre Plasencia, Hervás, Baños de Montemayor y Béjar: recorrido, qué ver y actividades de aventura cerca con guías locales."
  }
 }

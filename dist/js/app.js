@@ -319,7 +319,10 @@
   }
   function injectLD() {
     var ld = EVENTS.slice(0, 30).map(function (e) {
-      return { "@context": "https://schema.org", "@type": e.tipo === "curso" ? "EducationEvent" : "SportsEvent", name: e.titulo, startDate: e.fecha + (e.hora ? "T" + e.hora : ""), endDate: e.fecha_fin || e.fecha, eventStatus: "https://schema.org/EventScheduled", eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode", location: { "@type": "Place", name: e.lugar || "Castilla y León", address: { "@type": "PostalAddress", addressLocality: e.lugar || "Castilla y León", addressCountry: "ES" } }, organizer: { "@type": "Organization", name: "Guías Ad Astra", url: location.origin }, offers: { "@type": "Offer", price: e.precio, priceCurrency: "EUR", availability: e.libres ? "https://schema.org/InStock" : "https://schema.org/SoldOut", url: location.href, validFrom: todayISO() }, maximumAttendeeCapacity: e.max, remainingAttendeeCapacity: e.libres };
+      var c = CAT[e.slug] || {}, org = { "@type": "Organization", name: "Guías Ad Astra", url: location.origin + (CFG.base || "") + "/" };
+      return { "@context": "https://schema.org", "@type": e.tipo === "curso" ? "EducationEvent" : "SportsEvent", name: e.titulo,
+        description: (c.desc || (e.titulo + " con guías titulados de Guías Ad Astra.")) + (e.notas ? " " + e.notas : ""),
+        image: [c.img || location.origin + (CFG.base || "") + "/img/logo-512.png"], performer: org, startDate: e.fecha + (e.hora ? "T" + e.hora : ""), endDate: e.fecha_fin || e.fecha, eventStatus: "https://schema.org/EventScheduled", eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode", location: { "@type": "Place", name: e.lugar || "Castilla y León", address: { "@type": "PostalAddress", addressLocality: e.lugar || "Castilla y León", addressCountry: "ES" } }, organizer: org, offers: { "@type": "Offer", price: e.precio, priceCurrency: "EUR", availability: e.libres ? "https://schema.org/InStock" : "https://schema.org/SoldOut", url: location.href, validFrom: todayISO() }, maximumAttendeeCapacity: e.max, remainingAttendeeCapacity: e.libres };
     });
     if (!ld.length) return;
     var s = document.createElement("script"); s.type = "application/ld+json"; s.textContent = JSON.stringify(ld); document.head.appendChild(s);

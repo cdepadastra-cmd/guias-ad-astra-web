@@ -211,8 +211,8 @@ def options_html(opts):
 # ---------------------------------------------------------------- páginas de actividad
 def act_ld(a, path, prices):
     ld = [crumbs_ld([("Inicio", "/"), ("Actividades", "/actividades/"), (a["title"], path)])]
-    prod = {"@context": "https://schema.org", "@type": "Product", "name": a["title"], "description": a.get("seo_desc", a["short"]), "image": a["img"],
-            "brand": {"@type": "Brand", "name": "Guías Ad Astra"}, "category": a["cat"], "url": url(path)}
+    prod = {"@context": "https://schema.org", "@type": "Service", "name": a["title"], "description": a.get("seo_desc", a["short"]), "image": a["img"],
+            "serviceType": a["cat"], "provider": {"@id": D + "/#empresa"}, "areaServed": {"@type": "Country", "name": "España"}, "url": url(path)}
     if prices:
         prod["offers"] = {"@type": "AggregateOffer", "priceCurrency": "EUR", "lowPrice": min(prices), "highPrice": max(prices), "offerCount": len(prices),
                           "availability": "https://schema.org/InStock", "seller": {"@id": D + "/#empresa"}}
@@ -402,7 +402,7 @@ def build_zona(a, path):
     pl = dict(a["place_ld"]); pl["@context"] = "https://schema.org"; pl["description"] = a["seo_desc"]; pl["url"] = url(path); pl["image"] = a["img"]
     pl["containsPlace"] = [{"@type": "Place", "name": n} for n in pl.get("containsPlace", [])]
     offers = {"@context": "https://schema.org", "@type": "ItemList", "name": "Actividades guiadas: " + a["title"], "itemListElement": [
-        {"@type": "ListItem", "position": i + 1, "item": {"@type": "Product", "name": o["name"], "description": o["desc"], "brand": {"@type": "Brand", "name": "Guías Ad Astra"},
+        {"@type": "ListItem", "position": i + 1, "item": {"@type": "Service", "name": o["name"], "description": o["desc"], "provider": {"@id": D + "/#empresa"},
                                                        "offers": {"@type": "Offer", "price": o["price"], "priceCurrency": "EUR", "availability": "https://schema.org/InStock", "url": url(path) + "#reservar"}}} for i, o in enumerate(a["options"])]}
     ld = [crumbs_ld([("Inicio", "/"), (a["title"], path)]), pl, offers, faq_ld(a["faq"]), {"@context": "https://schema.org", **ORG}]
     page(path, a["seo_title"], a["seo_desc"], body, "otr", ld, "article", a["img"], "0.8")
@@ -481,8 +481,8 @@ def build_rental():
             '<div class="field"><label for="r-notas">Tallas o notas (opcional)</label><textarea id="r-notas" placeholder="Ej.: neoprenos talla M y L, altura 1,70 y 1,85"></textarea></div>'
             '<p class="err" id="r-err" role="alert"></p><button class="btn btn-wa btn-block" type="submit">%s Enviar por WhatsApp</button><p class="hint">Es una solicitud: te confirmamos disponibilidad por WhatsApp. Pagas al recoger.</p></form></dialog>' % WA_SVG)
     items_ld = {"@context": "https://schema.org", "@type": "ItemList", "name": "Alquiler de material de montaña", "itemListElement": [
-        {"@type": "ListItem", "position": i + 1, "item": {"@type": "Product", "name": "Alquiler " + r["name"].lower(), "description": r["desc"], "image": r["img"], "category": "Alquiler de material de " + r["cats"][0].lower(),
-                                                       "brand": {"@type": "Brand", "name": "Guías Ad Astra"},
+        {"@type": "ListItem", "position": i + 1, "item": {"@type": "Service", "name": "Alquiler " + r["name"].lower(), "description": r["desc"], "image": r["img"], "serviceType": "Alquiler de material de " + r["cats"][0].lower(),
+                                                       "provider": {"@id": D + "/#empresa"},
                                                        "offers": {"@type": "Offer", "price": r["price"], "priceCurrency": "EUR", "availability": "https://schema.org/InStock", "businessFunction": "http://purl.org/goodrelations/v1#LeaseOut",
                                                                   "priceSpecification": {"@type": "UnitPriceSpecification", "price": r["price"], "priceCurrency": "EUR", "unitCode": "DAY", "valueAddedTaxIncluded": True}, "seller": {"@id": D + "/#empresa"}}}}
         for i, r in enumerate(RENTAL)]}
@@ -848,8 +848,8 @@ def build_option(a, o, path):
     if len(desc) > 160:
         desc = _short(desc, 158)
     ld = [crumbs_ld([("Inicio", "/"), ("Actividades", "/actividades/"), (a["title"], "/actividades/%s/" % a["slug"]), (n, path)]),
-          {"@context": "https://schema.org", "@type": "Product", "name": h1, "description": desc, "image": a["img"], "category": a["cat"], "url": url(path),
-           "brand": {"@type": "Brand", "name": "Guías Ad Astra"},
+          {"@context": "https://schema.org", "@type": "Service", "name": h1, "description": desc, "image": a["img"], "serviceType": a["cat"], "url": url(path),
+           "provider": {"@id": D + "/#empresa"},
            "offers": {"@type": "Offer", "price": o["price"], "priceCurrency": "EUR", "availability": "https://schema.org/InStock", "url": url(path) + "#reservar", "seller": {"@id": D + "/#empresa"}}},
           {"@context": "https://schema.org", "@type": "TouristAttraction", "name": n, "address": {"@type": "PostalAddress", "addressLocality": place.split("(")[0].strip(), "addressRegion": region, "addressCountry": "ES"}},
           faq_ld(faq)]
@@ -875,8 +875,8 @@ def main():
         "  <url><loc>%s</loc><lastmod>%s</lastmod><priority>%s</priority></url>\n" % (url(p), TODAY, pr) for p, pr in PAGES) + "</urlset>\n"
     open(os.path.join(OUT, "sitemap.xml"), "w").write(sm)
     # Catálogo para el calendario: si en la hoja falta precio, título o tipo, la web los toma de aquí (por slug)
-    catalogo = {c["slug"]: {"titulo": c["title"], "tipo": "Curso", "precio": c["price"]} for c in COURSES}
-    catalogo.update({x["slug"]: {"titulo": x["title"], "tipo": "Actividad", "precio": min_price(x) or 0} for x in ACTIVITIES if x["slug"] not in catalogo})
+    catalogo = {c["slug"]: {"titulo": c["title"], "tipo": "Curso", "precio": c["price"], "img": c["img"], "desc": c.get("seo_desc", c.get("short", ""))} for c in COURSES}
+    catalogo.update({x["slug"]: {"titulo": x["title"], "tipo": "Actividad", "precio": min_price(x) or 0, "img": x["img"], "desc": x.get("seo_desc", x.get("short", ""))} for x in ACTIVITIES if x["slug"] not in catalogo})
     os.makedirs(os.path.join(OUT, "data"), exist_ok=True)
     json.dump(catalogo, open(os.path.join(OUT, "data", "catalogo.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
     if BASE:
