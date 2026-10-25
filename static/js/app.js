@@ -136,9 +136,14 @@
   if (rent) (function () {
     var d1 = $("#r-desde"), d2 = $("#r-hasta"), daysOut = $("#r-dias"), bar = $(".mbar"), dlg = $("#r-dlg");
     var qty = {}, items = {};
-    $$(".rent-card").forEach(function (c) {
+    var rows = $$(".rent-card");
+    rows.forEach(function (c) {
       var id = c.dataset.id; items[id] = { name: c.dataset.name, price: +c.dataset.price };
-      bindStepper($(".stepper", c), function (v) { qty[id] = v; c.classList.toggle("on", v > 0); update(); });
+      bindStepper($(".stepper", c), function (v) {
+        qty[id] = v;
+        rows.forEach(function (o) { if (o.dataset.id === id) { o.classList.toggle("on", v > 0); var i = $(".stepper input", o); if (i && +i.value !== v) i.value = v; } });   // el mismo material aparece en varias tablas
+        update();
+      });
     });
     var t = todayISO(); d1.min = t; d2.min = t;
     function days() {

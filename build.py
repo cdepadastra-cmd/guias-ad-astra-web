@@ -444,13 +444,15 @@ def build_course(c):
 # ---------------------------------------------------------------- alquiler
 def build_rental():
     path = "/actividades/alquiler-material-montana/"
-    cats = ["Barranquismo", "Vías ferratas", "Escalada", "Alpinismo"]
-    chips = '<button class="chip" data-val="" aria-pressed="true">Todo</button>' + "".join('<button class="chip" data-val="%s" aria-pressed="false">%s</button>' % (c, c) for c in cats)
-    cards = "".join(
-        '<article class="card rent-card" data-id="%s" data-name="%s" data-price="%d" data-cat="%s"><div class="ph"><img src="%s" alt="Alquiler de %s para %s" loading="lazy"></div>'
-        '<div class="body"><span class="tag">%s</span><h3>%s</h3><p>%s</p><div class="foot"><span class="price">%d€<small style="margin:0 0 0 4px">/día</small></span>'
-        '<div class="stepper" role="group" aria-label="Unidades de %s"><button type="button" data-step="-1" aria-label="Quitar una">−</button><input type="number" min="0" max="20" value="0" inputmode="numeric" aria-label="Unidades"><button type="button" data-step="1" aria-label="Añadir una">+</button></div></div></div></article>'
-        % (r["id"], e(r["name"]), r["price"], "|".join(r["cats"]), e(r["img"]), e(r["name"].lower()), e(" y ".join(r["cats"]).lower()), e(" · ".join(r["cats"])), e(r["name"]), e(r["desc"]), r["price"], e(r["name"])) for r in RENTAL)
+    cats = [("Barranquismo", "Material de barranquismo"), ("Vías ferratas", "Material de vía ferrata"), ("Escalada", "Material de escalada"), ("Alpinismo", "Material de alpinismo e invernal")]
+    def row(r):
+        return ('<tr class="rent-card%s" data-id="%s" data-name="%s" data-price="%d"><td><b>%s</b><small>%s</small></td><td class="p">%d €</td>'
+                '<td><div class="stepper" role="group" aria-label="Unidades de %s"><button type="button" data-step="-1" aria-label="Quitar una">−</button><input type="number" min="0" max="20" value="0" inputmode="numeric" aria-label="Unidades"><button type="button" data-step="1" aria-label="Añadir una">+</button></div></td></tr>'
+                % (" hl" if r["id"].startswith("equipo") else "", r["id"], e(r["name"]), r["price"], e(r["name"]), e(r["desc"]), r["price"], e(r["name"])))
+    tables = "".join(
+        '<div class="rent-tbl"><h3>%s</h3><table><thead><tr><th>Material</th><th class="p">Precio/día</th><th class="u">Unidades</th></tr></thead><tbody>%s</tbody></table></div>'
+        % (e(t), "".join(row(r) for r in sorted([r for r in RENTAL if c in r["cats"]], key=lambda r: (not r["id"].startswith("equipo"), -r["price"]))))
+        for c, t in cats)
     puntos = "".join('<option>%s</option>' % b for b in RENTAL_PICKUP)
     body = (hero("Alquiler", "Alquiler de material de montaña y barranquismo", "Neoprenos, arneses, cascos, disipadores de ferrata, piolets y crampones. Precio por día con IVA incluido. Recogida en Fuentes de Béjar (Salamanca) o en Valladolid.",
                  img("e3722879-d648-4dbe-b361-b365f07e1692/otros-media-5.webp"), [("Inicio", "/"), ("Alquiler de material", "")], '<a class="btn btn-primary" href="#catalogo">Elegir material</a>') +
@@ -458,10 +460,10 @@ def build_rental():
             '<section class="section" id="catalogo"><div class="wrap" id="alquiler-app"><div class="section-head"><p class="eyebrow">Catálogo</p><h2>Elige fechas y unidades</h2><p class="muted">Indica el día de recogida y el de devolución, suma las unidades que necesitas y envíanos la solicitud por WhatsApp. Te confirmamos disponibilidad al momento.</p></div>'
             '<div class="datebar"><div class="field"><label for="r-desde">Recogida</label><input id="r-desde" type="date"></div><div class="field"><label for="r-hasta">Devolución</label><input id="r-hasta" type="date"></div>'
             '<div class="field"><span class="label">Días de alquiler</span><span class="days" id="r-dias">—</span></div><div class="field"><label for="r-punto">Recogida en</label><select id="r-punto">%s</select></div></div>'
-            '<div class="chips" data-filter="#rgrid" data-key="cat" style="margin-bottom:22px">%s</div><div class="grid c4" id="rgrid">%s</div></div></section>' % (puntos, chips, cards) +
+            '<div class="rent-tables">%s</div></div></section>' % (puntos, tables) +
             '<section class="section alt"><div class="wrap"><div class="section-head"><p class="eyebrow">Cómo funciona</p><h2>Alquilar es así de fácil</h2></div><ol class="steps3">'
             '<li><h3>Elige fechas</h3><p>Día de recogida y de devolución. Si es un solo día, deja la devolución igual.</p></li>'
-            '<li><h3>Suma unidades</h3><p>Pulsa + en cada artículo. Verás el total estimado abajo.</p></li>'
+            '<li><h3>Suma unidades</h3><p>Pulsa + en cada material de la tabla. Verás el total estimado abajo.</p></li>'
             '<li><h3>Envía por WhatsApp</h3><p>Te confirmamos disponibilidad, tallas y punto de recogida. Pagas al recoger.</p></li></ol></div></section>'
             '<section class="section"><div class="wrap split"><div class="stack" style="gap:0">' +
             block("Material técnico revisado para cada actividad", prose([
