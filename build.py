@@ -23,7 +23,7 @@ CHEV = '<svg class="chev" viewBox="0 0 10 10" aria-hidden="true"><path d="M1 3l4
 
 ORG = {
     "@type": ["LocalBusiness", "SportsActivityLocation"], "@id": D + "/#empresa",
-    "name": SITE["name"], "alternateName": "Ad Astra Montaña y Aventura", "url": D + "/",
+    "name": SITE["name"], "alternateName": ["Ad Astra Montaña y Aventura", "AdAstra Guías de Montaña", "Guías de montaña Ad Astra", "Ad Astra Guías"], "url": D + "/",
     "logo": {"@type": "ImageObject", "url": D + "/img/logo-512.png", "width": 512, "height": 512}, "image": HERO, "telephone": SITE["phone_intl"], "email": SITE["email"],
     "priceRange": "15€ - 800€",
     "openingHoursSpecification": [{"@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"], "opens": "09:00", "closes": "18:00"}],
@@ -470,6 +470,8 @@ def build_rental():
                 "Para vías ferratas alquilamos sets disipadores homologados, arneses y cascos: todo lo necesario para la ferrata del Cancho de la Muela en Candelario, las de Burgos o las de León.",
                 "Para alpinismo y montaña invernal tenemos piolets de travesía y crampones de 12 puntas de correas, compatibles con cualquier bota. Perfectos para Gredos, Guadarrama o la Montaña Palentina en invierno.",
             ])) +
+            block("Dónde recoger el material", '<div class="two"><div class="panel"><h3>Alquiler de material de montaña en Valladolid</h3><p class="muted">Recogida y devolución en Valladolid capital, con cita previa por WhatsApp. Ideal si vas a Picos de Europa, Palencia, León, Burgos o Gredos: crampones y piolet para invierno, equipo de vía ferrata (arnés, disipador y casco) y equipo completo de barranquismo.</p></div>'
+                  '<div class="panel"><h3>Alquiler de material en Béjar, Candelario y Gredos (Salamanca)</h3><p class="muted">Recogida en Fuentes de Béjar, a pocos minutos de Béjar, Candelario, La Covatilla y la vía ferrata de La Muela. Perfecto para rutas invernales por la Sierra de Béjar y Gredos y para barrancos del Valle del Jerte y del Ambroz.</p></div></div>') +
             block("Condiciones del alquiler", ticks(["Precios por unidad y día, IVA incluido.", "Se paga en el momento de la entrega y se firma un contrato de alquiler.", "El material se devuelve en el mismo lugar de entrega o donde indique la empresa.", "Un retraso en la devolución sin avisar se cobra como un día más de alquiler."])) +
             block("Preguntas frecuentes", faq_html(RENTAL_FAQ)) +
             '</div><div class="sticky"><div class="panel"><p class="eyebrow">Puntos de recogida</p><h3>Dónde recoger</h3>%s<a class="btn btn-wa" href="https://wa.me/%s?text=%s" target="_blank" rel="noopener">%s Preguntar por WhatsApp</a></div></div></div></section>'
