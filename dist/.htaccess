@@ -1,4 +1,10 @@
 ErrorDocument 404 /404.html
+# Dirección única: guiasadastra.com (sin www) lleva siempre a https://www.guiasadastra.com
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteCond %{HTTP_HOST} ^guiasadastra\.com$ [NC]
+RewriteRule ^(.*)$ https://www.guiasadastra.com/$1 [R=301,L]
+</IfModule>
 # Las páginas se revisan siempre (así los cambios se ven al momento); fotos, CSS y JS sí se guardan en caché
 <IfModule mod_headers.c>
 <FilesMatch "\.(html|xml|txt)$">

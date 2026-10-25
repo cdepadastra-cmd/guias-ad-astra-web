@@ -919,6 +919,8 @@ def main():
         "BOULDER-LAS-TUERCES-PALENCIA.pdf": "/media/b3fa4166-e520-42c1-b9f6-311b0b33ec26/otros-media-3.pdf",
     })
     open(os.path.join(OUT, ".htaccess"), "w").write("ErrorDocument 404 /404.html\n"
+        "# Dirección única: guiasadastra.com (sin www) lleva siempre a https://www.guiasadastra.com\n"
+        "<IfModule mod_rewrite.c>\nRewriteEngine On\nRewriteCond %{HTTP_HOST} ^guiasadastra\\.com$ [NC]\nRewriteRule ^(.*)$ https://www.guiasadastra.com/$1 [R=301,L]\n</IfModule>\n"
         "# Las páginas se revisan siempre (así los cambios se ven al momento); fotos, CSS y JS sí se guardan en caché\n"
         "<IfModule mod_headers.c>\n<FilesMatch \"\\.(html|xml|txt)$\">\nHeader set Cache-Control \"no-cache\"\n</FilesMatch>\n"
         "# Cabeceras de seguridad\nHeader set X-Content-Type-Options \"nosniff\"\nHeader set Referrer-Policy \"strict-origin-when-cross-origin\"\n"
