@@ -468,7 +468,7 @@ def build_rental():
             '<section class="section"><div class="wrap split"><div class="stack" style="gap:0">' +
             block("Material técnico revisado para cada actividad", prose([
                 "Somos guías titulados y usamos este mismo material en nuestras actividades: lo revisamos después de cada uso y lo retiramos cuando toca. Todo está homologado para su uso.",
-                "Para barranquismo tenemos neoprenos bipieza de 5 mm, escarpines de 3 mm, arneses específicos con culera y descensor, y el equipo completo para que solo traigas bañador y toalla. Ideal para los barrancos de Gredos, el Valle del Jerte, las Arribes del Duero o León.",
+                "Para barranquismo tenemos neoprenos bipieza de 5 mm, escarpines de 3 mm, arneses específicos con culera y cabos de anclaje, descensores de ocho, bidones estancos y el equipo completo para que solo traigas bañador y toalla. Ideal para los barrancos de Gredos, el Valle del Jerte, las Arribes del Duero o León.",
                 "Para vías ferratas alquilamos sets disipadores homologados, arneses y cascos: todo lo necesario para la ferrata del Cancho de la Muela en Candelario, las de Burgos o las de León.",
                 "Para alpinismo y montaña invernal tenemos piolets de travesía y crampones de 12 puntas de correas, compatibles con cualquier bota. Perfectos para Gredos, Guadarrama o la Montaña Palentina en invierno.",
             ])) +

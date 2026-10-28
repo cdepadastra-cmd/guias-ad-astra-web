@@ -619,16 +619,19 @@ COURSES = [
 ]
 
 # ---------------------------------------------------------------- ALQUILER (precio por día, IVA incluido)
+D_LOGO = SITE["domain"] + "/img/logo-512.png"
 RENTAL = [
   {"id": "neopreno", "name": "Neopreno bipieza", "cats": ["Barranquismo"], "price": 20, "img": img("e89d2f67-e4c0-4443-8f1f-9f4f13528f9f/otros-media-6.webp"), "desc": "Neopreno de dos piezas de 5 mm, específico para barranquismo. Tallas de adulto."},
-  {"id": "equipo-barrancos", "name": "Equipo completo barrancos", "cats": ["Barranquismo"], "price": 30, "img": img("e89d2f67-e4c0-4443-8f1f-9f4f13528f9f/otros-media-6.webp"), "desc": "Neopreno bipieza, escarpines, arnés y casco. Todo lo que necesitas para un barranco."},
-  {"id": "arnes-barrancos", "name": "Arnés con cabos de anclaje", "cats": ["Barranquismo"], "price": 8, "img": img("3dba4ad8-1315-4130-9770-45db04eaa599/otros-media-7.webp"), "desc": "Arnés de barranquismo con culera, doble cabo de anclaje con mosquetones y descensor en ocho."},
+  {"id": "equipo-barrancos", "name": "Equipo completo barrancos", "cats": ["Barranquismo"], "price": 30, "img": img("e89d2f67-e4c0-4443-8f1f-9f4f13528f9f/otros-media-6.webp"), "desc": "Traje de neopreno bipieza, escarpines, arnés con cabos de anclaje, casco y descensor de ocho. Todo lo que necesitas para un barranco."},
+  {"id": "arnes-barrancos", "name": "Arnés con cabos de anclaje y descensor de ocho", "cats": ["Barranquismo"], "price": 8, "img": img("3dba4ad8-1315-4130-9770-45db04eaa599/otros-media-7.webp"), "desc": "Arnés de barranquismo con culera, doble cabo de anclaje con mosquetones y descensor de ocho."},
   {"id": "escarpines", "name": "Escarpines", "cats": ["Barranquismo"], "price": 4, "img": img("45256902-9a61-44a4-bb28-caaf8db75e7b/otros-media-10.webp"), "desc": "Escarpines de neopreno de 3 mm para barranquismo."},
+  {"id": "descensor", "name": "Descensor de ocho", "cats": ["Barranquismo"], "price": 3, "img": D_LOGO, "desc": "Descensor en ocho para rápeles en barrancos."},
+  {"id": "bidon", "name": "Bidón estanco", "cats": ["Barranquismo"], "price": 5, "img": D_LOGO, "desc": "Bidón estanco para llevar seco el móvil, la comida o la ropa de abrigo dentro del barranco."},
   {"id": "casco", "name": "Casco", "cats": ["Barranquismo", "Alpinismo", "Escalada", "Vías ferratas"], "price": 8, "img": img("9e905542-b5a0-4f9d-b7f3-a115afc0e1ea/otros-media-11.webp"), "desc": "Casco homologado para barranquismo, escalada y vías ferratas."},
   {"id": "set-disipador", "name": "Set disipador", "cats": ["Vías ferratas"], "price": 10, "img": img("fdf52b6f-11d4-471d-8675-31bb0cbf1364/otros-media-8.webp"), "desc": "Set disipador para vías ferratas homologado, con mosquetón de reposo incluido."},
   {"id": "arnes-escalada", "name": "Arnés de escalada y ferratas", "cats": ["Escalada", "Alpinismo", "Vías ferratas"], "price": 10, "img": img("253d8598-1a1e-4c29-9cdb-e27a874a5268/otros-media-12.webp"), "desc": "Arnés acolchado y regulable para escalada, alpinismo y vías ferratas."},
-  {"id": "piolet", "name": "Piolet", "cats": ["Alpinismo"], "price": 10, "img": img("8dddfa1f-7f39-49ad-ae8e-0092c11564f0/otros-media-9.webp"), "desc": "Piolet de travesía de 54 cm para alpinismo y montaña invernal."},
-  {"id": "crampones", "name": "Crampones", "cats": ["Alpinismo"], "price": 15, "img": img("1beca0fb-51ca-436e-adcc-b0a672ab3052/otros-media-13.webp"), "desc": "Crampones de correas de 12 puntas, aptos para cualquier bota de montaña."},
+  {"id": "piolet", "name": "Piolet de travesía", "cats": ["Alpinismo"], "price": 10, "img": img("8dddfa1f-7f39-49ad-ae8e-0092c11564f0/otros-media-9.webp"), "desc": "Piolet de travesía de 54 cm para alpinismo y montaña invernal."},
+  {"id": "crampones", "name": "Crampones de correas", "cats": ["Alpinismo"], "price": 15, "img": img("1beca0fb-51ca-436e-adcc-b0a672ab3052/otros-media-13.webp"), "desc": "Crampones de correas de 12 puntas, aptos para cualquier bota de montaña."},
 ]
 
 # Puntos de recogida del material de alquiler
