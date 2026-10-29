@@ -494,7 +494,7 @@ def build_rental():
            "areaServed": ["Salamanca", "Béjar", "Fuentes de Béjar", "Ávila", "Cáceres", "Valladolid", "Zamora", "Segovia"], "url": url(path)}
     ld = [crumbs_ld([("Inicio", "/"), ("Alquiler de material", path)]), items_ld, svc, faq_ld(RENTAL_FAQ), {"@context": "https://schema.org", **ORG}]
     page(path, "Alquiler de material de montaña y barranquismo | Salamanca y Valladolid",
-         "Alquila neopreno, arnés, casco, set de vía ferrata, piolet y crampones desde 4 €/día. Recogida en Fuentes de Béjar (Salamanca) o Valladolid. Reserva por WhatsApp.",
+         "Alquila neopreno, arnés, casco, set de vía ferrata, piolet y crampones desde 3 €/día. Recogida en Fuentes de Béjar (Salamanca) o Valladolid. Reserva por WhatsApp.",
          body, "alq", ld, "website", img("e89d2f67-e4c0-4443-8f1f-9f4f13528f9f/otros-media-6.webp"), "0.9")
 
 # ---------------------------------------------------------------- listados
@@ -555,7 +555,7 @@ def build_home():
             '<section class="section alt"><div class="wrap"><div class="stats"><div><b>+10</b><span>años guiando</span></div><div><b>8</b><span>provincias</span></div><div><b>100%%</b><span>guías titulados</span></div></div></div></section>'
             '<section class="section"><div class="wrap"><div class="section-head row"><div><p class="eyebrow">Formación</p><h2>Cursos de montaña</h2></div><a class="btn btn-ghost" href="/calendario/">Fechas y plazas</a></div><div class="grid c3">%s</div></div></section>' % ccards +
             '<section class="section alt"><div class="wrap about"><img src="%s" alt="Material de alquiler: neopreno de barranquismo" loading="lazy" style="background:#e9e6e2;object-fit:contain"><div style="display:grid;gap:18px"><p class="eyebrow">Alquiler de material</p><h2>Equípate para tu aventura</h2>'
-            '<p class="lead">Neoprenos, arneses, cascos, disipadores, piolets y crampones desde 4 € al día. Eliges fechas y unidades y nos lo envías por WhatsApp.</p><div><a class="btn btn-primary" href="/actividades/alquiler-material-montana/">Alquilar material</a></div></div></div></section>' % img("e89d2f67-e4c0-4443-8f1f-9f4f13528f9f/otros-media-6.webp") +
+            '<p class="lead">Neoprenos, arneses, cascos, disipadores, piolets y crampones desde 3 € al día. Eliges fechas y unidades y nos lo envías por WhatsApp.</p><div><a class="btn btn-primary" href="/actividades/alquiler-material-montana/">Alquilar material</a></div></div></div></section>' % img("e89d2f67-e4c0-4443-8f1f-9f4f13528f9f/otros-media-6.webp") +
             '<section class="section"><div class="wrap about"><img src="%s" alt="Jairo Hernández, guía de montaña de Guías Ad Astra" loading="lazy"><div style="display:grid;gap:18px"><img class="about-logo" src="/img/logo-adastra.png" width="140" height="187" alt="Logotipo de Guías Ad Astra, guías de montaña y aventura" loading="lazy" style="margin:0"><p class="eyebrow">Quiénes somos</p><h2>Pasión por la montaña desde Gredos</h2>'
             '<p class="lead">Guías Ad Astra («hacia las estrellas», en latín) nace de la pasión de Jairo Hernández por la montaña y todos los deportes que en ella se pueden practicar.</p><div><a class="btn btn-ghost" href="/sobre-nosotros/">Conócenos</a></div></div></div></section>' % JAIRO +
             '<section class="section alt"><div class="wrap"><div class="section-head"><p class="eyebrow">Qué hacemos</p><h2>Empresa de turismo activo en Gredos, Salamanca, Ávila y Valladolid</h2></div><div class="prose" style="max-width:none;columns:2 340px;column-gap:48px">'
@@ -953,7 +953,7 @@ def main():
     L += ["- [%s](%s%s): %s, %s, %d €." % (o["name"], D, p_, o["place"], o["dur"], o["price"]) for _, o, p_ in OPTION_PAGES]
     L += ["", "## Cursos de formación"]
     L += ["- [%s](%s/actividades/%s/): %s Desde %s €." % (c["title"], D, c["slug"], c["short"], c["price"]) for c in COURSES]
-    L += ["", "## Alquiler de material", "- [Alquiler de material de montaña y barranquismo](%s/actividades/alquiler-material-montana/): neoprenos, arneses, cascos, sets de vía ferrata, piolets y crampones desde 4 €/día. Recogida en Fuentes de Béjar (Salamanca) o Valladolid." % D,
+    L += ["", "## Alquiler de material", "- [Alquiler de material de montaña y barranquismo](%s/actividades/alquiler-material-montana/): neoprenos, arneses, cascos, sets de vía ferrata, piolets y crampones desde 3 €/día. Recogida en Fuentes de Béjar (Salamanca) o Valladolid." % D,
           "", "## Servicios para entidades"]
     L += ["- [%s](%s/%s/): %s" % (s["title"], D, s["slug"], s["short"]) for s in SERVICES]
     L += ["- [Organización de eventos deportivos](%s/actividades/organizacion-eventos-deportivos/)" % D,
