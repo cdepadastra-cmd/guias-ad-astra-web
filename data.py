@@ -627,7 +627,7 @@ RENTAL = [
   {"id": "escarpines", "name": "Escarpines", "cats": ["Barranquismo"], "price": 4, "img": img("45256902-9a61-44a4-bb28-caaf8db75e7b/otros-media-10.webp"), "desc": "Escarpines de neopreno de 3 mm para barranquismo."},
   {"id": "descensor", "name": "Descensor de ocho", "cats": ["Barranquismo"], "price": 3, "img": D_LOGO, "desc": "Descensor en ocho para rápeles en barrancos."},
   {"id": "bidon", "name": "Bidón estanco", "cats": ["Barranquismo"], "price": 5, "img": D_LOGO, "desc": "Bidón estanco para llevar seco el móvil, la comida o la ropa de abrigo dentro del barranco."},
-  {"id": "casco", "name": "Casco", "cats": ["Barranquismo", "Alpinismo", "Escalada", "Vías ferratas"], "price": 8, "img": img("9e905542-b5a0-4f9d-b7f3-a115afc0e1ea/otros-media-11.webp"), "desc": "Casco homologado para barranquismo, escalada y vías ferratas."},
+  {"id": "casco", "name": "Casco", "cats": ["Barranquismo", "Alpinismo", "Escalada", "Vías ferratas"], "price": 6, "img": img("9e905542-b5a0-4f9d-b7f3-a115afc0e1ea/otros-media-11.webp"), "desc": "Casco homologado para barranquismo, escalada y vías ferratas."},
   {"id": "equipo-ferrata", "name": "Equipo completo de ferrata", "cats": ["Vías ferratas"], "price": 22, "img": img("fdf52b6f-11d4-471d-8675-31bb0cbf1364/otros-media-8.webp"), "desc": "Set disipador homologado, casco y arnés. Todo lo que necesitas para una vía ferrata."},
   {"id": "set-disipador", "name": "Set disipador", "cats": ["Vías ferratas"], "price": 10, "img": img("fdf52b6f-11d4-471d-8675-31bb0cbf1364/otros-media-8.webp"), "desc": "Set disipador para vías ferratas homologado, con mosquetón de reposo incluido."},
   {"id": "arnes-escalada", "name": "Arnés (ferratas, escalada y alpinismo)", "cats": ["Escalada", "Alpinismo", "Vías ferratas"], "price": 10, "img": img("253d8598-1a1e-4c29-9cdb-e27a874a5268/otros-media-12.webp"), "desc": "Solo el arnés, acolchado y regulable, para vías ferratas, escalada y alpinismo. Sin cabos ni descensor."},
@@ -639,7 +639,7 @@ RENTAL = [
 RENTAL_PICKUP = ["Fuentes de Béjar (Salamanca)", "Valladolid"]
 
 RENTAL_FAQ = [
-    ("¿Alquiláis material para vía ferrata?", "Sí: el equipo completo de vía ferrata (set disipador homologado, casco y arnés) cuesta 22 € al día. También se alquilan por separado: set disipador 10 €, arnés 10 € y casco 8 € al día."),
+    ("¿Alquiláis material para vía ferrata?", "Sí: el equipo completo de vía ferrata (set disipador homologado, casco y arnés) cuesta 22 € al día. También se alquilan por separado: set disipador 10 €, arnés 10 € y casco 6 € al día."),
     ("¿Se pueden alquilar piolet y crampones?", "Sí: piolet de travesía de 54 cm (6 €/día) y crampones de correas de 12 puntas que valen para cualquier bota de montaña (12 €/día). Ideal para Gredos, Guadarrama o Picos en invierno."),
   ("¿Dónde se recoge el material de alquiler?", "En Fuentes de Béjar (Salamanca), junto a la Sierra de Béjar y Candelario, o en Valladolid. El material se devuelve en el mismo sitio donde lo recogiste."),
   ("¿Cómo se calcula el precio?", "El precio es por unidad y día, con IVA incluido. Si alquilas dos neoprenos tres días: 2 × 3 × 20 € = 120 €. Al enviar tu solicitud verás el total estimado."),
