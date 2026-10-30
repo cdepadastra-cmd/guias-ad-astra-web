@@ -442,13 +442,39 @@ def build_course(c):
     page(path, c["seo_title"], c["seo_desc"], body, "cur", ld, "product", c["img"], "0.8")
 
 # ---------------------------------------------------------------- alquiler
+# Dibujos de línea del material de alquiler (SVG en línea, usan el color del texto)
+_HELMET = '<path d="M8 30C8 18 16 11 24 11s16 7 16 19z"/><path d="M5 30h38"/><path d="M19 12v6M29 12v6M24 11v7"/><path d="M13 30q1 8 11 8t11-8"/>'
+_SUIT = '<path d="M17 7l7 4 7-4 10 6-4 9-4-2v21H15V20l-4 2-4-9z"/><path d="M24 11v29"/><path d="M15 27h18"/>'
+_HARNESS = '<path d="M7 15q17 9 34 0v6q-17 9-34 0z"/><ellipse cx="16" cy="33" rx="7" ry="5"/><ellipse cx="32" cy="33" rx="7" ry="5"/><path d="M21 25q3 6 6 0"/>'
+_EIGHT = '<circle cx="24" cy="14" r="6"/><circle cx="24" cy="14" r="2.5"/><circle cx="24" cy="31" r="10"/><circle cx="24" cy="31" r="5"/>'
+_LANYARD = '<rect x="20" y="5" width="8" height="12" rx="2"/><path d="M24 17q-8 8-11 18M24 17q8 8 11 18"/><path d="M10 35a3.5 5.5 0 1 0 7 0a3.5 5.5 0 1 0-7 0zM31 35a3.5 5.5 0 1 0 7 0a3.5 5.5 0 1 0-7 0z"/>'
+RENT_ICON = {
+    "casco": _HELMET,
+    "neopreno": _SUIT,
+    "equipo-barrancos": '<g transform="translate(-3 3) scale(.8)">' + _SUIT + '</g><g transform="translate(24 -2) scale(.5)">' + _HELMET + '</g>',
+    "arnes-barrancos": '<g transform="translate(-2 0) scale(.82)">' + _HARNESS + '</g><path d="M20 26q8 2 14 12"/><g transform="translate(29 30) scale(.4)">' + _EIGHT + '</g>',
+    "escarpines": '<path d="M13 9h11v18q0 3 3 4l11 3q4 1 4 5v2H12q-2 0-2-3v-8q3-4 3-10z"/><path d="M10 37h32"/><path d="M13 14h11"/>',
+    "descensor": _EIGHT,
+    "bidon": '<rect x="13" y="8" width="22" height="6" rx="2"/><rect x="15" y="14" width="18" height="27" rx="4"/><path d="M15 22h18M15 32h18"/>',
+    "set-disipador": _LANYARD,
+    "equipo-ferrata": '<g transform="translate(0 4) scale(.85)">' + _LANYARD + '</g><g transform="translate(25 -1) scale(.5)">' + _HELMET + '</g>',
+    "arnes-escalada": _HARNESS,
+    "piolet": '<path d="M15 42L32 11"/><path d="M26 9q9-2 17 5"/><path d="M26 9l-5-3-2 4"/><path d="M15 42l-2 4"/>',
+    "crampones": '<path d="M6 24h34l5 4M40 24l6-2"/><path d="M9 24v7M15 24v7M21 24v7M27 24v7M33 24v7"/><path d="M12 24q0-11 12-11t12 11"/><path d="M18 13l-2 11M30 13l2 11"/>',
+}
+def rent_icon(rid):
+    g = RENT_ICON.get(rid)
+    if not g:
+        return ""
+    return '<svg class="rent-ico" viewBox="0 0 48 48" width="44" height="44" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">%s</svg>' % g
+
 def build_rental():
     path = "/actividades/alquiler-material-montana/"
     cats = [("Barranquismo", "Material de barranquismo"), ("Vías ferratas", "Material de vía ferrata"), ("Escalada", "Material de escalada"), ("Alpinismo", "Material de alpinismo e invernal")]
     def row(r):
-        return ('<tr class="rent-card%s" data-id="%s" data-name="%s" data-price="%d"><td><b>%s</b><small>%s</small></td><td class="p">%d €</td>'
+        return ('<tr class="rent-card%s" data-id="%s" data-name="%s" data-price="%d"><td><div class="rent-it">%s<div><b>%s</b><small>%s</small></div></div></td><td class="p">%d €</td>'
                 '<td><div class="stepper" role="group" aria-label="Unidades de %s"><button type="button" data-step="-1" aria-label="Quitar una">−</button><input type="number" min="0" max="20" value="0" inputmode="numeric" aria-label="Unidades"><button type="button" data-step="1" aria-label="Añadir una">+</button></div></td></tr>'
-                % (" hl" if r["id"].startswith("equipo") else "", r["id"], e(r["name"]), r["price"], e(r["name"]), e(r["desc"]), r["price"], e(r["name"])))
+                % (" hl" if r["id"].startswith("equipo") else "", r["id"], e(r["name"]), r["price"], rent_icon(r["id"]), e(r["name"]), e(r["desc"]), r["price"], e(r["name"])))
     tables = "".join(
         '<div class="rent-tbl"><h3>%s</h3><table><thead><tr><th>Material</th><th class="p">Precio/día</th><th class="u">Unidades</th></tr></thead><tbody>%s</tbody></table></div>'
         % (e(t), "".join(row(r) for r in sorted([r for r in RENTAL if c in r["cats"]], key=lambda r: (not r["id"].startswith("equipo"), -r["price"]))))

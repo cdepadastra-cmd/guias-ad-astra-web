@@ -464,3 +464,6 @@ details.adv[open] summary{margin-bottom:14px}
 .rent-tbl .stepper{grid-template-columns:34px 40px 34px}
 .rent-tbl .stepper input{padding:7px 0}
 @media (max-width:520px){.rent-tbl td{padding:10px}.rent-tbl td small{display:none}.rent-tbl th{padding:12px 10px}}
+.rent-it{display:flex;gap:14px;align-items:center}
+.rent-ico{flex:none;width:58px;height:58px;color:#f0d9b5;background:rgba(233,165,59,.08);border:1px solid var(--line-2);border-radius:10px;padding:4px}
+@media (max-width:520px){.rent-ico{width:36px;height:36px;padding:3px}.rent-it{gap:10px}}
