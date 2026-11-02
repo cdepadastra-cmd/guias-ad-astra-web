@@ -10,6 +10,8 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+  schedule:
+    - cron: "17 * * * *"   # cada hora: mira si han cambiado los precios en la hoja de Google
 
 concurrency:
   group: ftp-web
@@ -33,14 +35,58 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Generar la web
+      # Descarga la hoja «Precios web Guías Ad Astra». En las pasadas de cada hora, si la hoja no ha
+      # cambiado desde la última publicación (o no responde), no se hace nada más.
+      - name: Leer la hoja de precios
+        id: hoja
         if: env.FTP_SERVER != ''
+        run: |
+          python3 - <<'PY'
+          import hashlib, os, urllib.request, precios
+          out = open(os.environ["GITHUB_OUTPUT"], "a")
+          try:
+              req = urllib.request.Request(precios._url(), headers={"User-Agent": "guiasadastra-build"})
+              raw = urllib.request.urlopen(req, timeout=30).read()
+              if raw.lstrip().startswith(b"<"):
+                  raise RuntimeError("la hoja no está compartida como «Cualquier persona con el enlace: lector»")
+              open("precios-hoja.csv", "wb").write(raw)
+              out.write("ok=true\nhash=%s\n" % hashlib.sha1(raw).hexdigest()[:16])
+              print("Hoja de precios leída")
+          except Exception as ex:
+              print("::warning::No he podido leer la hoja de precios: %s" % ex)
+              out.write("ok=false\nhash=sin-hoja\n")
+          PY
+
+      - name: ¿Ya está publicada esta versión de los precios?
+        id: cache
+        if: env.FTP_SERVER != '' && github.event_name == 'schedule'
+        uses: actions/cache/restore@v4
+        with:
+          path: precios-hoja.csv
+          key: precios-${{ steps.hoja.outputs.hash }}-${{ github.sha }}
+          lookup-only: true
+
+      - name: Decidir si hay que publicar
+        id: seguir
+        if: env.FTP_SERVER != ''
+        run: |
+          if [ "${{ github.event_name }}" = "schedule" ] && { [ "${{ steps.hoja.outputs.ok }}" != "true" ] || [ "${{ steps.cache.outputs.cache-hit }}" = "true" ]; }; then
+            echo "Sin cambios de precios: no se publica nada."; echo "si=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "si=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Generar la web
+        if: env.FTP_SERVER != '' && steps.seguir.outputs.si == 'true'
+        env:
+          PRECIOS_CSV: ${{ steps.hoja.outputs.ok == 'true' && 'precios-hoja.csv' || '' }}
+          PRECIOS_OFF: ${{ steps.hoja.outputs.ok == 'true' && '' || '1' }}
         run: python3 build.py
 
       - name: Subir por FTP
         id: ftp1
         continue-on-error: true
-        if: env.FTP_SERVER != ''
+        if: env.FTP_SERVER != '' && steps.seguir.outputs.si == 'true'
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
@@ -52,11 +98,13 @@ jobs:
           timeout: 120000
 
       - name: Esperar unos segundos
-        if: env.FTP_SERVER != '' && steps.ftp1.outcome == 'failure'
+        if: env.FTP_SERVER != '' && steps.seguir.outputs.si == 'true' && steps.ftp1.outcome == 'failure'
         run: sleep 20
 
       - name: Reintentar si se cortó la conexión
-        if: env.FTP_SERVER != '' && steps.ftp1.outcome == 'failure'
+        id: ftp2
+        continue-on-error: true
+        if: env.FTP_SERVER != '' && steps.seguir.outputs.si == 'true' && steps.ftp1.outcome == 'failure'
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
@@ -67,8 +115,21 @@ jobs:
           server-dir: /guiasadastra.com/
           timeout: 120000
 
+      - name: Avisar si no se pudo subir
+        if: env.FTP_SERVER != '' && steps.seguir.outputs.si == 'true' && steps.ftp1.outcome == 'failure' && steps.ftp2.outcome != 'success'
+        run: |
+          echo "::error::No se pudo subir la web por FTP (dos intentos)."
+          exit 1
+
+      - name: Recordar que esta versión de los precios ya está publicada
+        if: env.FTP_SERVER != '' && steps.seguir.outputs.si == 'true' && steps.hoja.outputs.ok == 'true' && (steps.ftp1.outcome == 'success' || steps.ftp2.outcome == 'success')
+        uses: actions/cache/save@v4
+        with:
+          path: precios-hoja.csv
+          key: precios-${{ steps.hoja.outputs.hash }}-${{ github.sha }}
+
       - name: Avisar a Bing y otros buscadores (IndexNow)
-        if: env.FTP_SERVER != ''
+        if: env.FTP_SERVER != '' && steps.seguir.outputs.si == 'true'
         continue-on-error: true
         run: |
           python3 - <<'PY'

@@ -2,6 +2,8 @@
 """Genera la web estática de Guías Ad Astra en ./dist  ->  python3 build.py"""
 import json, os, shutil, html, datetime
 from data import *
+import precios
+precios.aplicar()  # precios desde la hoja de Google (si responde)
 
 BASE = os.environ.get("BASE", "").rstrip("/")  # p. ej. BASE=/NUEVA para publicar en una subcarpeta
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "dist" + (("-" + BASE.strip("/")) if BASE else ""))
@@ -246,7 +248,7 @@ def build_activity(a):
         kb.append(("Temporada", a["epoca"].split(",")[0].split(":")[-1].strip().rstrip(".")[:40] if len(a["epoca"]) > 40 else a["epoca"].rstrip(".")))
     kb.append(("Incluye", "Guía titulado, material y seguro"))
     if k == "senderismo":
-        kb = [(x, y) for x, y in a["ficha"]] + [("Precio", "Desde 15 € / persona")]
+        kb = [(x, y) for x, y in a["ficha"]] + [("Precio", "Desde %d € / persona" % precios.desde_slug("senderismo-avila-gredos"))]
     left = []
     intro = []
     if a.get("intro"):
@@ -284,7 +286,7 @@ def build_activity(a):
     if a.get("packs"):
         left.append(block("Packs de aventura", '<div class="two">%s</div>' % "".join(
             '<div class="panel"><div style="display:flex;justify-content:space-between;gap:12px;align-items:baseline"><h3>%s</h3><span class="price">+%d€</span></div><p class="muted">%s</p></div>' % (e(n), p, e(d)) for n, d, p in a["packs"])))
-    faq = list(a.get("faq", [])) + (auto_faq(a) if k != "list" else [("¿Cuánto cuesta una ascensión guiada?", "Desde 20 € por persona según la cumbre y el tamaño del grupo. Elige la cumbre en la tabla y te enviamos el precio exacto."), ("¿Puedo proponer otra montaña?", "Sí. Escríbenos con la cumbre que te apetece y la fecha y preparamos la ascensión."), ("¿Qué incluye?", "Guía de montaña titulado y seguro. En ascensiones invernales también te asesoramos sobre material, que puedes alquilarnos.")])
+    faq = list(a.get("faq", [])) + (auto_faq(a) if k != "list" else [("¿Cuánto cuesta una ascensión guiada?", "Desde %d € por persona según la cumbre y el tamaño del grupo. Elige la cumbre en la tabla y te enviamos el precio exacto." % precios.desde_slug("ascensiones-montana")), ("¿Puedo proponer otra montaña?", "Sí. Escríbenos con la cumbre que te apetece y la fecha y preparamos la ascensión."), ("¿Qué incluye?", "Guía de montaña titulado y seguro. En ascensiones invernales también te asesoramos sobre material, que puedes alquilarnos.")])
     left.append(block("Preguntas frecuentes", faq_html(faq)))
     form = book_form(a["title"], opts if opts else None, a.get("price", 0), opt_label="Cumbre" if k == "list" else ("Nivel" if k == "senderismo" else "Opción"))
     right = '<div class="sticky" style="display:grid;gap:18px">%s%s</div>' % (upcoming(a["slug"]), form)
@@ -520,7 +522,7 @@ def build_rental():
            "areaServed": ["Salamanca", "Béjar", "Fuentes de Béjar", "Ávila", "Cáceres", "Valladolid", "Zamora", "Segovia"], "url": url(path)}
     ld = [crumbs_ld([("Inicio", "/"), ("Alquiler de material", path)]), items_ld, svc, faq_ld(RENTAL_FAQ), {"@context": "https://schema.org", **ORG}]
     page(path, "Alquiler de material de montaña y barranquismo | Salamanca y Valladolid",
-         "Alquila neopreno, arnés, casco, set de vía ferrata, piolet y crampones desde 3 €/día. Recogida en Fuentes de Béjar (Salamanca) o Valladolid. Reserva por WhatsApp.",
+         "Alquila neopreno, arnés, casco, set de vía ferrata, piolet y crampones desde %d €/día. Recogida en Fuentes de Béjar (Salamanca) o Valladolid. Reserva por WhatsApp." % precios.desde_alquiler(),
          body, "alq", ld, "website", img("e89d2f67-e4c0-4443-8f1f-9f4f13528f9f/otros-media-6.webp"), "0.9")
 
 # ---------------------------------------------------------------- listados
@@ -581,7 +583,7 @@ def build_home():
             '<section class="section alt"><div class="wrap"><div class="stats"><div><b>+10</b><span>años guiando</span></div><div><b>8</b><span>provincias</span></div><div><b>100%%</b><span>guías titulados</span></div></div></div></section>'
             '<section class="section"><div class="wrap"><div class="section-head row"><div><p class="eyebrow">Formación</p><h2>Cursos de montaña</h2></div><a class="btn btn-ghost" href="/calendario/">Fechas y plazas</a></div><div class="grid c3">%s</div></div></section>' % ccards +
             '<section class="section alt"><div class="wrap about"><img src="%s" alt="Material de alquiler: neopreno de barranquismo" loading="lazy" style="background:#e9e6e2;object-fit:contain"><div style="display:grid;gap:18px"><p class="eyebrow">Alquiler de material</p><h2>Equípate para tu aventura</h2>'
-            '<p class="lead">Neoprenos, arneses, cascos, disipadores, piolets y crampones desde 3 € al día. Eliges fechas y unidades y nos lo envías por WhatsApp.</p><div><a class="btn btn-primary" href="/actividades/alquiler-material-montana/">Alquilar material</a></div></div></div></section>' % img("e89d2f67-e4c0-4443-8f1f-9f4f13528f9f/otros-media-6.webp") +
+            '<p class="lead">Neoprenos, arneses, cascos, disipadores, piolets y crampones desde %d € al día. Eliges fechas y unidades y nos lo envías por WhatsApp.</p><div><a class="btn btn-primary" href="/actividades/alquiler-material-montana/">Alquilar material</a></div></div></div></section>' % (img("e89d2f67-e4c0-4443-8f1f-9f4f13528f9f/otros-media-6.webp"), precios.desde_alquiler()) +
             '<section class="section"><div class="wrap about"><img src="%s" alt="Jairo Hernández, guía de montaña de Guías Ad Astra" loading="lazy"><div style="display:grid;gap:18px"><img class="about-logo" src="/img/logo-adastra.png" width="140" height="187" alt="Logotipo de Guías Ad Astra, guías de montaña y aventura" loading="lazy" style="margin:0"><p class="eyebrow">Quiénes somos</p><h2>Pasión por la montaña desde Gredos</h2>'
             '<p class="lead">Guías Ad Astra («hacia las estrellas», en latín) nace de la pasión de Jairo Hernández por la montaña y todos los deportes que en ella se pueden practicar.</p><div><a class="btn btn-ghost" href="/sobre-nosotros/">Conócenos</a></div></div></div></section>' % JAIRO +
             '<section class="section alt"><div class="wrap"><div class="section-head"><p class="eyebrow">Qué hacemos</p><h2>Empresa de turismo activo en Gredos, Salamanca, Ávila y Valladolid</h2></div><div class="prose" style="max-width:none;columns:2 340px;column-gap:48px">'
@@ -731,7 +733,7 @@ def build_calculator():
                        "Recomendamos sumar entre un 10 % y un 20 % para descansos, hidratación e imprevistos. Nieve, calor, piedra suelta, niños o mochilas pesadas pueden alargar bastante la ruta: sal siempre con margen de luz."]) +
                 '<p><a href="https://mide.montanasegura.com/mide/" target="_blank" rel="noopener">Más información sobre el método MIDE (Montaña Segura) →</a></p></div>') +
             block("Preguntas frecuentes", faq_html(faq)) +
-            '</div><div class="sticky"><div class="panel"><p class="eyebrow">¿Mejor con guía?</p><h3>Te llevamos nosotros</h3><p class="muted">Rutas guiadas por Gredos para todos los niveles, desde 15 € por persona.</p>'
+            '</div><div class="sticky"><div class="panel"><p class="eyebrow">¿Mejor con guía?</p><h3>Te llevamos nosotros</h3><p class="muted">Rutas guiadas por Gredos para todos los niveles, desde ' + str(precios.desde_slug("senderismo-avila-gredos")) + ' € por persona.</p>'
             '<a class="btn btn-primary" href="/actividades/senderismo-avila-gredos/">Senderismo en Gredos</a><a class="btn btn-ghost" href="/actividades/ascensiones-montana/">Ascensiones</a></div></div></div></section>')
     ld = [crumbs_ld([("Inicio", "/"), ("Calculadora de rutas", path)]), faq_ld(faq),
           {"@context": "https://schema.org", "@type": "WebApplication", "name": "Calculadora de rutas de montaña", "url": url(path), "applicationCategory": "TravelApplication", "operatingSystem": "Web",
@@ -776,7 +778,7 @@ def build_topografia():
                 "Los tramos andando por el cauce no llevan nada, salvo los largos, que llevan una A y la distancia (A250). Si un rápel acaba en una poza, se dibuja en azul; si en la poza hay un remolino se marca con una espiral, y cualquier peligro o incidencia (un rebufo, un sifón, un tronco atascado…) con una señal de exclamación y una nota.",
                 "Para saber cuánta cuerda llevar, cuenta el doble del rápel más largo: la herramienta te lo calcula. Lleva siempre una cuerda de reserva y revisa el estado de las instalaciones antes de colgarte."])) +
             block("Preguntas frecuentes", faq_html(faq)) +
-            '</div><div class="sticky"><div class="panel"><p class="eyebrow">¿Mejor con guía?</p><h3>Barrancos guiados</h3><p class="muted">Ponemos el material, el seguro y la experiencia. Desde 35 € por persona.</p>'
+            '</div><div class="sticky"><div class="panel"><p class="eyebrow">¿Mejor con guía?</p><h3>Barrancos guiados</h3><p class="muted">Ponemos el material, el seguro y la experiencia. Desde ' + str(precios.desde_cat("Barranquismo")) + ' € por persona.</p>'
             '<a class="btn btn-primary" href="/actividades/barranquismo-avila/">Barranquismo en Gredos</a><a class="btn btn-ghost" href="/actividades/curso-barranquismo/">Curso de barranquismo</a></div></div></div></section>')
     ld = [crumbs_ld([("Inicio", "/"), ("Topografía de barrancos", path)]), faq_ld(faq),
           {"@context": "https://schema.org", "@type": "WebApplication", "name": "Topografía de barrancos", "url": url(path), "applicationCategory": "DesignApplication", "operatingSystem": "Web",
@@ -979,7 +981,7 @@ def main():
     L += ["- [%s](%s%s): %s, %s, %d €." % (o["name"], D, p_, o["place"], o["dur"], o["price"]) for _, o, p_ in OPTION_PAGES]
     L += ["", "## Cursos de formación"]
     L += ["- [%s](%s/actividades/%s/): %s Desde %s €." % (c["title"], D, c["slug"], c["short"], c["price"]) for c in COURSES]
-    L += ["", "## Alquiler de material", "- [Alquiler de material de montaña y barranquismo](%s/actividades/alquiler-material-montana/): neoprenos, arneses, cascos, sets de vía ferrata, piolets y crampones desde 3 €/día. Recogida en Fuentes de Béjar (Salamanca) o Valladolid." % D,
+    L += ["", "## Alquiler de material", "- [Alquiler de material de montaña y barranquismo](%s/actividades/alquiler-material-montana/): neoprenos, arneses, cascos, sets de vía ferrata, piolets y crampones desde %d €/día. Recogida en Fuentes de Béjar (Salamanca) o Valladolid." % (D, precios.desde_alquiler()),
           "", "## Servicios para entidades"]
     L += ["- [%s](%s/%s/): %s" % (s["title"], D, s["slug"], s["short"]) for s in SERVICES]
     L += ["- [Organización de eventos deportivos](%s/actividades/organizacion-eventos-deportivos/)" % D,

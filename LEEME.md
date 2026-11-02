@@ -16,6 +16,19 @@ La web se publica sola: cada cambio que se sube a la rama `main` de GitHub se ge
 
 Servicios que usa la web (todos gratis y sin claves): Google Sheets + Apps Script (calendario, reservas e inscripciones), Google Fonts, mapas de Google My Maps, Leaflet + OpenTopoMap/OpenStreetMap y relieve de AWS Terrain Tiles (calculadora) e IndexNow (aviso a Bing). No usa ningún servicio de IA ni de pago.
 
+## 1b. Cambiar precios (hoja de Google «Precios web Guías Ad Astra»)
+
+Los precios de actividades, cursos, cumbres, extras y alquiler se leen de la hoja
+https://docs.google.com/spreadsheets/d/1MQ0lXOaz-MnG91RpU39D4hgLPp6MWNE9krfj1Iq7A8c/edit
+
+- Se cambia solo la columna amarilla «Precio (€)» (número entero). La columna «ID» no se toca y la pestaña «Precios» tiene que ser la primera.
+- La hoja tiene que estar compartida como «Cualquier persona con el enlace: lector».
+- GitHub Actions mira la hoja cada hora (`subir-web.yml`, minuto 17). Si ha cambiado, genera y sube la web; si no, no hace nada.
+- Celda vacía o valor raro → se queda el precio de `data.py` para esa fila (aviso en el registro de Actions).
+- Todo lo que lleva el precio escrito se actualiza solo: fichas, títulos de Google («desde X€»), datos estructurados, formulario de reserva, llms.txt y «desde X €» de alquiler, senderismo, ascensiones y barrancos (`precios.py`).
+- `python3 precios.py csv` saca todos los precios actuales de `data.py` en CSV (para rehacer la hoja). Si se añade una actividad nueva en `data.py`, hay que añadir su fila (con su ID) a la hoja.
+- Ojo: GitHub pausa las tareas programadas si el repositorio pasa 60 días sin cambios; se reactivan en Actions → «Subir la web…» → Enable workflow.
+
 ## 2. Activar el calendario con plazas reales (Google Sheets, 10 minutos)
 
 Hasta que lo actives, el calendario muestra unas **fechas de ejemplo** (marcadas así) desde `dist/data/calendario.json`.
