@@ -860,6 +860,10 @@ def build_option(a, o, path):
         left.append(block("Qué incluye", inner + "</div>"))
     if a.get("epoca"):
         left.append(block("Mejor época", prose([a["epoca"]])))
+    if a.get("que_es"):
+        left.append(block(a["que_es"][0], prose(a["que_es"][1])))
+    if a.get("req"):
+        left.append(block("Requisitos", ticks(a["req"])))
     faq = [("¿Dónde es %s?" % art,
             "En %s. Te enviamos el punto de encuentro exacto y cómo llegar al confirmar la reserva." % place),
            ("¿Cuánto dura?", "Unas %s en total, contando aproximación, actividad y regreso." % o["dur"].replace(" aprox.", "")),
@@ -877,9 +881,11 @@ def build_option(a, o, path):
             '<section class="section"><div class="wrap split"><div class="stack" style="gap:0">%s</div><div class="sticky" style="display:grid;gap:18px">%s</div></div></section>' % ("".join(left), form) + related(a))
     pf = place.replace(" (", ", ").rstrip(")")
     title = "%s con guía (%s) | %d€" % (n, pf, o["price"])
-    if len(title) > 62:
+    if o.get("seo_title"):
+        title = o["seo_title"] % o["price"] if "%d" in o["seo_title"] else o["seo_title"]
+    elif len(title) > 62:
         title = "%s con guía, %s | %d€" % (n, region, o["price"])
-    if len(title) > 62:
+    if not o.get("seo_title") and len(title) > 62:
         title = "%s con guía | %d€" % (n, o["price"])
     first = o["desc"].split(". ")[0].rstrip(".") + "."
     desc = "%s con guías titulados en %s: %s, %d € por persona con material y seguro. %s" % (n, pf, o["dur"], o["price"], first)

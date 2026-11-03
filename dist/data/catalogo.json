@@ -42,7 +42,7 @@
   "desc": "Barranquismo en la Sierra de Gredos (Ávila): Río Mayor, Arbillas y Solana con guía titulado, neopreno y seguro incluidos. Reserva por WhatsApp desde 35€."
  },
  "barranquismo-en-caceres": {
-  "titulo": "Barranquismo en Cáceres",
+  "titulo": "Barranquismo en el Valle del Jerte",
   "tipo": "Actividad",
   "precio": 40,
   "img": "https://www.guiasadastra.com/media/99ae7d6e-7918-4fc2-8550-26a844c55625/barranquismo-en-caceres.webp",
@@ -63,14 +63,14 @@
   "desc": "Barranquismo en León: barranco del 40 Aniversario, Cueva de Valporquero y Sima de Perlas con guía titulado. Muy cerca de Valladolid y Palencia."
  },
  "barranquismo-cueva-valporquero-sima-de-perlas": {
-  "titulo": "Barranquismo cueva de Valporquero",
+  "titulo": "Espeleobarranquismo en la Cueva de Valporquero",
   "tipo": "Actividad",
   "precio": 65,
   "img": "https://www.guiasadastra.com/media/abd10400-5131-4432-8f77-97fd28b477ab/barranquismo-cueva-valporquero-sima-de-perlas.webp",
-  "desc": "Descenso guiado de la Cueva de Valporquero (León) y travesía por la Sima de Perlas: rápeles y toboganes bajo tierra. Grupos reducidos, material incluido."
+  "desc": "Espeleobarranquismo guiado en la Cueva de Valporquero (León) y travesía por la Sima de Perlas: rápeles y toboganes bajo tierra. Grupos reducidos, material incluido."
  },
  "barranquismo-madrid-segovia": {
-  "titulo": "Barranquismo en Madrid y Segovia",
+  "titulo": "Barranco de Somosierra (Madrid y Segovia)",
   "tipo": "Actividad",
   "precio": 45,
   "img": "https://www.guiasadastra.com/media/2632ebe7-e733-474c-90e4-0a7ed4b96481/barranquismo-madrid-segovia.webp",
@@ -84,18 +84,18 @@
   "desc": "Barranquismo en la Montaña Palentina, bajo la cara norte del Espigüete. Guía titulado, neopreno y seguro incluidos. Muy cerca de Valladolid."
  },
  "via-ferrata-salamanca": {
-  "titulo": "Vías ferratas en Salamanca",
+  "titulo": "Vía ferrata de La Muela (Salamanca)",
   "tipo": "Actividad",
   "precio": 35,
   "img": "https://www.guiasadastra.com/media/24195f49-7868-4e49-a166-35003ba5de58/via-ferrata-salamanca.webp",
-  "desc": "Vía ferrata guiada del Cancho de la Muela, en Candelario y la Sierra de Béjar (Salamanca). Recorridos K1 a K4 con rápel. Material y seguro incluidos."
+  "desc": "Vía ferrata de La Muela (Cancho de la Muela) con guía, junto al Puerto de Béjar: recorridos K1 a K4 con rápel final, para familias y expertos. Material y seguro incluidos."
  },
  "via-ferrata-burgos": {
   "titulo": "Vías ferratas Burgos",
   "tipo": "Actividad",
   "precio": 40,
   "img": "https://www.guiasadastra.com/media/9ec618e7-ead6-457a-b4d7-9b4153c4e9dc/via-ferrata-burgos.webp",
-  "desc": "Vías ferratas guiadas en Burgos, junto al Cañón del Río Lobos: Arauzo de Miel, Huerta del Rey y Espeja. Para familias e iniciación. Material incluido."
+  "desc": "Vías ferratas guiadas en Burgos, junto al Cañón del Río Lobos: Huerta del Rey, Arauzo de Miel y Espeja (Soria). Para familias e iniciación. Material incluido."
  },
  "vias-ferratas-leon": {
   "titulo": "Vías ferratas León",

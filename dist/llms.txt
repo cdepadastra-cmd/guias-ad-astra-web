@@ -8,13 +8,13 @@
 
 ## Actividades guiadas
 - [Barranquismo en Ávila](https://www.guiasadastra.com/actividades/barranquismo-avila/): Los mejores descensos de barrancos en la Sierra de Gredos, en la provincia de Ávila. Desde 35 €.
-- [Barranquismo en Cáceres](https://www.guiasadastra.com/actividades/barranquismo-en-caceres/): Los mejores barrancos del Valle del Jerte, en la Sierra de Gredos. Desde 40 €.
+- [Barranquismo en el Valle del Jerte](https://www.guiasadastra.com/actividades/barranquismo-en-caceres/): Los mejores barrancos del Valle del Jerte, en la Sierra de Gredos. Desde 40 €.
 - [Barranquismo en Salamanca](https://www.guiasadastra.com/actividades/barranquismo-salamanca/): Barrancos en las Arribes del Duero, Valle del Jerte y Sierra de Gredos. Desde 45 €.
 - [Barranquismo en León](https://www.guiasadastra.com/actividades/barranquismo-leon/): Barrancos y cuevas en León, muy cerca de Valladolid y Palencia. Desde 50 €.
-- [Barranquismo cueva de Valporquero](https://www.guiasadastra.com/actividades/barranquismo-cueva-valporquero-sima-de-perlas/): Descenso de la Cueva de Valporquero y la Sima de Perlas. Desde 65 €.
-- [Barranquismo en Madrid y Segovia](https://www.guiasadastra.com/actividades/barranquismo-madrid-segovia/): El barranco de Somosierra, en la frontera entre Madrid y Segovia. Desde 45 €.
+- [Espeleobarranquismo en la Cueva de Valporquero](https://www.guiasadastra.com/actividades/barranquismo-cueva-valporquero-sima-de-perlas/): Descenso de la Cueva de Valporquero y la Sima de Perlas. Desde 65 €.
+- [Barranco de Somosierra (Madrid y Segovia)](https://www.guiasadastra.com/actividades/barranquismo-madrid-segovia/): El barranco de Somosierra, en la frontera entre Madrid y Segovia. Desde 45 €.
 - [Barranquismo en Palencia](https://www.guiasadastra.com/actividades/barranquismo-palencia/): Barranquismo en la cara norte del Espigüete, muy cerca de Valladolid. Desde 50 €.
-- [Vías ferratas en Salamanca](https://www.guiasadastra.com/actividades/via-ferrata-salamanca/): Vía ferrata del Cancho de la Muela, en la Sierra de Béjar y Candelario. Desde 35 €.
+- [Vía ferrata de La Muela (Salamanca)](https://www.guiasadastra.com/actividades/via-ferrata-salamanca/): Vía ferrata del Cancho de la Muela, en la Sierra de Béjar y Candelario. Desde 35 €.
 - [Vías ferratas Burgos](https://www.guiasadastra.com/actividades/via-ferrata-burgos/): Ferratas junto al Cañón del Río Lobos, cerca de Palencia y Valladolid. Desde 40 €.
 - [Vías ferratas León](https://www.guiasadastra.com/actividades/vias-ferratas-leon/): Ferratas de Arbás, Cistierna y Sabero, con puentes de hasta 100 m. Desde 45 €.
 - [Espeleología en León](https://www.guiasadastra.com/actividades/espeleologia-leon/): Déjate seducir por las profundidades de la tierra. Desde 40 €.
@@ -38,7 +38,7 @@
 - [Barranco del 40 Aniversario](https://www.guiasadastra.com/actividades/barranquismo-leon/barranco-del-40-aniversario/): Valporquero (León), 2-3 horas, 50 €.
 - [Vía ferrata de Arauzo de Miel](https://www.guiasadastra.com/actividades/via-ferrata-burgos/via-ferrata-de-arauzo-de-miel/): Arauzo de Miel (Burgos), 1h30-2h, 40 €.
 - [Vía ferrata de Huerta del Rey](https://www.guiasadastra.com/actividades/via-ferrata-burgos/via-ferrata-de-huerta-del-rey/): Huerta del Rey (Burgos), 2 horas, 40 €.
-- [Vía ferrata de Espeja](https://www.guiasadastra.com/actividades/via-ferrata-burgos/via-ferrata-de-espeja/): Espeja de San Marcelino (Burgos), 2 horas, 45 €.
+- [Vía ferrata de Espeja](https://www.guiasadastra.com/actividades/via-ferrata-burgos/via-ferrata-de-espeja/): Espeja de San Marcelino (Soria), 2 horas, 45 €.
 - [Vía ferrata del Valle de Arbás](https://www.guiasadastra.com/actividades/vias-ferratas-leon/via-ferrata-del-valle-de-arbas/): Arbás (León), 2 horas, 45 €.
 - [Vía ferrata de Cistierna](https://www.guiasadastra.com/actividades/vias-ferratas-leon/via-ferrata-de-cistierna/): Cistierna (León), 2 horas, 50 €.
 - [Vía ferrata de Sabero](https://www.guiasadastra.com/actividades/vias-ferratas-leon/via-ferrata-de-sabero/): Sabero (León), 3 horas, 60 €.
