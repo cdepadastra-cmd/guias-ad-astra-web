@@ -135,7 +135,7 @@ def ecmwf():
     m = Modelo("ecmwf", "ECMWF IFS", "0,25° (~25 km)")
     steps = list(range(0, 145, 3)) + list(range(150, HORAS + 1, 6))
     src = None
-    for s in ("aws", "ecmwf"):
+    for s in ("azure", "google", "ecmwf", "aws"):
         try:
             c = Client(source=s, model="ifs", resol="0p25")
             run = c.latest(type="fc", step=HORAS, param="2t")
@@ -162,14 +162,10 @@ def ecmwf():
         return None
 
     pedidos = {p: {"param": p, "levtype": "sfc"} for p in ("2t", "10u", "10v", "tp", "10fg", "tcc", "mucape")}
-    for p in ("t", "gh", "u", "v"):
-        pedidos["pl_" + p] = {"param": p, "levtype": "pl", "levelist": LEVELS}
-    with cf.ThreadPoolExecutor(6) as ex:
+    for p, levs in (("t", [925, 850, 700, 500]), ("gh", [925, 850, 700, 500]), ("u", [850, 700, 500]), ("v", [850, 700, 500])):
+        pedidos["pl_" + p] = {"param": p, "levtype": "pl", "levelist": levs}
+    with cf.ThreadPoolExecutor(3) as ex:
         rutas = dict(zip(pedidos, ex.map(lambda kv: bajar(*kv), pedidos.items())))
-    # niveles sin 600 hPa si fallaron
-    for p in ("t", "gh", "u", "v"):
-        if not rutas["pl_" + p]:
-            rutas["pl_" + p] = bajar("pl_%s_b" % p, {"param": p, "levtype": "pl", "levelist": [925, 850, 700, 500]})
     inv = {}
     for nombre, path in rutas.items():
         if not path:
@@ -215,6 +211,54 @@ for _l in LEVELS:
         GFS_WANT.add((_v, "%d mb" % _l))
 
 
+NOMADS = "https://nomads.ncep.noaa.gov/cgi-bin/filter_gfs_0p25.pl"
+NOMADS_Q = ("&var_TMP=on&var_HGT=on&var_UGRD=on&var_VGRD=on&var_GUST=on&var_APCP=on&var_TCDC=on&var_CAPE=on"
+            "&lev_2_m_above_ground=on&lev_10_m_above_ground=on&lev_surface=on&lev_entire_atmosphere=on&lev_0C_isotherm=on"
+            + "".join("&lev_%d_mb=on" % l for l in LEVELS) + "&subregion=&leftlon=-10&rightlon=4&toplat=45&bottomlat=35")
+
+
+def gfs_nomads(m, steps):
+    """Descarga recortada a España desde NOMADS; identifica cada campo por sus metadatos GRIB."""
+    def paso(st):
+        url = "%s?dir=%%2Fgfs.%s%%2F%02d%%2Fatmos&file=gfs.t%02dz.pgrb2.0p25.f%03d%s" % (NOMADS, m.run.strftime("%Y%m%d"), m.run.hour, m.run.hour, st, NOMADS_Q)
+        for intento in range(4):
+            rr = S.get(url, timeout=90)
+            if rr.status_code == 200 and rr.content[:4] == b"GRIB":
+                break
+            time.sleep(5 + 10 * intento)
+        else:
+            raise RuntimeError("NOMADS f%03d: %s" % (st, rr.status_code))
+        res = []
+        for msg in split_messages(rr.content):
+            meta, v = decode(msg)
+            sn, tl, lev = meta["shortName"], meta["typeOfLevel"], meta["level"]
+            if tl == "isobaricInhPa":
+                var = {"t": "TMP", "gh": "HGT", "u": "UGRD", "v": "VGRD"}.get(sn)
+                if var:
+                    res.append((var, "%d mb" % lev, meta, v))
+            elif sn in ("2t", "t") and tl == "heightAboveGround":
+                res.append(("TMP", "2 m above ground", meta, v))
+            elif sn in ("10u", "u") and tl == "heightAboveGround":
+                res.append(("UGRD", "10 m above ground", meta, v))
+            elif sn in ("10v", "v") and tl == "heightAboveGround":
+                res.append(("VGRD", "10 m above ground", meta, v))
+            elif tl == "isothermZero" or (sn == "gh" and tl not in ("surface",)) and "isotherm" in tl.lower():
+                res.append(("HGT", "0C isotherm", meta, v))
+            elif sn in ("orog", "gh", "h") and tl == "surface":
+                res.append(("HGT", "surface", meta, v))
+            elif sn in ("gust", "i10fg", "10fg"):
+                res.append(("GUST", "surface", meta, v))
+            elif sn in ("tp", "prate") and sn == "tp":
+                res.append(("APCP", "surface", meta, v))
+            elif sn == "tcc":
+                res.append(("TCDC", "entire atmosphere", meta, v))
+            elif sn == "cape" and tl == "surface":
+                res.append(("CAPE", "surface", meta, v))
+        return st, res
+    with cf.ThreadPoolExecutor(4) as ex:
+        return list(ex.map(paso, steps))
+
+
 def gfs():
     m = Modelo("gfs", "NOAA GFS", "0,25° (~25 km)")
     now = dt.datetime.now(UTC)
@@ -253,8 +297,13 @@ def gfs():
             i = j + 1
         return st, res
 
-    with cf.ThreadPoolExecutor(12) as ex:
-        resultados = list(ex.map(paso, steps))
+    try:
+        resultados = gfs_nomads(m, steps)
+        log("GFS: datos de NOMADS (recorte de España)")
+    except Exception as ex_:
+        log("GFS: NOMADS falló (%s); uso la copia de AWS" % ex_)
+        with cf.ThreadPoolExecutor(4) as ex:
+            resultados = list(ex.map(paso, steps))
     buckets = []
     for st, res in resultados:
         t = m.run + dt.timedelta(hours=st)
@@ -337,7 +386,7 @@ def icon():
         return tr, v
 
     fallos = 0
-    with cf.ThreadPoolExecutor(16) as ex:
+    with cf.ThreadPoolExecutor(12) as ex:
         for (var, lev, st, url), v in ex.map(bajar, trabajos):
             if v is None:
                 fallos += 1
@@ -607,17 +656,30 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", default="meteo-out")
     ap.add_argument("--modelos", default="ecmwf,gfs,icon")
+    ap.add_argument("--limite", type=int, default=22, help="minutos máximos de descarga")
     a = ap.parse_args()
     os.makedirs(a.out, exist_ok=True)
     funcs = {"ecmwf": ecmwf, "gfs": gfs, "icon": icon}
     modelos = {}
-    for nombre in a.modelos.split(","):
+    inicio = time.time()
+
+    def lanzar(nombre):
         t0 = time.time()
-        try:
-            modelos[nombre] = funcs[nombre]()
-            log("%s listo en %.0f s" % (nombre, time.time() - t0))
-        except Exception:
-            log("ERROR en %s:\n%s" % (nombre, traceback.format_exc()))
+        res = funcs[nombre]()
+        log("%s listo en %.0f s" % (nombre, time.time() - t0))
+        return res
+    ex = cf.ThreadPoolExecutor(3)
+    futs = {ex.submit(lanzar, nombre): nombre for nombre in a.modelos.split(",")}
+    try:
+        for f in cf.as_completed(futs, timeout=a.limite * 60):
+            try:
+                modelos[futs[f]] = f.result()
+            except Exception:
+                log("ERROR en %s:\n%s" % (futs[f], traceback.format_exc()))
+    except cf.TimeoutError:
+        log("Tiempo máximo (%d min): sigo sin %s" % (a.limite, ", ".join(n for f, n in futs.items() if not f.done())))
+    ex.shutdown(wait=False, cancel_futures=True)
+    log("Descargas: %.0f s" % (time.time() - inicio))
     if not modelos:
         sys.exit("Ningún modelo disponible: no se publica nada.")
     now = dt.datetime.now(UTC)
@@ -643,6 +705,8 @@ def main():
             mac["id"], d0.get("tc_min"), d0.get("tc_max"), d0.get("wc_max"), d0.get("pr"), d0.get("i0_min"), ",".join(d0.get("avisos", []))))
     json.dump(resumen, open(os.path.join(a.out, "resumen.json"), "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
     log("Escritos %d macizos con modelos: %s" % (len(MACIZOS), ", ".join(modelos)))
+    sys.stdout.flush()
+    os._exit(0)  # no esperar a descargas que se hayan quedado colgadas
 
 
 if __name__ == "__main__":
