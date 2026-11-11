@@ -1,0 +1,98 @@
+# -*- coding: utf-8 -*-
+"""Macizos de la página de meteorología.
+
+Cada macizo tiene dos puntos:
+- base:   pueblo o punto de partida (temperatura a 2 m corregida a su altitud, viento a 10 m, rachas)
+- cumbre: cumbre de referencia (temperatura y viento interpolados en la vertical con los niveles de presión)
+Coordenadas en grados decimales (lat, lon) y altitud en metros.
+"""
+
+REGIONES = ["Sistema Central", "Cordillera Cantábrica", "Sistema Ibérico", "Pirineos", "Sur y Levante"]
+
+MACIZOS = [
+    # ---------------------------------------------------------------- Sistema Central
+    {"id": "gredos-macizo-central", "nombre": "Sierra de Gredos · Macizo Central", "corto": "Gredos Central", "region": "Sistema Central",
+     "base": {"nombre": "Hoyos del Espino", "lat": 40.351, "lon": -5.173, "alt": 1434},
+     "cumbre": {"nombre": "Almanzor", "lat": 40.2463, "lon": -5.2978, "alt": 2591},
+     "texto": "Circo de Gredos, Almanzor, La Galana, Laguna Grande y Cinco Lagunas."},
+    {"id": "gredos-macizo-oriental", "nombre": "Sierra de Gredos · Macizo Oriental", "corto": "Gredos Oriental", "region": "Sistema Central",
+     "base": {"nombre": "Piedralaves", "lat": 40.317, "lon": -4.699, "alt": 740},
+     "cumbre": {"nombre": "Cerro Torozo", "lat": 40.290, "lon": -4.853, "alt": 2021},
+     "texto": "Torozo, Cerro de Guisando y la cuerda oriental de Gredos sobre el valle del Alberche y el Tiétar."},
+    {"id": "sierra-de-candelario", "nombre": "Sierra de Candelario y Béjar", "corto": "Candelario", "region": "Sistema Central",
+     "base": {"nombre": "Candelario", "lat": 40.368, "lon": -5.744, "alt": 1126},
+     "cumbre": {"nombre": "El Calvitero", "lat": 40.279, "lon": -5.748, "alt": 2401},
+     "texto": "Calvitero, Canchal de la Ceja, La Covatilla y la ferrata de La Muela."},
+    {"id": "la-vera", "nombre": "La Vera", "corto": "La Vera", "region": "Sistema Central",
+     "base": {"nombre": "Jarandilla de la Vera", "lat": 40.129, "lon": -5.660, "alt": 660},
+     "cumbre": {"nombre": "La Covacha", "lat": 40.217, "lon": -5.415, "alt": 2399},
+     "texto": "Gargantas de La Vera, Cuerda de los Tres Picos y Garganta de Alardos."},
+    {"id": "valle-del-tietar", "nombre": "Valle del Tiétar", "corto": "Tiétar", "region": "Sistema Central",
+     "base": {"nombre": "Arenas de San Pedro", "lat": 40.210, "lon": -5.088, "alt": 510},
+     "cumbre": {"nombre": "La Mira", "lat": 40.244, "lon": -5.102, "alt": 2343},
+     "texto": "Cara sur de Gredos: Arenas de San Pedro, Guisando, Los Galayos y La Mira."},
+    {"id": "sierra-de-francia", "nombre": "Sierra de Francia", "corto": "S. de Francia", "region": "Sistema Central",
+     "base": {"nombre": "La Alberca", "lat": 40.489, "lon": -6.110, "alt": 1048},
+     "cumbre": {"nombre": "Peña de Francia", "lat": 40.514, "lon": -6.169, "alt": 1723},
+     "texto": "Peña de Francia, Las Batuecas y La Alberca."},
+    {"id": "las-quilamas", "nombre": "Las Quilamas", "corto": "Quilamas", "region": "Sistema Central",
+     "base": {"nombre": "Linares de Riofrío", "lat": 40.580, "lon": -5.920, "alt": 940},
+     "cumbre": {"nombre": "Pico Cervero", "lat": 40.531, "lon": -5.875, "alt": 1465},
+     "texto": "Sierra de las Quilamas, entre la Sierra de Francia y la de Béjar."},
+    {"id": "guadarrama", "nombre": "Sierra de Guadarrama", "corto": "Guadarrama", "region": "Sistema Central",
+     "base": {"nombre": "Rascafría", "lat": 40.903, "lon": -3.879, "alt": 1163},
+     "cumbre": {"nombre": "Peñalara", "lat": 40.8505, "lon": -3.9551, "alt": 2428},
+     "texto": "Peñalara, Cuerda Larga, Siete Picos y La Pedriza."},
+    {"id": "ayllon", "nombre": "Sierra de Ayllón", "corto": "Ayllón", "region": "Sistema Central",
+     "base": {"nombre": "Riaza", "lat": 41.280, "lon": -3.478, "alt": 1190},
+     "cumbre": {"nombre": "Pico del Lobo", "lat": 41.187, "lon": -3.462, "alt": 2273},
+     "texto": "Pico del Lobo, Hayedo de la Pedrosa, Somosierra y el Ocejón."},
+    # ---------------------------------------------------------------- Cordillera Cantábrica
+    {"id": "picos-de-europa", "nombre": "Picos de Europa", "corto": "Picos de Europa", "region": "Cordillera Cantábrica",
+     "base": {"nombre": "Posada de Valdeón", "lat": 43.151, "lon": -4.918, "alt": 940},
+     "cumbre": {"nombre": "Torre Cerredo", "lat": 43.1975, "lon": -4.853, "alt": 2650},
+     "texto": "Macizos Central, Occidental y Oriental: Torre Cerredo, Naranjo de Bulnes y Valdeón."},
+    {"id": "montanas-de-leon", "nombre": "Montañas de León", "corto": "Montaña de León", "region": "Cordillera Cantábrica",
+     "base": {"nombre": "San Emiliano", "lat": 42.972, "lon": -6.001, "alt": 1135},
+     "cumbre": {"nombre": "Peña Ubiña", "lat": 42.981, "lon": -5.959, "alt": 2417},
+     "texto": "Babia, Luna, Arbás, Valporquero y Sabero."},
+    {"id": "montana-palentina", "nombre": "Montaña Palentina", "corto": "M. Palentina", "region": "Cordillera Cantábrica",
+     "base": {"nombre": "Triollo", "lat": 42.929, "lon": -4.680, "alt": 1290},
+     "cumbre": {"nombre": "Curavacas", "lat": 42.979, "lon": -4.672, "alt": 2524},
+     "texto": "Curavacas, Espigüete, Peña Prieta y Fuentes Carrionas."},
+    # ---------------------------------------------------------------- Sistema Ibérico
+    {"id": "serrania-de-cuenca", "nombre": "Serranía de Cuenca", "corto": "S. de Cuenca", "region": "Sistema Ibérico",
+     "base": {"nombre": "Tragacete", "lat": 40.348, "lon": -1.852, "alt": 1283},
+     "cumbre": {"nombre": "Cerro de San Felipe", "lat": 40.402, "lon": -1.842, "alt": 1839},
+     "texto": "Nacimiento del Cuervo, Tragacete, Uña y la Ciudad Encantada."},
+    {"id": "alto-tajo", "nombre": "Alto Tajo", "corto": "Alto Tajo", "region": "Sistema Ibérico",
+     "base": {"nombre": "Peralejos de las Truchas", "lat": 40.596, "lon": -1.929, "alt": 1180},
+     "cumbre": {"nombre": "Parameras del Alto Tajo", "lat": 40.660, "lon": -2.050, "alt": 1450},
+     "texto": "Parque Natural del Alto Tajo: hoces del Tajo, Peralejos y Taravilla."},
+    {"id": "sierra-de-albarracin", "nombre": "Sierra de Albarracín", "corto": "Albarracín", "region": "Sistema Ibérico",
+     "base": {"nombre": "Albarracín", "lat": 40.408, "lon": -1.444, "alt": 1182},
+     "cumbre": {"nombre": "Caimodorro", "lat": 40.396, "lon": -1.665, "alt": 1935},
+     "texto": "Montes Universales, pinares de rodeno y el boulder de Albarracín."},
+    # ---------------------------------------------------------------- Pirineos
+    {"id": "ordesa-monte-perdido", "nombre": "Ordesa y Monte Perdido", "corto": "Ordesa", "region": "Pirineos",
+     "base": {"nombre": "Torla", "lat": 42.629, "lon": -0.111, "alt": 1032},
+     "cumbre": {"nombre": "Monte Perdido", "lat": 42.675, "lon": 0.034, "alt": 3355},
+     "texto": "Valle de Ordesa, Monte Perdido, Brecha de Rolando y Añisclo."},
+    {"id": "aneto-posets", "nombre": "Aneto y Posets", "corto": "Aneto", "region": "Pirineos",
+     "base": {"nombre": "Benasque", "lat": 42.604, "lon": 0.523, "alt": 1140},
+     "cumbre": {"nombre": "Aneto", "lat": 42.631, "lon": 0.657, "alt": 3404},
+     "texto": "Valle de Benasque, Aneto, Posets y Maladeta."},
+    {"id": "aiguestortes-carros-de-foc", "nombre": "Aigüestortes y Carros de Foc", "corto": "Carros de Foc", "region": "Pirineos",
+     "base": {"nombre": "Espot", "lat": 42.576, "lon": 1.088, "alt": 1320},
+     "cumbre": {"nombre": "Montardo", "lat": 42.637, "lon": 0.894, "alt": 2833},
+     "texto": "Parque Nacional de Aigüestortes, Sant Maurici y la travesía Carros de Foc."},
+    # ---------------------------------------------------------------- Sur y Levante
+    {"id": "sierra-nevada", "nombre": "Sierra Nevada", "corto": "Sierra Nevada", "region": "Sur y Levante",
+     "base": {"nombre": "Capileira", "lat": 36.962, "lon": -3.359, "alt": 1436},
+     "cumbre": {"nombre": "Mulhacén", "lat": 37.053, "lon": -3.311, "alt": 3479},
+     "texto": "Mulhacén, Veleta, Alpujarras y la estación de esquí."},
+    {"id": "calpe-costa-blanca", "nombre": "Calpe y Costa Blanca", "corto": "Calpe", "region": "Sur y Levante",
+     "base": {"nombre": "Calpe", "lat": 38.644, "lon": 0.044, "alt": 20},
+     "cumbre": {"nombre": "Sierra de Bernia", "lat": 38.672, "lon": -0.064, "alt": 1128},
+     "texto": "Peñón de Ifach, Bernia, Puig Campana y la escalada de la Costa Blanca."},
+]

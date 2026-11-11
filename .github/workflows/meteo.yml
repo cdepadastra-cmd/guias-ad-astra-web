@@ -1,0 +1,57 @@
+# Previsión meteorológica de montaña (página /meteo/ de la web).
+# Cada 6 horas descarga ECMWF IFS, NOAA GFS y DWD ICON-EU, calcula la previsión de cada macizo
+# (meteo/procesar.py) y sube los JSON a /meteo/datos/ por FTP. No toca el resto de la web.
+name: Previsión meteorológica de montaña
+
+on:
+  schedule:
+    - cron: "40 3,9,15,21 * * *"   # UTC: cuando ya están publicadas las pasadas de 00, 06, 12 y 18
+  workflow_dispatch:
+
+concurrency:
+  group: meteo
+  cancel-in-progress: false
+
+jobs:
+  meteo:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      FTP_SERVER: ${{ secrets.FTP_SERVER }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalar librerías (ecCodes para leer GRIB)
+        run: pip install --quiet eccodes ecmwf-opendata numpy requests && python -m eccodes selfcheck
+
+      - name: Descargar modelos y calcular la previsión
+        run: python3 meteo/procesar.py --out meteo-out
+
+      - name: Subir datos por FTP
+        id: ftp1
+        continue-on-error: true
+        if: env.FTP_SERVER != ''
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USER }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./meteo-out/
+          server-dir: /guiasadastra.com/meteo/datos/
+          timeout: 120000
+
+      - name: Reintentar si se cortó la conexión
+        id: ftp2
+        if: env.FTP_SERVER != '' && steps.ftp1.outcome == 'failure'
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USER }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./meteo-out/
+          server-dir: /guiasadastra.com/meteo/datos/
+          timeout: 120000

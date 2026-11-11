@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """Genera la web estática de Guías Ad Astra en ./dist  ->  python3 build.py"""
-import json, os, shutil, html, datetime
+import json, os, shutil, html, datetime, sys
 from data import *
 import precios
 precios.aplicar()  # precios desde la hoja de Google (si responde)
@@ -12,7 +12,7 @@ TODAY = datetime.date.today().isoformat()
 PAGES = []  # (path, priority) para el sitemap
 import hashlib
 _ST = os.path.join(os.path.dirname(os.path.abspath(__file__)), "static")
-VER = {a: hashlib.md5(open(os.path.join(_ST, a), "rb").read()).hexdigest()[:8] for a in ("css/estilos.css", "js/app.js", "js/calculadora.js", "js/topografia.js", "config.js")}
+VER = {a: hashlib.md5(open(os.path.join(_ST, a), "rb").read()).hexdigest()[:8] for a in ("css/estilos.css", "js/app.js", "js/calculadora.js", "js/topografia.js", "js/meteo.js", "config.js")}
 
 def e(s):
     return html.escape(str(s), quote=True)
@@ -48,7 +48,7 @@ NAV_ACT = [("Todas las actividades", "/actividades/"), ("Barranquismo", "/activi
            ("Alpinismo y ascensiones", "/actividades/?categoria=Ascensiones"), ("Espeleología", "/actividades/?categoria=Espeleología"), ("Escalada y boulder", "/actividades/?categoria=Escalada"),
            ("Senderismo", "/actividades/?categoria=Senderismo"), ("Travesías y viajes", "/actividades/?categoria=Viajes")]
 NAV_CUR = [("Todos los cursos", "/formacion-cursos/")] + [(c["disc_label"], "/actividades/%s/" % c["slug"]) for c in COURSES]
-NAV_OTR = [("Calculadora de rutas", "/calculadora-rutas/"), ("Topografía de barrancos", "/topografia-barrancos/"), ("Boulder en Las Tuerces", "/actividades/boulder-las-tuerces/"), ("Boulder en Zona Centro", "/actividades/boulder-zona-centro-salamanca-caceres/"),
+NAV_OTR = [("Meteorología de montaña", "/meteo/"), ("Calculadora de rutas", "/calculadora-rutas/"), ("Topografía de barrancos", "/topografia-barrancos/"), ("Boulder en Las Tuerces", "/actividades/boulder-las-tuerces/"), ("Boulder en Zona Centro", "/actividades/boulder-zona-centro-salamanca-caceres/"),
            ("Iniciativas de turismo rural", "/iniciativas-turismo-rural/"), ("Creación y mantenimiento de senderos", "/creacion-mantenimiento-senderos/"), ("Route setting", "/route-setting/"), ("Organización de eventos", "/actividades/organizacion-eventos-deportivos/"), ("Gredos Limpio", "/actividades/gredos-limpio/"),
            ("Oeste de Gredos", "/actividades/comarca-natural-oeste-de-gredos/"), ("Vía Verde Ruta de la Plata", "/actividades/via-verde-ruta-de-la-plata/")]
 
@@ -98,7 +98,7 @@ def page(path, title, desc, body, active="", ld=None, og_type="website", image=N
            '<link rel="stylesheet" href="/css/estilos.css"><link rel="icon" href="/favicon.ico" sizes="any"><link rel="icon" href="/img/favicon-32.png" type="image/png" sizes="32x32"><link rel="icon" href="/img/favicon-48.png" type="image/png" sizes="48x48"><link rel="icon" href="/img/favicon-192.png" type="image/png" sizes="192x192"><link rel="apple-touch-icon" href="/img/apple-touch-icon.png">' + head + lds +
            '</head><body>' + header(active) + '<main id="contenido">' + body + '</main>' + footer() +
            '<script src="/config.js"></script><script src="/js/app.js" defer></script>' + scripts + '</body></html>')
-    for asset in ("css/estilos.css", "js/app.js", "js/calculadora.js", "js/topografia.js", "config.js"):
+    for asset in ("css/estilos.css", "js/app.js", "js/calculadora.js", "js/topografia.js", "js/meteo.js", "config.js"):
         doc = doc.replace('"/%s"' % asset, '"/%s?v=%s"' % (asset, VER.get(asset, "1")))
     if BASE:
         doc = doc.replace('href="/', 'href="%s/' % BASE).replace('src="/', 'src="%s/' % BASE)
@@ -788,6 +788,93 @@ def build_topografia():
          "Crea gratis la topografía de un barranco: añade rápeles (R), destrepes (D) y tramos andando, calcula la cuerda necesaria y descarga el croquis en PNG o JPG.",
          body, "otr", ld, priority="0.7", scripts='<script src="/js/topografia.js" defer></script>')
 
+# ---------------------------------------------------------------- meteorología de montaña
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "meteo"))
+from macizos import MACIZOS, REGIONES  # noqa: E402
+
+METEO_IMG = img("0c5376bd-2231-4c62-b798-6f0139e73cd7/cursos-alpinismo.webp")
+METEO_ACT = {
+    "gredos-macizo-central": ["senderismo-avila-gredos", "ascensiones-montana", "barranquismo-avila"],
+    "gredos-macizo-oriental": ["barranquismo-avila", "senderismo-avila-gredos"],
+    "sierra-de-candelario": ["via-ferrata-salamanca", "barranquismo-salamanca", "comarca-natural-oeste-de-gredos"],
+    "la-vera": ["barranquismo-en-caceres", "barranquismo-avila"],
+    "valle-del-tietar": ["barranquismo-avila", "ascensiones-montana"],
+    "sierra-de-francia": ["boulder-zona-centro-salamanca-caceres", "barranquismo-salamanca"],
+    "las-quilamas": ["barranquismo-salamanca", "via-ferrata-salamanca"],
+    "guadarrama": ["barranquismo-madrid-segovia", "espeleologia-segovia", "cursos-alpinismo"],
+    "ayllon": ["barranquismo-madrid-segovia", "espeleologia-segovia"],
+    "picos-de-europa": ["ascensiones-montana", "vias-ferratas-leon"],
+    "montanas-de-leon": ["barranquismo-cueva-valporquero-sima-de-perlas", "vias-ferratas-leon", "barranquismo-leon"],
+    "montana-palentina": ["barranquismo-palencia", "boulder-las-tuerces", "ascensiones-montana"],
+    "ordesa-monte-perdido": ["ascensiones-montana", "cursos-alpinismo"],
+    "aneto-posets": ["ascensiones-montana", "cursos-alpinismo"],
+    "aiguestortes-carros-de-foc": ["trekking-carros-de-foc", "ascensiones-montana"],
+    "sierra-nevada": ["ascensiones-montana", "cursos-alpinismo"],
+}
+METEO_FAQ = [
+    ("¿De dónde salen estos datos?", "De los propios modelos meteorológicos, no de otras webs del tiempo: ECMWF IFS (Centro Europeo, 25 km), GFS (servicio meteorológico de EE. UU., 25 km) e ICON-EU (servicio alemán, 6,5 km). Cada 6 horas descargamos su última pasada y calculamos la previsión de cada macizo."),
+    ("¿Qué diferencia hay entre la cumbre y la base?", "La base es el pueblo o punto de partida habitual, con la temperatura a 2 metros corregida a su altitud. La cumbre es la cima de referencia del macizo: la temperatura y el viento se calculan en la vertical, a su altitud real, con los datos del modelo en altura (850, 700, 600 y 500 hPa). Es lo que vas a encontrar arriba, no en el valle."),
+    ("¿Qué es la isocero y la cota de nieve?", "La isocero es la altitud a la que la temperatura del aire es 0 °C. La cota de nieve suele estar unos 300 metros por debajo: por encima de ella, si precipita, lo hace en forma de nieve. ICON-EU la calcula directamente y en los demás modelos se estima a partir de la isocero."),
+    ("¿Por qué se muestran varios modelos?", "Porque ningún modelo acierta siempre. Mostramos la mediana de los tres como previsión principal y cada modelo por separado en las gráficas y en la comparación. Si coinciden, la previsión es fiable; si discrepan mucho, hay incertidumbre y conviene tener un plan B."),
+    ("¿Cómo se calcula el riesgo de tormenta?", "Con la energía disponible para la convección (CAPE) y la precipitación prevista en el mismo tramo de 3 horas. Si un modelo lo marca, la tormenta es posible; si lo marcan dos o más, probable. En verano, las tormentas de montaña suelen formarse por la tarde: madruga y planifica estar fuera de las cumbres a mediodía."),
+    ("¿Sustituye a los avisos oficiales?", "No. Es una previsión automática para planificar actividades. Consulta siempre los avisos de AEMET y el boletín de peligro de aludes en invierno, y ante la duda, no subas."),
+]
+
+def meteo_metodo():
+    return block("Cómo se hace esta previsión", prose([
+        "Cada 6 horas un proceso automático descarga la última pasada de tres modelos meteorológicos globales y regionales: <strong>ECMWF IFS</strong> (Centro Europeo de Previsión a Plazo Medio, el de referencia en Europa), <strong>GFS</strong> (NOAA, Estados Unidos) e <strong>ICON-EU</strong> (DWD, servicio meteorológico alemán, con más resolución pero solo a 5 días).",
+        "Para cada macizo calculamos dos puntos. En la <strong>cumbre</strong>, la temperatura y el viento se interpolan en la vertical entre el suelo del modelo y los niveles de 925, 850, 700, 600 y 500 hPa, a la altitud real de la cima: así se evita el error típico de las previsiones por municipio, que dan el tiempo del pueblo. En la <strong>base</strong>, la temperatura a 2 metros se corrige a la altitud del pueblo.",
+        "La previsión principal es la <strong>mediana</strong> de los modelos disponibles. En las gráficas y en la comparación verás cada modelo por separado: cuanto más se parezcan, más fiable es la previsión.",
+        "Datos: ECMWF (CC BY 4.0), NOAA/NCEP GFS (dominio público) y DWD ICON-EU (CC BY 4.0). Previsión elaborada por Guías Ad Astra. Es orientativa: consulta también los avisos de AEMET."]))
+
+def build_meteo():
+    path = "/meteo/"
+    regiones = ", ".join(REGIONES)
+    body = (hero("Herramientas", "Meteorología de montaña", "Previsión a 7 días en cumbre y en el pueblo base para %d macizos de España, calculada cada 6 horas directamente con los modelos ECMWF, GFS e ICON." % len(MACIZOS), METEO_IMG,
+                 [("Inicio", "/"), ("Meteorología de montaña", "")], '<a class="btn btn-primary" href="#previsiones">Ver previsiones</a><a class="btn btn-ghost" href="#como">Cómo se calcula</a>') +
+            keybar([("Macizos", "%d" % len(MACIZOS)), ("Modelos", "ECMWF · GFS · ICON-EU"), ("Alcance", "7 días, cada 3 horas"), ("Actualización", "Cada 6 horas")]) +
+            '<section class="section" id="previsiones"><div class="wrap"><div id="mt-index" class="mt"><p class="mt-cargando">Cargando previsiones…</p></div>'
+            '<noscript><ul>' + "".join('<li><a href="/meteo/%s/">%s</a></li>' % (m["id"], e(m["nombre"])) for m in MACIZOS) + '</ul></noscript></div></section>' +
+            '<section class="section alt" id="como"><div class="wrap split"><div class="stack" style="gap:0">' + meteo_metodo() + block("Preguntas frecuentes", faq_html(METEO_FAQ)) +
+            '</div><div class="sticky"><div class="panel"><p class="eyebrow">Macizos</p>' + "".join(
+                '<h3 style="font-size:1.2rem;margin-top:6px">%s</h3><p>%s</p>' % (e(rg), " · ".join('<a href="/meteo/%s/">%s</a>' % (m["id"], e(m["corto"])) for m in MACIZOS if m["region"] == rg)) for rg in REGIONES) +
+            '</div></div></div></section>')
+    ld = [crumbs_ld([("Inicio", "/"), ("Meteorología de montaña", path)]), faq_ld(METEO_FAQ)]
+    page(path, "Meteorología de montaña: previsión en cumbre a 7 días | Ad Astra",
+         "Previsión del tiempo en montaña a 7 días para %d macizos: temperatura y viento en cumbre, nieve, isocero y tormentas. Modelos ECMWF, GFS e ICON, cada 6 h." % len(MACIZOS),
+         body, "otr", ld, priority="0.8", scripts='<script src="/js/meteo.js" defer></script>')
+    for m in MACIZOS:
+        build_meteo_macizo(m)
+
+def build_meteo_macizo(m):
+    path = "/meteo/%s/" % m["id"]
+    c, b = m["cumbre"], m["base"]
+    fmt = lambda x: "{:,}".format(x).replace(",", ".")
+    h1 = "Tiempo en %s" % m["nombre"]
+    lead = "Previsión de montaña a 7 días en %s (%s m) y %s (%s m): temperatura, viento en cumbre, precipitación, nieve, isocero y tormentas. %s" % (c["nombre"], fmt(c["alt"]), b["nombre"], fmt(b["alt"]), m["texto"])
+    acts = [x for x in ACTIVITIES if x["slug"] in METEO_ACT.get(m["id"], [])]
+    otros = [x for x in MACIZOS if x["region"] == m["region"] and x["id"] != m["id"]]
+    lateral = ""
+    if acts:
+        lateral += '<div class="panel"><p class="eyebrow">Con guía en la zona</p>' + "".join(
+            '<a class="btn btn-ghost btn-block" href="/actividades/%s/">%s</a>' % (x["slug"], e(x["title"])) for x in acts) + '</div>'
+    if otros:
+        lateral += '<div class="panel"><p class="eyebrow">%s</p>%s<a href="/meteo/">Todos los macizos</a></div>' % (e(m["region"]), "".join('<a href="/meteo/%s/">%s</a>' % (x["id"], e(x["nombre"])) for x in otros))
+    body = (hero("Meteorología de montaña", e(h1), e(lead), METEO_IMG, [("Inicio", "/"), ("Meteorología", "/meteo/"), (m["nombre"], "")]) +
+            keybar([("Cumbre", "%s · %s m" % (c["nombre"], fmt(c["alt"]))), ("Base", "%s · %s m" % (b["nombre"], fmt(b["alt"]))), ("Modelos", "ECMWF · GFS · ICON-EU"), ("Actualización", "Cada 6 horas")]) +
+            '<section class="section"><div class="wrap"><div id="mt-mac" class="mt" data-id="%s"><p class="mt-cargando">Cargando previsión…</p></div></div></section>' % m["id"] +
+            '<section class="section alt"><div class="wrap split"><div class="stack" style="gap:0">' + meteo_metodo() + block("Preguntas frecuentes", faq_html(METEO_FAQ[:4])) +
+            '</div><div class="sticky" style="display:grid;gap:18px">' + lateral + '</div></div></section>')
+    ld = [crumbs_ld([("Inicio", "/"), ("Meteorología de montaña", "/meteo/"), (m["nombre"], path)]), faq_ld(METEO_FAQ[:4]),
+          {"@context": "https://schema.org", "@type": "Place", "name": c["nombre"], "geo": {"@type": "GeoCoordinates", "latitude": c["lat"], "longitude": c["lon"], "elevation": c["alt"]},
+           "containedInPlace": {"@type": "Place", "name": m["nombre"]}}]
+    nom = {"gredos-macizo-central": "Gredos y el Almanzor", "gredos-macizo-oriental": "Gredos Oriental"}.get(m["id"], m["nombre"])
+    title = "Tiempo en %s: previsión de montaña a 7 días" % nom
+    if len(title) > 64:
+        title = "Tiempo en %s: previsión de montaña" % nom
+    desc = _short("Previsión meteorológica de montaña en %s: tiempo en %s (%s m) y %s a 7 días, viento en cumbre, nieve, isocero y tormentas con ECMWF, GFS e ICON." % (m["nombre"], c["nombre"], fmt(c["alt"]), b["nombre"]), 158)
+    page(path, title, desc, body, "otr", ld, priority="0.6", scripts='<script src="/js/meteo.js" defer></script>')
+
 def build_service(s):
     path = "/%s/" % s["slug"]
     form = ('<form class="book" data-book data-presupuesto data-full data-title="%s" data-price="" id="reservar" novalidate><p class="eyebrow">Sin compromiso</p><h2>Pide información</h2>'
@@ -906,7 +993,7 @@ def main():
     cfg = os.path.join(OUT, "config.js")
     c = open(cfg, encoding="utf-8").read().replace('calendarioURL: ""', 'calendarioURL: "",\n  // Carpeta donde está publicada la web ("" si está en la raíz del dominio)\n  base: "%s"' % BASE)
     open(cfg, "w", encoding="utf-8").write(c)
-    build_home(); build_activities_index(); build_courses_index(); build_calendar(); build_rental(); build_about(); build_contact(); build_404(); build_calculator(); build_topografia()
+    build_home(); build_activities_index(); build_courses_index(); build_calendar(); build_rental(); build_about(); build_contact(); build_404(); build_calculator(); build_topografia(); build_meteo()
     for a in ACTIVITIES:
         build_activity(a)
     for a, o, p in OPTION_PAGES:
@@ -966,7 +1053,7 @@ def main():
         "# Dirección única: guiasadastra.com (sin www) lleva siempre a https://www.guiasadastra.com\n"
         "<IfModule mod_rewrite.c>\nRewriteEngine On\nRewriteCond %{HTTP_HOST} ^guiasadastra\\.com$ [NC]\nRewriteRule ^(.*)$ https://www.guiasadastra.com/$1 [R=301,L]\n</IfModule>\n"
         "# Las páginas se revisan siempre (así los cambios se ven al momento); fotos, CSS y JS sí se guardan en caché\n"
-        "<IfModule mod_headers.c>\n<FilesMatch \"\\.(html|xml|txt)$\">\nHeader set Cache-Control \"no-cache\"\n</FilesMatch>\n"
+        "<IfModule mod_headers.c>\n<FilesMatch \"\\.(html|xml|txt|json)$\">\nHeader set Cache-Control \"no-cache\"\n</FilesMatch>\n"
         "# Cabeceras de seguridad\nHeader set X-Content-Type-Options \"nosniff\"\nHeader set Referrer-Policy \"strict-origin-when-cross-origin\"\n"
         "Header set X-Frame-Options \"SAMEORIGIN\"\nHeader set Permissions-Policy \"camera=(), microphone=(), geolocation=()\"\n</IfModule>\n"
         "<Files \".ftp-deploy-sync-state.json\">\nRequire all denied\n</Files>\n"
@@ -993,6 +1080,7 @@ def main():
     L += ["- [Organización de eventos deportivos](%s/actividades/organizacion-eventos-deportivos/)" % D,
           "", "## Información útil", "- [Calendario de cursos y salidas con plazas libres](%s/calendario/)" % D,
           "- [Calculadora de tiempo de rutas (método MIDE) y perfil de GPX](%s/calculadora-rutas/)" % D,
+          "- [Meteorología de montaña](%s/meteo/): previsión a 7 días en cumbre y en el pueblo base para %d macizos (Gredos, Picos de Europa, Pirineos, Sierra Nevada…), calculada cada 6 horas con los modelos ECMWF, GFS e ICON-EU." % (D, len(MACIZOS)),
           "- [Boulder en Las Tuerces (Palencia)](%s/actividades/boulder-las-tuerces/) y [boulder en Salamanca, Ávila y Cáceres](%s/actividades/boulder-zona-centro-salamanca-caceres/): mapas de sectores y croquis." % (D, D),
           "- [Contacto](%s/contacto/) · [Sobre nosotros](%s/sobre-nosotros/)" % (D, D), ""]
     open(os.path.join(OUT, "llms.txt"), "w", encoding="utf-8").write("\n".join(L))

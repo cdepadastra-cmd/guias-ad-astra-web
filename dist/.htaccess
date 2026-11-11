@@ -7,7 +7,7 @@ RewriteRule ^(.*)$ https://www.guiasadastra.com/$1 [R=301,L]
 </IfModule>
 # Las páginas se revisan siempre (así los cambios se ven al momento); fotos, CSS y JS sí se guardan en caché
 <IfModule mod_headers.c>
-<FilesMatch "\.(html|xml|txt)$">
+<FilesMatch "\.(html|xml|txt|json)$">
 Header set Cache-Control "no-cache"
 </FilesMatch>
 # Cabeceras de seguridad
