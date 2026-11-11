@@ -72,7 +72,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .dd-menu a:hover{background:var(--card)}
 .chev{width:10px;height:10px}
 .menu-toggle{display:none;margin-left:auto;background:none;border:1px solid var(--line-2);color:var(--fg);border-radius:var(--r);padding:9px 11px;cursor:pointer}
-@media (max-width:1640px){.brand small{display:none}}
+@media (max-width:1860px){.brand small{display:none}}
 @media (max-width:1320px){
   .menu-toggle{display:block}
   .nav{display:none;position:absolute;top:100%;left:0;right:0;background:var(--bg-2);border-bottom:1px solid var(--line);flex-direction:column;align-items:stretch;padding:10px max(20px,env(safe-area-inset-right,0px)) 18px max(20px,env(safe-area-inset-left,0px));max-height:calc(100vh - 68px);overflow:auto}
