@@ -111,7 +111,7 @@
   /* ---------------------------------------------------------------- gráficas */
   function grafica(o) {
     // o: {t:[Date], series:[{v:[], c, w, dash, label}], barras:{v:[], c}, min, max, unidad, sel:[i0,i1], dias:[idx], alto}
-    var W = 1000, Hh = o.alto || 190, L = 44, R = 12, T = 12, B = 26, N = o.t.length;
+    var W = 1000, Hh = o.alto || 190, L = 44, R = 12, T = 16, B = 26, N = o.t.length;
     var x = function (i) { return L + (W - L - R) * (i / (N - 1)); };
     var vals = [];
     o.series.forEach(function (s) { s.v.forEach(function (v) { if (v != null) vals.push(v); }); });
@@ -152,7 +152,6 @@
       });
       if (d) s += '<path d="' + d + '" fill="none" stroke="' + se.c + '" stroke-width="' + (se.w || 2) + '"' + (se.dash ? ' stroke-dasharray="' + se.dash + '"' : "") + ' stroke-linejoin="round" stroke-linecap="round"' + (se.op ? ' opacity="' + se.op + '"' : "") + "/>";
     });
-    s += '<text x="' + (L - 6) + '" y="' + (T - 2) + '" text-anchor="end" class="mt-ax">' + esc(o.unidad || "") + "</text>";
     return s + "</svg>";
   }
   function leyenda(items) {
@@ -213,10 +212,10 @@
         var gI = grafica({ titulo: "Isocero", t: T, unidad: "m", min: 0, sel: rg, dias: marcas,
           series: mods.map(function (k) { return fino(k, doc.series[k].i0); }).concat([{ v: C.i0, c: "#6fb3e0", w: 2.4 }]), alto: 150 });
         var ley = leyenda(mods.map(function (k) { return { c: MOD[k].c, l: MOD[k].n }; }));
-        return '<div class="mt-g"><h3>Temperatura</h3>' + leyenda([{ c: "#f3e9df", l: "Cumbre " + doc.cumbre.alt.toLocaleString("es-ES") + " m" }, { c: "#b9a593", l: "Base " + doc.base.alt.toLocaleString("es-ES") + " m" }]) + '<div class="mt-scroll">' + gT + "</div></div>" +
-          '<div class="mt-g"><h3>Precipitación</h3><div class="mt-scroll">' + gP + "</div></div>" +
-          '<div class="mt-g"><h3>Viento en cumbre</h3><div class="mt-scroll">' + gW + "</div></div>" +
-          '<div class="mt-g"><h3>Isocero</h3><div class="mt-scroll">' + gI + "</div></div>" + '<p class="muted small">Líneas de colores: cada modelo por separado. ' + ley + "</p>";
+        return '<div class="mt-g"><h3>Temperatura <small>°C</small></h3>' + leyenda([{ c: "#f3e9df", l: "Cumbre " + doc.cumbre.alt.toLocaleString("es-ES") + " m" }, { c: "#b9a593", l: "Base " + doc.base.alt.toLocaleString("es-ES") + " m" }]) + '<div class="mt-scroll">' + gT + "</div></div>" +
+          '<div class="mt-g"><h3>Precipitación <small>mm cada 3 h</small></h3><div class="mt-scroll">' + gP + "</div></div>" +
+          '<div class="mt-g"><h3>Viento en cumbre <small>km/h</small></h3><div class="mt-scroll">' + gW + "</div></div>" +
+          '<div class="mt-g"><h3>Isocero <small>metros</small></h3><div class="mt-scroll">' + gI + "</div></div>" + '<p class="muted small">Líneas de colores: cada modelo por separado. ' + ley + "</p>";
       }
 
       function comparativa() {

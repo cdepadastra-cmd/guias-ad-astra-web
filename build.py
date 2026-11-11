@@ -48,8 +48,8 @@ NAV_ACT = [("Todas las actividades", "/actividades/"), ("Barranquismo", "/activi
            ("Alpinismo y ascensiones", "/actividades/?categoria=Ascensiones"), ("Espeleología", "/actividades/?categoria=Espeleología"), ("Escalada y boulder", "/actividades/?categoria=Escalada"),
            ("Senderismo", "/actividades/?categoria=Senderismo"), ("Travesías y viajes", "/actividades/?categoria=Viajes")]
 NAV_CUR = [("Todos los cursos", "/formacion-cursos/")] + [(c["disc_label"], "/actividades/%s/" % c["slug"]) for c in COURSES]
-NAV_OTR = [("Meteorología de montaña", "/meteo/"), ("Calculadora de rutas", "/calculadora-rutas/"), ("Topografía de barrancos", "/topografia-barrancos/"), ("Boulder en Las Tuerces", "/actividades/boulder-las-tuerces/"), ("Boulder en Zona Centro", "/actividades/boulder-zona-centro-salamanca-caceres/"),
-           ("Iniciativas de turismo rural", "/iniciativas-turismo-rural/"), ("Creación y mantenimiento de senderos", "/creacion-mantenimiento-senderos/"), ("Route setting", "/route-setting/"), ("Organización de eventos", "/actividades/organizacion-eventos-deportivos/"), ("Gredos Limpio", "/actividades/gredos-limpio/"),
+NAV_HER = [("Meteorología de montaña", "/meteo/"), ("Calculadora de rutas", "/calculadora-rutas/"), ("Topografía de barrancos", "/topografia-barrancos/"), ("Boulder en Las Tuerces", "/actividades/boulder-las-tuerces/"), ("Boulder en Zona Centro", "/actividades/boulder-zona-centro-salamanca-caceres/")]
+NAV_OTR = [("Iniciativas de turismo rural", "/iniciativas-turismo-rural/"), ("Creación y mantenimiento de senderos", "/creacion-mantenimiento-senderos/"), ("Route setting", "/route-setting/"), ("Organización de eventos", "/actividades/organizacion-eventos-deportivos/"), ("Gredos Limpio", "/actividades/gredos-limpio/"),
            ("Oeste de Gredos", "/actividades/comarca-natural-oeste-de-gredos/"), ("Vía Verde Ruta de la Plata", "/actividades/via-verde-ruta-de-la-plata/")]
 
 def dd(label, items, key, active):
@@ -64,7 +64,7 @@ def header(active=""):
             '<button class="menu-toggle" aria-expanded="false" aria-controls="nav" aria-label="Abrir menú">☰</button>'
             '<nav class="nav" id="nav" aria-label="Principal">' + a("/", "Inicio", "inicio") +
             dd("Actividades", NAV_ACT, "act", active) + dd("Formación–Cursos", NAV_CUR, "cur", active) +
-            a("/actividades/alquiler-material-montana/", "Alquiler", "alq") + a("/calendario/", "Calendario", "cal") + dd("Otros", NAV_OTR, "otr", active) +
+            a("/actividades/alquiler-material-montana/", "Alquiler", "alq") + a("/calendario/", "Calendario", "cal") + dd("Herramientas", NAV_HER, "her", active) + dd("Otros", NAV_OTR, "otr", active) +
             a("/sobre-nosotros/", "Nosotros", "nos") + a("/contacto/", "Contacto", "con") +
             '<a class="btn btn-primary" href="/calendario/">Reservar</a></nav></div></header>')
 
@@ -350,7 +350,7 @@ def build_boulder(a, path):
           {"@context": "https://schema.org", "@type": ["TouristAttraction", "Place"], "name": a["h1"], "description": a["seo_desc"], "image": a["img"], "url": url(path),
            "touristType": "Escaladores", "hasMap": a["map_link"], "address": {"@type": "PostalAddress", "addressRegion": a["zona"], "addressCountry": "ES"}},
           {"@context": "https://schema.org", **ORG}]
-    page(path, a["seo_title"], a["seo_desc"], body, "act", ld, "article", a["img"], "0.8")
+    page(path, a["seo_title"], a["seo_desc"], body, "her", ld, "article", a["img"], "0.8")
 
 def build_eventos(a, path):
     body = (hero("Otros", e(a["title"]), e(a["short"]), a["img"], [("Inicio", "/"), ("Otros", "")], '<a class="btn btn-wa" href="https://wa.me/%s?text=%s" target="_blank" rel="noopener">%s Pide información</a>' % (SITE["wa"], e("Hola, quiero información sobre organización de eventos deportivos."), WA_SVG)) +
@@ -743,7 +743,7 @@ def build_calculator():
     scripts = '<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="" defer></script><script src="/js/calculadora.js" defer></script>'
     page(path, "Calculadora MIDE de tiempo de rutas y perfil GPX | Ad Astra",
          "Calcula gratis la duración de una ruta con el método MIDE según distancia y desnivel. Sube tu GPX y descarga el perfil de altitud, el mapa y la ficha de la ruta.",
-         body, "otr", ld, priority="0.8", head=head, scripts=scripts)
+         body, "her", ld, priority="0.8", head=head, scripts=scripts)
 
 
 def build_topografia():
@@ -786,7 +786,7 @@ def build_topografia():
            "offers": {"@type": "Offer", "price": 0, "priceCurrency": "EUR"}, "provider": {"@id": D + "/#empresa"}}]
     page(path, "Topografía de barrancos: crea el croquis de rápeles | Ad Astra",
          "Crea gratis la topografía de un barranco: añade rápeles (R), destrepes (D) y tramos andando, calcula la cuerda necesaria y descarga el croquis en PNG o JPG.",
-         body, "otr", ld, priority="0.7", scripts='<script src="/js/topografia.js" defer></script>')
+         body, "her", ld, priority="0.7", scripts='<script src="/js/topografia.js" defer></script>')
 
 # ---------------------------------------------------------------- meteorología de montaña
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "meteo"))
@@ -842,7 +842,7 @@ def build_meteo():
     ld = [crumbs_ld([("Inicio", "/"), ("Meteorología de montaña", path)]), faq_ld(METEO_FAQ)]
     page(path, "Meteorología de montaña: previsión en cumbre a 7 días | Ad Astra",
          "Previsión del tiempo en montaña a 7 días para %d macizos: temperatura y viento en cumbre, nieve, isocero y tormentas. Modelos ECMWF, GFS e ICON, cada 6 h." % len(MACIZOS),
-         body, "otr", ld, priority="0.8", scripts='<script src="/js/meteo.js" defer></script>')
+         body, "her", ld, priority="0.8", scripts='<script src="/js/meteo.js" defer></script>')
     for m in MACIZOS:
         build_meteo_macizo(m)
 
@@ -873,7 +873,7 @@ def build_meteo_macizo(m):
     if len(title) > 64:
         title = "Tiempo en %s: previsión de montaña" % nom
     desc = _short("Previsión meteorológica de montaña en %s: tiempo en %s (%s m) y %s a 7 días, viento en cumbre, nieve, isocero y tormentas con ECMWF, GFS e ICON." % (m["nombre"], c["nombre"], fmt(c["alt"]), b["nombre"]), 158)
-    page(path, title, desc, body, "otr", ld, priority="0.6", scripts='<script src="/js/meteo.js" defer></script>')
+    page(path, title, desc, body, "her", ld, priority="0.6", scripts='<script src="/js/meteo.js" defer></script>')
 
 def build_service(s):
     path = "/%s/" % s["slug"]
