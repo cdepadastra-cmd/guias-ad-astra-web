@@ -35,6 +35,34 @@
     });
   }
 
+  /* ---------------------------------------------------------------- sol (algoritmo de la NOAA, precisión ~1 min) */
+  function solDia(iso, lat, lon) {
+    var p = iso.split("-"), rad = Math.PI / 180;
+    var jd = Date.UTC(+p[0], +p[1] - 1, +p[2], 12) / 864e5 + 2440587.5;
+    var n = Math.round(jd - 2451545 + 0.0008), js = n - lon / 360;
+    var M = (357.5291 + 0.98560028 * js) % 360;
+    var C = 1.9148 * Math.sin(M * rad) + 0.02 * Math.sin(2 * M * rad) + 0.0003 * Math.sin(3 * M * rad);
+    var lam = (M + C + 180 + 102.9372) % 360;
+    var jt = 2451545 + js + 0.0053 * Math.sin(M * rad) - 0.0069 * Math.sin(2 * lam * rad);
+    var dec = Math.asin(Math.sin(lam * rad) * Math.sin(23.44 * rad));
+    var cw = (Math.sin(-0.833 * rad) - Math.sin(lat * rad) * Math.sin(dec)) / (Math.cos(lat * rad) * Math.cos(dec));
+    if (cw < -1 || cw > 1) return null;
+    var w = Math.acos(cw) / rad / 360, aJ = function (j) { return new Date((j - 2440587.5) * 864e5); };
+    return { sale: aJ(jt - w), pone: aJ(jt + w) };
+  }
+
+  /* ---------------------------------------------------------------- avisos de AEMET */
+  var fAviso = new Intl.DateTimeFormat("es-ES", { timeZone: TZ, weekday: "short", day: "numeric", hour: "2-digit", minute: "2-digit", hour12: false });
+  function avisoEnDia(a, iso) {
+    var p = iso.split("-"), d0 = Date.UTC(+p[0], +p[1] - 1, +p[2]) - 2 * 36e5, d1 = d0 + 864e5 + 2 * 36e5;
+    var i = Date.parse(a.inicio), f = Date.parse(a.fin);
+    return (isNaN(i) || i < d1) && (isNaN(f) || f > d0);
+  }
+  function fenomeno(a) { return (a.evento || a.titulo || "Aviso").replace(/^Aviso (amarillo|naranja|rojo) (de|por)\s*/i, ""); }
+  function chipAemet(a, largo) {
+    return '<span class="mt-aemet mt-' + a.nivel + '" title="' + esc(a.titulo || a.evento) + '">Aviso ' + a.nivel + " AEMET" + (largo ? ": " + esc(fenomeno(a)) : "") + "</span>";
+  }
+
   /* ---------------------------------------------------------------- iconos */
   var SOL = '<circle cx="24" cy="24" r="8" fill="#f2c14e"/><g stroke="#f2c14e" stroke-width="2.6" stroke-linecap="round"><path d="M24 6v5M24 37v5M6 24h5M37 24h5M11.3 11.3l3.5 3.5M33.2 33.2l3.5 3.5M11.3 36.7l3.5-3.5M33.2 14.8l3.5-3.5"/></g>';
   var LUNA = '<path d="M30 9a14 14 0 1 0 9 22A12 12 0 0 1 30 9z" fill="#e8dcc0"/>';
@@ -101,7 +129,8 @@
           dias.forEach(function (d) {
             h += '<div><b>' + diaCorto(d.fecha) + "</b>" + icono(d.icono) + '<span class="mt-t"><i>' + n(d.tc_max, "°") + "</i> " + n(d.tc_min, "°") + '</span><span class="mt-s">' + (d.pr ? dec(d.pr) + " mm" : "&nbsp;") + '</span><span class="mt-s">' + n(d.wc_max) + " km/h</span></div>";
           });
-          h += "</div>" + (av.length ? '<div class="mt-avisos">' + av.map(function (a) { return '<span class="mt-aviso">' + esc(a) + "</span>"; }).join("") + "</div>" : "") + "</a>";
+          var ae = (m.aemet || []).filter(function (a) { return Date.parse(a.inicio) < Date.now() + 3 * 864e5; });
+          h += "</div>" + (ae.length ? '<div class="mt-avisos">' + chipAemet(ae[0], true) + (ae.length > 1 ? '<span class="mt-s">+' + (ae.length - 1) + "</span>" : "") + "</div>" : "") + (av.length ? '<div class="mt-avisos">' + av.map(function (a) { return '<span class="mt-aviso">' + esc(a) + "</span>"; }).join("") + "</div>" : "") + "</a>";
         });
         h += "</div>";
       });
@@ -183,13 +212,22 @@
       function tira() {
         return '<div class="mt-dias" role="tablist">' + dias.map(function (d, k) {
           return '<button type="button" role="tab" class="mt-dia' + (k === sel ? " on" : "") + '" data-k="' + k + '" aria-selected="' + (k === sel) + '"><b>' + diaCorto(d.fecha) + "</b><small>" + fFecha.format(fechaLocal(d.fecha)) + "</small>" + icono(d.icono) +
-            '<span class="mt-t" title="Cumbre: máxima / mínima"><i>' + n(d.tc_max, "°") + "</i> " + n(d.tc_min, "°") + '</span><span class="mt-s">' + (d.pr ? dec(d.pr) + " mm" : "Sin precip.") + '</span><span class="mt-s">' + flecha(d.wc_dir) + n(d.wc_max) + " km/h</span>" + (d.avisos && d.avisos.length ? '<span class="mt-pt" title="' + esc(d.avisos.join(" · ")) + '">!</span>' : "") + "</button>";
+            '<span class="mt-t" title="Cumbre: máxima / mínima"><i>' + n(d.tc_max, "°") + "</i> " + n(d.tc_min, "°") + '</span><span class="mt-s">' + (d.pr ? dec(d.pr) + " mm" : "Sin precip.") + '</span><span class="mt-s">' + flecha(d.wc_dir) + n(d.wc_max) + " km/h</span>" + (d.avisos && d.avisos.length ? '<span class="mt-pt" title="' + esc(d.avisos.join(" · ")) + '">!</span>' : "") + aemetPunto(d.fecha) + "</button>";
         }).join("") + "</div>";
       }
 
+      function aemetPunto(iso) {
+        var a = (doc.aemet || []).filter(function (x) { return avisoEnDia(x, iso); });
+        return a.length ? '<span class="mt-pa mt-' + a[0].nivel + '" title="Aviso ' + a[0].nivel + ' de AEMET"></span>' : "";
+      }
       function detalleDia() {
         var d = dias[sel], ix = idxDia[d.fecha] || [];
-        var h = '<div class="mt-res"><div><h3>' + cap(fLargo.format(fechaLocal(d.fecha))) + "</h3>" + (d.horas < 24 ? '<p class="muted small">Desde ahora hasta medianoche.</p>' : "") + avisos(d) + "</div>";
+        var sl = solDia(d.fecha, doc.base.lat, doc.base.lon);
+        var aeDia = (doc.aemet || []).filter(function (x) { return avisoEnDia(x, d.fecha); });
+        var h = '<div class="mt-res"><div><h3>' + cap(fLargo.format(fechaLocal(d.fecha))) + "</h3>" +
+          (sl ? '<p class="mt-sol">Amanece ' + fHora.format(sl.sale) + " · Anochece " + fHora.format(sl.pone) + "</p>" : "") +
+          (d.horas < 24 ? '<p class="muted small">Desde ahora hasta medianoche.</p>' : "") +
+          (aeDia.length ? '<div class="mt-avisos">' + aeDia.map(function (a) { return chipAemet(a, true); }).join("") + "</div>" : "") + avisos(d) + "</div>";
         h += '<dl class="mt-kv">' +
           "<div><dt>Cumbre (" + esc(doc.cumbre.nombre) + ")</dt><dd>" + n(d.tc_min, "°") + " / " + n(d.tc_max, "°C") + "</dd></div>" +
           "<div><dt>Base (" + esc(doc.base.nombre) + ")</dt><dd>" + n(d.tv_min, "°") + " / " + n(d.tv_max, "°C") + "</dd></div>" +
@@ -252,7 +290,11 @@
       }
 
       function pintar() {
-        el.innerHTML = '<p class="mt-act">' + actualizado(doc) + "</p>" + tira() +
+        var ae = doc.aemet || [];
+        var bloque = ae.length ? '<div class="mt-aemet-box"><h3>Avisos de AEMET</h3><ul>' + ae.map(function (a) {
+          return "<li>" + chipAemet(a, false) + " <b>" + esc(fenomeno(a)) + "</b> · " + esc(a.zona) + ' <span class="muted">(' + (a.inicio ? fAviso.format(new Date(a.inicio)) : "") + " – " + (a.fin ? fAviso.format(new Date(a.fin)) : "") + ")</span></li>";
+        }).join("") + '</ul><p class="muted small">Avisos oficiales de la Agencia Estatal de Meteorología para la zona del pueblo base o de la cumbre. Consulta el detalle en <a href="https://www.aemet.es/es/eltiempo/prediccion/avisos" target="_blank" rel="noopener">aemet.es</a>.</p></div>' : "";
+        el.innerHTML = '<p class="mt-act">' + actualizado(doc) + "</p>" + bloque + tira() +
           '<div class="mt-sec">' + detalleDia() + "</div>" +
           '<div class="mt-sec"><h2>Evolución a 7 días</h2>' + graficas() + "</div>" +
           '<div class="mt-sec"><h2>Comparación de modelos</h2>' + comparativa() + "</div>";

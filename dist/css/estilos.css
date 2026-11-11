@@ -521,3 +521,10 @@ details.adv[open] summary{margin-bottom:14px}
 .mt-modo{display:inline-flex;border:1px solid var(--line-2);border-radius:var(--r);overflow:hidden;justify-self:start}
 .mt-modo button{background:none;border:0;color:var(--muted);font:600 .8rem/1 var(--label);letter-spacing:.12em;text-transform:uppercase;padding:10px 14px;cursor:pointer}
 .mt-modo button.on{background:var(--gold);color:#1a0d05}
+.mt-sol{font-size:.85rem;color:var(--muted);margin:2px 0 8px}
+.mt-aemet{display:inline-block;font:600 .72rem/1.2 var(--label);letter-spacing:.08em;text-transform:uppercase;border-radius:3px;padding:4px 7px;margin:4px 6px 0 0;color:#1a0d05}
+.mt-amarillo{background:#f5d33b}.mt-naranja{background:#f08a24}.mt-rojo{background:#d93a2b;color:#fff}
+.mt-pa{position:absolute;top:8px;left:8px;width:10px;height:10px;border-radius:50%}
+.mt-aemet-box{border:1px solid var(--line-2);border-left:4px solid #f08a24;border-radius:var(--r);background:var(--card);padding:16px 18px}
+.mt-aemet-box h3{font-size:1.3rem;margin-bottom:6px}
+.mt-aemet-box ul{list-style:none;margin:0 0 8px;padding:0;display:grid;gap:6px}

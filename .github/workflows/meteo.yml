@@ -28,8 +28,23 @@ jobs:
       - name: Instalar librerías (ecCodes para leer GRIB)
         run: pip install --quiet eccodes ecmwf-opendata numpy requests && python -m eccodes selfcheck
 
+      # ECMWF solo publica pasadas nuevas a las 00 y 12 UTC: si ya se procesó, se reutiliza (menos minutos de GitHub)
+      - name: Recuperar caché de ECMWF
+        uses: actions/cache/restore@v4
+        with:
+          path: meteo-cache
+          key: meteo-cache-${{ github.run_id }}
+          restore-keys: meteo-cache-
+
       - name: Descargar modelos y calcular la previsión
         run: python3 meteo/procesar.py --out meteo-out
+
+      - name: Guardar caché de ECMWF
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: meteo-cache
+          key: meteo-cache-${{ github.run_id }}
 
       - name: Subir datos por FTP
         id: ftp1

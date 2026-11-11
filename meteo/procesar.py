@@ -16,7 +16,8 @@ Para cada macizo se calculan dos puntos:
   925, 850, 700, 600 y 500 hPa, a la altitud real de la cumbre.
 También: precipitación cada 3 h, nubosidad, isocero, cota de nieve y CAPE (energía para tormentas).
 """
-import argparse, bz2, concurrent.futures as cf, datetime as dt, json, math, os, sys, tempfile, time, traceback
+import argparse, bz2, concurrent.futures as cf, datetime as dt, json, math, os, pickle, sys, tempfile, time, traceback
+import xml.etree.ElementTree as ET
 from zoneinfo import ZoneInfo
 
 import numpy as np
@@ -33,6 +34,7 @@ HORAS = 168           # 7 días
 PASO = 3              # horas (a partir de las primeras 72 h)
 HORARIO = 72          # las primeras 72 h van hora a hora
 LEVELS = [925, 850, 700, 600, 500]
+CACHE = os.environ.get("METEO_CACHE", "meteo-cache")
 UA = {"User-Agent": "guiasadastra-meteo/1.0 (+https://www.guiasadastra.com/meteo/)"}
 
 S = requests.Session()
@@ -148,6 +150,16 @@ def ecmwf():
         raise RuntimeError("ECMWF no disponible")
     m.run = run.replace(tzinfo=UTC)
     log("ECMWF: pasada %s (fuente %s)" % (m.run.strftime("%Y-%m-%d %HZ"), src))
+    cache = os.path.join(CACHE, "ecmwf-%s.pkl" % m.run.strftime("%Y%m%d%H"))
+    if os.path.exists(cache):
+        try:
+            c_ = pickle.load(open(cache, "rb"))
+            if c_.get("npts") == NP:
+                m.campos, m.acc = c_["campos"], c_["acc"]
+                log("ECMWF: pasada ya procesada, uso la caché (no se descarga de nuevo)")
+                return m
+        except Exception as ex:
+            log("ECMWF: caché ilegible (%s)" % ex)
     tmp = tempfile.mkdtemp()
 
     def bajar(nombre, req):
@@ -192,6 +204,14 @@ def ecmwf():
             elif sn == "mucape":
                 m.put("cape", t, v)
     log("ECMWF: inventario", sorted(inv.items()))
+    try:
+        os.makedirs(CACHE, exist_ok=True)
+        for f in os.listdir(CACHE):
+            if f.startswith("ecmwf-"):
+                os.remove(os.path.join(CACHE, f))
+        pickle.dump({"npts": NP, "campos": m.campos, "acc": m.acc}, open(cache, "wb"))
+    except Exception as ex:
+        log("ECMWF: no se pudo guardar la caché (%s)" % ex)
     m.acc.setdefault(m.run, np.zeros(NP))
     for (sn, lev) in [k for k in m.campos if isinstance(k, tuple)]:
         if sn == "gh":
@@ -676,6 +696,96 @@ def dias(eje, modelos_series, mac_id):
     return out, cons
 
 
+# ------------------------------------------------------------------ avisos oficiales de AEMET (vía MeteoAlarm, formato CAP)
+METEOALARM = "https://feeds.meteoalarm.org/feeds/meteoalarm-legacy-atom-spain"
+NIVEL = {"yellow": "amarillo", "orange": "naranja", "red": "rojo"}
+
+
+def _dentro(lat, lon, poli):
+    dentro = False
+    for (a1, o1), (a2, o2) in zip(poli, poli[1:] + poli[:1]):
+        if (a1 > lat) != (a2 > lat) and lon < (o2 - o1) * (lat - a1) / (a2 - a1) + o1:
+            dentro = not dentro
+    return dentro
+
+
+def avisos_oficiales():
+    """Avisos de AEMET en vigor o previstos: {macizo_id: [aviso, ...]}. Nunca hace fallar el proceso."""
+    out = {m["id"]: [] for m in MACIZOS}
+    try:
+        feed = S.get(METEOALARM, timeout=60)
+        feed.raise_for_status()
+        root = ET.fromstring(feed.content)
+        enlaces = []
+        for e in root.iter("{http://www.w3.org/2005/Atom}entry"):
+            for l in e.iter("{http://www.w3.org/2005/Atom}link"):
+                if "cap" in (l.get("type") or "") and l.get("href"):
+                    enlaces.append(l.get("href"))
+        log("Avisos: %d avisos en el feed de España" % len(enlaces))
+
+        def leer(url):
+            try:
+                x = ET.fromstring(S.get(url, timeout=60).content)
+            except Exception:
+                return None
+            ns = {"c": x.tag.split("}")[0].strip("{")} if x.tag.startswith("{") else {}
+            q = (lambda t: "c:" + t) if ns else (lambda t: t)
+            infos = x.findall(q("info"), ns)
+            info = next((i for i in infos if (i.findtext(q("language"), "", ns) or "").lower().startswith("es")), infos[0] if infos else None)
+            if info is None:
+                return None
+            nivel = None
+            for prm in info.findall(q("parameter"), ns):
+                if (prm.findtext(q("valueName"), "", ns) or "").lower() == "awareness_level":
+                    v = (prm.findtext(q("value"), "", ns) or "").split(";")
+                    nivel = NIVEL.get(v[1].strip().lower()) if len(v) > 1 else None
+            if not nivel:
+                nivel = {"Moderate": "amarillo", "Severe": "naranja", "Extreme": "rojo"}.get(info.findtext(q("severity"), "", ns))
+            if not nivel:
+                return None
+            areas = []
+            for ar in info.findall(q("area"), ns):
+                polis = []
+                for pg in ar.findall(q("polygon"), ns):
+                    pts = [tuple(map(float, p.split(","))) for p in (pg.text or "").split() if "," in p]
+                    if len(pts) >= 3:
+                        polis.append(pts)
+                areas.append((ar.findtext(q("areaDesc"), "", ns), polis))
+            return {"nivel": nivel, "evento": info.findtext(q("event"), "", ns), "titulo": info.findtext(q("headline"), "", ns),
+                    "texto": (info.findtext(q("description"), "", ns) or "")[:400], "inicio": info.findtext(q("onset"), "", ns) or info.findtext(q("effective"), "", ns),
+                    "fin": info.findtext(q("expires"), "", ns), "areas": areas}
+
+        with cf.ThreadPoolExecutor(8) as ex:
+            caps = [c for c in ex.map(leer, enlaces) if c]
+        ahora = dt.datetime.now(UTC)
+        sin_poligono = 0
+        for c in caps:
+            try:
+                fin = dt.datetime.fromisoformat(c["fin"].replace("Z", "+00:00"))
+                if fin < ahora:
+                    continue
+            except Exception:
+                pass
+            for zona, polis in c["areas"]:
+                if not polis:
+                    sin_poligono += 1
+                    continue
+                for m in MACIZOS:
+                    if any(_dentro(p["lat"], p["lon"], pl) for p in (m["base"], m["cumbre"]) for pl in polis):
+                        av = {"nivel": c["nivel"], "evento": c["evento"], "titulo": c["titulo"], "zona": zona,
+                              "inicio": c["inicio"], "fin": c["fin"], "texto": c["texto"]}
+                        if av not in out[m["id"]]:
+                            out[m["id"]].append(av)
+        orden = {"rojo": 0, "naranja": 1, "amarillo": 2}
+        for k in out:
+            out[k].sort(key=lambda a: (orden[a["nivel"]], a["inicio"] or ""))
+        log("Avisos: %d CAP leídos, %d zonas sin polígono, macizos con aviso: %s" % (
+            len(caps), sin_poligono, ", ".join("%s(%d)" % (k, len(v)) for k, v in out.items() if v) or "ninguno"))
+    except Exception as ex:
+        log("Avisos: no disponibles (%s)" % ex)
+    return out
+
+
 # ------------------------------------------------------------------ principal
 def main():
     ap = argparse.ArgumentParser()
@@ -721,15 +831,17 @@ def main():
     info = {n: {"nombre": m.etiqueta, "resol": m.resol, "pasada": m.run.strftime("%Y-%m-%dT%H:%MZ")} for n, m in modelos.items()}
     gen = now.strftime("%Y-%m-%dT%H:%MZ")
     resumen = {"generado": gen, "modelos": info, "regiones": REGIONES, "macizos": []}
+    oficiales = avisos_oficiales()
     for mac in MACIZOS:
         ds, cons = dias(eje, series, mac["id"])
         doc = {"id": mac["id"], "nombre": mac["nombre"], "region": mac["region"], "base": mac["base"], "cumbre": mac["cumbre"],
                "generado": gen, "modelos": info, "t0": eje[0].strftime("%Y-%m-%dT%H:%MZ"), "paso": PASO, "horario": HORARIO,
                "h": [int((t - eje[0]).total_seconds() // 3600) for t in eje],
-               "series": {n: s[mac["id"]] for n, s in series.items()}, "consenso": cons, "dias": ds}
+               "series": {n: s[mac["id"]] for n, s in series.items()}, "consenso": cons, "dias": ds, "aemet": oficiales.get(mac["id"], [])}
         json.dump(doc, open(os.path.join(a.out, mac["id"] + ".json"), "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
         resumen["macizos"].append({"id": mac["id"], "nombre": mac["nombre"], "corto": mac["corto"], "region": mac["region"],
-                                   "base": mac["base"], "cumbre": mac["cumbre"], "dias": ds})
+                                   "base": mac["base"], "cumbre": mac["cumbre"], "dias": ds,
+                                   "aemet": [{k: a[k] for k in ("nivel", "evento", "inicio", "fin")} for a in oficiales.get(mac["id"], [])]})
         d0 = ds[0] if ds else {}
         log("%-28s hoy: cumbre %s/%s °C, viento %s km/h, precip %s mm, isocero %s m, %s" % (
             mac["id"], d0.get("tc_min"), d0.get("tc_max"), d0.get("wc_max"), d0.get("pr"), d0.get("i0_min"), ",".join(d0.get("avisos", []))))
