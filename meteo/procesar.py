@@ -681,7 +681,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", default="meteo-out")
     ap.add_argument("--modelos", default="ecmwf,gfs,icon")
-    ap.add_argument("--limite", type=int, default=22, help="minutos máximos de descarga")
+    ap.add_argument("--limite", type=int, default=30, help="minutos máximos de descarga")
     a = ap.parse_args()
     os.makedirs(a.out, exist_ok=True)
     funcs = {"ecmwf": ecmwf, "gfs": gfs, "icon": icon}
