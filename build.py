@@ -805,6 +805,8 @@ METEO_ACT = {
     "ayllon": ["barranquismo-madrid-segovia", "espeleologia-segovia"],
     "picos-de-europa": ["ascensiones-montana", "vias-ferratas-leon"],
     "montanas-de-leon": ["barranquismo-cueva-valporquero-sima-de-perlas", "vias-ferratas-leon", "barranquismo-leon"],
+    "macizo-de-ubina": ["vias-ferratas-leon", "barranquismo-leon", "ascensiones-montana"],
+    "pirineo-navarro": ["ascensiones-montana"],
     "montana-palentina": ["barranquismo-palencia", "boulder-las-tuerces", "ascensiones-montana"],
     "ordesa-monte-perdido": ["ascensiones-montana", "cursos-alpinismo"],
     "aneto-posets": ["ascensiones-montana", "cursos-alpinismo"],
@@ -822,9 +824,9 @@ METEO_FAQ = [
 
 def meteo_metodo():
     return block("Cómo se hace esta previsión", prose([
-        "Cada 6 horas un proceso automático descarga la última pasada de tres modelos meteorológicos globales y regionales: <strong>ECMWF IFS</strong> (Centro Europeo de Previsión a Plazo Medio, el de referencia en Europa), <strong>GFS</strong> (NOAA, Estados Unidos) e <strong>ICON-EU</strong> (DWD, servicio meteorológico alemán, con más resolución pero solo a 5 días).",
-        "Para cada macizo calculamos dos puntos. En la <strong>cumbre</strong>, la temperatura y el viento se interpolan en la vertical entre el suelo del modelo y los niveles de 925, 850, 700, 600 y 500 hPa, a la altitud real de la cima: así se evita el error típico de las previsiones por municipio, que dan el tiempo del pueblo. En la <strong>base</strong>, la temperatura a 2 metros se corrige a la altitud del pueblo.",
-        "La previsión principal es la <strong>mediana</strong> de los modelos disponibles. En las gráficas y en la comparación verás cada modelo por separado: cuanto más se parezcan, más fiable es la previsión.",
+        "Cada 6 horas un proceso automático descarga la última pasada de tres modelos meteorológicos globales y regionales: ECMWF IFS (Centro Europeo de Previsión a Plazo Medio, el de referencia en Europa), GFS (NOAA, Estados Unidos) e ICON-EU (DWD, servicio meteorológico alemán, con más resolución pero solo a 5 días).",
+        "Para cada macizo calculamos dos puntos. En la cumbre, la temperatura y el viento se interpolan en la vertical entre el suelo del modelo y los niveles de 925, 850, 700, 600 y 500 hPa, a la altitud real de la cima: así se evita el error típico de las previsiones por municipio, que dan el tiempo del pueblo. En la base, la temperatura a 2 metros se corrige a la altitud del pueblo.",
+        "La previsión principal es la mediana de los modelos disponibles. En las gráficas y en la comparación verás cada modelo por separado: cuanto más se parezcan, más fiable es la previsión.",
         "Datos: ECMWF (CC BY 4.0), NOAA/NCEP GFS (dominio público) y DWD ICON-EU (CC BY 4.0). Previsión elaborada por Guías Ad Astra. Es orientativa: consulta también los avisos de AEMET."]))
 
 def build_meteo():

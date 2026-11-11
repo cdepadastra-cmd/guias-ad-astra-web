@@ -30,7 +30,8 @@ G = 9.80665
 UTC = dt.timezone.utc
 TZ = ZoneInfo("Europe/Madrid")
 HORAS = 168           # 7 días
-PASO = 3              # horas
+PASO = 3              # horas (a partir de las primeras 72 h)
+HORARIO = 72          # las primeras 72 h van hora a hora
 LEVELS = [925, 850, 700, 600, 500]
 UA = {"User-Agent": "guiasadastra-meteo/1.0 (+https://www.guiasadastra.com/meteo/)"}
 
@@ -216,9 +217,22 @@ NOMADS_Q = ("&var_TMP=on&var_HGT=on&var_UGRD=on&var_VGRD=on&var_GUST=on&var_APCP
             + "".join("&lev_%d_mb=on" % l for l in LEVELS) + "&subregion=&leftlon=-10&rightlon=4&toplat=45&bottomlat=35")
 
 
+_NOMADS_LOCK = __import__("threading").Lock()
+_NOMADS_LAST = [0.0]
+
+
+def _nomads_turno():
+    with _NOMADS_LOCK:
+        espera = _NOMADS_LAST[0] + 0.65 - time.time()
+        if espera > 0:
+            time.sleep(espera)
+        _NOMADS_LAST[0] = time.time()
+
+
 def gfs_nomads(m, steps):
     """Descarga recortada a España desde NOMADS; identifica cada campo por sus metadatos GRIB."""
     def paso(st):
+        _nomads_turno()
         url = "%s?dir=%%2Fgfs.%s%%2F%02d%%2Fatmos&file=gfs.t%02dz.pgrb2.0p25.f%03d%s" % (NOMADS, m.run.strftime("%Y%m%d"), m.run.hour, m.run.hour, st, NOMADS_Q)
         for intento in range(4):
             rr = S.get(url, timeout=90)
@@ -271,7 +285,7 @@ def gfs():
     if not m.run:
         raise RuntimeError("GFS no disponible")
     log("GFS: pasada %s" % m.run.strftime("%Y-%m-%d %HZ"))
-    steps = list(range(0, HORAS + 1, PASO))
+    steps = list(range(0, HORARIO + 4)) + list(range(HORARIO + 6, HORAS + 1, PASO))
 
     def paso(st):
         url = "%s/gfs.%s/%02d/atmos/gfs.t%02dz.pgrb2.0p25.f%03d" % (GFS_BUCKET, m.run.strftime("%Y%m%d"), m.run.hour, m.run.hour, st)
@@ -365,7 +379,7 @@ def icon():
         raise RuntimeError("ICON-EU no disponible")
     rs, hh = m.run.strftime("%Y%m%d%H"), m.run.hour
     log("ICON-EU: pasada %s" % m.run.strftime("%Y-%m-%d %HZ"))
-    steps = list(range(0, ultimo + 1, PASO))
+    steps = list(range(0, HORARIO + 4)) + list(range(HORARIO + 6, ultimo + 1, PASO))
     trabajos = []
     for var in ICON_SINGLE:
         for st in steps:
@@ -504,7 +518,7 @@ def series_modelo(m, eje, orog_proxy):
     for k, mac in enumerate(MACIZOS):
         b, c = 2 * k, 2 * k + 1
         s = {x: [] for x in ("tv", "tc", "wc", "dc", "wv", "gv", "pr", "cc", "i0", "sl", "cp")}
-        for t in eje:
+        for ii, t in enumerate(eje):
             g = lambda var, p: (lambda a: None if a is None else float(a[p]))(en_tiempo(m.campos.get(var), t))
             t2b, t2c = g("t2", b), g("t2", c)
             hb = float(orog_v[b]) if orog_v is not None else None
@@ -532,7 +546,8 @@ def series_modelo(m, eje, orog_proxy):
             gb = g("gust", b)
             gv = None if gb is None else gb * 3.6
             # precipitación de las 3 h anteriores (media de base y cumbre)
-            a1, a0 = en_tiempo(m.acc, t, 6), en_tiempo(m.acc, t - dt.timedelta(hours=PASO), 6)
+            tprev = eje[ii - 1] if ii else t - dt.timedelta(hours=1)
+            a1, a0 = en_tiempo(m.acc, t, 6), en_tiempo(m.acc, tprev, 6)
             pr = None
             if a1 is not None and a0 is not None:
                 pr = max(0.0, float((a1[b] - a0[b] + a1[c] - a0[c]) / 2))
@@ -592,12 +607,13 @@ def dias(eje, modelos_series, mac_id):
         nd = 1 if x in ("tv", "tc", "pr") else 0
         cons[x] = [None if v is None else (round(v, 1) if nd else (int(round(v / 10.0) * 10) if x in ("i0", "sl") else int(round(v)))) for v in cons[x]]
     grupos = {}
+    dur = [(eje[i] - eje[i - 1]).total_seconds() / 3600 if i else 1.0 for i in range(n)]
     for i, t in enumerate(eje):
-        d = (t - dt.timedelta(minutes=90)).astimezone(TZ).date()
+        d = (t - dt.timedelta(hours=dur[i] / 2)).astimezone(TZ).date()
         grupos.setdefault(d, []).append(i)
     out = []
     for d, idx in sorted(grupos.items())[:8]:
-        if len(idx) < 3:
+        if sum(dur[i] for i in idx) < 6:
             continue
         val = lambda x: [cons[x][i] for i in idx if cons[x][i] is not None]
         prs = val("pr")
@@ -607,7 +623,7 @@ def dias(eje, modelos_series, mac_id):
         # tormenta: algún modelo con CAPE >= 500 J/kg y precipitación >= 0,3 mm en el mismo tramo
         votos = 0
         for m in ms:
-            if any((ms[m]["cp"][i] or 0) >= 500 and (ms[m]["pr"][i] or 0) >= 0.3 for i in idx):
+            if any((ms[m]["cp"][i] or 0) >= 500 and (ms[m]["pr"][i] or 0) >= 0.1 * dur[i] for i in idx):
                 votos += 1
         diurnas = [cons["cc"][i] for i in idx if cons["cc"][i] is not None and 8 <= eje[i].astimezone(TZ).hour <= 20]
         nubes = sum(diurnas) / len(diurnas) if diurnas else None
@@ -648,7 +664,7 @@ def dias(eje, modelos_series, mac_id):
         if pr is not None and pr >= 30:
             avisos.append("Lluvia abundante")
         out.append({
-            "fecha": d.isoformat(), "horas": len(idx) * PASO,
+            "fecha": d.isoformat(), "horas": int(sum(dur[i] for i in idx)),
             "icono": icono(pr, nieve_c >= max(0.3, 0.5 * (pr or 0)), votos >= 2 or (votos == 1 and len(ms) == 1), nubes),
             "tv_min": r(min(tv), 0) if tv else None, "tv_max": r(max(tv), 0) if tv else None,
             "tc_min": r(min(tc), 0) if tc else None, "tc_max": r(max(tc), 0) if tc else None,
@@ -692,8 +708,12 @@ def main():
     if not modelos:
         sys.exit("Ningún modelo disponible: no se publica nada.")
     now = dt.datetime.now(UTC)
-    t0 = now.replace(minute=0, second=0, microsecond=0, hour=now.hour - now.hour % PASO)
-    eje = [t0 + dt.timedelta(hours=PASO * i) for i in range(HORAS // PASO + 1)]
+    t0 = now.replace(minute=0, second=0, microsecond=0)
+    eje = [t0 + dt.timedelta(hours=h) for h in range(HORARIO + 1)]
+    while eje[-1].hour % PASO:
+        eje.append(eje[-1] + dt.timedelta(hours=1))
+    while eje[-1] + dt.timedelta(hours=PASO) <= t0 + dt.timedelta(hours=HORAS):
+        eje.append(eje[-1] + dt.timedelta(hours=PASO))
     orog_proxy = None
     if "gfs" in modelos and modelos["gfs"].campos.get("orog"):
         orog_proxy = list(modelos["gfs"].campos["orog"].values())[0]
@@ -704,7 +724,8 @@ def main():
     for mac in MACIZOS:
         ds, cons = dias(eje, series, mac["id"])
         doc = {"id": mac["id"], "nombre": mac["nombre"], "region": mac["region"], "base": mac["base"], "cumbre": mac["cumbre"],
-               "generado": gen, "modelos": info, "t0": eje[0].strftime("%Y-%m-%dT%H:%MZ"), "paso": PASO,
+               "generado": gen, "modelos": info, "t0": eje[0].strftime("%Y-%m-%dT%H:%MZ"), "paso": PASO, "horario": HORARIO,
+               "h": [int((t - eje[0]).total_seconds() // 3600) for t in eje],
                "series": {n: s[mac["id"]] for n, s in series.items()}, "consenso": cons, "dias": ds}
         json.dump(doc, open(os.path.join(a.out, mac["id"] + ".json"), "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
         resumen["macizos"].append({"id": mac["id"], "nombre": mac["nombre"], "corto": mac["corto"], "region": mac["region"],

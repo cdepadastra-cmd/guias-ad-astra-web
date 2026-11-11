@@ -70,6 +70,6 @@
 ## Información útil
 - [Calendario de cursos y salidas con plazas libres](https://www.guiasadastra.com/calendario/)
 - [Calculadora de tiempo de rutas (método MIDE) y perfil de GPX](https://www.guiasadastra.com/calculadora-rutas/)
-- [Meteorología de montaña](https://www.guiasadastra.com/meteo/): previsión a 7 días en cumbre y en el pueblo base para 20 macizos (Gredos, Picos de Europa, Pirineos, Sierra Nevada…), calculada cada 6 horas con los modelos ECMWF, GFS e ICON-EU.
+- [Meteorología de montaña](https://www.guiasadastra.com/meteo/): previsión a 7 días en cumbre y en el pueblo base para 22 macizos (Gredos, Picos de Europa, Pirineos, Sierra Nevada…), calculada cada 6 horas con los modelos ECMWF, GFS e ICON-EU.
 - [Boulder en Las Tuerces (Palencia)](https://www.guiasadastra.com/actividades/boulder-las-tuerces/) y [boulder en Salamanca, Ávila y Cáceres](https://www.guiasadastra.com/actividades/boulder-zona-centro-salamanca-caceres/): mapas de sectores y croquis.
 - [Contacto](https://www.guiasadastra.com/contacto/) · [Sobre nosotros](https://www.guiasadastra.com/sobre-nosotros/)

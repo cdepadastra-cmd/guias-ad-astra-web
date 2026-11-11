@@ -58,8 +58,10 @@
     var t = { sol: noche ? "Despejado" : "Soleado", "poco-nuboso": "Poco nuboso", nuboso: "Nuboso", cubierto: "Cubierto", chubascos: "Chubascos", lluvia: "Lluvia", "nieve-debil": "Nieve débil", nieve: "Nieve", tormenta: "Tormenta" };
     return '<svg class="mt-ico" viewBox="0 0 48 48" role="img" aria-label="' + (t[k] || k) + '"><title>' + (t[k] || k) + "</title>" + (g[k] || g.nuboso) + "</svg>";
   }
-  function iconoTramo(c, i) {
-    var pr = c.pr[i], tc = c.tc[i], cp = c.cp[i], cc = c.cc[i];
+  function iconoTramo(c, i, horas, prSum) {
+    horas = horas || 3;
+    var pr = prSum != null ? prSum : c.pr[i], tc = c.tc[i], cp = c.cp[i], cc = c.cc[i];
+    if (pr != null) pr = pr * 3 / horas;  // umbrales pensados para 3 h
     if (cp != null && cp >= 500 && pr != null && pr >= 0.3) return "tormenta";
     var nieve = tc != null && tc <= 0.5;
     if (pr != null && pr >= 1) return nieve ? "nieve" : "lluvia";
@@ -112,7 +114,8 @@
   function grafica(o) {
     // o: {t:[Date], series:[{v:[], c, w, dash, label}], barras:{v:[], c}, min, max, unidad, sel:[i0,i1], dias:[idx], alto}
     var W = 1000, Hh = o.alto || 190, L = 44, R = 12, T = 16, B = 26, N = o.t.length;
-    var x = function (i) { return L + (W - L - R) * (i / (N - 1)); };
+    var H = o.h || o.t.map(function (_, i) { return i; }), h0 = H[0], hN = H[N - 1];
+    var x = function (i) { return L + (W - L - R) * ((H[i] - h0) / (hN - h0)); };
     var vals = [];
     o.series.forEach(function (s) { s.v.forEach(function (v) { if (v != null) vals.push(v); }); });
     if (o.barras) o.barras.v.forEach(function (v) { if (v != null) vals.push(v); });
@@ -137,9 +140,9 @@
       s += '<text x="' + (x(d.i) + 4) + '" y="' + (Hh - 8) + '" class="mt-ax">' + esc(d.l) + "</text>";
     });
     if (o.barras) {
-      var bw = (W - L - R) / (N - 1) * 0.7;
       o.barras.v.forEach(function (v, i) {
         if (!v) return;
+        var bw = Math.max(1.5, (x(i) - x(i ? i - 1 : 0)) * 0.8) || 2;
         s += '<rect x="' + (x(i) - bw) + '" y="' + y(v) + '" width="' + bw + '" height="' + Math.max(0, y(mn) - y(v)) + '" fill="' + o.barras.c + '" rx="1"/>';
       });
     }
@@ -158,16 +161,21 @@
     return '<div class="mt-ley">' + items.map(function (it) { return '<span><i style="background:' + it.c + (it.dash ? ";height:2px;border-top:2px dashed " + it.c + ";background:none" : "") + '"></i>' + esc(it.l) + "</span>"; }).join("") + "</div>";
   }
 
+  function C0(N, P) { var a = []; for (var i = 0; i < N; i++) a.push(i * P); return a; }
+
   /* ---------------------------------------------------------------- ficha de macizo */
   function ficha(el) {
     var id = el.getAttribute("data-id");
     json(DATOS + id + ".json").then(function (doc) {
       var t0 = new Date(doc.t0.replace("Z", ":00Z")), N = doc.consenso.tc.length, P = doc.paso;
-      var T = []; for (var i = 0; i < N; i++) T.push(new Date(t0.getTime() + i * P * 36e5));
+      var HH = doc.h || C0(N, P);
+      var T = HH.map(function (h) { return new Date(t0.getTime() + h * 36e5); });
+      var DUR = HH.map(function (h, i) { return i ? h - HH[i - 1] : 1; });
+      var modo = "1h";
       var C = doc.consenso, mods = Object.keys(doc.series);
       // índices de cada día local
       var dias = doc.dias, idxDia = {};
-      T.forEach(function (t, i) { var k = fYmd.format(new Date(t.getTime() - 90 * 6e4)); (idxDia[k] = idxDia[k] || []).push(i); });
+      T.forEach(function (t, i) { var k = fYmd.format(new Date(t.getTime() - DUR[i] * 18e5)); (idxDia[k] = idxDia[k] || []).push(i); });
       var marcas = [];
       dias.forEach(function (d) { var ix = idxDia[d.fecha]; if (ix) marcas.push({ i: ix[0], l: diaCorto(d.fecha) + " " + fechaLocal(d.fecha).getUTCDate() }); });
       var sel = 0;
@@ -191,29 +199,38 @@
           "<div><dt>Isocero</dt><dd>" + (d.i0_min == null ? "–" : (d.i0_min === d.i0_max ? d.i0_min.toLocaleString("es-ES") : d.i0_min.toLocaleString("es-ES") + "–" + d.i0_max.toLocaleString("es-ES")) + " m") + "</dd></div>" +
           "<div><dt>Tormentas</dt><dd>" + (d.tormenta >= 2 ? "Probables" : d.tormenta === 1 ? "Posibles" : "No") + "</dd></div>" +
           "<div><dt>Acuerdo entre modelos</dt><dd>" + (d.acuerdo ? cap(d.acuerdo) : "–") + "</dd></div></dl></div>";
+        var hayHoras = ix.some(function (i) { return DUR[i] === 1; });
+        var filas = ix, m3 = !hayHoras || modo === "3h";
+        if (m3) filas = ix.filter(function (i) { return T[i].getUTCHours() % 3 === 0; });
+        if (hayHoras) h += '<div class="mt-modo" role="group" aria-label="Detalle de la tabla"><button type="button" data-modo="1h" class="' + (modo === "1h" ? "on" : "") + '">Cada hora</button><button type="button" data-modo="3h" class="' + (modo === "3h" ? "on" : "") + '">Cada 3 horas</button></div>';
         h += '<div class="mt-scroll"><table class="mt-tab"><thead><tr><th>Hora</th><th>Cielo</th><th>Cumbre</th><th>Base</th><th>Viento cumbre</th><th>Racha base</th><th>Precip.</th><th>Nubes</th><th>Isocero</th><th>Cota nieve</th></tr></thead><tbody>';
-        ix.forEach(function (i) {
+        filas.forEach(function (i) {
           var noche = +fH.format(T[i]) < 8 || +fH.format(T[i]) >= 20;
-          h += "<tr><td>" + fHora.format(T[i]) + "</td><td>" + icono(iconoTramo(C, i), noche) + "</td><td><b>" + n(C.tc[i], "°") + "</b></td><td>" + n(C.tv[i], "°") + "</td><td>" + flecha(C.dc[i]) + n(C.wc[i]) + " km/h " + dir(C.dc[i]) + "</td><td>" + n(C.gv[i]) + " km/h</td><td>" + (C.pr[i] ? dec(C.pr[i]) + " mm" : "–") + "</td><td>" + n(C.cc[i], "%") + "</td><td>" + (C.i0[i] == null ? "–" : C.i0[i].toLocaleString("es-ES") + " m") + "</td><td>" + (C.sl[i] == null || !C.pr[i] ? "–" : C.sl[i].toLocaleString("es-ES") + " m") + "</td></tr>";
+          var horas = DUR[i], pr = C.pr[i];
+          if (m3 && DUR[i] === 1) {  // suma de las 3 horas anteriores
+            pr = null; horas = 0;
+            for (var j = i; j >= 0 && horas < 3; j--) { if (C.pr[j] != null) pr = (pr || 0) + C.pr[j]; horas += DUR[j]; }
+          }
+          h += "<tr><td>" + fHora.format(T[i]) + "</td><td>" + icono(iconoTramo(C, i, horas, pr), noche) + "</td><td><b>" + n(C.tc[i], "°") + "</b></td><td>" + n(C.tv[i], "°") + "</td><td>" + flecha(C.dc[i]) + n(C.wc[i]) + " km/h " + dir(C.dc[i]) + "</td><td>" + n(C.gv[i]) + " km/h</td><td>" + (pr ? dec(pr) + " mm" : "–") + "</td><td>" + n(C.cc[i], "%") + "</td><td>" + (C.i0[i] == null ? "–" : C.i0[i].toLocaleString("es-ES") + " m") + "</td><td>" + (C.sl[i] == null || !pr ? "–" : C.sl[i].toLocaleString("es-ES") + " m") + "</td></tr>";
         });
-        h += "</tbody></table></div><p class=\"muted small\">Cada fila resume las 3 horas anteriores en la precipitación y es el valor a esa hora en el resto. Mediana de los modelos.</p>";
+        h += "</tbody></table></div><p class=\"muted small\">La precipitación de cada fila es la caída desde la fila anterior (" + (m3 ? "3 horas" : "1 hora") + "); el resto, el valor a esa hora. Mediana de los modelos. Las primeras 72 horas van hora a hora (ECMWF solo da datos cada 3 horas: entre medias se interpola).</p>";
         return h;
       }
 
       function graficas() {
         var d = dias[sel], ix = idxDia[d.fecha] || [0], rg = [ix[0], ix[ix.length - 1]];
         var fino = function (k, v) { return { v: v, c: MOD[k].c, w: 1.2, op: 0.55, dash: "3 3" }; };
-        var gT = grafica({ titulo: "Temperatura", t: T, unidad: "°C", cero: true, sel: rg, dias: marcas,
+        var gT = grafica({ titulo: "Temperatura", t: T, h: HH, unidad: "°C", cero: true, sel: rg, dias: marcas,
           series: mods.map(function (k) { return fino(k, doc.series[k].tc); }).concat([{ v: C.tv, c: "#b9a593", w: 2 }, { v: C.tc, c: "#f3e9df", w: 2.6 }]) });
-        var gP = grafica({ titulo: "Precipitación", t: T, unidad: "mm/3h", min: 0, max: 2, sel: rg, dias: marcas, barras: { v: C.pr, c: "#3f84b8" },
+        var gP = grafica({ titulo: "Precipitación", t: T, h: HH, unidad: "mm", min: 0, max: 2, sel: rg, dias: marcas, barras: { v: C.pr, c: "#3f84b8" },
           series: mods.map(function (k) { return { v: doc.series[k].pr, c: MOD[k].c, w: 1.3, op: 0.7 }; }), alto: 150 });
-        var gW = grafica({ titulo: "Viento en cumbre", t: T, unidad: "km/h", min: 0, sel: rg, dias: marcas,
+        var gW = grafica({ titulo: "Viento en cumbre", t: T, h: HH, unidad: "km/h", min: 0, sel: rg, dias: marcas,
           series: mods.map(function (k) { return fino(k, doc.series[k].wc); }).concat([{ v: C.wc, c: "#f3e9df", w: 2.6 }]), alto: 160 });
-        var gI = grafica({ titulo: "Isocero", t: T, unidad: "m", min: 0, sel: rg, dias: marcas,
+        var gI = grafica({ titulo: "Isocero", t: T, h: HH, unidad: "m", min: 0, sel: rg, dias: marcas,
           series: mods.map(function (k) { return fino(k, doc.series[k].i0); }).concat([{ v: C.i0, c: "#6fb3e0", w: 2.4 }]), alto: 150 });
         var ley = leyenda(mods.map(function (k) { return { c: MOD[k].c, l: MOD[k].n }; }));
         return '<div class="mt-g"><h3>Temperatura <small>°C</small></h3>' + leyenda([{ c: "#f3e9df", l: "Cumbre " + doc.cumbre.alt.toLocaleString("es-ES") + " m" }, { c: "#b9a593", l: "Base " + doc.base.alt.toLocaleString("es-ES") + " m" }]) + '<div class="mt-scroll">' + gT + "</div></div>" +
-          '<div class="mt-g"><h3>Precipitación <small>mm cada 3 h</small></h3><div class="mt-scroll">' + gP + "</div></div>" +
+          '<div class="mt-g"><h3>Precipitación <small>mm por hora (cada 3 h desde el 4.º día)</small></h3><div class="mt-scroll">' + gP + "</div></div>" +
           '<div class="mt-g"><h3>Viento en cumbre <small>km/h</small></h3><div class="mt-scroll">' + gW + "</div></div>" +
           '<div class="mt-g"><h3>Isocero <small>metros</small></h3><div class="mt-scroll">' + gI + "</div></div>" + '<p class="muted small">Líneas de colores: cada modelo por separado. ' + ley + "</p>";
       }
@@ -239,6 +256,9 @@
           '<div class="mt-sec">' + detalleDia() + "</div>" +
           '<div class="mt-sec"><h2>Evolución a 7 días</h2>' + graficas() + "</div>" +
           '<div class="mt-sec"><h2>Comparación de modelos</h2>' + comparativa() + "</div>";
+        el.querySelectorAll("[data-modo]").forEach(function (b) {
+          b.addEventListener("click", function () { modo = b.getAttribute("data-modo"); var y = window.scrollY; pintar(); window.scrollTo(0, y); });
+        });
         el.querySelectorAll(".mt-dia").forEach(function (b) {
           b.addEventListener("click", function () { sel = +b.getAttribute("data-k"); var y = window.scrollY; pintar(); window.scrollTo(0, y); });
         });
