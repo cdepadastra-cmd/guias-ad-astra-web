@@ -73,7 +73,6 @@ RedirectMatch 301 ^/escalada-palencia\.html$ https://www.guiasadastra.com/activi
 RedirectMatch 301 ^/escalada-salamanca\.html$ https://www.guiasadastra.com/actividades/boulder-zona-centro-salamanca-caceres/
 RedirectMatch 301 ^/escalada-segovia\.html$ https://www.guiasadastra.com/actividades/curso-iniciacion-escalada-en-roca/
 RedirectMatch 301 ^/escalada-zamora\.html$ https://www.guiasadastra.com/actividades/curso-iniciacion-escalada-en-roca/
-RedirectMatch 301 ^/espeleologia-leon\.html$ https://www.guiasadastra.com/actividades/espeleologia-leon/
 RedirectMatch 301 ^/espeleologia-segovia\.html$ https://www.guiasadastra.com/actividades/espeleologia-segovia/
 RedirectMatch 301 ^/espeleologia-valladolid\.html$ https://www.guiasadastra.com/actividades/espeleologia-segovia/
 RedirectMatch 301 ^/formacion-cursos\.html$ https://www.guiasadastra.com/formacion-cursos/
@@ -101,7 +100,10 @@ RedirectMatch 301 ^/reservas-vias-ferratas\.html$ https://www.guiasadastra.com/c
 RedirectMatch 301 ^/route-setting\.html$ https://www.guiasadastra.com/route-setting/
 RedirectMatch 301 ^/senderismo-avila-gredo\.html$ https://www.guiasadastra.com/actividades/senderismo-avila-gredos/
 RedirectMatch 301 ^/senderismo-avila-gredos\.html$ https://www.guiasadastra.com/actividades/senderismo-avila-gredos/
+RedirectMatch 301 ^/senderismo-montana-palentina\.html$ https://www.guiasadastra.com/actividades/senderismo-montana-palentina/
 RedirectMatch 301 ^/senderismo-salamanca-bejar-alberca\.html$ https://www.guiasadastra.com/actividades/senderismo-avila-gredos/
+RedirectMatch 301 ^/senderismo-salamanca\.html$ https://www.guiasadastra.com/actividades/senderismo-salamanca/
+RedirectMatch 301 ^/senderismo-valladolid\.html$ https://www.guiasadastra.com/actividades/senderismo-valladolid/
 RedirectMatch 301 ^/senderismo\.html$ https://www.guiasadastra.com/actividades/senderismo-avila-gredos/
 RedirectMatch 301 ^/servicio-routte-setting-equipador\.html$ https://www.guiasadastra.com/route-setting/
 RedirectMatch 301 ^/sobre-nosotros\.html$ https://www.guiasadastra.com/sobre-nosotros/
@@ -111,5 +113,7 @@ RedirectMatch 301 ^/via-ferrata-salamanca\.html$ https://www.guiasadastra.com/ac
 RedirectMatch 301 ^/via-verde-ruta-de-la-plata\.html$ https://www.guiasadastra.com/actividades/via-verde-ruta-de-la-plata/
 RedirectMatch 301 ^/vias-ferratas-leon\.html$ https://www.guiasadastra.com/actividades/vias-ferratas-leon/
 RedirectMatch 301 ^/vias-ferratas-valladolid\.html$ https://www.guiasadastra.com/actividades/via-ferrata-burgos/
+# Actividades retiradas
+RedirectMatch 301 ^/actividades/espeleologia-leon(/.*)?$ https://www.guiasadastra.com/actividades/barranquismo-cueva-valporquero-sima-de-perlas/
 # La versión de prueba /NUEVA ya no existe: lleva a la misma página en la web principal
 RedirectMatch 301 ^/NUEVA(/.*)?$ https://www.guiasadastra.com$1

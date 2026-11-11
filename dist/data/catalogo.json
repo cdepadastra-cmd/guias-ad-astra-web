@@ -104,13 +104,6 @@
   "img": "https://www.guiasadastra.com/media/aeb9b4e2-f247-4249-9fbd-5f31ae3575fd/vias-ferratas-leon.webp",
   "desc": "Vías ferratas guiadas en León: Valle de Arbás, Cistierna (puente de 40 m) y Sabero (puente de 100 m y paso por cueva). Material y seguro incluidos."
  },
- "espeleologia-leon": {
-  "titulo": "Espeleología en León",
-  "tipo": "Actividad",
-  "precio": 40,
-  "img": "https://www.guiasadastra.com/media/7a848726-9459-4eb2-a042-b1e78bb77b41/espeleologia-leon.webp",
-  "desc": "Espeleología guiada en León, cerca de Valladolid: Cueva del Burro (Vegacervera) y Cueva del Arenal (Valdeteja). Mono, casco y frontal incluidos."
- },
  "espeleologia-segovia": {
   "titulo": "Espeleología en Segovia",
   "tipo": "Actividad",
@@ -131,6 +124,27 @@
   "precio": 15,
   "img": "https://www.guiasadastra.com/media/afe67801-cf88-4cef-a3ac-e25e4e971634/senderismo-avila-gredos.webp",
   "desc": "Rutas de senderismo guiadas por la Sierra de Gredos: Laguna Grande, Pico Morezón, Cinco Lagunas y Los Galayos. Tres niveles desde 15€. Guía y seguro incluidos."
+ },
+ "senderismo-salamanca": {
+  "titulo": "Senderismo en Salamanca: Arribes del Duero y Sierra de Candelario",
+  "tipo": "Actividad",
+  "precio": 15,
+  "img": "https://www.guiasadastra.com/media/afe67801-cf88-4cef-a3ac-e25e4e971634/senderismo-avila-gredos.webp",
+  "desc": "Rutas de senderismo guiadas en Salamanca: cañones y cascadas de Arribes del Duero y la Sierra de Candelario y Béjar. Tres niveles desde 15€. Guía y seguro incluidos."
+ },
+ "senderismo-montana-palentina": {
+  "titulo": "Senderismo en la Montaña Palentina",
+  "tipo": "Actividad",
+  "precio": 15,
+  "img": "https://www.guiasadastra.com/media/afe67801-cf88-4cef-a3ac-e25e4e971634/senderismo-avila-gredos.webp",
+  "desc": "Rutas de senderismo guiadas en la Montaña Palentina: Pozo Curavacas, Las Tuerces, cascada de Mazobre y Fuentes Carrionas. Tres niveles desde 15€. Guía y seguro incluidos."
+ },
+ "senderismo-valladolid": {
+  "titulo": "Senderismo en Valladolid",
+  "tipo": "Actividad",
+  "precio": 15,
+  "img": "https://www.guiasadastra.com/media/afe67801-cf88-4cef-a3ac-e25e4e971634/senderismo-avila-gredos.webp",
+  "desc": "Rutas de senderismo guiadas en Valladolid: Canal de Castilla, Senda del Duero, Montes Torozos y riberas del Pisuerga. Tres niveles desde 15€. Guía y seguro incluidos."
  },
  "monte-olimpo": {
   "titulo": "Trekking del Monte Olimpo",

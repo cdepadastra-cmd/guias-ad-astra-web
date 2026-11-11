@@ -17,10 +17,12 @@
 - [Vía ferrata de La Muela (Salamanca)](https://www.guiasadastra.com/actividades/via-ferrata-salamanca/): Vía ferrata del Cancho de la Muela, en la Sierra de Béjar y Candelario. Desde 35 €.
 - [Vías ferratas Burgos](https://www.guiasadastra.com/actividades/via-ferrata-burgos/): Ferratas junto al Cañón del Río Lobos, cerca de Palencia y Valladolid. Desde 40 €.
 - [Vías ferratas León](https://www.guiasadastra.com/actividades/vias-ferratas-leon/): Ferratas de Arbás, Cistierna y Sabero, con puentes de hasta 100 m. Desde 45 €.
-- [Espeleología en León](https://www.guiasadastra.com/actividades/espeleologia-leon/): Déjate seducir por las profundidades de la tierra. Desde 40 €.
 - [Espeleología en Segovia](https://www.guiasadastra.com/actividades/espeleologia-segovia/): Déjate seducir por las profundidades de la tierra. Desde 35 €.
 - [Ascensiones](https://www.guiasadastra.com/actividades/ascensiones-montana/): Nuestras mejores ascensiones por España. Propónnos la que te apetezca.
 - [Senderismo en Ávila, Gredos](https://www.guiasadastra.com/actividades/senderismo-avila-gredos/): Las mejores rutas por la Sierra de Gredos al alcance de todos. Desde 15 €.
+- [Senderismo en Salamanca: Arribes del Duero y Sierra de Candelario](https://www.guiasadastra.com/actividades/senderismo-salamanca/): Rutas guiadas por los cañones de Arribes del Duero y las gargantas de la Sierra de Candelario. Desde 15 €.
+- [Senderismo en la Montaña Palentina](https://www.guiasadastra.com/actividades/senderismo-montana-palentina/): Rutas guiadas por Fuentes Carrionas, Las Tuerces y las cascadas de la Montaña Palentina. Desde 15 €.
+- [Senderismo en Valladolid](https://www.guiasadastra.com/actividades/senderismo-valladolid/): Rutas guiadas por el Canal de Castilla, la Senda del Duero y los Montes Torozos. Desde 15 €.
 - [Trekking del Monte Olimpo](https://www.guiasadastra.com/actividades/monte-olimpo/): La montaña de los dioses, Grecia. Viaje guiado de 6 días con ascensión al Mitikas. Desde 793 €.
 - [Trekking de Carros de Foc](https://www.guiasadastra.com/actividades/trekking-carros-de-foc/): Uno de los trekkings más bonitos del Pirineo: 9 refugios en 6 días por Aigüestortes. Desde 743 €.
 - [Boulder en Las Tuerces](https://www.guiasadastra.com/actividades/boulder-las-tuerces/): Mapa de sectores, croquis y accesos para hacer boulder en Las Tuerces (Palencia).
@@ -42,8 +44,6 @@
 - [Vía ferrata del Valle de Arbás](https://www.guiasadastra.com/actividades/vias-ferratas-leon/via-ferrata-del-valle-de-arbas/): Arbás (León), 2 horas, 45 €.
 - [Vía ferrata de Cistierna](https://www.guiasadastra.com/actividades/vias-ferratas-leon/via-ferrata-de-cistierna/): Cistierna (León), 2 horas, 50 €.
 - [Vía ferrata de Sabero](https://www.guiasadastra.com/actividades/vias-ferratas-leon/via-ferrata-de-sabero/): Sabero (León), 3 horas, 60 €.
-- [Cueva del Burro](https://www.guiasadastra.com/actividades/espeleologia-leon/cueva-del-burro/): Vegacervera (León), 1h30, 40 €.
-- [Cueva del Arenal](https://www.guiasadastra.com/actividades/espeleologia-leon/cueva-del-arenal/): Valdeteja (León), 1h30, 40 €.
 - [Cueva de la Cantera](https://www.guiasadastra.com/actividades/espeleologia-segovia/cueva-de-la-cantera/): Fuentidueña (Segovia), 1h30, 35 €.
 - [Cueva de las Mesillas](https://www.guiasadastra.com/actividades/espeleologia-segovia/cueva-de-las-mesillas/): Casla (Segovia), 1h30, 35 €.
 - [Ascensión al Canchal de la Ceja y el Calvitero](https://www.guiasadastra.com/actividades/comarca-natural-oeste-de-gredos/ascension-al-canchal-de-la-ceja-y-el-calvitero/): Candelario (Salamanca), 4-6 horas, 45 €.

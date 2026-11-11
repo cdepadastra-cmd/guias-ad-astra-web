@@ -589,7 +589,7 @@ def build_home():
             '<section class="section alt"><div class="wrap"><div class="section-head"><p class="eyebrow">Qué hacemos</p><h2>Empresa de turismo activo en Gredos, Salamanca, Ávila y Valladolid</h2></div><div class="prose" style="max-width:none;columns:2 340px;column-gap:48px">'
             '<p><strong>Guías Ad Astra</strong> es una empresa de turismo activo con guías de montaña titulados. Trabajamos desde Fuentes de Béjar, en la Sierra de Béjar y el oeste de Gredos, y desde Valladolid, y guiamos en Ávila, Salamanca, Cáceres, León, Palencia, Segovia, Burgos y Madrid.</p>'
             '<p>Hacemos <a href="/actividades/barranquismo-avila/">barranquismo en Gredos</a> (Arbillas, Río Mayor, Solana), <a href="/actividades/barranquismo-en-caceres/">barrancos del Valle del Jerte</a> como <a href="/actividades/barranquismo-en-caceres/barranco-de-los-papuos/">los Papúos</a>, la <a href="/actividades/barranquismo-cueva-valporquero-sima-de-perlas/">cueva de Valporquero</a> y barrancos en Salamanca, León, Palencia y Segovia.</p>'
-            '<p>Guiamos <a href="/actividades/via-ferrata-salamanca/">la vía ferrata de La Muela en la Sierra de Béjar</a> y <a href="/actividades/vias-ferratas-leon/">vías ferratas en León</a> y <a href="/actividades/via-ferrata-burgos/">Burgos</a>, <a href="/actividades/senderismo-avila-gredos/">rutas de senderismo por Gredos</a>, <a href="/actividades/ascensiones-montana/">ascensiones al Almanzor y otras cumbres</a> y <a href="/actividades/espeleologia-leon/">espeleología</a>.</p>'
+            '<p>Guiamos <a href="/actividades/via-ferrata-salamanca/">la vía ferrata de La Muela en la Sierra de Béjar</a> y <a href="/actividades/vias-ferratas-leon/">vías ferratas en León</a> y <a href="/actividades/via-ferrata-burgos/">Burgos</a>, <a href="/actividades/senderismo-avila-gredos/">rutas de senderismo por Gredos</a>, <a href="/actividades/senderismo-salamanca/">Salamanca</a>, <a href="/actividades/senderismo-montana-palentina/">la Montaña Palentina</a> y <a href="/actividades/senderismo-valladolid/">Valladolid</a>, <a href="/actividades/ascensiones-montana/">ascensiones al Almanzor y otras cumbres</a> y <a href="/actividades/espeleologia-segovia/">espeleología</a>.</p>'
             '<p>Damos <a href="/formacion-cursos/">cursos de barranquismo, escalada, alpinismo, autorrescate y ARVA</a>, con fechas y plazas en el <a href="/calendario/">calendario</a>, y tenemos <a href="/actividades/alquiler-material-montana/">alquiler de material de montaña en Valladolid y Béjar</a>: neoprenos, equipos de vía ferrata, piolets y crampones.</p>'
             '</div></div></section>'
             '<section class="cta-band"><div class="wrap"><h2>Tu próxima cumbre te espera</h2><a class="btn" href="/calendario/">Ver fechas y reservar</a></div></section>')
@@ -796,7 +796,7 @@ METEO_IMG = img("0c5376bd-2231-4c62-b798-6f0139e73cd7/cursos-alpinismo.webp")
 METEO_ACT = {
     "gredos-macizo-central": ["senderismo-avila-gredos", "ascensiones-montana", "barranquismo-avila"],
     "gredos-macizo-oriental": ["barranquismo-avila", "senderismo-avila-gredos"],
-    "sierra-de-candelario": ["via-ferrata-salamanca", "barranquismo-salamanca", "comarca-natural-oeste-de-gredos"],
+    "sierra-de-candelario": ["via-ferrata-salamanca", "senderismo-salamanca", "barranquismo-salamanca", "comarca-natural-oeste-de-gredos"],
     "la-vera": ["barranquismo-en-caceres", "barranquismo-avila"],
     "valle-del-tietar": ["barranquismo-avila", "ascensiones-montana"],
     "sierra-de-francia": ["boulder-zona-centro-salamanca-caceres", "barranquismo-salamanca"],
@@ -807,7 +807,7 @@ METEO_ACT = {
     "montanas-de-leon": ["barranquismo-cueva-valporquero-sima-de-perlas", "vias-ferratas-leon", "barranquismo-leon"],
     "macizo-de-ubina": ["vias-ferratas-leon", "barranquismo-leon", "ascensiones-montana"],
     "pirineo-navarro": ["ascensiones-montana"],
-    "montana-palentina": ["barranquismo-palencia", "boulder-las-tuerces", "ascensiones-montana"],
+    "montana-palentina": ["senderismo-montana-palentina", "barranquismo-palencia", "boulder-las-tuerces", "ascensiones-montana"],
     "ordesa-monte-perdido": ["ascensiones-montana", "cursos-alpinismo"],
     "aneto-posets": ["ascensiones-montana", "cursos-alpinismo"],
     "aiguestortes-carros-de-foc": ["trekking-carros-de-foc", "ascensiones-montana"],
@@ -1061,6 +1061,7 @@ def main():
         "<Files \".ftp-deploy-sync-state.json\">\nRequire all denied\n</Files>\n"
         "# Direcciones de la web antigua -> nuevas (301)\n" + "".join(
         "RedirectMatch 301 ^/%s$ %s%s\n" % (k.replace(".", "\\."), D, v) for k, v in sorted(old.items())) +
+        "# Actividades retiradas\nRedirectMatch 301 ^/actividades/espeleologia-leon(/.*)?$ %s/actividades/barranquismo-cueva-valporquero-sima-de-perlas/\n" % D +
         "# La versión de prueba /NUEVA ya no existe: lleva a la misma página en la web principal\nRedirectMatch 301 ^/NUEVA(/.*)?$ %s$1\n" % D)
     # Resumen para buscadores con IA (ChatGPT, Perplexity, Gemini, Claude…): https://llmstxt.org
     L = ["# Guías Ad Astra · Montaña y Aventura", "",
