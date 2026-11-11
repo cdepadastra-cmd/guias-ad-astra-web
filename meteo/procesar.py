@@ -150,7 +150,7 @@ def ecmwf():
     tmp = tempfile.mkdtemp()
 
     def bajar(nombre, req):
-        cl = Client(source=src, model="ifs", resol="0p25")
+        cl = c  # un solo cliente: Azure limita los permisos de acceso (SAS) si se piden muchos
         path = os.path.join(tmp, nombre + ".grib2")
         for st in (steps, steps[1:]):  # algunas variables (rachas, precipitación) no tienen paso 0
             try:
@@ -164,8 +164,7 @@ def ecmwf():
     pedidos = {p: {"param": p, "levtype": "sfc"} for p in ("2t", "10u", "10v", "tp", "10fg", "tcc", "mucape")}
     for p, levs in (("t", [925, 850, 700, 500]), ("gh", [925, 850, 700, 500]), ("u", [850, 700, 500]), ("v", [850, 700, 500])):
         pedidos["pl_" + p] = {"param": p, "levtype": "pl", "levelist": levs}
-    with cf.ThreadPoolExecutor(3) as ex:
-        rutas = dict(zip(pedidos, ex.map(lambda kv: bajar(*kv), pedidos.items())))
+    rutas = {k: bajar(k, v) for k, v in pedidos.items()}
     inv = {}
     for nombre, path in rutas.items():
         if not path:
@@ -582,6 +581,16 @@ def dias(eje, modelos_series, mac_id):
     ms = {m: s[mac_id] for m, s in modelos_series.items()}
     n = len(eje)
     cons = {x: [mediana([ms[m][x][i] for m in ms]) for i in range(n)] for x in ("tv", "tc", "wc", "dc", "wv", "gv", "pr", "cc", "i0", "sl", "cp")}
+    def dir_media(i):  # media circular de la dirección del viento
+        d = [ms[m]["dc"][i] for m in ms if ms[m]["dc"][i] is not None]
+        if not d:
+            return None
+        sx, sy = sum(math.sin(math.radians(v)) for v in d), sum(math.cos(math.radians(v)) for v in d)
+        return (math.degrees(math.atan2(sx, sy)) + 360) % 360
+    cons["dc"] = [dir_media(i) for i in range(n)]
+    for x in cons:
+        nd = 1 if x in ("tv", "tc", "pr") else 0
+        cons[x] = [None if v is None else (round(v, 1) if nd else (int(round(v / 10.0) * 10) if x in ("i0", "sl") else int(round(v)))) for v in cons[x]]
     grupos = {}
     for i, t in enumerate(eje):
         d = (t - dt.timedelta(minutes=90)).astimezone(TZ).date()
