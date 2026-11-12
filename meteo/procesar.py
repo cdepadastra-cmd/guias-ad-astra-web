@@ -699,6 +699,36 @@ def dias(eje, modelos_series, mac_id):
 # ------------------------------------------------------------------ avisos oficiales de AEMET (vía MeteoAlarm, formato CAP)
 METEOALARM = "https://feeds.meteoalarm.org/feeds/meteoalarm-legacy-atom-spain"
 NIVEL = {"yellow": "amarillo", "orange": "naranja", "red": "rojo"}
+# Zonas de aviso de AEMET (Meteoalerta) de cada macizo, para los avisos que llegan sin polígono
+ZONAS_AEMET = {
+    "gredos-macizo-central": ["Sistema Central de Ávila"],
+    "gredos-macizo-oriental": ["Sistema Central de Ávila", "Sur de Ávila"],
+    "sierra-de-candelario": ["Sistema Central de Salamanca"],
+    "la-vera": ["Norte de Cáceres"],
+    "valle-del-tietar": ["Sur de Ávila", "Sistema Central de Ávila"],
+    "sierra-de-francia": ["Sistema Central de Salamanca"],
+    "las-quilamas": ["Sistema Central de Salamanca"],
+    "guadarrama": ["Sierra de Madrid", "Sistema Central de Segovia"],
+    "ayllon": ["Sistema Central de Segovia", "Serranía de Guadalajara", "Sierra de Madrid"],
+    "picos-de-europa": ["Cordillera Cantábrica de León", "Cordillera y Picos de Europa", "Liébana"],
+    "macizo-de-ubina": ["Cordillera Cantábrica de León", "Cordillera y Picos de Europa"],
+    "montanas-de-leon": ["Cordillera Cantábrica de León"],
+    "montana-palentina": ["Cordillera Cantábrica de Palencia"],
+    "serrania-de-cuenca": ["Serranía de Cuenca"],
+    "alto-tajo": ["Parameras de Molina", "Serranía de Guadalajara"],
+    "sierra-de-albarracin": ["Albarracín y Jiloca"],
+    "pirineo-navarro": ["Pirineo navarro"],
+    "ordesa-monte-perdido": ["Pirineo oscense"],
+    "aneto-posets": ["Pirineo oscense"],
+    "aiguestortes-carros-de-foc": ["Pirineo de Lleida", "Arán"],
+    "sierra-nevada": ["Nevada y Alpujarras"],
+    "calpe-costa-blanca": ["Litoral norte de Alicante"],
+}
+
+
+def _norm(t):
+    import unicodedata
+    return " ".join(unicodedata.normalize("NFKD", t or "").encode("ascii", "ignore").decode().lower().split())
 
 
 def _dentro(lat, lon, poli):
@@ -769,9 +799,10 @@ def avisos_oficiales():
             for zona, polis in c["areas"]:
                 if not polis:
                     sin_poligono += 1
-                    continue
                 for m in MACIZOS:
-                    if any(_dentro(p["lat"], p["lon"], pl) for p in (m["base"], m["cumbre"]) for pl in polis):
+                    por_mapa = any(_norm(zona) == _norm(z) or _norm(z) in _norm(zona) for z in ZONAS_AEMET.get(m["id"], []))
+                    por_poligono = any(_dentro(p["lat"], p["lon"], pl) for p in (m["base"], m["cumbre"]) for pl in polis)
+                    if por_mapa or por_poligono:
                         av = {"nivel": c["nivel"], "evento": c["evento"], "titulo": c["titulo"], "zona": zona,
                               "inicio": c["inicio"], "fin": c["fin"], "texto": c["texto"]}
                         if av not in out[m["id"]]:
@@ -779,6 +810,8 @@ def avisos_oficiales():
         orden = {"rojo": 0, "naranja": 1, "amarillo": 2}
         for k in out:
             out[k].sort(key=lambda a: (orden[a["nivel"]], a["inicio"] or ""))
+        zonas = sorted({z for c in caps for z, _ in c["areas"]})
+        log("Avisos: zonas con aviso ahora: %s" % "; ".join(zonas)[:3000])
         log("Avisos: %d CAP leídos, %d zonas sin polígono, macizos con aviso: %s" % (
             len(caps), sin_poligono, ", ".join("%s(%d)" % (k, len(v)) for k, v in out.items() if v) or "ninguno"))
     except Exception as ex:

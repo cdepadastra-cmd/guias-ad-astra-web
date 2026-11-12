@@ -24,6 +24,7 @@ RedirectMatch 301 ^/BOULDER-LAS-TUERCES-PALENCIA\.pdf$ https://www.guiasadastra.
 RedirectMatch 301 ^/actividades\.html$ https://www.guiasadastra.com/actividades/
 RedirectMatch 301 ^/alquiler-material-montana\.html$ https://www.guiasadastra.com/actividades/alquiler-material-montana/
 RedirectMatch 301 ^/alquiler-material\.html$ https://www.guiasadastra.com/actividades/alquiler-material-montana/
+RedirectMatch 301 ^/ascension-al-toubkal\.html$ https://www.guiasadastra.com/actividades/ascension-al-toubkal/
 RedirectMatch 301 ^/ascensiones-montana\.html$ https://www.guiasadastra.com/actividades/ascensiones-montana/
 RedirectMatch 301 ^/barranco-de-papuos\.html$ https://www.guiasadastra.com/actividades/barranquismo-avila/
 RedirectMatch 301 ^/barranco-del-arbillas\.html$ https://www.guiasadastra.com/actividades/barranquismo-avila/
@@ -108,6 +109,9 @@ RedirectMatch 301 ^/senderismo\.html$ https://www.guiasadastra.com/actividades/s
 RedirectMatch 301 ^/servicio-routte-setting-equipador\.html$ https://www.guiasadastra.com/route-setting/
 RedirectMatch 301 ^/sobre-nosotros\.html$ https://www.guiasadastra.com/sobre-nosotros/
 RedirectMatch 301 ^/trekking-carros-de-foc\.html$ https://www.guiasadastra.com/actividades/trekking-carros-de-foc/
+RedirectMatch 301 ^/trekking-taghia-marruecos\.html$ https://www.guiasadastra.com/actividades/trekking-taghia-marruecos/
+RedirectMatch 301 ^/trekking-tour-del-mont-blanc\.html$ https://www.guiasadastra.com/actividades/trekking-tour-del-mont-blanc/
+RedirectMatch 301 ^/trekking-ultra-de-gredos\.html$ https://www.guiasadastra.com/actividades/trekking-ultra-de-gredos/
 RedirectMatch 301 ^/via-ferrata-burgos\.html$ https://www.guiasadastra.com/actividades/via-ferrata-burgos/
 RedirectMatch 301 ^/via-ferrata-salamanca\.html$ https://www.guiasadastra.com/actividades/via-ferrata-salamanca/
 RedirectMatch 301 ^/via-verde-ruta-de-la-plata\.html$ https://www.guiasadastra.com/actividades/via-verde-ruta-de-la-plata/

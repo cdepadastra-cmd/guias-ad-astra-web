@@ -46,7 +46,7 @@ def faq_ld(faq):
 
 NAV_ACT = [("Todas las actividades", "/actividades/"), ("Barranquismo", "/actividades/?categoria=Barranquismo"), ("Vías ferratas", "/actividades/?categoria=Vías ferratas"),
            ("Alpinismo y ascensiones", "/actividades/?categoria=Ascensiones"), ("Espeleología", "/actividades/?categoria=Espeleología"), ("Escalada y boulder", "/actividades/?categoria=Escalada"),
-           ("Senderismo", "/actividades/?categoria=Senderismo"), ("Travesías y viajes", "/actividades/?categoria=Viajes")]
+           ("Senderismo", "/actividades/?categoria=Senderismo"), ("Travesías y viajes", "/actividades/?categoria=Travesías y viajes")]
 NAV_CUR = [("Todos los cursos", "/formacion-cursos/")] + [(c["disc_label"], "/actividades/%s/" % c["slug"]) for c in COURSES]
 NAV_HER = [("Meteorología de montaña", "/meteo/"), ("Calculadora de rutas", "/calculadora-rutas/"), ("Topografía de barrancos", "/topografia-barrancos/"), ("Boulder en Las Tuerces", "/actividades/boulder-las-tuerces/"), ("Boulder en Zona Centro", "/actividades/boulder-zona-centro-salamanca-caceres/")]
 NAV_OTR = [("Iniciativas de turismo rural", "/iniciativas-turismo-rural/"), ("Creación y mantenimiento de senderos", "/creacion-mantenimiento-senderos/"), ("Route setting", "/route-setting/"), ("Organización de eventos", "/actividades/organizacion-eventos-deportivos/"), ("Gredos Limpio", "/actividades/gredos-limpio/"),
@@ -248,7 +248,7 @@ def build_activity(a):
         kb.append(("Temporada", a["epoca"].split(",")[0].split(":")[-1].strip().rstrip(".")[:40] if len(a["epoca"]) > 40 else a["epoca"].rstrip(".")))
     kb.append(("Incluye", "Guía titulado, material y seguro"))
     if k == "senderismo":
-        kb = [(x, y) for x, y in a["ficha"]] + [("Precio", "Desde %d € / persona" % precios.desde_slug("senderismo-avila-gredos"))]
+        kb = [(x, y) for x, y in a["ficha"]] + [("Precio", "Desde %d € / persona" % min(prices))]
     left = []
     intro = []
     if a.get("intro"):
@@ -265,6 +265,9 @@ def build_activity(a):
         left.append(block("Elige tu opción", options_html(opts)))
     if k == "senderismo":
         left.append(block("Rutas destacadas", '<div class="two">%s</div>' % "".join('<div class="panel"><h3>%s</h3><p class="muted">%s</p></div>' % (e(n), e(d)) for n, d in a["itinerarios"])))
+    if k == "list" and not a.get("macizo"):
+        left.append(block("Ascensiones por macizo", '<div class="two">%s</div>' % "".join(
+            '<a class="panel" href="/actividades/%s/" style="color:var(--fg)"><h3>%s</h3><p class="muted">%s</p></div></a>'.replace("</div></a>", "</a>") % (asc_slug(g), e(g), e(", ".join(n.split(" ")[0] if False else n.rsplit(" ", 2)[0] for n, _, _, _ in rows[:4]))) for g, rows in a["groups"])))
     if k == "list":
         groups = []
         for g, rows in a["groups"]:
@@ -295,8 +298,32 @@ def build_activity(a):
     ld = act_ld(a, path, prices) + [faq_ld(faq)]
     page(path, a.get("seo_title", a["title"] + " | Guías Ad Astra"), a.get("seo_desc", a["short"]), body, "act", ld, "product", a["img"], "0.8")
 
+ASC_TXT = {
+    "Sierra de Gredos": "El Almanzor (2.592 m), techo del Sistema Central, y las grandes cumbres que rodean el Circo de Gredos: La Galana, Cabeza Nevada, La Mira y Los Galayos, además del Canchal de la Ceja en la Sierra de Béjar. Granito, lagunas glaciares y algunos de los paisajes de alta montaña más bonitos de la península.",
+    "Montaña Palentina": "Curavacas, Espigüete y Peña Prieta, los tres colosos de Fuentes Carrionas, en el extremo oriental de la Cordillera Cantábrica. Cumbres de más de 2.400 m con vistas a los Picos de Europa.",
+    "Sierra de Guadarrama": "Peñalara, techo de la Comunidad de Madrid, La Maliciosa y El Yelmo en La Pedriza: ascensiones cerca de Madrid y Segovia, perfectas para iniciarse o para la montaña invernal.",
+    "Picos de Europa": "Torrecerredo, la cumbre más alta de la Cordillera Cantábrica, Peña Santa de Castilla, Peña Vieja, Tesorero y Peña Castil: caliza, canales y jous en el Parque Nacional más antiguo de España.",
+    "Sanabria": "El Coriscao y las cumbres que rodean el lago de Sanabria, en el noroeste de Zamora: lagunas glaciares y paisajes de alta montaña poco frecuentados.",
+    "Pirineos": "Aneto, Posets y Monte Perdido, los tresmiles más deseados, junto a cumbres como el Midi d'Ossau, Anayet, Garmo Negro o la Mesa de los Tres Reyes, del Pirineo navarro al aragonés y el francés.",
+}
+
+def asc_slug(g):
+    return "ascensiones-" + precios._slug(g)
+
+def build_ascensiones_macizos():
+    base = next(x for x in ACTIVITIES if x["slug"] == "ascensiones-montana")
+    for g, rows in base["groups"]:
+        cumbres = [n.rsplit(" ", 2)[0] for n, _, _, _ in rows]
+        a = dict(base, slug=asc_slug(g), macizo=True, groups=[(g, rows)],
+                 title="Ascensiones guiadas en %s" % g,
+                 short="Ascensiones con guía de montaña titulado en %s: %s." % (g, ", ".join(cumbres[:4])),
+                 lead=ASC_TXT.get(g, "Ascensiones guiadas en %s." % g),
+                 seo_title=("Ascensiones guiadas en %s: %s | Desde %d€" % (g, ", ".join(cumbres[:2]), min(p for *_, p in rows)))[:70],
+                 seo_desc=("Ascensiones con guía de montaña en %s: %s. Precio por persona según la cumbre y el tamaño del grupo." % (g, ", ".join(cumbres[:5])))[:158])
+        build_activity(a)
+
 def build_trip(a, path):
-    crumbs = [("Inicio", "/"), ("Actividades", "/actividades/"), (a["cat"], "/actividades/?categoria=" + a["cat"])]
+    crumbs = [("Inicio", "/"), ("Actividades", "/actividades/"), ("Travesías y viajes", "/actividades/?categoria=Travesías y viajes")]
     left = [block("El viaje", prose(a["intro"]))]
     if a.get("etapas"):
         left.append(block("Etapas día a día", '<ol class="stages">%s</ol>' % "".join('<li><span class="d">%s</span><h4>%s</h4><p>%s</p></li>' % (e(d), e(t), e(s)) for d, t, s in a["etapas"])))
@@ -531,7 +558,7 @@ def min_price(x):
 
 def build_activities_index():
     order = ["Barranquismo", "Vías ferratas", "Ascensiones", "Espeleología", "Escalada", "Senderismo", "Travesías", "Viajes", "Otros"]
-    chips = '<button class="chip" data-val="" aria-pressed="true">Todas</button>' + "".join('<button class="chip" data-val="%s" aria-pressed="false">%s</button>' % (c, c) for c in order)
+    chips = '<button class="chip" data-val="" aria-pressed="true">Todas</button>' + "".join('<button class="chip" data-val="%s" aria-pressed="false">%s</button>' % (c, c) for c in order if c not in ("Travesías", "Viajes")).replace('<button class="chip" data-val="Otros"', '<button class="chip" data-val="Travesías y viajes" aria-pressed="false">Travesías y viajes</button><button class="chip" data-val="Otros"')
     secs = ""
     for c in order:
         items = [x for x in ACTIVITIES if x["cat"] == c]
@@ -539,7 +566,7 @@ def build_activities_index():
             items = [{"slug": "alquiler-material-montana", "img": img("e3722879-d648-4dbe-b361-b365f07e1692/otros-media-5.webp"), "cat": "Otros", "title": "Alquiler de material", "short": "Neoprenos, arneses, cascos, disipadores, piolets y crampones por días."}] + items
         if not items:
             continue
-        secs += '<section class="cat-section"><h2>%s</h2><div class="grid c3">%s</div></section>' % (c, "".join(card("/actividades/%s/" % x["slug"], x["img"], x["cat"], x["title"], x["short"], min_price(x), 'data-cat="%s"' % c) for x in items))
+        secs += '<section class="cat-section"><h2>%s</h2><div class="grid c3">%s</div></section>' % (c, "".join(card("/actividades/%s/" % x["slug"], x["img"], x["cat"], x["title"], x["short"], min_price(x), 'data-cat="%s"' % (c + "|Travesías y viajes" if c in ("Travesías", "Viajes") else c)) for x in items))
     body = (hero("Actividades", "Elige tu aventura", "Barranquismo, vías ferratas, espeleología, ascensiones, senderismo, escalada y viajes con guías titulados en Gredos, Castilla y León y el mundo.", HERO, [("Inicio", "/"), ("Actividades", "")]) +
             '<section class="section"><div class="wrap"><div class="chips" data-filter="#acts" data-key="cat" data-param="categoria" style="margin-bottom:36px">%s</div><div id="acts">%s</div></div></section>' % (chips, secs) +
             '<section class="section alt"><div class="wrap"><div class="section-head"><p class="eyebrow">Recorridos</p><h2>Barrancos, ferratas, cuevas y rutas</h2><p class="muted">Todos los recorridos que guiamos, con su precio y duración.</p></div><div class="two">%s</div></div></section>'
@@ -998,6 +1025,7 @@ def main():
     build_home(); build_activities_index(); build_courses_index(); build_calendar(); build_rental(); build_about(); build_contact(); build_404(); build_calculator(); build_topografia(); build_meteo()
     for a in ACTIVITIES:
         build_activity(a)
+    build_ascensiones_macizos()
     for a, o, p in OPTION_PAGES:
         build_option(a, o, p)
     for c in COURSES:

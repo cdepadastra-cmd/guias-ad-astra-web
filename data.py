@@ -57,6 +57,31 @@ PACK_FERRATA = ("Vía ferrata", "Escalada en roca con la seguridad de un cable y
 
 # ---------------------------------------------------------------- ACTIVIDADES
 # kind: options (varias opciones), single, list (ascensiones), info (sin reserva), boulder, trip, senderismo
+
+QUE_ES_ESCALADA = [
+    "La escalada en roca consiste en subir por una pared natural con la seguridad de una cuerda, un arnés y anclajes fijos en la roca. Mientras escalas, el guía te asegura desde abajo y te va indicando dónde poner pies y manos.",
+    "No hace falta experiencia previa ni mucha fuerza: la técnica de pies y el equilibrio cuentan más que los brazos. Elegimos vías adaptadas a tu nivel para que disfrutes desde el primer metro.",
+]
+INCLUYE_ESCALADA = ["Guía titulado", "Casco, arnés, pies de gato y todo el material de seguridad", "Seguros de accidentes y RC", "IVA (21%)"]
+TRAER_ESCALADA = ["Ropa cómoda que permita moverse", "Calzado deportivo para la aproximación", "Agua y algo de comida", "Crema solar y gorra"]
+REQ_ESCALADA = ["Desde 8 años (menores acompañados).", "No hace falta experiencia previa.", "Seguir en todo momento las indicaciones del guía."]
+
+def _escalada(prov, slug, img_, lead, extra_seo):
+    return {
+        "slug": slug, "cat": "Escalada", "kind": "options",
+        "title": "Escalada en %s" % prov, "img": img_,
+        "short": "Escalada en roca guiada en %s: bautismo de escalada y jornadas para todos los niveles." % prov,
+        "seo_title": "Escalada en %s con guía: bautismo y jornadas | Desde 25€" % prov,
+        "seo_desc": "Escalada en roca guiada en %s%s: bautismo de escalada de 2 horas o jornada de 5 horas, con todo el material incluido. Grupos reducidos." % (prov, extra_seo),
+        "lead": lead,
+        "intro": [], "que_es": ("¿Qué es la escalada en roca?", QUE_ES_ESCALADA), "req": REQ_ESCALADA,
+        "options": [
+            {"name": "Bautismo de escalada en %s" % prov, "place": prov, "dur": "2 horas", "price": 25, "specs": ["Primera vez", "Vías fáciles", "Material incluido"], "desc": "Tu primer contacto con la roca: aprendes a ponerte el equipo, las técnicas básicas y subes varias vías asegurado por el guía."},
+            {"name": "Jornada de escalada en %s" % prov, "place": prov, "dur": "5 horas", "price": 50, "specs": ["Todos los niveles", "Varias vías", "Material incluido"], "desc": "Una jornada completa de escalada: progresamos de vías sencillas a otras más exigentes según tu nivel, con técnica de pies, lectura de la vía y descenso en rápel."},
+        ],
+        "incluye": INCLUYE_ESCALADA, "traer": TRAER_ESCALADA, "epoca": "Todo el año, eligiendo la orientación de la pared según la temporada.",
+    }
+
 ACTIVITIES = [
  {
   "slug": "barranquismo-avila", "cat": "Barranquismo", "kind": "options",
@@ -409,7 +434,130 @@ ACTIVITIES = [
   "incluye": ["Guías de montaña titulados UIMLA / AEGM", "Asesoramiento técnico previo", "6 noches en refugios en media pensión y pícnic", "Seguro de asistencia", "Botiquín colectivo"],
   "noincluye": ["Traslados hasta el inicio y regreso", "Noches fuera de la ruta", "Cualquier cosa no indicada en «incluye»"],
   "etapas": [],
+ }, {
+  "slug": "trekking-ultra-de-gredos", "cat": "Travesías", "kind": "trip", "price": 300,
+  "title": "Trekking del Ultra de Gredos", "img": img("0c5376bd-2231-4c62-b798-6f0139e73cd7/cursos-alpinismo.webp"),
+  "short": "El recorrido del Ultra de Gredos a pie y sin prisas: 3 días cruzando el corazón de la Sierra de Gredos.",
+  "seo_title": "Trekking del Ultra de Gredos: 3 días por la Sierra de Gredos | 300€",
+  "seo_desc": "Trekking guiado de 3 días por el recorrido del Ultra de Gredos: unos 71 km por el Parque Regional de la Sierra de Gredos, con salida y llegada en Hoyos del Espino.",
+  "ficha": [("Fechas", "Próxima salida por confirmar"), ("Duración", "3 días"), ("Precio", "300 € por persona"), ("Grupo", "Grupos reducidos")],
+  "intro": [
+    "El Ultra de Gredos es una de las carreras de montaña más conocidas del Sistema Central. Nosotros te proponemos recorrer su trazado andando, repartido en tres etapas, para disfrutar con calma de lo que los corredores pasan a toda velocidad.",
+    "Son unos 71 km y alrededor de 2.300 m de desnivel positivo por el Parque Regional de la Sierra de Gredos, con salida y llegada en Hoyos del Espino: gargantas, praderas de alta montaña, lagunas glaciares y las vistas al Circo de Gredos y al Almanzor.",
+  ],
+  "faq": [
+    ("¿Qué nivel hace falta?", "Buena forma física y costumbre de caminar 6-8 horas seguidas por sendero de montaña, varios días seguidos. No hay pasos técnicos."),
+    ("¿Cuándo se hace?", "De finales de primavera a otoño, cuando no hay nieve en los collados. Fijamos las fechas con el grupo."),
+    ("¿Qué incluye el precio?", "Guía de montaña titulado durante los tres días, seguro y asesoramiento previo. El alojamiento y las comidas se consultan según el grupo."),
+  ],
+  "req": ["Ropa de montaña adecuada a la estación.", "Buena condición física y costumbre de caminar varias jornadas seguidas.", "Respetar las indicaciones del guía."],
+  "material": ["Mochila de 30-35 litros", "Botas de montaña", "Chaqueta impermeable", "Forro polar o plumífero ligero", "Gorra, gafas de sol y crema", "Frontal", "Bastones", "Cantimplora de 1,5 litros"],
+  "incluye": ["Guía de montaña titulado", "Asesoramiento técnico previo", "Seguro de accidentes y RC", "Botiquín colectivo"],
+  "noincluye": ["Alojamiento y comidas (consúltanos)", "Desplazamiento hasta Hoyos del Espino", "Cualquier cosa no indicada en «incluye»"],
+  "etapas": [
+    ("Día 1", "Primera etapa por el recorrido del Ultra", "Unos 24 km por la vertiente norte de Gredos."),
+    ("Día 2", "Etapa central por la alta montaña", "Unos 24 km con los collados y vistas al Circo de Gredos."),
+    ("Día 3", "Etapa final hasta Hoyos del Espino", "Unos 23 km de regreso a la meta del Ultra."),
+  ],
  },
+ {
+  "slug": "trekking-tour-del-mont-blanc", "cat": "Viajes", "kind": "trip", "price": 1290,
+  "title": "Trekking del Tour del Mont Blanc", "img": img("34a2d34b-b1c7-4e46-84c9-d86f2f3b63f8/trekking-carros-de-foc.webp"),
+  "short": "La vuelta al Mont Blanc por Francia, Italia y Suiza: 8 etapas de refugio en refugio con guía.",
+  "seo_title": "Tour del Mont Blanc guiado: 10 días por Francia, Italia y Suiza | 1.290€",
+  "seo_desc": "Trekking guiado del Tour del Mont Blanc (TMB): 8 etapas y unos 125 km entre Chamonix, Courmayeur y Champex, con refugios en media pensión. Salida en verano.",
+  "ficha": [("Fechas", "Julio y agosto (por confirmar)"), ("Duración", "10 días y 9 noches"), ("Precio", "1.290 € por persona, sin vuelos"), ("Grupo", "De 4 a 12 personas")],
+  "intro": [
+    "El Tour del Mont Blanc (TMB) es el gran clásico del senderismo alpino: una vuelta completa al macizo más alto de Europa occidental, cruzando Francia, Italia y Suiza por collados de más de 2.500 m.",
+    "Lo hacemos en ocho etapas de entre 11 y 25 km, durmiendo en refugios y alojamientos de montaña, con los glaciares del Mont Blanc, las Grandes Jorasses y el valle de Ferret siempre a la vista.",
+  ],
+  "faq": [
+    ("¿Cuánto mide el recorrido?", "El circuito completo ronda los 170 km. En nuestro programa caminamos unos 125 km en 8 etapas y usamos algún remonte para evitar tramos de pista."),
+    ("¿Qué nivel hace falta?", "Buena forma física: hay etapas de más de 1.000 m de desnivel positivo y de 6 a 8 horas de marcha, varios días seguidos. No hay dificultad técnica."),
+    ("¿Cuándo se hace?", "De principios de julio a principios de septiembre, cuando los collados están sin nieve y los refugios abiertos."),
+    ("¿Incluye vuelos?", "No. Te ayudamos a buscar vuelos a Ginebra, desde donde se llega a Chamonix en una hora."),
+  ],
+  "req": ["Buena condición física y costumbre de caminar 6-8 horas varios días seguidos.", "Ropa de montaña para frío, lluvia y sol.", "DNI en vigor y tarjeta sanitaria europea."],
+  "material": ["Mochila de 35-40 litros", "Botas de trekking", "Chaqueta impermeable y pantalón impermeable", "Forro polar o plumífero ligero", "Gorro, guantes, gafas de sol y crema", "Saco sábana para los refugios", "Bastones", "Frontal", "Cantimplora de 1,5 litros"],
+  "incluye": ["Guía de montaña titulado UIMLA / AEGM", "6 noches en refugios en media pensión", "3 noches en albergue u hotel con desayuno en Chamonix y Courmayeur", "Seguro de asistencia y rescate", "Asesoramiento previo", "Botiquín colectivo"],
+  "noincluye": ["Vuelos y traslado Ginebra–Chamonix", "Comidas de mediodía y bebidas", "Remontes opcionales", "Cualquier cosa no indicada en «incluye»"],
+  "etapas": [
+    ("Día 1", "Llegada a Ginebra y traslado a Chamonix", "Presentación del viaje y revisión del material."),
+    ("Día 2", "Les Houches – Col de Tricot – Refugio de Miage", "13 km · +1.300 m / −750 m"),
+    ("Día 3", "Miage – Les Contamines – Nant Borrant", "13 km · +900 m / −1.000 m"),
+    ("Día 4", "Nant Borrant – Col de la Croix du Bonhomme – Les Mottets", "15 km · +1.385 m / −1.000 m"),
+    ("Día 5", "Les Mottets – Col de la Seigne (Italia) – Courmayeur", "19 km · +1.150 m / −1.100 m"),
+    ("Día 6", "Courmayeur – Val Ferret – Rifugio Elena", "Etapa larga con vistas a las Grandes Jorasses"),
+    ("Día 7", "Rifugio Elena – Grand Col Ferret (Suiza) – Champex-Lac", "13 km · +710 m / −1.150 m"),
+    ("Día 8", "Champex – Fenêtre d'Arpette – Trient", "15 km · +1.250 m / −1.450 m"),
+    ("Día 9", "Trient – Col de Balme – Le Tour – Chamonix", "11 km · +1.000 m / −750 m"),
+    ("Día 10", "Traslado al aeropuerto de Ginebra", "Fin del viaje."),
+  ],
+ },
+ {
+  "slug": "ascension-al-toubkal", "cat": "Viajes", "kind": "trip", "price": 650,
+  "title": "Trekking y ascensión al Toubkal", "img": img("4539531d-0da2-43d5-a826-5048938c6bec/monte-olimpo.webp"),
+  "short": "El techo del norte de África (4.167 m): trekking por el Alto Atlas y ascensión al Toubkal.",
+  "seo_title": "Ascensión al Toubkal (4.167 m) con guía: trekking por el Atlas | 650€",
+  "seo_desc": "Viaje guiado al Toubkal, la montaña más alta del norte de África (4.167 m): 8 días con trekking por los valles bereberes del Alto Atlas y ascensión a la cumbre.",
+  "ficha": [("Fechas", "Primavera y otoño (por confirmar)"), ("Duración", "8 días y 7 noches"), ("Precio", "650 € por persona, sin vuelos"), ("Grupo", "De 3 a 8 personas")],
+  "intro": [
+    "El Toubkal (4.167 m) es la cumbre más alta de Marruecos y del norte de África, en pleno Alto Atlas y a solo un par de horas de Marrakech.",
+    "No subimos directos: dedicamos varios días a caminar por los valles de Azzaden y Mizane, entre aldeas bereberes, cascadas y collados, para aclimatarnos bien antes del día de cumbre. Las mulas llevan el equipaje.",
+  ],
+  "faq": [
+    ("¿Es difícil subir al Toubkal?", "Técnicamente es sencillo, pero la altitud (más de 4.000 m) es el verdadero reto. Por eso el programa incluye varios días de aclimatación."),
+    ("¿Hace falta piolet y crampones?", "Depende de la época: en primavera suele quedar nieve y los usamos. Te enseñamos lo básico y pueden alquilarse allí."),
+    ("¿Cuándo es mejor ir?", "De abril a junio y de septiembre a noviembre. En invierno es una ascensión invernal más exigente."),
+    ("¿Necesito visado?", "Con pasaporte español en vigor no hace falta visado para viajar a Marruecos como turista."),
+  ],
+  "req": ["Buena condición física y costumbre de caminar 6-7 horas en montaña.", "Pasaporte en vigor.", "Seguir las indicaciones del guía en altitud."],
+  "material": ["Mochila de 30-35 litros para el día", "Bolsa de viaje para las mulas", "Botas de montaña", "Ropa de abrigo (por la noche hace frío)", "Chaqueta impermeable", "Saco de dormir", "Gafas de sol, crema y gorra", "Frontal y bastones"],
+  "incluye": ["Guía de montaña titulado", "Traslados en Marruecos", "Hotel en Marrakech con desayuno", "Refugios y casas rurales en pensión completa durante el trekking", "Mulas para el equipaje", "Seguro de viaje y rescate"],
+  "noincluye": ["Vuelos", "Comidas en Marrakech y bebidas", "Alquiler de crampones si hacen falta", "Propinas", "Cualquier cosa no indicada en «incluye»"],
+  "etapas": [
+    ("Día 1", "Llegada a Marrakech", "Traslado al hotel y tarde libre."),
+    ("Día 2", "Marrakech – Imi Oughlad (1.400 m) – Id Aïssa", "Traslado de 1h15 y primera etapa por el valle de Azzaden."),
+    ("Día 3", "Id Aïssa – Azib Tamsoult (2.210 m)", "Por la cascada de Irhouilidene."),
+    ("Día 4", "Azib Tamsoult – Tizi M'Zic – Armed (1.970 m)", "Cruzamos al valle de Mizane."),
+    ("Día 5", "Armed – Refugio del Toubkal (3.200 m)", "Subida por la ruta clásica al refugio."),
+    ("Día 6", "Cumbre del Toubkal (4.167 m)", "Salida de madrugada, cumbre y regreso al refugio."),
+    ("Día 7", "Refugio – Imlil – Marrakech", "Descenso y tarde libre en Marrakech."),
+    ("Día 8", "Vuelo de regreso", "Traslado al aeropuerto."),
+  ],
+ },
+ {
+  "slug": "trekking-taghia-marruecos", "cat": "Viajes", "kind": "trip", "price": 690,
+  "title": "Trekking por Taghia y el Valle Feliz (Marruecos)", "img": img("4539531d-0da2-43d5-a826-5048938c6bec/monte-olimpo.webp"),
+  "short": "Las paredes de Taghia, los collados del Atlas Central y el Valle Feliz de Aït Bouguemez en 8 días.",
+  "seo_title": "Trekking por Taghia y el Valle Feliz (Atlas, Marruecos) | 690€",
+  "seo_desc": "Trekking guiado por el circo de Taghia y el Valle Feliz (Aït Bouguemez), en el Atlas Central de Marruecos: 8 días entre gargantas, aldeas bereberes y collados de 3.000 m.",
+  "ficha": [("Fechas", "De mayo a septiembre (por confirmar)"), ("Duración", "8 días y 7 noches"), ("Precio", "690 € por persona, sin vuelos"), ("Grupo", "Desde 3 personas")],
+  "intro": [
+    "Taghia es una aldea bereber encajada entre enormes paredes de caliza en el Atlas Central, uno de los rincones más espectaculares de Marruecos y meca de la escalada en roca.",
+    "Desde allí cruzamos collados de cerca de 3.000 m, la meseta del lago seco de Izoughar y las aldeas de Aït Bouguemez, el «Valle Feliz», con sus graneros fortificados y huellas de dinosaurio. Dormimos en casas de familias y en campamento, con mulas que llevan el equipaje.",
+  ],
+  "faq": [
+    ("¿Qué nivel hace falta?", "Medio: etapas de 5 a 7 horas con algún día de más de 1.000 m de desnivel. No hay pasos técnicos."),
+    ("¿Cuándo es mejor ir?", "De mayo a septiembre, cuando los collados altos están sin nieve."),
+    ("¿Dónde se duerme?", "Dos noches en hotel o riad en Marrakech y el resto en casas bereberes y campamento, en pensión completa."),
+  ],
+  "req": ["Buena condición física y costumbre de caminar 6-7 horas.", "Pasaporte en vigor.", "Ganas de convivir con la cultura bereber."],
+  "material": ["Mochila de 30 litros para el día", "Bolsa de viaje para las mulas", "Botas de trekking", "Ropa de abrigo para las noches", "Saco de dormir", "Gafas de sol, crema y gorra", "Frontal y bastones"],
+  "incluye": ["Guía de montaña titulado y guía local", "Traslados en 4x4 o minibús", "2 noches en hotel o riad en Marrakech con desayuno", "5 noches en casas bereberes y campamento en pensión completa", "Mulas y cocinero durante el trekking", "Seguro de viaje y rescate"],
+  "noincluye": ["Vuelos", "Bebidas", "Visitas turísticas en Marrakech", "Propinas", "Cualquier cosa no indicada en «incluye»"],
+  "etapas": [
+    ("Día 1", "Llegada a Marrakech", "Traslado al riad y tarde libre."),
+    ("Día 2", "Marrakech – Zaouiat Ahansal – Taghia (1.890 m)", "Traslado por Azilal y 2h30 a pie por el valle del Ahansal."),
+    ("Día 3", "Taghia – Tizi n'Tighboula (2.900 m)", "7 h · +1.030 m. Noche en campamento."),
+    ("Día 4", "Tizi n'Tighboula – lago seco de Izoughar", "5h30 · collado de 3.100 m."),
+    ("Día 5", "Izoughar – Rbat (1.950 m)", "6 h por aldeas del Alto Atlas Central."),
+    ("Día 6", "Rbat – Agouti (Valle Feliz)", "5 h por los graneros y las huellas de dinosaurio."),
+    ("Día 7", "Regreso a Marrakech por las cascadas de Ouzoud", "Parada para comer junto a las cascadas."),
+    ("Día 8", "Vuelo de regreso", "Traslado al aeropuerto."),
+  ],
+ },
+
  {
   "slug": "boulder-las-tuerces", "cat": "Escalada", "kind": "boulder",
   "title": "Boulder en Las Tuerces", "img": img("ad7c9424-1340-4b52-8333-4f3db832aeae/otros-media-2.webp"),
@@ -467,7 +615,13 @@ ACTIVITIES = [
     ("¿Cuál es la mejor época?", "Otoño, invierno soleado y primavera son ideales en Valcorchero y Becedas. En verano son mejores las zonas altas como Candelario y La Hoya, a primera o última hora."),
     ("¿Necesito material propio?", "Pies de gato, magnesio, cepillo y crash pads. En el granito conviene llevar varias colchonetas porque muchos bloques tienen salidas altas."),
   ],
- },
+ },  _escalada("Salamanca", "escalada-salamanca", img("7d11c597-caa3-4128-a7f5-68709771380b/curso-iniciacion-escalada-en-roca.webp"),
+            "Escalada en roca guiada por las paredes de granito de la provincia de Salamanca, desde la Sierra de Béjar y Candelario hasta Arribes del Duero.", ", en granito"),
+  _escalada("Palencia", "escalada-palencia", img("7d11c597-caa3-4128-a7f5-68709771380b/curso-iniciacion-escalada-en-roca.webp"),
+            "Escalada en roca guiada en la provincia de Palencia: caliza y conglomerado en la Montaña Palentina, cerca de Aguilar de Campoo y Cervera de Pisuerga.", " y la Montaña Palentina"),
+  _escalada("Zamora", "escalada-zamora", img("7d11c597-caa3-4128-a7f5-68709771380b/curso-iniciacion-escalada-en-roca.webp"),
+            "Escalada en roca guiada en la provincia de Zamora, entre los granitos de Sanabria y los cañones de Arribes del Duero.", ", Sanabria y Arribes"),
+
  # ------------------------------------------------ Otros
  {
   "slug": "organizacion-eventos-deportivos", "cat": "Otros", "kind": "eventos",

@@ -160,6 +160,34 @@
   "img": "https://www.guiasadastra.com/media/34a2d34b-b1c7-4e46-84c9-d86f2f3b63f8/trekking-carros-de-foc.webp",
   "desc": "Carros de Foc con guías titulados: 65 km y 5.700 m de desnivel por los 9 refugios del Parque Nacional de Aigüestortes. Media pensión en refugios incluida."
  },
+ "trekking-ultra-de-gredos": {
+  "titulo": "Trekking del Ultra de Gredos",
+  "tipo": "Actividad",
+  "precio": 300,
+  "img": "https://www.guiasadastra.com/media/0c5376bd-2231-4c62-b798-6f0139e73cd7/cursos-alpinismo.webp",
+  "desc": "Trekking guiado de 3 días por el recorrido del Ultra de Gredos: unos 71 km por el Parque Regional de la Sierra de Gredos, con salida y llegada en Hoyos del Espino."
+ },
+ "trekking-tour-del-mont-blanc": {
+  "titulo": "Trekking del Tour del Mont Blanc",
+  "tipo": "Actividad",
+  "precio": 1290,
+  "img": "https://www.guiasadastra.com/media/34a2d34b-b1c7-4e46-84c9-d86f2f3b63f8/trekking-carros-de-foc.webp",
+  "desc": "Trekking guiado del Tour del Mont Blanc (TMB): 8 etapas y unos 125 km entre Chamonix, Courmayeur y Champex, con refugios en media pensión. Salida en verano."
+ },
+ "ascension-al-toubkal": {
+  "titulo": "Trekking y ascensión al Toubkal",
+  "tipo": "Actividad",
+  "precio": 650,
+  "img": "https://www.guiasadastra.com/media/4539531d-0da2-43d5-a826-5048938c6bec/monte-olimpo.webp",
+  "desc": "Viaje guiado al Toubkal, la montaña más alta del norte de África (4.167 m): 8 días con trekking por los valles bereberes del Alto Atlas y ascensión a la cumbre."
+ },
+ "trekking-taghia-marruecos": {
+  "titulo": "Trekking por Taghia y el Valle Feliz (Marruecos)",
+  "tipo": "Actividad",
+  "precio": 690,
+  "img": "https://www.guiasadastra.com/media/4539531d-0da2-43d5-a826-5048938c6bec/monte-olimpo.webp",
+  "desc": "Trekking guiado por el circo de Taghia y el Valle Feliz (Aït Bouguemez), en el Atlas Central de Marruecos: 8 días entre gargantas, aldeas bereberes y collados de 3.000 m."
+ },
  "boulder-las-tuerces": {
   "titulo": "Boulder en Las Tuerces",
   "tipo": "Actividad",
@@ -173,6 +201,27 @@
   "precio": 0,
   "img": "https://www.guiasadastra.com/media/ad7c9424-1340-4b52-8333-4f3db832aeae/otros-media-2.webp",
   "desc": "Mapa de sectores de boulder en granito en la zona centro: Valcorchero (Plasencia), Candelario, Valdesangil, Vallejera, La Hoya y Becedas. Accesos y época."
+ },
+ "escalada-salamanca": {
+  "titulo": "Escalada en Salamanca",
+  "tipo": "Actividad",
+  "precio": 25,
+  "img": "https://www.guiasadastra.com/media/7d11c597-caa3-4128-a7f5-68709771380b/curso-iniciacion-escalada-en-roca.webp",
+  "desc": "Escalada en roca guiada en Salamanca, en granito: bautismo de escalada de 2 horas o jornada de 5 horas, con todo el material incluido. Grupos reducidos."
+ },
+ "escalada-palencia": {
+  "titulo": "Escalada en Palencia",
+  "tipo": "Actividad",
+  "precio": 25,
+  "img": "https://www.guiasadastra.com/media/7d11c597-caa3-4128-a7f5-68709771380b/curso-iniciacion-escalada-en-roca.webp",
+  "desc": "Escalada en roca guiada en Palencia y la Montaña Palentina: bautismo de escalada de 2 horas o jornada de 5 horas, con todo el material incluido. Grupos reducidos."
+ },
+ "escalada-zamora": {
+  "titulo": "Escalada en Zamora",
+  "tipo": "Actividad",
+  "precio": 25,
+  "img": "https://www.guiasadastra.com/media/7d11c597-caa3-4128-a7f5-68709771380b/curso-iniciacion-escalada-en-roca.webp",
+  "desc": "Escalada en roca guiada en Zamora, Sanabria y Arribes: bautismo de escalada de 2 horas o jornada de 5 horas, con todo el material incluido. Grupos reducidos."
  },
  "organizacion-eventos-deportivos": {
   "titulo": "Organización de eventos",
