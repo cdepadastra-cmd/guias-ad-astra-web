@@ -528,3 +528,17 @@ details.adv[open] summary{margin-bottom:14px}
 .mt-aemet-box{border:1px solid var(--line-2);border-left:4px solid #f08a24;border-radius:var(--r);background:var(--card);padding:16px 18px}
 .mt-aemet-box h3{font-size:1.3rem;margin-bottom:6px}
 .mt-aemet-box ul{list-style:none;margin:0 0 8px;padding:0;display:grid;gap:6px}
+.mt[hidden]{display:none}
+.mt-selbar{display:flex;flex-wrap:wrap;gap:12px 16px;align-items:end;margin-bottom:26px;padding:16px 18px;background:var(--card);border:1px solid var(--line);border-radius:var(--r);scroll-margin-top:90px}
+.mt-selbar label{display:grid;gap:6px;flex:1 1 240px;max-width:420px}
+.mt-selbar span{font:600 .72rem/1.2 var(--label);letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+.mt-selbar select{width:100%;font:inherit;font-size:1rem;color:var(--fg);background:#1b120c;border:1px solid var(--line-2);border-radius:var(--r);padding:11px 36px 11px 12px;appearance:none;-webkit-appearance:none;cursor:pointer;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23e9a53b' stroke-width='2'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;background-size:12px 8px}
+.mt-selbar select:focus{outline:2px solid var(--gold);outline-offset:1px}
+.mt-cab h2{font-size:clamp(1.7rem,3vw,2.3rem)}
+.mt-upd{display:block;color:var(--muted)}
+.mt-upd b{color:var(--fg);font-weight:600}
+.mt-mods{display:block}
+.mt-st{color:#9fc6e6;font-weight:500;font-size:.85em}
+.mt-tab th.mt-nb{text-align:center;font-size:.64rem}
+.mt-tab td.mt-nb{text-align:center;font-size:.82rem;padding:6px 4px;min-width:52px}

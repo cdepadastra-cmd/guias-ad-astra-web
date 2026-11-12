@@ -5,7 +5,9 @@ name: Previsión meteorológica de montaña
 
 on:
   schedule:
-    - cron: "40 3,9,15,21 * * *"   # UTC: cuando ya están publicadas las pasadas de 00, 06, 12 y 18
+    # UTC: cuando ya están publicadas las pasadas de 00, 06, 12 y 18. GitHub se salta a menudo ejecuciones
+    # programadas, así que hay tres intentos por pasada; si la previsión publicada ya es reciente, no se hace nada.
+    - cron: "40 3-5,9-11,15-17,21-23 * * *"
   workflow_dispatch:
 
 concurrency:
@@ -13,7 +15,30 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  comprobar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    outputs:
+      hacer: ${{ steps.c.outputs.hacer }}
+    steps:
+      - id: c
+        name: ¿Hace falta una previsión nueva?
+        run: |
+          if [ "${{ github.event_name }}" != "schedule" ]; then echo "hacer=1" >> "$GITHUB_OUTPUT"; exit 0; fi
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          import json, urllib.request, datetime as dt
+          try:
+              d = json.load(urllib.request.urlopen("https://www.guiasadastra.com/meteo/datos/resumen.json?n=%d" % dt.datetime.utcnow().timestamp(), timeout=20))
+              g = dt.datetime.strptime(d["generado"], "%Y-%m-%dT%H:%MZ")
+              edad = (dt.datetime.utcnow() - g).total_seconds() / 3600
+          except Exception as ex:
+              edad = 99
+          print("hacer=%d" % (edad >= 4.5))
+          PY
+
   meteo:
+    needs: comprobar
+    if: needs.comprobar.outputs.hacer == '1'
     runs-on: ubuntu-latest
     timeout-minutes: 45
     env:

@@ -856,13 +856,27 @@ def meteo_metodo():
         "La previsión principal es la mediana de los modelos disponibles. En las gráficas y en la comparación verás cada modelo por separado: cuanto más se parezcan, más fiable es la previsión.",
         "Datos: ECMWF (CC BY 4.0), NOAA/NCEP GFS (dominio público) y DWD ICON-EU (CC BY 4.0). Previsión elaborada por Guías Ad Astra. Es orientativa: consulta también los avisos de AEMET."]))
 
+def meteo_selector(sel=None):
+    """Desplegables cordillera -> sierra/macizo; meteo.js carga la previsión en la misma página."""
+    reg_sel = next((m["region"] for m in MACIZOS if m["id"] == sel), "")
+    lista = [{"id": m["id"], "nombre": m["nombre"], "corto": m["corto"], "region": m["region"],
+              "cumbre": "%s %s m" % (m["cumbre"]["nombre"], "{:,}".format(m["cumbre"]["alt"]).replace(",", ".")),
+              "base": "%s %s m" % (m["base"]["nombre"], "{:,}".format(m["base"]["alt"]).replace(",", "."))} for m in MACIZOS]
+    ops_reg = '<option value="">Todas</option>' + "".join('<option%s>%s</option>' % (' selected' if rg == reg_sel else "", e(rg)) for rg in REGIONES)
+    ops_mac = '<option value="">Todas las sierras</option>' + "".join(
+        '<option value="%s"%s>%s</option>' % (m["id"], ' selected' if m["id"] == sel else "", e(m["nombre"])) for m in MACIZOS if not reg_sel or m["region"] == reg_sel)
+    return ('<form class="mt-selbar" id="mt-selbar" action="/meteo/" onsubmit="return false">'
+            '<label><span>Cordillera</span><select id="mt-reg" aria-label="Cordillera">%s</select></label>'
+            '<label><span>Sierra o macizo</span><select id="mt-sel" aria-label="Sierra o macizo">%s</select></label></form>'
+            '<script type="application/json" id="mt-lista">%s</script>') % (ops_reg, ops_mac, json.dumps(lista, ensure_ascii=False).replace("</", "<\\/"))
+
 def build_meteo():
     path = "/meteo/"
     regiones = ", ".join(REGIONES)
     body = (hero("Herramientas", "Meteorología de montaña", "Previsión a 7 días en cumbre y en el pueblo base para %d macizos de España, calculada cada 6 horas directamente con los modelos ECMWF, GFS e ICON." % len(MACIZOS), METEO_IMG,
                  [("Inicio", "/"), ("Meteorología de montaña", "")], '<a class="btn btn-primary" href="#previsiones">Ver previsiones</a><a class="btn btn-ghost" href="#como">Cómo se calcula</a>') +
-            keybar([("Macizos", "%d" % len(MACIZOS)), ("Modelos", "ECMWF · GFS · ICON-EU"), ("Alcance", "7 días, cada 3 horas"), ("Actualización", "Cada 6 horas")]) +
-            '<section class="section" id="previsiones"><div class="wrap"><div id="mt-index" class="mt"><p class="mt-cargando">Cargando previsiones…</p></div>'
+            keybar([("Macizos", "%d" % len(MACIZOS)), ("Modelos", "ECMWF · GFS · ICON-EU"), ("Alcance", "7 días, cada 3 horas"), ("Actualización", "4 veces al día")]) +
+            '<section class="section" id="previsiones"><div class="wrap">' + meteo_selector() + '<div id="mt-index" class="mt"><p class="mt-cargando">Cargando previsiones…</p></div><div id="mt-mac" class="mt" hidden></div>'
             '<noscript><ul>' + "".join('<li><a href="/meteo/%s/">%s</a></li>' % (m["id"], e(m["nombre"])) for m in MACIZOS) + '</ul></noscript></div></section>' +
             '<section class="section alt" id="como"><div class="wrap split"><div class="stack" style="gap:0">' + meteo_metodo() + block("Preguntas frecuentes", faq_html(METEO_FAQ)) +
             '</div><div class="sticky"><div class="panel"><p class="eyebrow">Macizos</p>' + "".join(
@@ -890,8 +904,8 @@ def build_meteo_macizo(m):
     if otros:
         lateral += '<div class="panel"><p class="eyebrow">%s</p>%s<a href="/meteo/">Todos los macizos</a></div>' % (e(m["region"]), "".join('<a href="/meteo/%s/">%s</a>' % (x["id"], e(x["nombre"])) for x in otros))
     body = (hero("Meteorología de montaña", e(h1), e(lead), METEO_IMG, [("Inicio", "/"), ("Meteorología", "/meteo/"), (m["nombre"], "")]) +
-            keybar([("Cumbre", "%s · %s m" % (c["nombre"], fmt(c["alt"]))), ("Base", "%s · %s m" % (b["nombre"], fmt(b["alt"]))), ("Modelos", "ECMWF · GFS · ICON-EU"), ("Actualización", "Cada 6 horas")]) +
-            '<section class="section"><div class="wrap"><div id="mt-mac" class="mt" data-id="%s"><p class="mt-cargando">Cargando previsión…</p></div></div></section>' % m["id"] +
+            keybar([("Cumbre", "%s · %s m" % (c["nombre"], fmt(c["alt"]))), ("Base", "%s · %s m" % (b["nombre"], fmt(b["alt"]))), ("Modelos", "ECMWF · GFS · ICON-EU"), ("Actualización", "4 veces al día")]) +
+            '<section class="section" id="previsiones"><div class="wrap">' + meteo_selector(m["id"]) + '<div id="mt-mac" class="mt" data-id="%s"><p class="mt-cargando">Cargando previsión…</p></div></div></section>' % m["id"] +
             '<section class="section alt"><div class="wrap split"><div class="stack" style="gap:0">' + meteo_metodo() + block("Preguntas frecuentes", faq_html(METEO_FAQ[:4])) +
             '</div><div class="sticky" style="display:grid;gap:18px">' + lateral + '</div></div></section>')
     ld = [crumbs_ld([("Inicio", "/"), ("Meteorología de montaña", "/meteo/"), (m["nombre"], path)]), faq_ld(METEO_FAQ[:4]),
