@@ -265,7 +265,7 @@
 
   function duracion(a, b) { var m = Math.round((b - a) / 6e4); return Math.floor(m / 60) + " h " + String(m % 60).padStart(2, "0") + " min"; }
   function sens(t, st) { return st == null || t == null || Math.round(st) === Math.round(t) ? "" : ' <span class="mt-st" title="Sensación térmica">' + n(st, "°") + "</span>"; }
-  var NUB = [3000, 2000, 1000, 500];
+  var NUB = [500, 1000, 2000, 3000];
   function celdaNube(v) {
     if (v == null) return '<td class="mt-nb">–</td>';
     var a = Math.min(1, Math.max(0, v / 100)) * 0.75;
