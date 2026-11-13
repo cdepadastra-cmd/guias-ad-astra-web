@@ -5,7 +5,7 @@
   "use strict";
   var DATOS = "/meteo/datos/";
   var TZ = "Europe/Madrid";
-  var MOD = { ecmwf: { n: "ECMWF", c: "#e9a53b" }, gfs: { n: "GFS", c: "#6fb3e0" }, icon: { n: "ICON", c: "#9ccf7a" } };
+  var MOD = { ecmwf: { n: "ECMWF", c: "#e9a53b" }, gfs: { n: "GFS", c: "#6fb3e0" }, icon: { n: "ICON", c: "#9ccf7a" }, arome: { n: "AROME", c: "#d98ad6" } };
   var DIRS = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSO", "SO", "OSO", "O", "ONO", "NO", "NNO"];
   var fDia = new Intl.DateTimeFormat("es-ES", { timeZone: TZ, weekday: "short" });
   var fFecha = new Intl.DateTimeFormat("es-ES", { timeZone: TZ, day: "numeric", month: "short" });
@@ -147,7 +147,7 @@
         });
         h += "</div>";
       });
-      h += '<p class="mt-nota muted small">Temperaturas y viento en la cumbre de referencia de cada macizo. Mediana de los modelos ECMWF, GFS e ICON-EU.</p>';
+      h += '<p class="mt-nota muted small">Temperaturas y viento en la cumbre de referencia de cada macizo. Mediana de los modelos ECMWF, GFS, ICON-EU y AROME.</p>';
       el.innerHTML = h;
       el.querySelectorAll("[data-mac]").forEach(function (a) {
         a.addEventListener("click", function (ev) {
@@ -313,8 +313,8 @@
           (d.horas < 24 ? '<p class="muted small">Desde ahora hasta medianoche.</p>' : "") +
           (aeDia.length ? '<div class="mt-avisos">' + aeDia.map(function (a) { return chipAemet(a, true); }).join("") + "</div>" : "") + avisos(d) + "</div>";
         h += '<dl class="mt-kv">' +
-          "<div><dt>Cumbre (" + esc(doc.cumbre.nombre) + ")</dt><dd>" + n(d.tc_min, "°") + " / " + n(d.tc_max, "°C") + (d.st_min != null ? ' <small class="mt-st">sensación ' + n(d.st_min, "°") + "</small>" : "") + "</dd></div>" +
-          "<div><dt>Base (" + esc(doc.base.nombre) + ")</dt><dd>" + n(d.tv_min, "°") + " / " + n(d.tv_max, "°C") + (d.sv_min != null ? ' <small class="mt-st">sensación ' + n(d.sv_min, "°") + (d.sv_max != null && d.tv_max != null && d.sv_max > d.tv_max ? " / " + n(d.sv_max, "°") : "") + "</small>" : "") + "</dd></div>" +
+          "<div><dt>Cumbre (" + esc(doc.cumbre.nombre) + ", " + doc.cumbre.alt.toLocaleString("es-ES") + " m)</dt><dd>" + n(d.tc_min, "°") + " / " + n(d.tc_max, "°C") + (d.st_min != null ? ' <small class="mt-st">sensación ' + n(d.st_min, "°") + "</small>" : "") + "</dd></div>" +
+          "<div><dt>Base (" + esc(doc.base.nombre) + ", " + doc.base.alt.toLocaleString("es-ES") + " m)</dt><dd>" + n(d.tv_min, "°") + " / " + n(d.tv_max, "°C") + (d.sv_min != null ? ' <small class="mt-st">sensación ' + n(d.sv_min, "°") + (d.sv_max != null && d.tv_max != null && d.sv_max > d.tv_max ? " / " + n(d.sv_max, "°") : "") + "</small>" : "") + "</dd></div>" +
           "<div><dt>Viento en cumbre</dt><dd>" + flecha(d.wc_dir) + n(d.wc_max) + " km/h " + dir(d.wc_dir) + "</dd></div>" +
           "<div><dt>Rachas en la base</dt><dd>" + n(d.gv_max) + " km/h</dd></div>" +
           "<div><dt>Precipitación</dt><dd>" + (d.pr ? dec(d.pr) + " mm" : "No") + (d.nieve_c ? " · " + d.nieve_c + " cm de nieve en cumbre" : "") + "</dd></div>" +
@@ -326,7 +326,7 @@
         var filas = ix, m3 = !hayHoras || modo === "3h";
         if (m3) filas = ix.filter(function (i) { return T[i].getUTCHours() % 3 === 0; });
         if (hayHoras) h += '<div class="mt-modo" role="group" aria-label="Detalle de la tabla"><button type="button" data-modo="1h" class="' + (modo === "1h" ? "on" : "") + '">Cada hora</button><button type="button" data-modo="3h" class="' + (modo === "3h" ? "on" : "") + '">Cada 3 horas</button></div>';
-        h += '<div class="mt-scroll"><table class="mt-tab"><thead><tr><th>Hora</th><th>Cielo</th><th>Cumbre</th><th>Base</th><th>Precip.</th><th>Viento cumbre</th><th>Racha base</th>' + (hayNub ? NUB.map(function (a) { return '<th class="mt-nb">Nubes<br>' + a.toLocaleString("es-ES") + " m</th>"; }).join("") : "<th>Nubes</th>") + "<th>Isocero</th><th>Cota nieve</th></tr></thead><tbody>";
+        h += '<div class="mt-scroll"><table class="mt-tab"><thead><tr><th>Hora</th><th>Cielo</th><th>Cumbre<br>' + doc.cumbre.alt.toLocaleString("es-ES") + ' m</th><th>Base<br>' + doc.base.alt.toLocaleString("es-ES") + ' m</th><th>Precip.</th><th>Viento cumbre</th><th>Racha base</th>' + (hayNub ? NUB.map(function (a) { return '<th class="mt-nb">Nubes<br>' + a.toLocaleString("es-ES") + " m</th>"; }).join("") : "<th>Nubes</th>") + "<th>Isocero</th><th>Cota nieve</th></tr></thead><tbody>";
         filas.forEach(function (i) {
           var noche = +fH.format(T[i]) < 8 || +fH.format(T[i]) >= 20;
           var horas = DUR[i], pr = C.pr[i];
@@ -371,7 +371,7 @@
           });
           h += "</tr>";
         });
-        return h + '</tbody></table></div><p class="muted small">ICON-EU llega a 5 días; ECMWF y GFS, a 7. Si los modelos no coinciden, la previsión es menos fiable.</p>';
+        return h + '</tbody></table></div><p class="muted small">AROME llega a 51 horas (y no cubre Sierra Nevada); ICON-EU, a 5 días; ECMWF y GFS, a 7. Si los modelos no coinciden, la previsión es menos fiable.</p>';
       }
 
       function pintar() {

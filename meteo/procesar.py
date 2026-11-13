@@ -470,6 +470,89 @@ def icon():
     return m
 
 
+# ------------------------------------------------------------------ Météo-France AROME (0,025°, 51 h)
+AROME = "https://meteofrance-pnt.s3.rbx.io.cloud.ovh.net/pnt"
+AROME_GRUPOS = ("00H06H", "07H12H", "13H18H", "19H24H", "25H30H", "31H36H", "37H42H", "43H48H", "49H51H")
+
+
+def arome():
+    """AROME de Météo-France: 2,5 km, hora a hora hasta 51 h. Solo superficie (paquetes SP1 y SP2).
+    Su dominio llega hasta 37,5° N: Sierra Nevada queda fuera."""
+    m = Modelo("arome", "Météo-France AROME", "0,025° (~2,5 km)")
+    m.viento_superficie = True  # en cumbre usa el viento a 10 m del punto de rejilla (el relieve está bien resuelto)
+    url = lambda run, pq, gr: "%s/%s:00:00Z/arome/0025/%s/arome__0025__%s__%s__%s:00:00Z.grib2" % (
+        AROME, run.strftime("%Y-%m-%dT%H"), pq, pq, gr, run.strftime("%Y-%m-%dT%H"))
+    now = dt.datetime.now(UTC)
+    base = now.replace(minute=0, second=0, microsecond=0, hour=now.hour - now.hour % 3)
+    for k in range(8):
+        run = base - dt.timedelta(hours=3 * k)
+        if all(S.head(url(run, pq, "49H51H"), timeout=20).status_code == 200 for pq in ("SP1", "SP2")):
+            m.run = run
+            break
+    if not m.run:
+        raise RuntimeError("AROME no disponible")
+    log("AROME: pasada %s" % m.run.strftime("%Y-%m-%d %HZ"))
+    QUIERO = {"2t", "2r", "10u", "10v", "max_i10fg", "tp", "prmsl", "sp", "lcc", "mcc", "hcc", "CAPE_INS"}
+
+    def bajar(tr):
+        pq, gr = tr
+        r = S.get(url(m.run, pq, gr), timeout=300)
+        r.raise_for_status()
+        out = []
+        for msg in split_messages(r.content):
+            gid = eccodes.codes_new_from_message(msg)
+            try:
+                sn = eccodes.codes_get(gid, "shortName")
+            finally:
+                eccodes.codes_release(gid)
+            if sn in QUIERO:
+                meta, v = decode(msg)
+                out.append((sn, meta["endStep"], v))
+        return tr, out
+
+    nubes, pres = {}, {}
+    trabajos = [(pq, gr) for pq in ("SP1", "SP2") for gr in AROME_GRUPOS]
+    with cf.ThreadPoolExecutor(6) as ex:
+        for (pq, gr), lista in ex.map(bajar, trabajos):
+            for sn, st, v in lista:
+                t = m.run + dt.timedelta(hours=int(st))
+                if sn == "2t":
+                    m.put("t2", t, v - 273.15)
+                elif sn == "2r":
+                    m.put("rh2", t, v)
+                elif sn == "10u":
+                    m.put("u10", t, v)
+                elif sn == "10v":
+                    m.put("v10", t, v)
+                elif sn == "max_i10fg":
+                    m.put("gust", t, v)
+                elif sn == "tp":
+                    m.acc[t] = v
+                elif sn == "CAPE_INS":
+                    m.put("cape", t, v)
+                elif sn in ("lcc", "mcc", "hcc"):
+                    nubes.setdefault(t, {})[sn] = v
+                elif sn in ("prmsl", "sp"):
+                    pres.setdefault(t, {})[sn] = v
+    for t, d in nubes.items():
+        if len(d) == 3:
+            f = [np.clip(d[x] / (100.0 if np.nanmax(d[x]) > 1.5 else 1.0), 0, 1) for x in ("lcc", "mcc", "hcc")]
+            m.put("tcc", t, 100 * (1 - (1 - f[0]) * (1 - f[1]) * (1 - f[2])))
+    # altitud del terreno del modelo, con la ecuación hipsométrica (presión en superficie y a nivel del mar)
+    for t in sorted(pres):
+        d = pres[t]
+        if "prmsl" in d and "sp" in d and t in m.campos.get("t2", {}):
+            tk = m.campos["t2"][t] + 273.15
+            z = np.zeros(NP)
+            for _ in range(3):
+                z = 287.05 * (tk + 0.0065 * z / 2) / G * np.log(d["prmsl"] / d["sp"])
+            m.put("orog", t, z)
+            break
+    m.acc.setdefault(m.run, np.zeros(NP))
+    log("AROME: %d pasos" % len(m.campos.get("t2", {})))
+    return m
+
+
 # ------------------------------------------------------------------ cálculo por punto
 def en_tiempo(serie, t, maxgap=6):
     """Valor de una serie {tiempo: array} en t (lineal entre pasos de hasta maxgap horas)."""
@@ -593,6 +676,8 @@ def series_modelo(m, eje, orog_proxy):
             niv_v = [(g(("gh", l), c), g(("v", l), c)) for l in lev_w]
             uc = perfil_en(mac["cumbre"]["alt"], None if hc is None else hc + 10, u10c, niv_u)
             vc = perfil_en(mac["cumbre"]["alt"], None if hc is None else hc + 10, v10c, niv_v)
+            if getattr(m, "viento_superficie", False):
+                uc, vc = u10c, v10c
             if (uc is None or vc is None) and u10c is not None and v10c is not None and hc is not None and hc >= mac["cumbre"]["alt"]:
                 uc, vc = u10c, v10c  # cumbre por debajo del suelo del modelo: viento a 10 m
             wc = dc = None
@@ -608,7 +693,8 @@ def series_modelo(m, eje, orog_proxy):
             a1, a0 = en_tiempo(m.acc, t, 6), en_tiempo(m.acc, tprev, 6)
             pr = None
             if a1 is not None and a0 is not None:
-                pr = max(0.0, float((a1[b] - a0[b] + a1[c] - a0[c]) / 2))
+                pr = float((a1[b] - a0[b] + a1[c] - a0[c]) / 2)
+                pr = None if math.isnan(pr) else max(0.0, pr)
             ccb, ccc = g("tcc", b), g("tcc", c)
             cc = None if ccb is None and ccc is None else np.nanmean([x for x in (ccb, ccc) if x is not None])
             i0 = g("iso0", c)
@@ -772,6 +858,10 @@ ZONAS_AEMET = {
     "macizo-de-ubina": ["Cordillera Cantábrica de León", "Cordillera y Picos de Europa"],
     "montanas-de-leon": ["Cordillera Cantábrica de León"],
     "montana-palentina": ["Cordillera Cantábrica de Palencia"],
+    "puerto-de-san-isidro": ["Cordillera Cantábrica de León"],
+    "puerto-de-san-glorio": ["Cordillera Cantábrica de León", "Cordillera Cantábrica de Palencia", "Liébana"],
+    "alto-campoo": ["Cantabria del Ebro", "Centro y valle de Villaverde", "Cordillera Cantábrica de Palencia"],
+    "sierra-de-tonda": ["Sistema Central de Salamanca", "Meseta de Salamanca"],
     "serrania-de-cuenca": ["Serranía de Cuenca"],
     "alto-tajo": ["Parameras de Molina", "Serranía de Guadalajara"],
     "sierra-de-albarracin": ["Albarracín y Jiloca"],
@@ -881,11 +971,11 @@ def avisos_oficiales():
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", default="meteo-out")
-    ap.add_argument("--modelos", default="ecmwf,gfs,icon")
+    ap.add_argument("--modelos", default="ecmwf,gfs,icon,arome")
     ap.add_argument("--limite", type=int, default=30, help="minutos máximos de descarga")
     a = ap.parse_args()
     os.makedirs(a.out, exist_ok=True)
-    funcs = {"ecmwf": ecmwf, "gfs": gfs, "icon": icon}
+    funcs = {"ecmwf": ecmwf, "gfs": gfs, "icon": icon, "arome": arome}
     modelos = {}
     inicio = time.time()
 
@@ -894,7 +984,7 @@ def main():
         res = funcs[nombre]()
         log("%s listo en %.0f s" % (nombre, time.time() - t0))
         return res
-    ex = cf.ThreadPoolExecutor(3)
+    ex = cf.ThreadPoolExecutor(4)
     futs = {ex.submit(lanzar, nombre): nombre for nombre in a.modelos.split(",")}
     try:
         for f in cf.as_completed(futs, timeout=a.limite * 60):
