@@ -845,13 +845,13 @@ METEOALARM = "https://feeds.meteoalarm.org/feeds/meteoalarm-legacy-atom-spain"
 NIVEL = {"yellow": "amarillo", "orange": "naranja", "red": "rojo"}
 # Zonas de aviso de AEMET (Meteoalerta) de cada macizo, para los avisos que llegan sin polígono
 ZONAS_AEMET = {
-    "gredos-macizo-central": ["Sistema Central de Ávila"],
+    "gredos-macizo-central": ["Sistema Central de Ávila", "Sur de Ávila"],
     "gredos-macizo-oriental": ["Sistema Central de Ávila", "Sur de Ávila"],
-    "sierra-de-candelario": ["Sistema Central de Salamanca"],
+    "sierra-de-candelario": ["Sistema Central de Salamanca", "Sur de Salamanca"],
     "la-vera": ["Norte de Cáceres"],
     "valle-del-tietar": ["Sur de Ávila", "Sistema Central de Ávila"],
-    "sierra-de-francia": ["Sistema Central de Salamanca"],
-    "las-quilamas": ["Sistema Central de Salamanca"],
+    "sierra-de-francia": ["Sistema Central de Salamanca", "Sur de Salamanca"],
+    "las-quilamas": ["Sistema Central de Salamanca", "Sur de Salamanca"],
     "guadarrama": ["Sierra de Madrid", "Sistema Central de Segovia"],
     "ayllon": ["Sistema Central de Segovia", "Serranía de Guadalajara", "Sierra de Madrid"],
     "picos-de-europa": ["Cordillera Cantábrica de León", "Cordillera y Picos de Europa", "Liébana"],
@@ -861,7 +861,7 @@ ZONAS_AEMET = {
     "puerto-de-san-isidro": ["Cordillera Cantábrica de León"],
     "puerto-de-san-glorio": ["Cordillera Cantábrica de León", "Cordillera Cantábrica de Palencia", "Liébana"],
     "alto-campoo": ["Cantabria del Ebro", "Centro y valle de Villaverde", "Cordillera Cantábrica de Palencia"],
-    "sierra-de-tonda": ["Sistema Central de Salamanca", "Meseta de Salamanca"],
+    "sierra-de-tonda": ["Sur de Salamanca", "Sistema Central de Salamanca", "Meseta de Salamanca"],
     "serrania-de-cuenca": ["Serranía de Cuenca"],
     "alto-tajo": ["Parameras de Molina", "Serranía de Guadalajara"],
     "sierra-de-albarracin": ["Albarracín y Jiloca"],
