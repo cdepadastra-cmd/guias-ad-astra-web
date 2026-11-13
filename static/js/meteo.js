@@ -326,7 +326,7 @@
         var filas = ix, m3 = !hayHoras || modo === "3h";
         if (m3) filas = ix.filter(function (i) { return T[i].getUTCHours() % 3 === 0; });
         if (hayHoras) h += '<div class="mt-modo" role="group" aria-label="Detalle de la tabla"><button type="button" data-modo="1h" class="' + (modo === "1h" ? "on" : "") + '">Cada hora</button><button type="button" data-modo="3h" class="' + (modo === "3h" ? "on" : "") + '">Cada 3 horas</button></div>';
-        h += '<div class="mt-scroll"><table class="mt-tab"><thead><tr><th>Hora</th><th>Cielo</th><th>Cumbre</th><th>Base</th><th>Viento cumbre</th><th>Racha base</th><th>Precip.</th>' + (hayNub ? NUB.map(function (a) { return '<th class="mt-nb">Nubes<br>' + a.toLocaleString("es-ES") + " m</th>"; }).join("") : "<th>Nubes</th>") + "<th>Isocero</th><th>Cota nieve</th></tr></thead><tbody>";
+        h += '<div class="mt-scroll"><table class="mt-tab"><thead><tr><th>Hora</th><th>Cielo</th><th>Cumbre</th><th>Base</th><th>Precip.</th><th>Viento cumbre</th><th>Racha base</th>' + (hayNub ? NUB.map(function (a) { return '<th class="mt-nb">Nubes<br>' + a.toLocaleString("es-ES") + " m</th>"; }).join("") : "<th>Nubes</th>") + "<th>Isocero</th><th>Cota nieve</th></tr></thead><tbody>";
         filas.forEach(function (i) {
           var noche = +fH.format(T[i]) < 8 || +fH.format(T[i]) >= 20;
           var horas = DUR[i], pr = C.pr[i];
@@ -334,7 +334,7 @@
             pr = null; horas = 0;
             for (var j = i; j >= 0 && horas < 3; j--) { if (C.pr[j] != null) pr = (pr || 0) + C.pr[j]; horas += DUR[j]; }
           }
-          h += "<tr><td>" + fHora.format(T[i]) + "</td><td>" + icono(iconoTramo(C, i, horas, pr), noche) + "</td><td><b>" + n(C.tc[i], "°") + "</b>" + sens(C.tc[i], C.st && C.st[i]) + "</td><td>" + n(C.tv[i], "°") + sens(C.tv[i], C.sv && C.sv[i]) + "</td><td>" + flecha(C.dc[i]) + n(C.wc[i]) + " km/h " + dir(C.dc[i]) + "</td><td>" + n(C.gv[i]) + " km/h</td><td>" + (pr ? dec(pr) + " mm" : "–") + "</td>" + (hayNub ? NUB.map(function (a) { return celdaNube(C["n" + a][i]); }).join("") : "<td>" + n(C.cc[i], "%") + "</td>") + "<td>" + (C.i0[i] == null ? "–" : C.i0[i].toLocaleString("es-ES") + " m") + "</td><td>" + (C.sl[i] == null || !pr ? "–" : C.sl[i].toLocaleString("es-ES") + " m") + "</td></tr>";
+          h += "<tr><td>" + fHora.format(T[i]) + "</td><td>" + icono(iconoTramo(C, i, horas, pr), noche) + "</td><td><b>" + n(C.tc[i], "°") + "</b>" + sens(C.tc[i], C.st && C.st[i]) + "</td><td>" + n(C.tv[i], "°") + sens(C.tv[i], C.sv && C.sv[i]) + "</td><td>" + (pr ? dec(pr) + " mm" : "–") + "</td><td>" + flecha(C.dc[i]) + n(C.wc[i]) + " km/h " + dir(C.dc[i]) + "</td><td>" + n(C.gv[i]) + " km/h</td>" + (hayNub ? NUB.map(function (a) { return celdaNube(C["n" + a][i]); }).join("") : "<td>" + n(C.cc[i], "%") + "</td>") + "<td>" + (C.i0[i] == null ? "–" : C.i0[i].toLocaleString("es-ES") + " m") + "</td><td>" + (C.sl[i] == null || !pr ? "–" : C.sl[i].toLocaleString("es-ES") + " m") + "</td></tr>";
         });
         h += "</tbody></table></div><p class=\"muted small\">La precipitación de cada fila es la caída desde la fila anterior (" + (m3 ? "3 horas" : "1 hora") + "); el resto, el valor a esa hora. Mediana de los modelos. En azul, junto a la temperatura, la sensación térmica (frío por viento o calor por humedad). Nubes a cada altitud: estimadas con la humedad del aire a esa altura; «–» si esa altitud queda bajo el terreno de la zona. Las primeras 72 horas van hora a hora (ECMWF solo da datos cada 3 horas: entre medias se interpola).</p>";
         return h;
