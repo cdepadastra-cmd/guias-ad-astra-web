@@ -824,8 +824,9 @@ METEO_ACT = {
     "gredos-macizo-central": ["senderismo-avila-gredos", "ascensiones-montana", "barranquismo-avila"],
     "gredos-macizo-oriental": ["barranquismo-avila", "senderismo-avila-gredos"],
     "sierra-de-candelario": ["via-ferrata-salamanca", "senderismo-salamanca", "barranquismo-salamanca", "comarca-natural-oeste-de-gredos"],
-    "la-vera": ["barranquismo-en-caceres", "barranquismo-avila"],
-    "valle-del-tietar": ["barranquismo-avila", "ascensiones-montana"],
+    "sierra-del-barco": ["senderismo-avila-gredos", "ascensiones-montana", "barranquismo-avila"],
+    "los-galayos": ["barranquismo-avila", "ascensiones-montana", "senderismo-avila-gredos"],
+    "valle-del-jerte": ["barranquismo-en-caceres", "senderismo-salamanca", "via-ferrata-salamanca"],
     "sierra-de-francia": ["boulder-zona-centro-salamanca-caceres", "barranquismo-salamanca"],
     "las-quilamas": ["barranquismo-salamanca", "via-ferrata-salamanca"],
     "guadarrama": ["barranquismo-madrid-segovia", "espeleologia-segovia", "cursos-alpinismo"],
@@ -1108,6 +1109,7 @@ def main():
         "<Files \".ftp-deploy-sync-state.json\">\nRequire all denied\n</Files>\n"
         "# Direcciones de la web antigua -> nuevas (301)\n" + "".join(
         "RedirectMatch 301 ^/%s$ %s%s\n" % (k.replace(".", "\\."), D, v) for k, v in sorted(old.items())) +
+        "# Zonas de meteo renombradas\nRedirectMatch 301 ^/meteo/valle-del-tietar/?$ %s/meteo/los-galayos/\nRedirectMatch 301 ^/meteo/la-vera/?$ %s/meteo/sierra-del-barco/\n" % (D, D) +
         "# Actividades retiradas\nRedirectMatch 301 ^/actividades/espeleologia-leon(/.*)?$ %s/actividades/barranquismo-cueva-valporquero-sima-de-perlas/\n" % D +
         "# La versión de prueba /NUEVA ya no existe: lleva a la misma página en la web principal\nRedirectMatch 301 ^/NUEVA(/.*)?$ %s$1\n" % D)
     # Resumen para buscadores con IA (ChatGPT, Perplexity, Gemini, Claude…): https://llmstxt.org
