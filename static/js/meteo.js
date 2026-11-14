@@ -400,21 +400,25 @@
           g += et(iMx, "máx ");
           if (iMn !== iMx) g += et(iMn, "mín ");
         });
-        // iconos cada 3 horas
-        var i = 0;
-        while (i < ix.length) {
-          var j = i, horas = DUR[ix[i]], pr = C.pr[ix[i]] || 0;
-          while (horas < 3 && j + 1 < ix.length && DUR[ix[j + 1]] === 1) { j++; horas += DUR[ix[j]]; pr += C.pr[ix[j]] || 0; }
-          var tm = T[ix[j]].getTime() - horas * 18e5;
+        // un icono por cada dato: cada hora en las primeras 72 h (después los modelos dan cada 3 h)
+        var horario = ix.filter(function (i) { return DUR[i] === 1; }).length > ix.length / 2, IC = horario ? 26 : 44;
+        var prMax = 0; ix.forEach(function (i) { prMax = Math.max(prMax, C.pr[i] || 0); });
+        ix.forEach(function (i, n) {
+          if (n === 0 && ix.length > 1) return;  // el primer punto es el final del día anterior
+          var tm = T[i].getTime() - DUR[i] * 18e5, xc = X(tm);
           var noche = sl ? (tm < sl.sale.getTime() || tm > sl.pone.getTime()) : false;
-          var xc = Math.min(W - R - ICO / 2, Math.max(L + ICO / 2, X(tm)));
-          g += '<g transform="translate(' + (xc - ICO / 2).toFixed(1) + " " + TOPD + ')">' + icono(iconoTramo(C, ix[j], horas, pr), noche).replace('class="mt-ico"', 'width="' + ICO + '" height="' + ICO + '"') + "</g>";
-          if (pr >= 0.1) g += '<text x="' + xc.toFixed(1) + '" y="' + (TOPD + ICO + 12) + '" class="mt-mg-p">' + dec(pr) + " mm</text>";
-          i = j + 1;
-        }
+          g += '<g transform="translate(' + (xc - IC / 2).toFixed(1) + " " + (TOPD + (ICO - IC) / 2) + ')">' + icono(iconoTramo(C, i, DUR[i], C.pr[i]), noche).replace('class="mt-ico"', 'width="' + IC + '" height="' + IC + '"') + "</g>";
+          var p = C.pr[i] || 0;
+          if (p >= 0.1) {  // barra de lluvia junto al eje inferior
+            var w = (W - L - R) * DUR[i] * 36e5 / (tB - tA) * 0.7, h = Math.max(3, 60 * p / Math.max(prMax, 2));
+            g += '<rect x="' + (xc - w / 2).toFixed(1) + '" y="' + (Hh - B - h).toFixed(1) + '" width="' + w.toFixed(1) + '" height="' + h.toFixed(1) + '" fill="rgba(111,179,224,.75)" rx="2"><title>' + dec(p) + " mm</title></rect>";
+          }
+        });
+        var prDia = ix.slice(ix.length > 1 ? 1 : 0).reduce(function (a, i) { return a + (C.pr[i] || 0); }, 0);
+        if (prDia >= 0.1) g += '<text x="' + (W - R) + '" y="' + (T0 - 2) + '" class="mt-mg-p" style="text-anchor:end">Lluvia del día: ' + dec(prDia) + " mm</text>";
         g += "</svg>";
         return '<div class="mt-mgw">' + g + "</div>" + leyenda([{ c: "#e8574a", l: "Base · " + doc.base.nombre + " (" + doc.base.alt.toLocaleString("es-ES") + " m)" }, { c: "#6fb3e0", l: "Cumbre · " + doc.cumbre.nombre + " (" + doc.cumbre.alt.toLocaleString("es-ES") + " m)" }]) +
-          '<p class="muted small">Iconos y lluvia cada 3 horas; franja clara: horas de luz; línea azul discontinua: 0 °C. Cambia de día en la tira de arriba.</p>';
+          '<p class="muted small">Un icono por hora (a partir del 4.º día los modelos dan datos cada 3 horas); barras azules: lluvia o nieve de cada hora; franja clara: horas de luz; línea azul discontinua: 0 °C. Cambia de día en la tira de arriba.</p>';
       }
 
       function graficas() {
