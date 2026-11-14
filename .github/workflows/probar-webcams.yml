@@ -1,0 +1,26 @@
+name: Probar webcams (temporal)
+on: workflow_dispatch
+jobs:
+  probar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Webcams
+        run: |
+          python3 - <<'PY'
+          import urllib.request, re, json
+          ids = "1369739199 1584619519 1272223531 1584619412 1793896805 1724870409 1606333063 1619163994 1416008706 1631448016 1793913229 1793913238 1456647776 1372831528 1360253056 1698105176 1349988616 1606262481 1606521015 1349988613 1232274363 1653172209 1282561870 1693035724 1752537062 1793900788 1643808316 1286641590 1793913236 1659037142 1381767277 1793909404 1648725131 1435343738 1426264758 1793909403 1694864852 1518025640 1497895359 1688055132 1249658346 1706715337 1610092408 1328085369 1793897020 1673860261 1358956659 1395846809 1517609320 1649011646 1573298277 1693038010 1660989234 1700122992 1697035315 1643972292 1606333524".split()
+          H={"User-Agent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/120 Safari/537.36","Accept-Language":"es-ES,es"}
+          def get(u):
+              try:
+                  r=urllib.request.urlopen(urllib.request.Request(u,headers=H),timeout=20); return r.status, r.read().decode("utf-8","ignore")
+              except Exception as e: return getattr(e,"code",0), ""
+          for i in ids:
+              st,h=get("https://webcams.windy.com/webcams/public/embed/player/%s/day"%i)
+              t=re.search(r"<title>(.*?)</title>",h,re.S); 
+              st2,h2=get("https://www.windy.com/webcams/%s"%i)
+              t2=re.search(r'<title>(.*?)</title>',h2,re.S); og=re.search(r'og:title" content="([^"]*)',h2); d=re.search(r'name="description" content="([^"]*)',h2)
+              ll=re.search(r'"latitude":\s*([\d.-]+).*?"longitude":\s*([\d.-]+)',h+h2,re.S)
+              print(i, st, (t.group(1).strip()[:80] if t else ""), "|", st2, (og.group(1) if og else (t2.group(1).strip()[:100] if t2 else "")), "|", (d.group(1)[:140] if d else ""), "|", ll.groups() if ll else "")
+          st,h=get("https://webcams.windy.com/webcams/public/embed/player/1369739199/day"); print(h[:1500])
+          PY
