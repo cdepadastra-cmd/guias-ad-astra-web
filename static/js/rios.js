@@ -51,8 +51,10 @@
       (b.dato_antiguo ? ' · <b style="color:#f08a3e">dato con más de 6 horas: el aforo puede estar sin conexión</b>' : "") + (b.max24 != null ? " · máximo 24 h: " + dec(b.max24) + " m³/s" : "") + "</p>";
     if (b.umbrales) h += '<p class="rio-umb">' + b.umbrales.map(function (u, i) {
       var de = i ? b.umbrales[i - 1].hasta : 0;
-      return '<span><i style="background:' + COL[u.estado] + '"></i>' + (u.hasta == null ? "más de " + dec(de, 0) : dec(de, 0) + "–" + dec(u.hasta, 0)) + " m³/s: " + esc(u.txt) + "</span>";
+      var f = function (x) { return x < 10 && x % 1 ? dec(x, 1) : dec(x, 0); };
+      return '<span><i style="background:' + COL[u.estado] + '"></i>' + (u.hasta == null ? "más de " + f(de) : f(de) + "–" + f(u.hasta)) + " m³/s: " + esc(u.txt) + "</span>";
     }).join("") + "</p>";
+    if (b.provisional) h += '<p class="muted small">Umbrales provisionales, estimados con el caudal del aforo en las épocas en que hacemos el barranco. Se irán ajustando con cada salida.</p>';
     h += grafica(b);
     var ll = b.lluvia_ahora, pv = b.prevision;
     h += '<div class="rio-ll">';

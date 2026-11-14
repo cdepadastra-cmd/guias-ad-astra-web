@@ -34,12 +34,18 @@ BARRANCOS = [
      "actividad": "/actividades/barranquismo-palencia/",
      "aforo": {"fuente": "duero", "codigo": "EA512", "nombre": "Carrión en Triollo"},
      "lluvia": {"fuente": "duero", "codigo": "PL102", "nombre": "Vidrieros"},
-     "umbrales": None},
+     # provisionales: el 27-7-2026 bajaba con poca agua; en el estiaje de 2026 el aforo marcó 0,2-1,2 m3/s
+     "provisional": True,
+     "umbrales": [(0.5, "poco", "Poco caudal"), (2, "bueno", "Caudal bueno"),
+                  (4, "alto", "Caudal alto: con experiencia y mucho cuidado"), (None, "no", "Muy alto: no recomendable")]},
     {"id": "valporquero", "nombre": "Cueva de Valporquero", "lugar": "Valporquero (León)", "macizo": "montanas-de-leon",
      "actividad": "/actividades/barranquismo-cueva-valporquero-sima-de-perlas/",
      "aforo": {"fuente": "duero", "codigo": "EA150", "nombre": "Torío en Matallana"},
      "lluvia": {"fuente": "duero", "codigo": "PL201", "nombre": "Valporquero"},
-     "umbrales": None},
+     # provisionales: se hace todo julio y agosto con caudal normal; en agosto de 2026 el aforo marcó 0,2-1,9 m3/s (máx. 2,8)
+     "provisional": True,
+     "umbrales": [(2, "bueno", "Caudal normal de verano"), (3.5, "alto", "Más agua de lo normal: con mucho cuidado"),
+                  (None, "no", "Muy alto: no recomendable")]},
 ]
 
 
@@ -233,6 +239,7 @@ def main():
             "tendencia": tendencia(serie), "max24": round(max([x[1] for x in serie if x[0] >= ahora - dt.timedelta(hours=24)] or [0]), 2) if serie else None,
             "estado": k, "estado_txt": txt,
             "umbrales": [{"hasta": u[0], "estado": u[1], "txt": u[2]} for u in b["umbrales"]] if b["umbrales"] else None,
+            "provisional": bool(b.get("provisional")),
             "serie": [(x[0].strftime("%Y-%m-%dT%H:%MZ"), round(x[1], 2)) for x in serie if x[0] >= ahora - dt.timedelta(hours=48)],
             "lluvia_ahora": lluvias.get(b["id"]),
             "prevision": lluvia_prevista(b["macizo"], a.meteo),
