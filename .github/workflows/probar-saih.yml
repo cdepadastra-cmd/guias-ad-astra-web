@@ -16,21 +16,20 @@ jobs:
           cj=http.cookiejar.CookieJar()
           op=urllib.request.build_opener(urllib.request.HTTPSHandler(context=ssl.create_default_context(cafile="bundle.pem")), urllib.request.HTTPCookieProcessor(cj))
           op.addheaders=[("User-Agent","Mozilla/5.0 (X11; Linux x86_64) Chrome/120"),("Accept-Language","es-ES")]
-          h=op.open("https://www.saihduero.es/risr/EA512",timeout=30).read().decode("utf-8","ignore")
-          k=h.find("Datos históricos"); print("BLOQUE:", re.sub(r"\s+"," ",h[k-200:k+2500]))
-          links=sorted(set(re.findall(r'risr/EA512/historico/[A-Za-z0-9]+', h)))
-          for l in links:
-              r=op.open("https://www.saihduero.es/"+l,timeout=60); b=r.read()
-              print("=====", l, r.status, r.headers.get("Content-Type"), r.headers.get("Content-Disposition"), len(b))
-              t=b.decode("utf-8","ignore")
-              if "<html" in t[:200].lower():
-                  tit=re.findall(r"<h4[^>]*>(.*?)</h4>", t, re.S); print("   H4:", [re.sub(r"<[^>]+>|\s+"," ",x).strip() for x in tit][:6])
-                  for pat in (r"2026-07-2[57][^\"']{0,40}", r"2[57]/07/2026[^\"']{0,60}", r"\d{2}/\d{2}/\d{4} \d{2}:\d{2}"):
-                      mm=re.findall(pat, t); print("   PAT", pat, len(mm), mm[:3], mm[-2:] if mm else "")
-                  k=t.find("labels"); print("   LABELS:", re.sub(r"\s+"," ",t[k-200:k+600]) if k>0 else None)
-                  k=t.find("series"); print("   SERIES:", re.sub(r"\s+"," ",t[k-100:k+500]) if k>0 else None)
-              else:
-                  print("   ", t[:400].replace("\n"," | "))
-                  lin=[x for x in t.splitlines() if re.search(r"(2[05]|27)/07/20\d\d|20\d\d-07-2[57]", x)]
-                  print("   JULIO:", lin[:12])
+          import collections
+          for est in ("EA512","EA150"):
+              h=op.open("https://www.saihduero.es/risr/"+est,timeout=30).read().decode("utf-8","ignore")
+              for l in sorted(set(re.findall(r'risr/%s/historico/[A-Za-z0-9]+' % est, h))):
+                  t=op.open("https://www.saihduero.es/"+l,timeout=60).read().decode("utf-8","ignore")
+                  k=t.find("<table"); cab=re.sub(r"<[^>]+>|\s+"," ",t[k:k+800]) if k>0 else ""
+                  filas=re.findall(r"(\d{2})/(\d{2})/(\d{4}) (\d{2}):\d{2}\s*</td>\s*<td[^>]*>\s*([-\d.,]+)", t)
+                  print("=====", est, l[-16:], "cabecera:", cab[:200], "filas:", len(filas), filas[:2])
+                  por=collections.defaultdict(list)
+                  for d,mo,y,hh,v in filas:
+                      try: q=float(v.replace(".","").replace(",",".")) if "," in v else float(v)
+                      except ValueError: continue
+                      clave = "%s-%s" % (y,mo) if not (mo=="08" and int(d)>=16) else "2026-08b"
+                      por[clave].append(q)
+                  for kk in sorted(por):
+                      v=sorted(por[kk]); print("    %s n=%d p10=%.2f p50=%.2f p90=%.2f min=%.2f max=%.2f" % (kk,len(v),v[len(v)//10],v[len(v)//2],v[9*len(v)//10],v[0],v[-1]))
           PY
