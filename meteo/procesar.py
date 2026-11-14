@@ -227,14 +227,14 @@ def ecmwf():
 GFS_BUCKET = "https://noaa-gfs-bdp-pds.s3.amazonaws.com"
 GFS_WANT = {("TMP", "2 m above ground"), ("RH", "2 m above ground"), ("UGRD", "10 m above ground"), ("VGRD", "10 m above ground"),
             ("GUST", "surface"), ("APCP", "surface"), ("TCDC", "entire atmosphere"), ("CAPE", "surface"),
-            ("HGT", "0C isotherm"), ("HGT", "surface")}
+            ("HGT", "0C isotherm"), ("HGT", "surface"), ("SNOD", "surface")}
 for _l in LEVELS:
     for _v in ("TMP", "HGT", "UGRD", "VGRD", "RH"):
         GFS_WANT.add((_v, "%d mb" % _l))
 
 
 NOMADS = "https://nomads.ncep.noaa.gov/cgi-bin/filter_gfs_0p25.pl"
-NOMADS_Q = ("&var_TMP=on&var_HGT=on&var_UGRD=on&var_VGRD=on&var_GUST=on&var_APCP=on&var_TCDC=on&var_CAPE=on"
+NOMADS_Q = ("&var_TMP=on&var_HGT=on&var_UGRD=on&var_VGRD=on&var_GUST=on&var_APCP=on&var_TCDC=on&var_CAPE=on&var_SNOD=on"
             "&var_RH=on&lev_2_m_above_ground=on&lev_10_m_above_ground=on&lev_surface=on&lev_entire_atmosphere=on&lev_0C_isotherm=on"
             + "".join("&lev_%d_mb=on" % l for l in LEVELS) + "&subregion=&leftlon=-10&rightlon=4&toplat=45&bottomlat=35")
 
@@ -291,6 +291,8 @@ def gfs_nomads(m, steps):
                 res.append(("TCDC", "entire atmosphere", meta, v))
             elif sn == "cape" and tl == "surface":
                 res.append(("CAPE", "surface", meta, v))
+            elif sn in ("sde", "sd", "snod") and tl == "surface":
+                res.append(("SNOD", "surface", meta, v))
         return st, res
     with cf.ThreadPoolExecutor(4) as ex:
         return list(ex.map(paso, steps))
@@ -371,6 +373,8 @@ def gfs():
                 m.put("tcc", t, v)
             elif var == "CAPE":
                 m.put("cape", t, v)
+            elif var == "SNOD":
+                m.put("snd", t, v * 100.0)  # m -> cm
             elif var == "HGT" and lev == "0C isotherm":
                 m.put("iso0", t, v)
             elif var == "HGT" and lev == "surface":
@@ -388,7 +392,7 @@ def gfs():
 
 # ------------------------------------------------------------------ DWD ICON-EU
 DWD = "https://opendata.dwd.de/weather/nwp/icon-eu/grib"
-ICON_SINGLE = ["t_2m", "relhum_2m", "u_10m", "v_10m", "vmax_10m", "tot_prec", "clct", "hzerocl", "snowlmt", "cape_ml"]
+ICON_SINGLE = ["t_2m", "relhum_2m", "u_10m", "v_10m", "vmax_10m", "tot_prec", "clct", "hzerocl", "snowlmt", "cape_ml", "h_snow"]
 ICON_PL = {"t": [925, 850, 700, 500], "fi": [1000, 925, 850, 700, 500], "u": [850, 700, 500], "v": [850, 700, 500], "relhum": [1000, 925, 850, 700, 500]}
 
 
@@ -462,6 +466,8 @@ def icon():
                 m.put("snowl", t, v)
             elif var == "cape_ml":
                 m.put("cape", t, v)
+            elif var == "h_snow":
+                m.put("snd", t, v * 100.0)  # m -> cm
             elif var == "hsurf":
                 m.put("orog", t, v)
     log("ICON-EU: %d ficheros, %d no disponibles" % (len(trabajos), fallos))
@@ -657,7 +663,7 @@ def series_modelo(m, eje, orog_proxy):
         orog_v = orog_proxy
     for k, mac in enumerate(MACIZOS):
         b, c = 2 * k, 2 * k + 1
-        s = {x: [] for x in ("tv", "tc", "wc", "dc", "wv", "gv", "pr", "cc", "i0", "sl", "cp", "sv", "st") + tuple("n%d" % h for h in ALTURAS_NUBES)}
+        s = {x: [] for x in ("tv", "tc", "wc", "dc", "wv", "gv", "pr", "cc", "i0", "sl", "cp", "sv", "st", "sn", "snb") + tuple("n%d" % h for h in ALTURAS_NUBES)}
         for ii, t in enumerate(eje):
             g = lambda var, p: (lambda a: None if a is None else float(a[p]))(en_tiempo(m.campos.get(var), t))
             t2b, t2c = g("t2", b), g("t2", c)
@@ -722,7 +728,9 @@ def series_modelo(m, eje, orog_proxy):
                     continue
                 rr_ = perfil_en(hh, None, None, niv_r)
                 nub["n%d" % hh] = None if rr_ is None else r(nube_por_humedad(rr_))
-            vals = dict(tv=r(tv, 1), tc=r(tc, 1), wc=r(wc), dc=r(dc), wv=r(wv), gv=r(gv), pr=r(pr, 1), cc=r(cc), sv=r(sv), st=r(st_), **nub,
+            # espesor de nieve del modelo (cm) en el punto de rejilla de la cumbre y de la base
+            snc, snb_ = g("snd", c), g("snd", b)
+            vals = dict(sn=None if snc is None else r(max(0.0, snc)), snb=None if snb_ is None else r(max(0.0, snb_)), tv=r(tv, 1), tc=r(tc, 1), wc=r(wc), dc=r(dc), wv=r(wv), gv=r(gv), pr=r(pr, 1), cc=r(cc), sv=r(sv), st=r(st_), **nub,
                         i0=None if i0 is None else int(round(i0 / 10.0) * 10), sl=None if sl is None else int(round(sl / 10.0) * 10), cp=r(cp))
             for x in s:
                 s[x].append(vals[x])
@@ -756,7 +764,7 @@ def dias(eje, modelos_series, mac_id):
     """Resumen por día local (consenso = mediana de los modelos disponibles)."""
     ms = {m: s[mac_id] for m, s in modelos_series.items()}
     n = len(eje)
-    claves = ("tv", "tc", "wc", "dc", "wv", "gv", "pr", "cc", "i0", "sl", "cp", "sv", "st") + tuple("n%d" % h for h in ALTURAS_NUBES)
+    claves = ("tv", "tc", "wc", "dc", "wv", "gv", "pr", "cc", "i0", "sl", "cp", "sv", "st", "sn", "snb") + tuple("n%d" % h for h in ALTURAS_NUBES)
     cons = {x: [mediana([ms[m].get(x, [None] * n)[i] for m in ms]) for i in range(n)] for x in claves}
     def dir_media(i):  # media circular de la dirección del viento
         d = [ms[m]["dc"][i] for m in ms if ms[m]["dc"][i] is not None]
@@ -1027,6 +1035,11 @@ def main():
         log("%-28s hoy: cumbre %s/%s °C, viento %s km/h, precip %s mm, isocero %s m, %s" % (
             mac["id"], d0.get("tc_min"), d0.get("tc_max"), d0.get("wc_max"), d0.get("pr"), d0.get("i0_min"), ",".join(d0.get("avisos", []))))
     json.dump(resumen, open(os.path.join(a.out, "resumen.json"), "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
+    try:
+        import nieve
+        nieve.generar(a.out, MACIZOS, log)
+    except Exception:
+        log("ERROR en el estado de la nieve:\n%s" % traceback.format_exc())
     log("Escritos %d macizos con modelos: %s" % (len(MACIZOS), ", ".join(modelos)))
     sys.stdout.flush()
     os._exit(0)  # no esperar a descargas que se hayan quedado colgadas

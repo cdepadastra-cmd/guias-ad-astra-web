@@ -12,7 +12,7 @@ TODAY = datetime.date.today().isoformat()
 PAGES = []  # (path, priority) para el sitemap
 import hashlib
 _ST = os.path.join(os.path.dirname(os.path.abspath(__file__)), "static")
-VER = {a: hashlib.md5(open(os.path.join(_ST, a), "rb").read()).hexdigest()[:8] for a in ("css/estilos.css", "js/app.js", "js/calculadora.js", "js/topografia.js", "js/meteo.js", "js/rios.js", "config.js")}
+VER = {a: hashlib.md5(open(os.path.join(_ST, a), "rb").read()).hexdigest()[:8] for a in ("css/estilos.css", "js/app.js", "js/calculadora.js", "js/topografia.js", "js/meteo.js", "js/rios.js", "js/nieve.js", "config.js")}
 
 def e(s):
     return html.escape(str(s), quote=True)
@@ -48,7 +48,7 @@ NAV_ACT = [("Todas las actividades", "/actividades/"), ("Barranquismo", "/activi
            ("Alpinismo y ascensiones", "/actividades/?categoria=Ascensiones"), ("Espeleología", "/actividades/?categoria=Espeleología"), ("Escalada y boulder", "/actividades/?categoria=Escalada"),
            ("Senderismo", "/actividades/?categoria=Senderismo"), ("Travesías y viajes", "/actividades/?categoria=Travesías y viajes")]
 NAV_CUR = [("Todos los cursos", "/formacion-cursos/")] + [(c["disc_label"], "/actividades/%s/" % c["slug"]) for c in COURSES]
-NAV_HER = [("Meteorología de montaña", "/meteo/"), ("Caudal de barrancos", "/barrancos-caudal/"), ("Calculadora de rutas", "/calculadora-rutas/"), ("Topografía de barrancos", "/topografia-barrancos/"), ("Boulder en Las Tuerces", "/actividades/boulder-las-tuerces/"), ("Boulder en Zona Centro", "/actividades/boulder-zona-centro-salamanca-caceres/")]
+NAV_HER = [("Meteorología de montaña", "/meteo/"), ("Estado de la nieve", "/nieve/"), ("Caudal de barrancos", "/barrancos-caudal/"), ("Calculadora de rutas", "/calculadora-rutas/"), ("Topografía de barrancos", "/topografia-barrancos/"), ("Boulder en Las Tuerces", "/actividades/boulder-las-tuerces/"), ("Boulder en Zona Centro", "/actividades/boulder-zona-centro-salamanca-caceres/")]
 NAV_OTR = [("Iniciativas de turismo rural", "/iniciativas-turismo-rural/"), ("Creación y mantenimiento de senderos", "/creacion-mantenimiento-senderos/"), ("Route setting", "/route-setting/"), ("Organización de eventos", "/actividades/organizacion-eventos-deportivos/"), ("Gredos Limpio", "/actividades/gredos-limpio/"),
            ("Oeste de Gredos", "/actividades/comarca-natural-oeste-de-gredos/"), ("Vía Verde Ruta de la Plata", "/actividades/via-verde-ruta-de-la-plata/")]
 
@@ -98,7 +98,7 @@ def page(path, title, desc, body, active="", ld=None, og_type="website", image=N
            '<link rel="stylesheet" href="/css/estilos.css"><link rel="icon" href="/favicon.ico" sizes="any"><link rel="icon" href="/img/favicon-32.png" type="image/png" sizes="32x32"><link rel="icon" href="/img/favicon-48.png" type="image/png" sizes="48x48"><link rel="icon" href="/img/favicon-192.png" type="image/png" sizes="192x192"><link rel="apple-touch-icon" href="/img/apple-touch-icon.png">' + head + lds +
            '</head><body>' + header(active) + '<main id="contenido">' + body + '</main>' + footer() +
            '<script src="/config.js"></script><script src="/js/app.js" defer></script>' + scripts + '</body></html>')
-    for asset in ("css/estilos.css", "js/app.js", "js/calculadora.js", "js/topografia.js", "js/meteo.js", "js/rios.js", "config.js"):
+    for asset in ("css/estilos.css", "js/app.js", "js/calculadora.js", "js/topografia.js", "js/meteo.js", "js/rios.js", "js/nieve.js", "config.js"):
         doc = doc.replace('"/%s"' % asset, '"/%s?v=%s"' % (asset, VER.get(asset, "1")))
     if BASE:
         doc = doc.replace('href="/', 'href="%s/' % BASE).replace('src="/', 'src="%s/' % BASE)
@@ -885,6 +885,29 @@ CAUDAL_FAQ = [
 ]
 
 
+NIEVE_FAQ = [
+    ("¿Cómo se calcula el estado de la nieve?", "Con los mismos modelos de nuestra página de meteorología (ECMWF, GFS, ICON y AROME). Guardamos lo que ha pasado en los últimos días y lo juntamos con la previsión de los próximos tres: nieve nueva en cumbre, viento después de las nevadas, días de deshielo seguidos de noches de helada, lluvia sobre la nieve e isocero. Con eso estimamos qué tipo de nieve vas a encontrar."),
+    ("¿Es un boletín de aludes?", "No. Es una estimación orientativa hecha con modelos meteorológicos, sin observaciones de campo ni sondeos del manto. Donde existe un boletín oficial de peligro de aludes (Pirineo), enlazamos el boletín, que es el que manda."),
+    ("¿Por qué el espesor del manto parece bajo?", "Los modelos calculan la nieve en su punto de rejilla, que está a menos altura que la cumbre real y no ve ventisqueros ni canales. Úsalo para comparar días y zonas, no como medida exacta."),
+    ("¿Qué significa costra de rehielo?", "Cuando de día se funde la capa superficial y de noche vuelve a helar, a primera hora la nieve está dura como el hielo: hacen falta crampones y piolet y una caída no se para fácilmente. Con el sol se va ablandando, antes en las solanas."),
+]
+
+
+def build_nieve():
+    path = "/nieve/"
+    cams = json.dumps({k: v for k, v in WEBCAMS.items()}, ensure_ascii=False).replace("</", "<\\/")
+    body = (hero("Herramientas", "Estado de la nieve", "Estimación del estado de la nieve en %d macizos: nieve reciente y prevista, placas de viento, costra de rehielo y nieve húmeda, calculada con los modelos meteorológicos y los datos de los últimos días." % len(MACIZOS), METEO_IMG,
+                 [("Inicio", "/"), ("Estado de la nieve", "")], '<a class="btn btn-primary" href="#estado">Ver el estado</a><a class="btn btn-ghost" href="/meteo/">Meteorología</a>') +
+            '<section class="section" id="estado"><div class="wrap"><div id="nv-lista" class="nv"><p class="mt-cargando">Cargando el estado de la nieve…</p></div></div></section>'
+            '<script type="application/json" id="nv-cams">' + cams + '</script>' +
+            '<section class="section alt"><div class="wrap split"><div class="stack" style="gap:0">' + block("Preguntas frecuentes", faq_html(NIEVE_FAQ)) +
+            '</div><div class="sticky"><div class="panel"><p class="eyebrow">Importante</p><p>Esto no es un boletín de peligro de aludes. Consulta siempre el boletín oficial donde lo haya, valora el terreno y la nieve sobre el sitio y lleva el material adecuado (ARVA, pala y sonda en terreno de aludes).</p></div></div></div></section>')
+    ld = [crumbs_ld([("Inicio", "/"), ("Estado de la nieve", path)]), faq_ld(NIEVE_FAQ)]
+    page(path, "Estado de la nieve en Gredos, Picos, Pirineos y Sierra Nevada | Ad Astra",
+         "Estado de la nieve por macizo: nieve reciente y prevista, placas de viento, costra de rehielo y nieve húmeda en Gredos, Guadarrama, Picos de Europa, Pirineos y Sierra Nevada.",
+         body, "her", ld, priority="0.6", scripts='<script src="/js/nieve.js" defer></script>')
+
+
 def build_caudales():
     path = "/barrancos-caudal/"
     body = (hero("Herramientas", "Caudal de los barrancos", "Estado de nuestros barrancos con el caudal de los aforos oficiales del SAIH Tajo y del SAIH Duero, la tendencia de las últimas horas y la lluvia prevista. Se actualiza cada hora.", METEO_IMG,
@@ -1064,7 +1087,7 @@ def main():
     cfg = os.path.join(OUT, "config.js")
     c = open(cfg, encoding="utf-8").read().replace('calendarioURL: ""', 'calendarioURL: "",\n  // Carpeta donde está publicada la web ("" si está en la raíz del dominio)\n  base: "%s"' % BASE)
     open(cfg, "w", encoding="utf-8").write(c)
-    build_home(); build_activities_index(); build_courses_index(); build_calendar(); build_rental(); build_about(); build_contact(); build_404(); build_calculator(); build_topografia(); build_meteo(); build_caudales()
+    build_home(); build_activities_index(); build_courses_index(); build_calendar(); build_rental(); build_about(); build_contact(); build_404(); build_calculator(); build_topografia(); build_meteo(); build_caudales(); build_nieve()
     for a in ACTIVITIES:
         build_activity(a)
     build_ascensiones_macizos()
