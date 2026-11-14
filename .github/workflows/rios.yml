@@ -46,6 +46,10 @@ jobs:
           server-dir: /guiasadastra.com/meteo/rios/
           timeout: 120000
 
+      - name: Esperar unos segundos
+        if: env.FTP_SERVER != '' && steps.ftp1.outcome == 'failure'
+        run: sleep 30
+
       - name: Reintentar si se cortó la conexión
         if: env.FTP_SERVER != '' && steps.ftp1.outcome == 'failure'
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5

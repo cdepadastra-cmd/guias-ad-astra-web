@@ -12,7 +12,7 @@ TODAY = datetime.date.today().isoformat()
 PAGES = []  # (path, priority) para el sitemap
 import hashlib
 _ST = os.path.join(os.path.dirname(os.path.abspath(__file__)), "static")
-VER = {a: hashlib.md5(open(os.path.join(_ST, a), "rb").read()).hexdigest()[:8] for a in ("css/estilos.css", "js/app.js", "js/calculadora.js", "js/topografia.js", "js/meteo.js", "config.js")}
+VER = {a: hashlib.md5(open(os.path.join(_ST, a), "rb").read()).hexdigest()[:8] for a in ("css/estilos.css", "js/app.js", "js/calculadora.js", "js/topografia.js", "js/meteo.js", "js/rios.js", "config.js")}
 
 def e(s):
     return html.escape(str(s), quote=True)
@@ -48,7 +48,7 @@ NAV_ACT = [("Todas las actividades", "/actividades/"), ("Barranquismo", "/activi
            ("Alpinismo y ascensiones", "/actividades/?categoria=Ascensiones"), ("Espeleología", "/actividades/?categoria=Espeleología"), ("Escalada y boulder", "/actividades/?categoria=Escalada"),
            ("Senderismo", "/actividades/?categoria=Senderismo"), ("Travesías y viajes", "/actividades/?categoria=Travesías y viajes")]
 NAV_CUR = [("Todos los cursos", "/formacion-cursos/")] + [(c["disc_label"], "/actividades/%s/" % c["slug"]) for c in COURSES]
-NAV_HER = [("Meteorología de montaña", "/meteo/"), ("Calculadora de rutas", "/calculadora-rutas/"), ("Topografía de barrancos", "/topografia-barrancos/"), ("Boulder en Las Tuerces", "/actividades/boulder-las-tuerces/"), ("Boulder en Zona Centro", "/actividades/boulder-zona-centro-salamanca-caceres/")]
+NAV_HER = [("Meteorología de montaña", "/meteo/"), ("Caudal de barrancos", "/barrancos-caudal/"), ("Calculadora de rutas", "/calculadora-rutas/"), ("Topografía de barrancos", "/topografia-barrancos/"), ("Boulder en Las Tuerces", "/actividades/boulder-las-tuerces/"), ("Boulder en Zona Centro", "/actividades/boulder-zona-centro-salamanca-caceres/")]
 NAV_OTR = [("Iniciativas de turismo rural", "/iniciativas-turismo-rural/"), ("Creación y mantenimiento de senderos", "/creacion-mantenimiento-senderos/"), ("Route setting", "/route-setting/"), ("Organización de eventos", "/actividades/organizacion-eventos-deportivos/"), ("Gredos Limpio", "/actividades/gredos-limpio/"),
            ("Oeste de Gredos", "/actividades/comarca-natural-oeste-de-gredos/"), ("Vía Verde Ruta de la Plata", "/actividades/via-verde-ruta-de-la-plata/")]
 
@@ -98,7 +98,7 @@ def page(path, title, desc, body, active="", ld=None, og_type="website", image=N
            '<link rel="stylesheet" href="/css/estilos.css"><link rel="icon" href="/favicon.ico" sizes="any"><link rel="icon" href="/img/favicon-32.png" type="image/png" sizes="32x32"><link rel="icon" href="/img/favicon-48.png" type="image/png" sizes="48x48"><link rel="icon" href="/img/favicon-192.png" type="image/png" sizes="192x192"><link rel="apple-touch-icon" href="/img/apple-touch-icon.png">' + head + lds +
            '</head><body>' + header(active) + '<main id="contenido">' + body + '</main>' + footer() +
            '<script src="/config.js"></script><script src="/js/app.js" defer></script>' + scripts + '</body></html>')
-    for asset in ("css/estilos.css", "js/app.js", "js/calculadora.js", "js/topografia.js", "js/meteo.js", "config.js"):
+    for asset in ("css/estilos.css", "js/app.js", "js/calculadora.js", "js/topografia.js", "js/meteo.js", "js/rios.js", "config.js"):
         doc = doc.replace('"/%s"' % asset, '"/%s?v=%s"' % (asset, VER.get(asset, "1")))
     if BASE:
         doc = doc.replace('href="/', 'href="%s/' % BASE).replace('src="/', 'src="%s/' % BASE)
@@ -877,6 +877,27 @@ def meteo_selector(sel=None):
             '<label><span>Sierra o macizo</span><select id="mt-sel" aria-label="Sierra o macizo">%s</select></label></form>'
             '<script type="application/json" id="mt-lista">%s</script>') % (ops_reg, ops_mac, json.dumps(lista, ensure_ascii=False).replace("</", "<\\/"))
 
+CAUDAL_FAQ = [
+    ("¿De dónde salen los caudales?", "De los aforos oficiales de las confederaciones hidrográficas: el SAIH Tajo para el Valle del Jerte y el SAIH Duero para León y Palencia. Son datos en tiempo real y provisionales: a veces un aforo deja de enviar datos o da un valor erróneo."),
+    ("¿Qué significa cada color?", "Lo marcan nuestros guías según su experiencia en cada barranco: verde, caudal bueno; amarillo, poco caudal; naranja, caudal alto, solo con experiencia y mucho cuidado; rojo, no recomendable. Donde todavía no hay umbrales se muestra solo el caudal y su tendencia."),
+    ("¿Por qué se mira un aforo que no está en el propio barranco?", "Casi ningún barranco tiene aforo propio. Se usa el del río principal más cercano, que sube y baja a la vez que el barranco: lo importante es comparar con los valores con los que el guía conoce el barranco."),
+    ("¿Sirve para decidir si entro?", "Es una ayuda, no una garantía. Una tormenta puede subir el caudal en minutos y el aforo puede tardar en reflejarlo. Mira también la previsión de lluvia y, ante la duda, no entres. Con nuestros guías la decisión se toma en el sitio."),
+]
+
+
+def build_caudales():
+    path = "/barrancos-caudal/"
+    body = (hero("Herramientas", "Caudal de los barrancos", "Estado de nuestros barrancos con el caudal de los aforos oficiales del SAIH Tajo y del SAIH Duero, la tendencia de las últimas horas y la lluvia prevista. Se actualiza cada hora.", METEO_IMG,
+                 [("Inicio", "/"), ("Caudal de barrancos", "")], '<a class="btn btn-primary" href="#estado">Ver el estado</a><a class="btn btn-ghost" href="/meteo/">Meteorología</a>') +
+            '<section class="section" id="estado"><div class="wrap"><div id="rio-lista" class="rio"><p class="mt-cargando">Cargando caudales…</p></div></div></section>' +
+            '<section class="section alt"><div class="wrap split"><div class="stack" style="gap:0">' + block("Preguntas frecuentes", faq_html(CAUDAL_FAQ)) +
+            '</div><div class="sticky"><div class="panel"><p class="eyebrow">Aviso</p><p>Datos oficiales en tiempo real, provisionales. Los umbrales son orientativos y los fija Guías Ad Astra para sus barrancos. En barrancos, la última palabra la tiene siempre lo que se ve en el sitio.</p></div></div></div></section>')
+    ld = [crumbs_ld([("Inicio", "/"), ("Caudal de barrancos", path)]), faq_ld(CAUDAL_FAQ)]
+    page(path, "Caudal de barrancos: estado del Jerte, Valporquero y Mazobre | Ad Astra",
+         "Caudal en tiempo real de los barrancos de los Hoyos, Papúos, Mazobre y la Cueva de Valporquero con los aforos del SAIH Tajo y Duero, tendencia y lluvia prevista.",
+         body, "her", ld, priority="0.6", scripts='<script src="/js/rios.js" defer></script>')
+
+
 def build_meteo():
     path = "/meteo/"
     regiones = ", ".join(REGIONES)
@@ -1043,7 +1064,7 @@ def main():
     cfg = os.path.join(OUT, "config.js")
     c = open(cfg, encoding="utf-8").read().replace('calendarioURL: ""', 'calendarioURL: "",\n  // Carpeta donde está publicada la web ("" si está en la raíz del dominio)\n  base: "%s"' % BASE)
     open(cfg, "w", encoding="utf-8").write(c)
-    build_home(); build_activities_index(); build_courses_index(); build_calendar(); build_rental(); build_about(); build_contact(); build_404(); build_calculator(); build_topografia(); build_meteo()
+    build_home(); build_activities_index(); build_courses_index(); build_calendar(); build_rental(); build_about(); build_contact(); build_404(); build_calculator(); build_topografia(); build_meteo(); build_caudales()
     for a in ACTIVITIES:
         build_activity(a)
     build_ascensiones_macizos()
