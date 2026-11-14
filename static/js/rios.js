@@ -70,9 +70,46 @@
 
   var el = document.getElementById("rio-lista");
   if (!el) return;
+  /* desplegables zona -> barranco, como en meteorología; la elección queda en la dirección (#id) */
+  function selector(lista, zonaDe, nombreDe, labZ, labS, todasS, onCambio) {
+    var zonas = [];
+    lista.forEach(function (x) { if (zonas.indexOf(zonaDe(x)) < 0) zonas.push(zonaDe(x)); });
+    var html = '<form class="mt-selbar" onsubmit="return false"><label><span>' + labZ + '</span><select class="sel-z"><option value="">Todas</option>' +
+      zonas.map(function (z) { return "<option>" + esc(z) + "</option>"; }).join("") + '</select></label><label><span>' + labS + '</span><select class="sel-s"></select></label></form>';
+    function rellenar(form, z, sel) {
+      form.querySelector(".sel-s").innerHTML = '<option value="">' + todasS + "</option>" + lista.filter(function (x) { return !z || zonaDe(x) === z; }).map(function (x) {
+        return '<option value="' + x.id + '"' + (x.id === sel ? " selected" : "") + ">" + esc(nombreDe(x)) + "</option>"; }).join("");
+    }
+    function montar(form) {
+      var sz = form.querySelector(".sel-z"), ss = form.querySelector(".sel-s");
+      function aplicar(id, z) {
+        var x = lista.filter(function (y) { return y.id === id; })[0];
+        if (x) z = zonaDe(x);
+        sz.value = z || ""; rellenar(form, z, id);
+        onCambio(id || "", z || "");
+      }
+      sz.addEventListener("change", function () {
+        var de = lista.filter(function (y) { return !sz.value || zonaDe(y) === sz.value; });
+        aplicar(de.length === 1 ? de[0].id : "", sz.value);
+        history.replaceState(null, "", de.length === 1 ? "#" + de[0].id : location.pathname);
+      });
+      ss.addEventListener("change", function () { aplicar(ss.value, sz.value); history.replaceState(null, "", ss.value ? "#" + ss.value : location.pathname); });
+      var ini = location.hash.slice(1);
+      aplicar(lista.some(function (y) { return y.id === ini; }) ? ini : "", "");
+      return aplicar;
+    }
+    return { html: html, montar: montar };
+  }
+
   fetch("/meteo/rios/rios.json?t=" + Math.floor(Date.now() / 6e5), { cache: "no-cache" }).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }).then(function (d) {
-    el.innerHTML = '<p class="mt-act">Actualizado: ' + fHora.format(fecha(d.generado)) + " · los aforos se leen cada hora</p>" +
-      '<div class="rio-cards">' + d.barrancos.map(tarjeta).join("") + "</div>" +
+    var S = selector(d.barrancos, function (b) { return b.zona || b.lugar; }, function (b) { return b.nombre; }, "Zona", "Barranco", "Todos los barrancos", function (id, z) {
+      var vis = d.barrancos.filter(function (b) { return id ? b.id === id : (!z || (b.zona || b.lugar) === z); });
+      cont.innerHTML = '<div class="rio-cards">' + vis.map(tarjeta).join("") + "</div>";
+    });
+    el.innerHTML = S.html + '<p class="mt-act">Actualizado: ' + fHora.format(fecha(d.generado)) + " · los aforos se leen cada hora</p>" +
+      '<div id="rio-cont"></div>' +
       (d.errores && d.errores.length ? '<p class="muted small">Sin respuesta ahora mismo: ' + esc(d.errores.join(" · ")) + "</p>" : "");
-  }).catch(function () { el.innerHTML = '<p class="mt-err">Los caudales se están cargando. Vuelve a intentarlo en unos minutos.</p>'; });
+    var cont = document.getElementById("rio-cont");
+    S.montar(el.querySelector(".mt-selbar"));
+  }).catch(function (e) { console.error(e); el.innerHTML = '<p class="mt-err">Los caudales se están cargando. Vuelve a intentarlo en unos minutos.</p>'; });
 })();

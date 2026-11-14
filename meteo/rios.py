@@ -20,17 +20,17 @@ CA = os.environ.get("SAIH_CA_BUNDLE")  # SAIH Duero no envía su certificado int
 # ------------------------------------------------------------------ barrancos y sus aforos
 # umbrales: lista de (caudal máximo en m3/s, estado, texto), de menos a más; el último con None = "por encima".
 BARRANCOS = [
-    {"id": "los-hoyos", "nombre": "Barranco de los Hoyos", "lugar": "Jerte (Cáceres)", "macizo": "valle-del-jerte",
+    {"id": "los-hoyos", "zona": "Valle del Jerte", "nombre": "Barranco de los Hoyos", "lugar": "Jerte (Cáceres)", "macizo": "valle-del-jerte",
      "actividad": "/actividades/barranquismo-en-caceres/",
      "aforo": {"fuente": "tajo", "codigo": "AR42", "buscar": "Jerte", "nombre": "Jerte en El Torno"},
      "umbrales": [(8, "poco", "Poco caudal"), (17, "bueno", "Caudal bueno"),
                   (20, "alto", "Alegre: solo con experiencia y mucho cuidado"), (None, "no", "Muy alto: no recomendable")]},
-    {"id": "los-papuos", "nombre": "Garganta de los Papúos", "lugar": "Valle del Jerte (Cáceres)", "macizo": "valle-del-jerte",
+    {"id": "los-papuos", "zona": "Valle del Jerte", "nombre": "Garganta de los Papúos", "lugar": "Valle del Jerte (Cáceres)", "macizo": "valle-del-jerte",
      "actividad": "/actividades/barranquismo-en-caceres/",
      "aforo": {"fuente": "tajo", "codigo": "AR42", "buscar": "Jerte", "nombre": "Jerte en El Torno"},
      "umbrales": [(8, "poco", "Poco caudal"), (17, "bueno", "Caudal bueno"),
                   (20, "alto", "Alegre: solo con experiencia y mucho cuidado"), (None, "no", "Muy alto: no recomendable")]},
-    {"id": "mazobre", "nombre": "Barranco de Mazobre", "lugar": "Cardaño de Abajo (Palencia)", "macizo": "montana-palentina",
+    {"id": "mazobre", "zona": "Montaña Palentina", "nombre": "Barranco de Mazobre", "lugar": "Cardaño de Abajo (Palencia)", "macizo": "montana-palentina",
      "actividad": "/actividades/barranquismo-palencia/",
      "aforo": {"fuente": "duero", "codigo": "EA512", "nombre": "Carrión en Triollo"},
      "lluvia": {"fuente": "duero", "codigo": "PL102", "nombre": "Vidrieros"},
@@ -38,7 +38,7 @@ BARRANCOS = [
      "provisional": True,
      "umbrales": [(0.5, "poco", "Poco caudal"), (2, "bueno", "Caudal bueno"),
                   (4, "alto", "Caudal alto: con experiencia y mucho cuidado"), (None, "no", "Muy alto: no recomendable")]},
-    {"id": "valporquero", "nombre": "Cueva de Valporquero", "lugar": "Valporquero (León)", "macizo": "montanas-de-leon",
+    {"id": "valporquero", "zona": "Montaña de León", "nombre": "Cueva de Valporquero", "lugar": "Valporquero (León)", "macizo": "montanas-de-leon",
      "actividad": "/actividades/barranquismo-cueva-valporquero-sima-de-perlas/",
      "aforo": {"fuente": "duero", "codigo": "EA150", "nombre": "Torío en Matallana"},
      "lluvia": {"fuente": "duero", "codigo": "PL201", "nombre": "Valporquero"},
@@ -233,7 +233,7 @@ def main():
         k, txt = estado(q, b["umbrales"])
         viejo = t is not None and ahora - t > dt.timedelta(hours=6)
         salida.append({
-            "id": b["id"], "nombre": b["nombre"], "lugar": b["lugar"], "actividad": b["actividad"],
+            "id": b["id"], "nombre": b["nombre"], "lugar": b["lugar"], "zona": b["zona"], "actividad": b["actividad"],
             "aforo": {"nombre": af["nombre"], "codigo": af["codigo"], "fuente": "SAIH Tajo" if af["fuente"] == "tajo" else "SAIH Duero"},
             "q": None if q is None else round(q, 2), "hora": t.strftime("%Y-%m-%dT%H:%MZ") if t else None, "dato_antiguo": viejo,
             "tendencia": tendencia(serie), "max24": round(max([x[1] for x in serie if x[0] >= ahora - dt.timedelta(hours=24)] or [0]), 2) if serie else None,
