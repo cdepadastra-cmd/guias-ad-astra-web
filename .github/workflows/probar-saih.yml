@@ -1,0 +1,32 @@
+name: Probar SAIH (temporal)
+on: workflow_dispatch
+jobs:
+  probar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Certificado intermedio de SAIH Duero
+        run: |
+          curl -sS --fail http://cacerts.thawte.com/ThawteTLSRSACAG1.crt -o thawte.der
+          openssl x509 -inform DER -in thawte.der -out thawte.pem
+          cat "$(python3 -c 'import ssl;print(ssl.get_default_verify_paths().openssl_cafile)')" thawte.pem > bundle.pem
+      - run: |
+          python3 - <<'PY'
+          import urllib.request, re, ssl
+          H={"User-Agent":"Mozilla/5.0 (X11; Linux x86_64) Chrome/120","Accept-Language":"es-ES"}
+          ctx=ssl.create_default_context(cafile="bundle.pem")
+          def get(u):
+              try:
+                  r=urllib.request.urlopen(urllib.request.Request(u,headers=H),timeout=30,context=ctx); return r.status, r.read().decode("utf-8","ignore")
+              except Exception as e: return getattr(e,"code",0), "ERROR "+repr(e)[:200]
+          for est in ("EA512","EA150"):
+              st,h=get("https://www.saihduero.es/risr/"+est)
+              print("=====",est,st,len(h))
+              for l in sorted(set(re.findall(r'(?:href|src|action|url)\s*[=:]\s*["\']([^"\']+)["\']',h))):
+                  if any(k in l.lower() for k in ("csv","dato","hist","graf","json","risr","php","descarg","export")): print("   ",l)
+              for k in ("Datos históricos","Datos estadísticos","Descargar","fecha","desde"):
+                  for mm in list(re.finditer(k,h))[:2]: print("  [%s] %s" % (k, re.sub(r"\s+"," ",re.sub(r"<[^>]+>"," ",h[max(0,mm.start()-300):mm.start()+700]))))
+              for mm in list(re.finditer(r"<script[^>]*>(.*?)</script>", h, re.S)):
+                  js=mm.group(1)
+                  if any(k in js for k in ("ajax","fetch","$.get","url")) and len(js)<8000: print("  SCRIPT:", re.sub(r"\s+"," ",js)[:1500])
+          PY
