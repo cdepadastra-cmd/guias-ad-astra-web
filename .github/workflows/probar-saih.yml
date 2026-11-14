@@ -19,17 +19,19 @@ jobs:
               try:
                   r=urllib.request.urlopen(urllib.request.Request(u,headers=H),timeout=25,context=ctx); return r.status, r.geturl(), r.read().decode("utf-8","ignore")
               except Exception as e: return getattr(e,"code",0), u, "ERROR " + repr(e)[:300]
-          st,fu,html=get("https://saihtajo.chtajo.es/")
-          for a in sorted(set(re.findall(r'<form[^>]*>', html)))[:40]: print("  FORM", a[:250])
-          for a in sorted(set(re.findall(r'(?:action|data-script|script)\s*=\s*["\']([^"\']+)["\']', html)))[:60]: print("  ACT", a)
           st,fu,js=get("https://saihtajo.chtajo.es/cache/js.js")
-          for k in ("enviarFormInterna(","cargarContenido(","ver-estacion","verEstacion"):
-              n=0
-              for mm in re.finditer(re.escape(k), js):
-                  print("  js[%s]: %s" % (k,re.sub(r"\s+"," ",js[max(0,mm.start()-120):mm.start()+260]))); n+=1
-                  if n>=4: break
+          n=0
+          for mm in re.finditer(r"accAjax\(", js):
+              c=re.sub(r"\s+"," ",js[max(0,mm.start()-60):mm.start()+200])
+              if "accAjax(url" in c: continue
+              print("  TAJO:", c); n+=1
+              if n>=14: break
           st,fu,h=get("https://www.saihduero.es/datos-tiempo-real/risr", ctxd)
-          print("===== duero risr", st, len(h)); print(re.sub(r"\s+"," ",re.sub(r"<[^>]+>"," ",h))[:800])
-          for l in sorted(set(re.findall(r'(?:href|src)\s*=\s*["\']([^"\']+)["\']',h)))[:90]: print("   ",l)
-          for l in sorted(set(re.findall(r'["\']([^"\']*(?:json|ajax|api/|\.php|risr/)[^"\']*)["\']',h,re.I)))[:50]: print("  *",l)
+          for k in ("Torío","Torio","Valporquero","Matallana","Mazobre","Carri","Vidrieros","Velilla","Pisuerga","Ruesga"):
+              for mm in list(re.finditer(k, h))[:3]:
+                  print("  DUERO[%s]: %s" % (k, re.sub(r"\s+"," ",h[max(0,mm.start()-200):mm.start()+120])))
+          st,fu,h=get("https://www.saihduero.es/risr/EA060", ctxd)
+          print("===== EA060", st, len(h)); t=re.sub(r"\s+"," ",re.sub(r"<[^>]+>"," ",re.sub(r"(?s)<script.*?</script>","",h)))
+          i0=t.find("Caudal"); print(t[max(0,i0-600):i0+900])
+          for l in sorted(set(re.findall(r'["\']([^"\']*(?:json|ajax|\.php|csv|grafica|datos)[^"\']*)["\']',h,re.I)))[:40]: print("  *",l)
           PY
