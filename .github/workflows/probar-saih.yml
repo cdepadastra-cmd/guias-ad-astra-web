@@ -20,13 +20,15 @@ jobs:
                   r=urllib.request.urlopen(urllib.request.Request(u,headers=H),timeout=30,context=ctx); return r.status, r.read().decode("utf-8","ignore")
               except Exception as e: return getattr(e,"code",0), "ERROR "+repr(e)[:200]
           import csv, io, statistics, collections
-          for est in ("EA512","EA150"):
+          for est in ("EA512",):
               st,h=get("https://www.saihduero.es/risr/"+est)
               links=sorted(set(re.findall(r'risr/%s/historico/[A-Za-z0-9]+' % est, h)))
               for l in links:
                   st,t=get("https://www.saihduero.es/"+l)
                   lines=t.splitlines()
-                  print("=====",est,l,st,len(lines)); print("   ", lines[:3])
+                  print("=====",est,l,st,len(lines)); print("   ", re.sub(r"\s+"," ",t)[:3000])
+                  break
+                  continue
                   mes=collections.defaultdict(list); dia=collections.defaultdict(list)
                   for row in csv.reader(io.StringIO(t), delimiter=";"):
                       if len(row)<2: continue
