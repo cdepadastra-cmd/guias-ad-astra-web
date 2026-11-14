@@ -27,8 +27,8 @@ jobs:
                   return r.read().decode("utf-8","ignore")
               except Exception as e: return "ERR "+repr(e)[:200]
           t=req("search", {"busquedatiemporeal":"Jerte"}); print("  SEARCH", re.sub(r"\s+"," ",t)[:1500])
-          t=req("tiemporeal"); print("  TR", len(t), re.sub(r"\s+"," ",t)[:600])
-          for k in ("Jerte","Torno"):
-              for mm in list(re.finditer(k, t))[:4]: print("  TR[%s]: %s" % (k, re.sub(r"\s+"," ",t[max(0,mm.start()-300):mm.start()+300])))
-          urls=re.findall(r'"url"\s*:\s*"([^"]*)"', t); print("  URLS", len(urls), urls[:8])
+          u=json.loads(t)["response"]["results"][0]["url"]
+          e=req(u); print("  EST", len(e)); print("  ESTJ", re.sub(r"\s+"," ",e)[:3500])
+          for k in ("url10dias","urlexportarjson","grafica","caudal","CAUDAL"):
+              for mm in list(re.finditer(k, e))[:2]: print("  EST[%s]: %s" % (k, re.sub(r"\s+"," ",e[max(0,mm.start()-200):mm.start()+400])))
           PY
