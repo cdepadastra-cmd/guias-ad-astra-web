@@ -5,28 +5,31 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
+      - name: Certificado intermedio de SAIH Duero (su servidor no lo envía)
+        run: |
+          curl -sS http://cacerts.thawte.com/ThawteTLSRSACAG1.crt -o thawte.der
+          openssl x509 -inform DER -in thawte.der -out thawte.pem
+          cat "$(python3 -c 'import ssl;print(ssl.get_default_verify_paths().openssl_cafile)')" thawte.pem > bundle.pem
       - run: |
           python3 - <<'PY'
-          import urllib.request, re
+          import urllib.request, re, ssl, json
           H={"User-Agent":"Mozilla/5.0 (X11; Linux x86_64) Chrome/120","Accept-Language":"es-ES"}
-          def get(u):
+          ctxd=ssl.create_default_context(cafile="bundle.pem")
+          def get(u, ctx=None):
               try:
-                  r=urllib.request.urlopen(urllib.request.Request(u,headers=H),timeout=25); return r.status, r.geturl(), r.read().decode("utf-8","ignore")
+                  r=urllib.request.urlopen(urllib.request.Request(u,headers=H),timeout=25,context=ctx); return r.status, r.geturl(), r.read().decode("utf-8","ignore")
               except Exception as e: return getattr(e,"code",0), u, "ERROR " + repr(e)[:300]
+          st,fu,html=get("https://saihtajo.chtajo.es/")
           st,fu,js=get("https://saihtajo.chtajo.es/cache/js.js")
-          print("JS", st, len(js))
-          for m in sorted(set(re.findall(r'["\'](index\.php\?[^"\']{0,120}|[^"\'\s]*\?w=[^"\']{0,120}|[^"\'\s]*(?:json|ajax)[^"\'\s]{0,80})["\']', js)))[:80]: print("  >", m)
-          vistos=set()
-          for k in ("$.ajax", "$.get", "$.post", "getJSON", "fetch(", "url:", "url :", "urlexportarjson", "url10dias", "aforos"):
-              n=0
-              for mm in re.finditer(re.escape(k), js):
-                  c=re.sub(r"\s+"," ",js[max(0,mm.start()-80):mm.start()+220])
-                  if c in vistos: continue
-                  vistos.add(c); print("  ctx[%s]: %s" % (k, c)); n+=1
-                  if n>=6: break
-          import subprocess
-          print(subprocess.run("echo | openssl s_client -connect www.saihduero.es:443 -servername www.saihduero.es -showcerts 2>/dev/null | openssl x509 -noout -subject -issuer -ext authorityInfoAccess", shell=True, capture_output=True, text=True).stdout)
-          for u in []:
-              st,fu,h=get(u); print("=====",u,st,fu,len(h)); print(h[:300] if h.startswith("ERROR") else re.sub(r"\s+"," ",re.sub(r"<[^>]+>"," ",h))[:400])
-              for l in sorted(set(re.findall(r'(?:href|src)\s*=\s*["\']([^"\']+)["\']',h)))[:60]: print("   ",l)
+          for src,txt in (("html",html),("js",js)):
+              for k in ("nombreprovincia","Jerte","Torno","obj3 =","obj3=","estaciones","response"):
+                  n=0
+                  for mm in re.finditer(re.escape(k), txt):
+                      print("  %s[%s]: %s" % (src,k,re.sub(r"\s+"," ",txt[max(0,mm.start()-150):mm.start()+250])))
+                      n+=1
+                      if n>=3: break
+          for u in ["https://www.saihduero.es/", "https://www.saihduero.es/risr/"]:
+              st,fu,h=get(u, ctxd); print("=====",u,st,fu,len(h)); print(h[:300] if h.startswith("ERROR") else re.sub(r"\s+"," ",re.sub(r"<[^>]+>"," ",h))[:500])
+              for l in sorted(set(re.findall(r'(?:href|src)\s*=\s*["\']([^"\']+)["\']',h)))[:70]: print("   ",l)
+              for l in sorted(set(re.findall(r'["\']([^"\']*(?:json|ajax|api/|\.php)[^"\']*)["\']',h,re.I)))[:40]: print("  *",l)
           PY
