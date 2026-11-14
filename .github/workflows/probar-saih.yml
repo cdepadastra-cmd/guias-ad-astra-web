@@ -3,46 +3,33 @@ on: workflow_dispatch
 jobs:
   probar:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
-      - name: Certificado intermedio de SAIH Duero
-        run: |
-          curl -sS --fail http://cacerts.thawte.com/ThawteTLSRSACAG1.crt -o thawte.der
-          openssl x509 -inform DER -in thawte.der -out thawte.pem
-          cat "$(python3 -c 'import ssl;print(ssl.get_default_verify_paths().openssl_cafile)')" thawte.pem > bundle.pem
       - run: |
           python3 - <<'PY'
-          import urllib.request, re, ssl
-          H={"User-Agent":"Mozilla/5.0 (X11; Linux x86_64) Chrome/120","Accept-Language":"es-ES"}
-          ctx=ssl.create_default_context(cafile="bundle.pem")
+          import urllib.request, re, time, collections
+          H={"User-Agent":"guiasadastra.com (estudio de caudales)"}
           def get(u):
               try:
-                  r=urllib.request.urlopen(urllib.request.Request(u,headers=H),timeout=30,context=ctx); return r.status, r.read().decode("utf-8","ignore")
-              except Exception as e: return getattr(e,"code",0), "ERROR "+repr(e)[:200]
-          import csv, io, statistics, collections
-          for est in ("EA512",):
-              st,h=get("https://www.saihduero.es/risr/"+est)
-              links=sorted(set(re.findall(r'risr/%s/historico/[A-Za-z0-9]+' % est, h)))
-              for l in links:
-                  st,t=get("https://www.saihduero.es/"+l)
-                  lines=t.splitlines()
-                  print("=====",est,l,st,len(lines)); print("   ", re.sub(r"\s+"," ",t)[:3000])
-                  break
-                  continue
-                  mes=collections.defaultdict(list); dia=collections.defaultdict(list)
-                  for row in csv.reader(io.StringIO(t), delimiter=";"):
-                      if len(row)<2: continue
-                      m=re.match(r"(\d{2})/(\d{2})/(\d{4})", row[0]) or re.match(r"(\d{4})-(\d{2})-(\d{2})", row[0])
-                      if not m: continue
-                      g=m.groups()
-                      y,mo,d=(g[2],g[1],g[0]) if len(g[0])==2 else g
-                      vals=[c for c in row[1:] if re.fullmatch(r"-?\d+([.,]\d+)?", c.strip())]
-                      if not vals: continue
-                      q=float(vals[-1].replace(",","."))
-                      mes[(y,mo)].append(q); dia[(y,mo,d)].append(q)
-                  for k in sorted(mes):
-                      if k[1] in ("06","07","08","09"):
-                          v=sorted(mes[k]); print("    %s-%s n=%d p10=%.2f p50=%.2f p90=%.2f max=%.2f" % (k[0],k[1],len(v),v[len(v)//10],v[len(v)//2],v[len(v)*9//10],v[-1]))
-                  for k in sorted(dia):
-                      if k[1]=="07" and k[2] in ("25","26","27","28","29"): print("     dia", k, round(statistics.mean(dia[k]),2))
+                  b=urllib.request.urlopen(urllib.request.Request(u,headers=H),timeout=40).read()
+                  try: return b.decode("utf-8")
+                  except UnicodeDecodeError: return b.decode("latin-1")
+              except Exception as e: return "ERROR "+repr(e)[:200]
+          B="https://ceh.cedex.es/anuarioaforos/afo/"
+          for est in ("2150","2512","2108"):
+              idx=get(B+"estaf-datos_anual.asp?ref_ceh="+est)
+              anos=sorted(set(re.findall(r"ano_hidr=(\d{4})", idx)))
+              print("=====", est, len(idx), "años:", anos[-8:], re.sub(r"\s+"," ",re.sub(r"<[^>]+>"," ",idx))[:300])
+              meses=collections.defaultdict(list)
+              for a in anos[-6:]:
+                  t=get(B+"estaf-datos_dia.asp?ref_ceh=%s&ano_hidr=%s" % (est,a)); time.sleep(1)
+                  for d,mo,y,rest in re.findall(r"(\d{2})/(\d{2})/(\d{4})</td>(.*?)</tr>", t, re.S):
+                      nums=re.findall(r">\s*(-?\d+[.,]?\d*)\s*<", rest)
+                      if len(nums)>=2:
+                          q=float(nums[1].replace(",","."))
+                          meses[mo].append(q)
+                          if mo=="07" and d in ("25","27","29"): print("   ", y, mo, d, "q=", q)
+              for mo in ("06","07","08","09"):
+                  v=sorted(meses.get(mo,[]))
+                  if v: print("   mes %s n=%d p10=%.2f p25=%.2f p50=%.2f p75=%.2f p90=%.2f" % (mo,len(v),v[len(v)//10],v[len(v)//4],v[len(v)//2],v[3*len(v)//4],v[9*len(v)//10]))
           PY
