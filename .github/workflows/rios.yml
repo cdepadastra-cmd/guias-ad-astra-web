@@ -1,0 +1,58 @@
+# Estado de los barrancos (página /barrancos-caudal/): caudal de los aforos del SAIH Tajo y SAIH Duero.
+# Cada hora (GitHub a veces se salta alguna) lee los aforos y sube /meteo/rios/rios.json por FTP.
+name: Caudal de barrancos
+
+on:
+  schedule:
+    - cron: "17 * * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: rios
+  cancel-in-progress: false
+
+jobs:
+  rios:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      FTP_SERVER: ${{ secrets.FTP_SERVER }}
+    steps:
+      - uses: actions/checkout@v4
+
+      # El servidor del SAIH Duero no envía su certificado intermedio: se descarga del emisor (Thawte/DigiCert)
+      # y se añade a los certificados del sistema, así la conexión se sigue verificando.
+      - name: Certificados
+        run: |
+          curl -sS --fail http://cacerts.thawte.com/ThawteTLSRSACAG1.crt -o thawte.der
+          openssl x509 -inform DER -in thawte.der -out thawte.pem
+          cat "$(python3 -c 'import ssl;print(ssl.get_default_verify_paths().openssl_cafile)')" thawte.pem > saih-ca.pem
+
+      - name: Leer aforos
+        env:
+          SAIH_CA_BUNDLE: saih-ca.pem
+        run: python3 meteo/rios.py --out rios-out
+
+      - name: Subir por FTP
+        id: ftp1
+        continue-on-error: true
+        if: env.FTP_SERVER != ''
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USER }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./rios-out/
+          server-dir: /guiasadastra.com/meteo/rios/
+          timeout: 120000
+
+      - name: Reintentar si se cortó la conexión
+        if: env.FTP_SERVER != '' && steps.ftp1.outcome == 'failure'
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USER }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./rios-out/
+          server-dir: /guiasadastra.com/meteo/rios/
+          timeout: 120000
