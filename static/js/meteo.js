@@ -360,7 +360,9 @@
         var X = function (t) { return L + (t - tA) / 36e5 * PXH; };
         var vals = []; ["tv", "tc"].forEach(function (k) { C[k].forEach(function (v) { if (v != null) vals.push(v); }); });
         if (!vals.length) return "";
-        var mn = Math.floor(Math.min.apply(null, vals) / 2) * 2 - 4, mx = Math.ceil(Math.max.apply(null, vals) / 2) * 2 + 4;
+        // escala fija de -20 a 45 °C (se ignoran valores imposibles fuera de -40 / 55)
+        vals = vals.filter(function (v) { return v > -40 && v < 55; });
+        var mn = Math.min(-20, Math.floor(Math.min.apply(null, vals.concat([-20])) / 5) * 5), mx = Math.max(45, Math.ceil(Math.max.apply(null, vals.concat([45])) / 5) * 5);
         var Y = function (v) { return T0 + (Hh - T0 - B) * (1 - (v - mn) / (mx - mn)); };
         var g = '<svg class="mt-mg" viewBox="0 0 ' + W + " " + Hh + '" width="' + W + '" height="' + Hh + '" role="img" aria-label="Perfil de temperatura y estado del cielo">';
         // horas de luz y separación de días
@@ -378,7 +380,7 @@
           g += '<text x="' + ((x0 + x1) / 2).toFixed(1) + '" y="15" class="mt-mg-d">' + cap(diaCorto(d.fecha)) + '</text><text x="' + ((x0 + x1) / 2).toFixed(1) + '" y="28" class="mt-mg-f">' + fFecha.format(fechaLocal(d.fecha)) + "</text>";
         });
         // rejilla de temperatura
-        var pasoT = mx - mn > 40 ? 10 : mx - mn > 20 ? 4 : 2;
+        var pasoT = 5;
         for (var v = Math.ceil(mn / pasoT) * pasoT; v <= mx; v += pasoT) {
           g += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + Y(v).toFixed(1) + '" y2="' + Y(v).toFixed(1) + '" stroke="' + (v === 0 ? "rgba(111,179,224,.7)" : "rgba(255,255,255,.07)") + '"' + (v === 0 ? ' stroke-dasharray="5 4"' : "") + '/><text x="' + (L - 6) + '" y="' + (Y(v) + 4).toFixed(1) + '" class="mt-mg-y">' + v + "°</text>";
         }
@@ -391,7 +393,7 @@
         // curvas
         function curva(k, col, fill) {
           var pts = [], seg = [], out = "";
-          C[k].forEach(function (v, i) { if (v == null) { if (seg.length) pts.push(seg); seg = []; } else seg.push([X(T[i].getTime()), Y(v)]); });
+          C[k].forEach(function (v, i) { if (v == null || v <= -40 || v >= 55) { if (seg.length) pts.push(seg); seg = []; } else seg.push([X(T[i].getTime()), Y(v)]); });
           if (seg.length) pts.push(seg);
           pts.forEach(function (sg) {
             var d = sg.map(function (p, j) { return (j ? "L" : "M") + p[0].toFixed(1) + " " + p[1].toFixed(1); }).join("");
@@ -406,7 +408,7 @@
           var ix = idxDia[d.fecha]; if (!ix || ix.length < 4) return;
           [["tv", "#ffb3aa", -9], ["tc", "#bfe0f7", 19]].forEach(function (kc) {
             var k = kc[0], iMx = -1, iMn = -1;
-            ix.forEach(function (i) { var v = C[k][i]; if (v == null) return; if (iMx < 0 || v > C[k][iMx]) iMx = i; if (iMn < 0 || v < C[k][iMn]) iMn = i; });
+            ix.forEach(function (i) { var v = C[k][i]; if (v == null || v <= -40 || v >= 55) return; if (iMx < 0 || v > C[k][iMx]) iMx = i; if (iMn < 0 || v < C[k][iMn]) iMn = i; });
             if (iMx < 0) return;
             // base: etiquetas por encima de su curva; cumbre: por debajo (así no se pisan cuando las curvas van juntas)
             g += '<text x="' + X(T[iMx].getTime()).toFixed(1) + '" y="' + (Y(C[k][iMx]) + kc[2]).toFixed(1) + '" class="mt-mg-v" fill="' + kc[1] + '">' + Math.round(C[k][iMx]) + "°</text>";
