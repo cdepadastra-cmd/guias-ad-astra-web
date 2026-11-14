@@ -547,9 +547,9 @@ details.adv[open] summary{margin-bottom:14px}
 .mt-mg text{font-family:var(--label,inherit)}
 .mt-mg-d{font-size:13px;font-weight:700;fill:var(--fg);text-anchor:middle}
 .mt-mg-f{font-size:11px;fill:var(--dim);text-anchor:middle}
-.mt-mg-y{font-size:11px;fill:var(--dim);text-anchor:end}
-.mt-mg-h{font-size:10px;fill:var(--dim);text-anchor:middle}
-.mt-mg-v{font-size:12.5px;font-weight:700;text-anchor:middle;paint-order:stroke;stroke:#1b120c;stroke-width:3px}
+.mt-mg-y{font-size:12px;fill:var(--dim);text-anchor:end}
+.mt-mg-h{font-size:11.5px;fill:var(--dim);text-anchor:middle}
+.mt-mg-v{font-size:14px;font-weight:700;text-anchor:middle;paint-order:stroke;stroke:#1b120c;stroke-width:3px}
 .mt-cams{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:16px}
 .mt-cam{margin:0;background:#1b120c;border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
 .mt-cam-v{position:relative;aspect-ratio:16/9}

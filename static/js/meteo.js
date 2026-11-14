@@ -355,12 +355,12 @@
 
       /* perfil tipo meteograma: icono cada 3 h, horas de luz y curvas de temperatura de cumbre y base */
       function meteograma() {
-        var tA = T[0].getTime(), tB = T[N - 1].getTime(), PXH = 11, Wt = Math.round((tB - tA) / 36e5 * PXH);
-        var L = 34, R = 12, W = Wt + L + R, TOPD = 34, ICO = 28, T0 = TOPD + ICO + 10, Hh = 290, B = 26;
+        var tA = T[0].getTime(), tB = T[N - 1].getTime(), PXH = 13, Wt = Math.round((tB - tA) / 36e5 * PXH);
+        var L = 34, R = 12, W = Wt + L + R, TOPD = 34, ICO = 28, T0 = TOPD + ICO + 10, Hh = 380, B = 28;
         var X = function (t) { return L + (t - tA) / 36e5 * PXH; };
         var vals = []; ["tv", "tc"].forEach(function (k) { C[k].forEach(function (v) { if (v != null) vals.push(v); }); });
         if (!vals.length) return "";
-        var mn = Math.floor(Math.min.apply(null, vals) / 2) * 2 - 2, mx = Math.ceil(Math.max.apply(null, vals) / 2) * 2 + 2;
+        var mn = Math.floor(Math.min.apply(null, vals) / 2) * 2 - 4, mx = Math.ceil(Math.max.apply(null, vals) / 2) * 2 + 4;
         var Y = function (v) { return T0 + (Hh - T0 - B) * (1 - (v - mn) / (mx - mn)); };
         var g = '<svg class="mt-mg" viewBox="0 0 ' + W + " " + Hh + '" width="' + W + '" height="' + Hh + '" role="img" aria-label="Perfil de temperatura y estado del cielo">';
         // horas de luz y separación de días
@@ -378,7 +378,7 @@
           g += '<text x="' + ((x0 + x1) / 2).toFixed(1) + '" y="15" class="mt-mg-d">' + cap(diaCorto(d.fecha)) + '</text><text x="' + ((x0 + x1) / 2).toFixed(1) + '" y="28" class="mt-mg-f">' + fFecha.format(fechaLocal(d.fecha)) + "</text>";
         });
         // rejilla de temperatura
-        var pasoT = mx - mn > 24 ? 4 : 2;
+        var pasoT = mx - mn > 40 ? 10 : mx - mn > 20 ? 4 : 2;
         for (var v = Math.ceil(mn / pasoT) * pasoT; v <= mx; v += pasoT) {
           g += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + Y(v).toFixed(1) + '" y2="' + Y(v).toFixed(1) + '" stroke="' + (v === 0 ? "rgba(111,179,224,.7)" : "rgba(255,255,255,.07)") + '"' + (v === 0 ? ' stroke-dasharray="5 4"' : "") + '/><text x="' + (L - 6) + '" y="' + (Y(v) + 4).toFixed(1) + '" class="mt-mg-y">' + v + "°</text>";
         }
@@ -404,12 +404,13 @@
         // máxima y mínima de cada día
         dias.forEach(function (d) {
           var ix = idxDia[d.fecha]; if (!ix || ix.length < 4) return;
-          [["tv", "#ffb3aa"], ["tc", "#bfe0f7"]].forEach(function (kc) {
+          [["tv", "#ffb3aa", -9], ["tc", "#bfe0f7", 19]].forEach(function (kc) {
             var k = kc[0], iMx = -1, iMn = -1;
             ix.forEach(function (i) { var v = C[k][i]; if (v == null) return; if (iMx < 0 || v > C[k][iMx]) iMx = i; if (iMn < 0 || v < C[k][iMn]) iMn = i; });
             if (iMx < 0) return;
-            g += '<text x="' + X(T[iMx].getTime()).toFixed(1) + '" y="' + (Y(C[k][iMx]) - 7).toFixed(1) + '" class="mt-mg-v" fill="' + kc[1] + '">' + Math.round(C[k][iMx]) + "°</text>";
-            if (iMn !== iMx) g += '<text x="' + X(T[iMn].getTime()).toFixed(1) + '" y="' + (Y(C[k][iMn]) + 16).toFixed(1) + '" class="mt-mg-v" fill="' + kc[1] + '">' + Math.round(C[k][iMn]) + "°</text>";
+            // base: etiquetas por encima de su curva; cumbre: por debajo (así no se pisan cuando las curvas van juntas)
+            g += '<text x="' + X(T[iMx].getTime()).toFixed(1) + '" y="' + (Y(C[k][iMx]) + kc[2]).toFixed(1) + '" class="mt-mg-v" fill="' + kc[1] + '">' + Math.round(C[k][iMx]) + "°</text>";
+            if (iMn !== iMx) g += '<text x="' + X(T[iMn].getTime()).toFixed(1) + '" y="' + (Y(C[k][iMn]) + kc[2]).toFixed(1) + '" class="mt-mg-v" fill="' + kc[1] + '">' + Math.round(C[k][iMn]) + "°</text>";
           });
         });
         // iconos cada 3 horas
@@ -468,8 +469,8 @@
           return "<li>" + chipAemet(a, false) + " <b>" + esc(fenomeno(a)) + "</b> · " + esc(a.zona) + ' <span class="muted">(' + (a.inicio ? fAviso.format(new Date(a.inicio)) : "") + " – " + (a.fin ? fAviso.format(new Date(a.fin)) : "") + ")</span></li>";
         }).join("") + '</ul><p class="muted small">Avisos oficiales de la Agencia Estatal de Meteorología para la zona del pueblo base o de la cumbre. Consulta el detalle en <a href="https://www.aemet.es/es/eltiempo/prediccion/avisos" target="_blank" rel="noopener">aemet.es</a>.</p></div>' : "";
         el.innerHTML = '<div class="mt-cab"><h2>Tiempo en ' + esc(doc.nombre) + '</h2><p class="muted small">Cumbre: ' + esc(doc.cumbre.nombre) + " " + doc.cumbre.alt.toLocaleString("es-ES") + " m · Base: " + esc(doc.base.nombre) + " " + doc.base.alt.toLocaleString("es-ES") + ' m</p></div><p class="mt-act">' + actualizado(doc) + "</p>" + bloque + tira() +
-          '<div class="mt-sec mt-perfil"><h2>Perfil de la semana</h2>' + meteograma() + "</div>" +
           '<div class="mt-sec">' + detalleDia() + "</div>" +
+          '<div class="mt-sec mt-perfil"><h2>Perfil de la semana</h2>' + meteograma() + "</div>" +
           '<div class="mt-sec"><h2>Evolución a 7 días</h2>' + graficas() + "</div>" +
           webcams(id) +
           '<div class="mt-sec"><h2>Comparación de modelos</h2>' + comparativa() + "</div>";

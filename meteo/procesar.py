@@ -151,7 +151,7 @@ def ecmwf():
         raise RuntimeError("ECMWF no disponible")
     m.run = run.replace(tzinfo=UTC)
     log("ECMWF: pasada %s (fuente %s)" % (m.run.strftime("%Y-%m-%d %HZ"), src))
-    cache = os.path.join(CACHE, "ecmwf-v2-%s.pkl" % m.run.strftime("%Y%m%d%H"))
+    cache = os.path.join(CACHE, "ecmwf-v3-%s.pkl" % m.run.strftime("%Y%m%d%H"))
     if os.path.exists(cache):
         try:
             c_ = pickle.load(open(cache, "rb"))
@@ -207,6 +207,10 @@ def ecmwf():
             elif sn == "mucape":
                 m.put("cape", t, v)
     log("ECMWF: inventario", sorted(inv.items()))
+    # temperatura en niveles de presión a °C ANTES de guardar la caché (si no, al reutilizarla quedaba en kelvin)
+    for (sn, lev) in [k for k in m.campos if isinstance(k, tuple)]:
+        if sn == "t":
+            m.campos[(sn, lev)] = {t: v - 273.15 for t, v in m.campos[(sn, lev)].items()}
     try:
         os.makedirs(CACHE, exist_ok=True)
         for f in os.listdir(CACHE):
@@ -216,11 +220,6 @@ def ecmwf():
     except Exception as ex:
         log("ECMWF: no se pudo guardar la caché (%s)" % ex)
     m.acc.setdefault(m.run, np.zeros(NP))
-    for (sn, lev) in [k for k in m.campos if isinstance(k, tuple)]:
-        if sn == "gh":
-            pass  # ya en metros geopotenciales
-        elif sn == "t":
-            m.campos[(sn, lev)] = {t: v - 273.15 for t, v in m.campos[(sn, lev)].items()}
     return m
 
 
