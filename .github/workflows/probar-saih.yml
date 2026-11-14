@@ -19,19 +19,15 @@ jobs:
               try:
                   r=urllib.request.urlopen(urllib.request.Request(u,headers=H),timeout=25,context=ctx); return r.status, r.geturl(), r.read().decode("utf-8","ignore")
               except Exception as e: return getattr(e,"code",0), u, "ERROR " + repr(e)[:300]
-          st,fu,js=get("https://saihtajo.chtajo.es/cache/js.js")
-          n=0
-          for mm in re.finditer(r"accAjax\(", js):
-              c=re.sub(r"\s+"," ",js[max(0,mm.start()-60):mm.start()+200])
-              if "accAjax(url" in c: continue
-              print("  TAJO:", c); n+=1
-              if n>=14: break
-          st,fu,h=get("https://www.saihduero.es/datos-tiempo-real/risr", ctxd)
-          for k in ("Torío","Torio","Valporquero","Matallana","Mazobre","Carri","Vidrieros","Velilla","Pisuerga","Ruesga"):
-              for mm in list(re.finditer(k, h))[:3]:
-                  print("  DUERO[%s]: %s" % (k, re.sub(r"\s+"," ",h[max(0,mm.start()-200):mm.start()+120])))
-          st,fu,h=get("https://www.saihduero.es/risr/EA060", ctxd)
-          print("===== EA060", st, len(h)); t=re.sub(r"\s+"," ",re.sub(r"<[^>]+>"," ",re.sub(r"(?s)<script.*?</script>","",h)))
-          i0=t.find("Caudal"); print(t[max(0,i0-600):i0+900])
-          for l in sorted(set(re.findall(r'["\']([^"\']*(?:json|ajax|\.php|csv|grafica|datos)[^"\']*)["\']',h,re.I)))[:40]: print("  *",l)
+          st,fu,html=get("https://saihtajo.chtajo.es/")
+          for cls in ("tiemporeal-buscador","home-buscador","aforosenrio-buscador"):
+              k=html.find(cls); print("  FORMHTML[%s]:" % cls, re.sub(r"\s+"," ",html[max(0,k-400):k+900]))
+          for k in ("default_url","urlmenu","default_template"):
+              m=re.search(r'id="%s"[^>]*value="([^"]*)"' % k, html) or re.search(r'value="([^"]*)"[^>]*id="%s"' % k, html); print("  INPUT", k, m.group(1) if m else None)
+          import urllib.parse
+          for path, data in (("search", {"q":"Jerte"}), ("search", {"buscar":"Jerte"}), ("search", {"search":"Jerte"})):
+              try:
+                  r=urllib.request.urlopen(urllib.request.Request("https://saihtajo.chtajo.es/"+path, data=urllib.parse.urlencode(data).encode(), headers=dict(H, **{"X-Requested-With":"XMLHttpRequest","Content-Type":"application/x-www-form-urlencoded"})), timeout=25)
+                  print("  POST", path, data, r.status, r.read().decode("utf-8","ignore")[:700])
+              except Exception as e: print("  POST", path, data, "ERR", repr(e)[:200])
           PY
