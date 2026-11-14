@@ -91,6 +91,7 @@ def analizar(mac, pasado, futuro, ahora):
     nfut = suma_nieve(ahora, ahora + dt.timedelta(hours=72))
     lluvia_sobre = sum((p.get("pr") or 0) for p in todos if ahora - dt.timedelta(hours=72) < _t(p["t"]) <= ahora + dt.timedelta(hours=48) and not es_nieve(p, alt))
     hay_nieve = (manto or 0) >= 3 or n7d >= 3 or nfut >= 3
+    solo_prevista = (manto or 0) < 3 and n7d < 3  # todavía no hay nieve: solo nevadas previstas
     señales = []
     estado = "Sin nieve significativa"
     if not hay_nieve:
@@ -104,7 +105,12 @@ def analizar(mac, pasado, futuro, ahora):
         # viento con nieve reciente o prevista
         ventanas = [p for p in todos if ahora - dt.timedelta(hours=72) < _t(p["t"]) <= ahora + dt.timedelta(hours=48)]
         fuerte = [p for p in ventanas if (p.get("wc") or 0) >= 40]
-        if fuerte and (n72 + nfut) >= 5:
+        if fuerte and (n72 + nfut) >= 5 and solo_prevista:
+            pmax = max(fuerte, key=lambda p: p["wc"])
+            señales.append(("medio", "Si nieva lo previsto, el viento (hasta %d km/h del %s) acumulará la nieve en laderas orientadas al %s y en collados: allí se formarán placas." % (
+                round(pmax["wc"]), _dir(pmax.get("dc")) or "–", _dir_opuesta(pmax.get("dc")) or "–")))
+            estado = "Nevadas previstas"
+        elif fuerte and (n72 + nfut) >= 5:
             pmax = max(fuerte, key=lambda p: p["wc"])
             señales.append(("alto", "Viento fuerte (hasta %d km/h del %s) con nieve reciente o prevista: placas de viento probables en laderas orientadas al %s y en collados." % (
                 round(pmax["wc"]), _dir(pmax.get("dc")) or "–", _dir_opuesta(pmax.get("dc")) or "–")))
@@ -135,7 +141,9 @@ def analizar(mac, pasado, futuro, ahora):
             señales.append(("medio", "Frío persistente (%d días seguidos sin pasar de −3 °C en cumbre): nieve fría y polvo, poco transformada; las placas se estabilizan despacio." % mx))
             if estado == "Sin nieve significativa":
                 estado = "Nieve fría / polvo"
-        if estado == "Sin nieve significativa":
+        if estado == "Sin nieve significativa" and solo_prevista:
+            estado = "Nevadas previstas"
+        elif estado == "Sin nieve significativa":
             estado = "Nieve asentada"
             señales.append(("info", "Sin cambios importantes: nieve asentada según los modelos."))
     return {"id": mac["id"], "nombre": mac["nombre"], "corto": mac["corto"], "region": mac["region"],
@@ -175,6 +183,8 @@ def generar(out, macizos, log=print):
         pasado = [p for p in hist[mac["id"]] if _t(p["t"]) <= ahora]
         futuro = [p for p in puntos if ahora < _t(p["t"]) <= ahora + dt.timedelta(hours=72)]
         res.append(analizar(mac, pasado, futuro, ahora))
+        if mac["id"] in ("aneto-posets", "gredos-macizo-central", "sierra-nevada"):
+            log("Nieve: manto máx. por modelo en %s: %s" % (mac["id"], {k: max([x for x in v.get("sn", []) if x is not None] or [None]) for k, v in doc["series"].items()}))
     json.dump({"generado": _f(ahora), "macizos": hist}, open(os.path.join(out, "historial.json"), "w", encoding="utf-8"), separators=(",", ":"))
     json.dump({"generado": _f(ahora), "macizos": res}, open(os.path.join(out, "nieve.json"), "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
     log("Nieve: %s" % ", ".join("%s=%s (%s cm)" % (r["id"], r["estado"], r["manto"]) for r in res if r["hay_nieve"]) or "Nieve: sin nieve en ningún macizo")

@@ -5,7 +5,7 @@
   var fAct = new Intl.DateTimeFormat("es-ES", { timeZone: TZ, weekday: "long", day: "numeric", month: "long", hour: "2-digit", minute: "2-digit", hour12: false });
   var fDia = new Intl.DateTimeFormat("es-ES", { timeZone: "UTC", weekday: "short", day: "numeric" });
   var COL = { "Placas de viento probables": "#e8574a", "Nieve reciente": "#f08a3e", "Nieve húmeda": "#e9c46a", "Nieve húmeda / fusión": "#e9c46a",
-    "Costra de rehielo": "#6fb3e0", "Nieve fría / polvo": "#bfe0f7", "Nieve asentada": "#7cc47f", "Sin nieve significativa": "#8d847b" };
+    "Costra de rehielo": "#6fb3e0", "Nevadas previstas": "#c9a7e8", "Nieve fría / polvo": "#bfe0f7", "Nieve asentada": "#7cc47f", "Sin nieve significativa": "#8d847b" };
   var NIV = { alto: "#e8574a", medio: "#e9c46a", info: "#8d847b" };
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
   function n(v, s) { return v == null ? "–" : Math.round(v) + (s || ""); }
