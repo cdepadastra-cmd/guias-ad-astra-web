@@ -19,15 +19,16 @@ jobs:
               try:
                   r=urllib.request.urlopen(urllib.request.Request(u,headers=H),timeout=25,context=ctx); return r.status, r.geturl(), r.read().decode("utf-8","ignore")
               except Exception as e: return getattr(e,"code",0), u, "ERROR " + repr(e)[:300]
-          st,fu,html=get("https://saihtajo.chtajo.es/")
-          for cls in ("tiemporeal-buscador","home-buscador","aforosenrio-buscador"):
-              k=html.find(cls); print("  FORMHTML[%s]:" % cls, re.sub(r"\s+"," ",html[max(0,k-400):k+900]))
-          for k in ("default_url","urlmenu","default_template"):
-              m=re.search(r'id="%s"[^>]*value="([^"]*)"' % k, html) or re.search(r'value="([^"]*)"[^>]*id="%s"' % k, html); print("  INPUT", k, m.group(1) if m else None)
           import urllib.parse
-          for path, data in (("search", {"q":"Jerte"}), ("search", {"buscar":"Jerte"}), ("search", {"search":"Jerte"})):
+          XH=dict(H, **{"X-Requested-With":"XMLHttpRequest"})
+          def req(path, data=None):
               try:
-                  r=urllib.request.urlopen(urllib.request.Request("https://saihtajo.chtajo.es/"+path, data=urllib.parse.urlencode(data).encode(), headers=dict(H, **{"X-Requested-With":"XMLHttpRequest","Content-Type":"application/x-www-form-urlencoded"})), timeout=25)
-                  print("  POST", path, data, r.status, r.read().decode("utf-8","ignore")[:700])
-              except Exception as e: print("  POST", path, data, "ERR", repr(e)[:200])
+                  r=urllib.request.urlopen(urllib.request.Request("https://saihtajo.chtajo.es/"+path, data=(urllib.parse.urlencode(data).encode() if data else None), headers=XH), timeout=30)
+                  return r.read().decode("utf-8","ignore")
+              except Exception as e: return "ERR "+repr(e)[:200]
+          t=req("search", {"busquedatiemporeal":"Jerte"}); print("  SEARCH", re.sub(r"\s+"," ",t)[:1500])
+          t=req("tiemporeal"); print("  TR", len(t), re.sub(r"\s+"," ",t)[:600])
+          for k in ("Jerte","Torno"):
+              for mm in list(re.finditer(k, t))[:4]: print("  TR[%s]: %s" % (k, re.sub(r"\s+"," ",t[max(0,mm.start()-300):mm.start()+300])))
+          urls=re.findall(r'"url"\s*:\s*"([^"]*)"', t); print("  URLS", len(urls), urls[:8])
           PY
