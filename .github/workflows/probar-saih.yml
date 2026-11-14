@@ -12,11 +12,15 @@ jobs:
           def get(u):
               try:
                   r=urllib.request.urlopen(urllib.request.Request(u,headers=H),timeout=25); return r.status, r.geturl(), r.read().decode("utf-8","ignore")
-              except Exception as e: return getattr(e,"code",0), u, str(e)[:200]
-          for u in ["https://saihtajo.chtajo.es/","https://saihtajo.chtajo.es/index.php","https://www.saihduero.es/","https://www.saihduero.es/risr/","https://www.saihduero.es/situacion-actual"]:
-              st,fu,h=get(u)
-              print("=====",u,st,fu,len(h))
-              print(re.sub(r"\s+"," ",re.sub(r"<[^>]+>"," ",h))[:600])
-              for l in sorted(set(re.findall(r'(?:href|src|url)\s*[=:]\s*["\']([^"\']+)["\']',h)))[:80]: print("   ",l)
-              for l in sorted(set(re.findall(r'["\']([^"\']*(?:json|ajax|api|php\?|estacion|datos)[^"\']*)["\']',h,re.I)))[:60]: print("  *",l)
+              except Exception as e: return getattr(e,"code",0), u, "ERROR " + repr(e)[:300]
+          st,fu,js=get("https://saihtajo.chtajo.es/cache/js.js")
+          print("JS", st, len(js))
+          for m in sorted(set(re.findall(r'["\'](index\.php\?[^"\']{0,120}|[^"\'\s]*\?w=[^"\']{0,120}|[^"\'\s]*(?:json|ajax)[^"\'\s]{0,80})["\']', js)))[:80]: print("  >", m)
+          for k in ("w=get", "getestacion", "datos-tiempo-real", "exportarjson", "url10dias"):
+              for mm in re.finditer(re.escape(k), js):
+                  print("  ctx[%s]:" % k, js[max(0,mm.start()-160):mm.start()+200].replace("\n"," "))
+                  break
+          for u in ["http://www.saihduero.es/", "https://www.saihduero.es/", "https://saihduero.es/", "http://saihduero.es/risr/"]:
+              st,fu,h=get(u); print("=====",u,st,fu,len(h)); print(h[:300] if h.startswith("ERROR") else re.sub(r"\s+"," ",re.sub(r"<[^>]+>"," ",h))[:400])
+              for l in sorted(set(re.findall(r'(?:href|src)\s*=\s*["\']([^"\']+)["\']',h)))[:60]: print("   ",l)
           PY
