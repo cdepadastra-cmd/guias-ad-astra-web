@@ -1,0 +1,22 @@
+name: Probar SAIH (temporal)
+on: workflow_dispatch
+jobs:
+  probar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - run: |
+          python3 - <<'PY'
+          import urllib.request, re
+          H={"User-Agent":"Mozilla/5.0 (X11; Linux x86_64) Chrome/120","Accept-Language":"es-ES"}
+          def get(u):
+              try:
+                  r=urllib.request.urlopen(urllib.request.Request(u,headers=H),timeout=25); return r.status, r.geturl(), r.read().decode("utf-8","ignore")
+              except Exception as e: return getattr(e,"code",0), u, str(e)[:200]
+          for u in ["https://saihtajo.chtajo.es/","https://saihtajo.chtajo.es/index.php","https://www.saihduero.es/","https://www.saihduero.es/risr/","https://www.saihduero.es/situacion-actual"]:
+              st,fu,h=get(u)
+              print("=====",u,st,fu,len(h))
+              print(re.sub(r"\s+"," ",re.sub(r"<[^>]+>"," ",h))[:600])
+              for l in sorted(set(re.findall(r'(?:href|src|url)\s*[=:]\s*["\']([^"\']+)["\']',h)))[:80]: print("   ",l)
+              for l in sorted(set(re.findall(r'["\']([^"\']*(?:json|ajax|api|php\?|estacion|datos)[^"\']*)["\']',h,re.I)))[:60]: print("  *",l)
+          PY
