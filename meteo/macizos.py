@@ -124,3 +124,32 @@ MACIZOS = [
      "cumbre": {"nombre": "Sierra de Bernia", "lat": 38.672, "lon": -0.064, "alt": 1128},
      "texto": "Peñón de Ifach, Bernia, Puig Campana y la escalada de la Costa Blanca."},
 ]
+
+# Webcams. "windy": cámaras de Windy.com que se pueden insertar en la página (su reproductor público).
+# "enlaces": otras cámaras que no permiten insertarlas; se ponen como enlace.
+WEBCAMS = {
+    "gredos-macizo-central": {"windy": [("1369739199", "Hoyos del Espino · Sierra de Gredos")]},
+    "gredos-macizo-oriental": {"windy": [("1584619519", "Navaquesera"), ("1584619412", "Navalacruz · La Paramera")]},
+    "sierra-de-candelario": {"enlaces": [("https://www.windfinder.com/webcams/la_covatilla_estacion_de_esqui", "La Covatilla (Windfinder)"),
+                                         ("https://www.skiinfo.fr/systeme-central/sierra-de-bejar-la-covatilla/webcams", "La Covatilla (Skiinfo)")]},
+    "sierra-de-francia": {"enlaces": [("https://www.skylinewebcams.com/webcam/espana/castilla-y-leon/salamanca/la-alberca.html", "La Alberca (SkylineWebcams)")]},
+    "guadarrama": {"enlaces": [("https://www.enterat.com/servicios/webcams-navacerrada.php", "Navacerrada y Cotos: listado de cámaras"),
+                               ("https://www.windfinder.com/webcams/puerto_de_navacerrada", "Puerto de Navacerrada (Windfinder)")]},
+    "ayllon": {"enlaces": [("https://www.onthesnow.co.uk/spain/la-pinilla/webcams", "La Pinilla (OnTheSnow)")]},
+    "montanas-de-leon": {"enlaces": [("https://www.skylinewebcams.com/webcam/espana/castilla-y-leon/leon/riano-y-pico-yordas.html", "Riaño y Pico Yordas (SkylineWebcams)")]},
+    "puerto-de-san-isidro": {"enlaces": [("https://www.skylinewebcams.com/webcam/espana/castilla-y-leon/leon/estacion-invernal-y-de-montana-san-isidro.html", "Estación de San Isidro (SkylineWebcams)"),
+                                         ("https://www.skiresort.info/ski-resort/san-isidro-zona-cebolledo/webcams/wcn72071", "San Isidro · Cebolledo (Skiresort.info)")]},
+    "alto-campoo": {"enlaces": [("https://www.skiresort.info/ski-resort/alto-campoo/webcams/", "Alto Campoo (Skiresort.info)")]},
+    "macizo-de-ubina": {"enlaces": [("https://www.windfinder.com/webcams/pajares", "Puerto de Pajares (Windfinder)")]},
+    "montana-palentina": {"enlaces": [("https://www.windfinder.com/webcams/cervera_de_pisuerga", "Cervera de Pisuerga (Windfinder)")]},
+    "serrania-de-cuenca": {"windy": [("1649011646", "Zafrilla · Serranía de Cuenca")]},
+    "alto-tajo": {"enlaces": [("https://www.windfinder.com/webcams/molina_de_aragon", "Molina de Aragón (Windfinder)")]},
+    "sierra-de-albarracin": {"enlaces": [("https://www.windy.com/es/-C%C3%A1maras-web/Espa%C3%B1a/Albarrac%C3%ADn/Plaza-Mayor/webcams/1395846809", "Albarracín · Plaza Mayor (Windy)")]},
+    "pirineo-navarro": {"windy": [("1519730803", "Larra-Belagua · La Contienda")]},
+    "ordesa-monte-perdido": {"windy": [("1793909404", "Refugio de Góriz"), ("1793909403", "Monte Perdido · Refugio de Pineta")],
+                             "enlaces": [("https://www.ordesamonteperdido.com/webcam/", "Parque Nacional de Ordesa")]},
+    "aneto-posets": {"windy": [("1693035724", "Benasque · Aneto"), ("1416008706", "Cerler · El Pico Cerler")]},
+    "aiguestortes-carros-de-foc": {"windy": [("1573298277", "Estany de Sant Maurici · Encantats")]},
+    "sierra-nevada": {"windy": [("1793913229", "Borreguiles · Pico Veleta"), ("1606521015", "Zona Veleta")]},
+    "calpe-costa-blanca": {"windy": [("1694864852", "Peñón de Ifach"), ("1518025640", "Serra de Bèrnia")]},
+}

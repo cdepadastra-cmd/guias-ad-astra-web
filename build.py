@@ -817,7 +817,7 @@ def build_topografia():
 
 # ---------------------------------------------------------------- meteorología de montaña
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "meteo"))
-from macizos import MACIZOS, REGIONES  # noqa: E402
+from macizos import MACIZOS, REGIONES, WEBCAMS  # noqa: E402
 
 METEO_IMG = img("0c5376bd-2231-4c62-b798-6f0139e73cd7/cursos-alpinismo.webp")
 METEO_ACT = {
@@ -867,7 +867,8 @@ def meteo_selector(sel=None):
     reg_sel = next((m["region"] for m in MACIZOS if m["id"] == sel), "")
     lista = [{"id": m["id"], "nombre": m["nombre"], "corto": m["corto"], "region": m["region"],
               "cumbre": "%s %s m" % (m["cumbre"]["nombre"], "{:,}".format(m["cumbre"]["alt"]).replace(",", ".")),
-              "base": "%s %s m" % (m["base"]["nombre"], "{:,}".format(m["base"]["alt"]).replace(",", "."))} for m in MACIZOS]
+              "base": "%s %s m" % (m["base"]["nombre"], "{:,}".format(m["base"]["alt"]).replace(",", ".")),
+              "cams": WEBCAMS.get(m["id"], {})} for m in MACIZOS]
     ops_reg = '<option value="">Todas</option>' + "".join('<option%s>%s</option>' % (' selected' if rg == reg_sel else "", e(rg)) for rg in REGIONES)
     ops_mac = '<option value="">Todas las sierras</option>' + "".join(
         '<option value="%s"%s>%s</option>' % (m["id"], ' selected' if m["id"] == sel else "", e(m["nombre"])) for m in MACIZOS if not reg_sel or m["region"] == reg_sel)
