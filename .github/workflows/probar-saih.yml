@@ -16,11 +16,17 @@ jobs:
           st,fu,js=get("https://saihtajo.chtajo.es/cache/js.js")
           print("JS", st, len(js))
           for m in sorted(set(re.findall(r'["\'](index\.php\?[^"\']{0,120}|[^"\'\s]*\?w=[^"\']{0,120}|[^"\'\s]*(?:json|ajax)[^"\'\s]{0,80})["\']', js)))[:80]: print("  >", m)
-          for k in ("w=get", "getestacion", "datos-tiempo-real", "exportarjson", "url10dias"):
+          vistos=set()
+          for k in ("$.ajax", "$.get", "$.post", "getJSON", "fetch(", "url:", "url :", "urlexportarjson", "url10dias", "aforos"):
+              n=0
               for mm in re.finditer(re.escape(k), js):
-                  print("  ctx[%s]:" % k, js[max(0,mm.start()-160):mm.start()+200].replace("\n"," "))
-                  break
-          for u in ["http://www.saihduero.es/", "https://www.saihduero.es/", "https://saihduero.es/", "http://saihduero.es/risr/"]:
+                  c=re.sub(r"\s+"," ",js[max(0,mm.start()-80):mm.start()+220])
+                  if c in vistos: continue
+                  vistos.add(c); print("  ctx[%s]: %s" % (k, c)); n+=1
+                  if n>=6: break
+          import subprocess
+          print(subprocess.run("echo | openssl s_client -connect www.saihduero.es:443 -servername www.saihduero.es -showcerts 2>/dev/null | openssl x509 -noout -subject -issuer -ext authorityInfoAccess", shell=True, capture_output=True, text=True).stdout)
+          for u in []:
               st,fu,h=get(u); print("=====",u,st,fu,len(h)); print(h[:300] if h.startswith("ERROR") else re.sub(r"\s+"," ",re.sub(r"<[^>]+>"," ",h))[:400])
               for l in sorted(set(re.findall(r'(?:href|src)\s*=\s*["\']([^"\']+)["\']',h)))[:60]: print("   ",l)
           PY
