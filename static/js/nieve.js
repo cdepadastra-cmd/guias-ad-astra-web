@@ -83,8 +83,13 @@
     cargarLeaflet(function () {
       if (!mapa) {
         mapa = L.map("nv-mapa", { scrollWheelZoom: false, attributionControl: true });
-        L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", { maxZoom: 12, subdomains: "abcd",
-          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>' }).addTo(mapa);
+        // mapa topográfico libre (OpenTopoMap); si no responde, el de OpenStreetMap
+        var topo = L.tileLayer("https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png", { maxZoom: 13, subdomains: "abc",
+          attribution: 'Mapa: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (CC-BY-SA) · datos &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>' }).addTo(mapa);
+        var fallos = 0;
+        topo.on("tileerror", function () {
+          if (++fallos === 4) { mapa.removeLayer(topo); L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 13, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>' }).addTo(mapa); }
+        });
       }
       Object.keys(capas).forEach(function (k) { mapa.removeLayer(capas[k]); }); capas = {};
       var pts = [];

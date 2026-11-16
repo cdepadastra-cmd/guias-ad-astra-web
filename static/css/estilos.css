@@ -596,8 +596,8 @@ details.adv[open] summary{margin-bottom:14px}
 .nv-links a,.nv-sin a{color:var(--gold)}
 .nv-sin-t{margin-top:36px;font-size:1.4rem}
 .nv-mapa{height:min(62vh,520px);border-radius:var(--r);border:1px solid var(--line);margin-bottom:10px;background:#1b120c;z-index:0}
-.nv-pin{display:inline-grid;place-items:center;border-radius:50%;background:color-mix(in srgb,var(--c) 30%,transparent);border:2px solid var(--c);color:#fff;line-height:1;box-shadow:0 0 10px rgba(0,0,0,.5);cursor:pointer;font-style:normal}
-.nv-pin-p{border-style:dashed;background:transparent}
+.nv-pin{display:inline-grid;place-items:center;border-radius:50%;background:color-mix(in srgb,var(--c) 55%,#1b120c);border:2.5px solid var(--c);color:#fff;text-shadow:0 0 3px #000;line-height:1;box-shadow:0 0 10px rgba(0,0,0,.5);cursor:pointer;font-style:normal}
+.nv-pin-p{border-style:dashed;background:rgba(27,18,12,.55)}
 .nv-pin-sel{outline:3px solid var(--gold);outline-offset:2px}
 .nv-pin-0{background:#8d847b;border:1px solid #1b120c;box-shadow:none}
 .nv-ley{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;font-size:.85rem;color:var(--muted);margin-bottom:24px}
