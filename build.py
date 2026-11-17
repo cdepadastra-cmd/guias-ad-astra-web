@@ -956,16 +956,24 @@ def build_mochila():
          body, "her", ld, priority="0.6", scripts='<script src="/js/mochila.js" defer></script>')
 
 
+PRENDAS = {
+    "1": ["Camiseta térmica (manga corta o larga)", "Mallas térmicas", "Calcetines técnicos", "Braga de cuello fina"],
+    "2": ["Forro polar", "Chaqueta de fibra (tipo Primaloft)", "Softshell fino", "Chaleco"],
+    "3": ["Chaqueta impermeable de membrana (tipo Gore-Tex)", "Cortavientos", "Softshell", "Cubrepantalón impermeable"],
+    "4": ["Plumífero (plumas)", "Chaqueta de fibra gruesa", "Guantes gordos o manoplas", "Gorro"],
+}
+
+
 def build_capas():
     path = "/teoria-de-las-capas/"
     capas = [("1", "Capa base", "#7cc47f", "Va pegada a la piel y su trabajo es sacar el sudor hacia fuera para que la piel esté seca. Camiseta (y mallas si hace frío) de fibra sintética, lana merina o mezcla. La merina abriga aunque esté húmeda y no huele; la sintética seca antes."),
              ("2", "Capa intermedia", "#e9a53b", "Guarda el calor del cuerpo. Un forro polar transpira bien y sirve casi siempre; una chaqueta fina de fibra abriga más y se guarda en poco sitio. Elige el grosor según el frío: si subes sudando, es demasiado."),
              ("3", "Capa exterior", "#6fb3e0", "Protege de la lluvia, la nieve y el viento. Una chaqueta con membrana impermeable y transpirable para el mal tiempo, o un cortavientos o softshell cuando solo hay viento. Las cremalleras de ventilación ayudan a no empaparte por dentro."),
              ("4", "Capa de reserva", "#c9a7e8", "No siempre se cuenta, pero en montaña es clave: un plumífero o chaqueta de fibra que va en la mochila para la cima, las paradas, una espera o una emergencia. Te la pones al parar, encima de todo, y te la quitas antes de volver a andar.")]
-    tabla = [("Calor (más de 20 °C)", "Camiseta técnica", "—", "Cortavientos ligero en la mochila"),
-             ("Templado (10 a 20 °C)", "Camiseta técnica", "Forro fino en la mochila", "Chubasquero en la mochila"),
-             ("Fresco (0 a 10 °C)", "Térmica de manga larga", "Forro polar", "Chaqueta de membrana + plumífero ligero para parar"),
-             ("Frío (bajo 0 °C)", "Térmica (merina) arriba y abajo", "Forro grueso o chaqueta de fibra", "Membrana arriba y abajo + plumífero, guantes dobles y gorro")]
+    tabla = [("Calor (más de 20 °C)", "Camiseta técnica de manga corta", "—", "Cortavientos ligero en la mochila"),
+             ("Templado (10 a 20 °C)", "Camiseta técnica", "Forro polar fino en la mochila", "Chaqueta impermeable en la mochila"),
+             ("Fresco (0 a 10 °C)", "Camiseta térmica de manga larga", "Forro polar", "Chaqueta impermeable + plumífero ligero para parar"),
+             ("Frío (bajo 0 °C)", "Camiseta y mallas térmicas (merina)", "Forro polar grueso o chaqueta de fibra", "Chaqueta y cubrepantalón impermeables + plumífero, guantes dobles y gorro")]
     consejos = ["Empieza a andar con un poco de frío: en diez minutos entrarás en calor.",
                 "Quita capa antes de empezar a sudar, no después; ponte la de reserva en cuanto pares.",
                 "Lo que sobra, a la mochila: es mejor parar un minuto que empaparse.",
@@ -976,8 +984,8 @@ def build_capas():
             '<section class="section" id="vinetas"><div class="wrap"><p class="eyebrow">La idea</p><h2>Varias capas finas abrigan más que una gorda</h2>'
             '<p class="lead-p">El aire que queda entre capa y capa también aísla, y con varias prendas puedes ajustar el abrigo a cada momento: quitar al subir, poner al parar. El objetivo es estar seco y a buena temperatura todo el día.</p>'
             '<div class="gd-fig gd-cm">' + guias_svg.capas_comic() + '</div>'
-            '<div class="gd-capas">' + "".join('<article style="--c:%s"><span>%s</span><h3>%s</h3><p>%s</p></article>' % (c, n, e(t), e(x)) for n, t, c, x in capas) + '</div></div></section>'
-            '<section class="section alt"><div class="wrap"><p class="eyebrow">Qué ponerse</p><h2>Según la temperatura</h2><div class="gd-tw"><table class="gd-t"><thead><tr><th>Tiempo</th><th>Capa base</th><th>Capa intermedia</th><th>Exterior y reserva</th></tr></thead><tbody>' +
+            '<div class="gd-capas">' + "".join('<article style="--c:%s"><span>%s</span><h3>%s</h3><ul class="gd-prendas">%s</ul><p>%s</p></article>' % (c, n, e(t), "".join("<li>%s</li>" % e(pr) for pr in PRENDAS[n]), e(x)) for n, t, c, x in capas) + '</div></div></section>'
+            '<section class="section alt"><div class="wrap"><p class="eyebrow">Qué ponerse</p><h2>Según la temperatura</h2><div class="gd-tw"><table class="gd-t"><thead><tr><th>Tiempo</th><th>1 · Base</th><th>2 · Intermedia</th><th>3 y 4 · Exterior y reserva</th></tr></thead><tbody>' +
             "".join("<tr><th>%s</th><td>%s</td><td>%s</td><td>%s</td></tr>" % tuple(e(x) for x in f) for f in tabla) +
             '</tbody></table></div><p class="muted small">Orientativo: cuenta también el viento, la altitud (unos 6 °C menos por cada 1.000 m) y lo intensa que sea la actividad.</p></div></section>'
             '<section class="section"><div class="wrap"><p class="eyebrow">Errores típicos</p><h2>Lo que no hay que hacer</h2><div class="gd-fig gd-cm">' + guias_svg.capas_errores() + '</div>'

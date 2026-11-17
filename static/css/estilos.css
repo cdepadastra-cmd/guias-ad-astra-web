@@ -648,3 +648,7 @@ details.adv[open] summary{margin-bottom:14px}
 .mo-acc{display:flex;gap:10px;flex-wrap:wrap}
 @media print{.site-header,.site-footer,.hero,.section:not(#lista),.mo-add,.mo-acc,.mo-btns .mo-btn:not(.on),.wa-float{display:none!important}.mo-g{break-inside:avoid}}
 .cm-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:18px}
+.cm-sub{font-size:17px;font-weight:700;fill:#f3c74f}
+.gd-lt{font-size:17px;fill:#e8dccb}.gd-n{font-size:16px;font-weight:800;fill:#fff}
+.gd-prendas{list-style:none;padding:0;margin:4px 0 10px;display:flex;flex-wrap:wrap;gap:6px}
+.gd-prendas li{background:color-mix(in srgb,var(--c) 22%,transparent);border:1px solid var(--c);border-radius:999px;padding:3px 10px;font-size:.82rem}
