@@ -926,6 +926,9 @@ CAPAS_FAQ = [
 ]
 
 
+COMIC_FONTS = '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bangers&family=Comic+Neue:wght@700&display=swap">'
+
+
 def build_mochila():
     path = "/como-preparar-la-mochila/"
     ajustes = [("Cinturón", "Ponlo sobre las crestas de la cadera y apriétalo: ahí debe ir la mayor parte del peso."),
@@ -952,8 +955,8 @@ def build_mochila():
             '</div><div class="sticky"><div class="panel"><p class="eyebrow">Con guía</p><p>En nuestras actividades te decimos qué traer y ponemos el material técnico. Si te falta algo, también lo <a href="/actividades/alquiler-material-montana/">alquilamos</a>.</p></div></div></div></section>')
     ld = [crumbs_ld([("Inicio", "/"), ("Cómo preparar la mochila", path)]), faq_ld(MOCHILA_FAQ)]
     page(path, "Cómo preparar la mochila de montaña y qué llevar | Ad Astra",
-         "Cómo repartir el peso en la mochila, cómo ajustarla y listas de material para barrancos, escalada, alpinismo, senderismo, montañismo y bivac que puedes ir tachando.",
-         body, "her", ld, priority="0.6", scripts='<script src="/js/mochila.js" defer></script>')
+         "Cómo repartir el peso en la mochila, cómo ajustarla y listas de material para barrancos, escalada, alpinismo, senderismo, montañismo y vivac que puedes ir tachando.",
+         body, "her", ld, priority="0.6", scripts=COMIC_FONTS + '<script src="/js/mochila.js" defer></script>')
 
 
 PRENDAS = {
@@ -995,7 +998,7 @@ def build_capas():
     ld = [crumbs_ld([("Inicio", "/"), ("Teoría de las capas", path)]), faq_ld(CAPAS_FAQ)]
     page(path, "Teoría de las capas: cómo vestirse para la montaña | Ad Astra",
          "La teoría de las tres capas (base, intermedia y exterior) más la capa de reserva, explicada con viñetas: qué ponerse según la temperatura y errores típicos.",
-         body, "her", ld, priority="0.6")
+         body, "her", ld, priority="0.6", scripts=COMIC_FONTS)
 
 
 def build_caudales():

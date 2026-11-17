@@ -27,7 +27,7 @@
     { id: "montanismo", n: "Montañismo", g: {
       "Ropa y calzado": ["Botas de montaña", "Calcetines técnicos y de recambio", "Camiseta térmica", "Forro polar o chaqueta de fibra", "Chaqueta con membrana", "Plumífero ligero para la cima", "Pantalón de montaña (y cubrepantalón si hay mal tiempo)", "Guantes y gorro", "Gafas de sol de categoría 3–4"],
       "Equipo": ["Bastones", "Crampones o microcrampones si hay nieve o hielo", "Piolet si hay nieve", "Casco si hay trepadas o caída de piedras", "GPS o app con el track y brújula", "Termo"] } },
-    { id: "vivac", n: "Bivac", g: {
+    { id: "vivac", n: "Vivac", g: {
       "Para dormir": ["Saco de dormir (mira la temperatura de confort)", "Esterilla aislante", "Funda de vivac o tienda ligera", "Almohada hinchable o la ropa en una bolsa", "Ropa seca para dormir", "Gorro y calcetines secos", "Tapones para los oídos"],
       "Cocina y agua": ["Hornillo, cartucho de gas y mechero", "Cazo y cubiertos", "Cena y desayuno", "Agua de sobra o filtro / pastillas potabilizadoras", "Taza o vaso"],
       "Otros": ["Plumífero", "Frontal con pilas de repuesto", "Papel higiénico y pala", "Bolsas para bajar toda la basura", "Normativa del espacio natural (dónde y desde qué altura se permite vivaquear)"] } },

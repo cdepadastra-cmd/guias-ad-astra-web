@@ -652,3 +652,11 @@ details.adv[open] summary{margin-bottom:14px}
 .gd-lt{font-size:17px;fill:#e8dccb}.gd-n{font-size:16px;font-weight:800;fill:#fff}
 .gd-prendas{list-style:none;padding:0;margin:4px 0 10px;display:flex;flex-wrap:wrap;gap:6px}
 .gd-prendas li{background:color-mix(in srgb,var(--c) 22%,transparent);border:1px solid var(--c);border-radius:999px;padding:3px 10px;font-size:.82rem}
+.cm-v text{font-family:"Bangers","Comic Neue","Comic Sans MS","Chalkboard SE",var(--label),sans-serif}
+.cm-t{font-size:24px;font-weight:900;fill:#120b07;letter-spacing:.02em}
+.cm-b{font-size:19px;font-weight:900;fill:#120b07}
+.cm-sub{font-size:18px;font-weight:800;fill:#f3c74f}
+.cm-pie{font-size:16px;font-weight:700;fill:#120b07}
+.cm-v text,.gd-svg .gd-cmx{font-family:"Comic Neue","Comic Sans MS",sans-serif}
+.cm-v .cm-t,.cm-v .cm-sub{font-family:"Bangers","Comic Neue",sans-serif;font-weight:400;letter-spacing:.04em}
+.cm-v .cm-t{font-size:27px}.cm-v .cm-sub{font-size:21px}
