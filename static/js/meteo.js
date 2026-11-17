@@ -209,7 +209,7 @@
       if (!mm) { reg.value = ""; rellenarSierras("", ""); }
     });
     var mac = document.getElementById("mt-mac");
-    if (mac && mac.getAttribute("data-id")) { history.replaceState({ id: mac.getAttribute("data-id") }, ""); H10 = "Meteorología de montaña"; TIT0 = "Meteorología de montaña: previsión en cumbre a 7 días | Ad Astra"; }
+    if (mac && mac.getAttribute("data-id")) { history.replaceState({ id: mac.getAttribute("data-id") }, ""); H10 = "Meteorología de montaña"; TIT0 = "Meteorología de montaña: previsión en cumbre a 15 días | Ad Astra"; }
   }
 
   /* ---------------------------------------------------------------- gráficas */
@@ -308,7 +308,7 @@
 
       function tira() {
         return '<div class="mt-dias" role="tablist">' + dias.map(function (d, k) {
-          return '<button type="button" role="tab" class="mt-dia' + (k === sel ? " on" : "") + '" data-k="' + k + '" aria-selected="' + (k === sel) + '"><b>' + diaCorto(d.fecha) + "</b><small>" + fFecha.format(fechaLocal(d.fecha)) + "</small>" + icono(d.icono) +
+          return '<button type="button" role="tab" class="mt-dia' + (k === sel ? " on" : "") + (k >= 7 ? " mt-lejos" : "") + '" data-k="' + k + '" aria-selected="' + (k === sel) + '"><b>' + diaCorto(d.fecha) + (k >= 10 ? ' <em class="mt-tend">tendencia</em>' : "") + "</b><small>" + fFecha.format(fechaLocal(d.fecha)) + "</small>" + icono(d.icono) +
             '<span class="mt-t" title="Cumbre: máxima / mínima"><i>' + n(d.tc_max, "°") + "</i> " + n(d.tc_min, "°") + '</span><span class="mt-s">' + (d.pr ? dec(d.pr) + " mm" : "Sin precip.") + '</span><span class="mt-s">' + flecha(d.wc_dir) + n(d.wc_max) + " km/h</span>" + (d.avisos && d.avisos.length ? '<span class="mt-pt" title="' + esc(d.avisos.join(" · ")) + '">!</span>' : "") + aemetPunto(d.fecha) + "</button>";
         }).join("") + "</div>";
       }
@@ -324,6 +324,7 @@
         var h = '<div class="mt-res"><div><h3>' + cap(fLargo.format(fechaLocal(d.fecha))) + "</h3>" +
           (sl ? '<p class="mt-sol">Amanece ' + fHora.format(sl.sale) + " · Anochece " + fHora.format(sl.pone) + '<br>Horas de luz: ' + duracion(sl.sale, sl.pone) + "</p>" : "") +
           (d.horas < 24 ? '<p class="muted small">Desde ahora hasta medianoche.</p>' : "") +
+          (sel >= 10 ? '<p class="mt-aviso-lejos">Más allá de 10 días solo queda un modelo (GFS): tómalo como tendencia, no como previsión.</p>' : sel >= 7 ? '<p class="mt-aviso-lejos">Del día 8 al 10 la previsión es menos fiable: solo ECMWF y GFS.</p>' : "") +
           (aeDia.length ? '<div class="mt-avisos">' + aeDia.map(function (a) { return chipAemet(a, true); }).join("") + "</div>" : "") + avisos(d) + "</div>";
         h += '<dl class="mt-kv">' +
           "<div><dt>Cumbre (" + esc(doc.cumbre.nombre) + ", " + doc.cumbre.alt.toLocaleString("es-ES") + " m)</dt><dd>" + n(d.tc_min, "°") + " / " + n(d.tc_max, "°C") + (d.st_min != null ? ' <small class="mt-st">sensación ' + n(d.st_min, "°") + "</small>" : "") + "</dd></div>" +
@@ -452,7 +453,7 @@
           });
           h += "</tr>";
         });
-        return h + '</tbody></table></div><p class="muted small">AROME llega a 51 horas (y no cubre Sierra Nevada); ICON-EU, a 5 días; ECMWF y GFS, a 7. Si los modelos no coinciden, la previsión es menos fiable.</p>';
+        return h + '</tbody></table></div><p class="muted small">AROME llega a 51 horas (y no cubre Sierra Nevada); ICON-EU, a 5 días; ECMWF, a 10 días; GFS, a 15 días. Si los modelos no coinciden, la previsión es menos fiable.</p>';
       }
 
       function pintar() {
@@ -463,7 +464,7 @@
         el.innerHTML = '<div class="mt-cab"><h2>Tiempo en ' + esc(doc.nombre) + '</h2><p class="muted small">Cumbre: ' + esc(doc.cumbre.nombre) + " " + doc.cumbre.alt.toLocaleString("es-ES") + " m · Base: " + esc(doc.base.nombre) + " " + doc.base.alt.toLocaleString("es-ES") + ' m</p></div><p class="mt-act">' + actualizado(doc) + "</p>" + bloque + tira() +
           '<div class="mt-sec">' + detalleDia() + "</div>" +
           '<div class="mt-sec mt-perfil"><h2>Perfil del día</h2><p class="muted" style="margin-top:-8px">' + cap(fLargo.format(fechaLocal(dias[sel].fecha))) + "</p>" + meteograma() + "</div>" +
-          '<div class="mt-sec"><h2>Evolución a 7 días</h2>' + graficas() + "</div>" +
+          '<div class="mt-sec"><h2>Evolución a 15 días</h2>' + graficas() + "</div>" +
           webcams(id) +
           '<div class="mt-sec"><h2>Comparación de modelos</h2>' + comparativa() + "</div>";
         el.querySelectorAll("[data-modo]").forEach(function (b) {

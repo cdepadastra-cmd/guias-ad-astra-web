@@ -30,8 +30,11 @@ from macizos import MACIZOS, REGIONES  # noqa: E402
 G = 9.80665
 UTC = dt.timezone.utc
 TZ = ZoneInfo("Europe/Madrid")
-HORAS = 168           # 7 días
-PASO = 3              # horas (a partir de las primeras 72 h)
+HORAS = 360           # 15 días
+PASO = 3              # horas (de las 72 h a los 7 días)
+MEDIO = 168           # a partir de aquí (días 8 a 15) el eje va cada 6 h
+PASO_LARGO = 6
+ECMWF_MAX = 240       # ECMWF IFS publica 10 días en las pasadas de 00 y 12 UTC
 HORARIO = 72          # las primeras 72 h van hora a hora
 LEVELS = [1000, 925, 850, 700, 600, 500]
 ALTURAS_NUBES = [500, 1000, 2000, 3000]   # nubosidad estimada a estas altitudes (m)
@@ -137,12 +140,12 @@ class Modelo:
 def ecmwf():
     from ecmwf.opendata import Client
     m = Modelo("ecmwf", "ECMWF IFS", "0,25° (~25 km)")
-    steps = list(range(0, 145, 3)) + list(range(150, HORAS + 1, 6))
+    steps = list(range(0, 145, 3)) + list(range(150, min(HORAS, ECMWF_MAX) + 1, 6))
     src = None
     for s in ("azure", "google", "ecmwf", "aws"):
         try:
             c = Client(source=s, model="ifs", resol="0p25")
-            run = c.latest(type="fc", step=HORAS, param="2t")
+            run = c.latest(type="fc", step=min(HORAS, ECMWF_MAX), param="2t")
             src = s
             break
         except Exception as ex:
@@ -151,7 +154,7 @@ def ecmwf():
         raise RuntimeError("ECMWF no disponible")
     m.run = run.replace(tzinfo=UTC)
     log("ECMWF: pasada %s (fuente %s)" % (m.run.strftime("%Y-%m-%d %HZ"), src))
-    cache = os.path.join(CACHE, "ecmwf-v3-%s.pkl" % m.run.strftime("%Y%m%d%H"))
+    cache = os.path.join(CACHE, "ecmwf-v4-%s.pkl" % m.run.strftime("%Y%m%d%H"))
     if os.path.exists(cache):
         try:
             c_ = pickle.load(open(cache, "rb"))
@@ -311,7 +314,7 @@ def gfs():
     if not m.run:
         raise RuntimeError("GFS no disponible")
     log("GFS: pasada %s" % m.run.strftime("%Y-%m-%d %HZ"))
-    steps = list(range(0, HORARIO + 4)) + list(range(HORARIO + 6, HORAS + 1, PASO))
+    steps = list(range(0, HORARIO + 4)) + list(range(HORARIO + 6, MEDIO + 1, PASO)) + list(range(MEDIO + PASO_LARGO, HORAS + 1, PASO_LARGO))
 
     def paso(st):
         url = "%s/gfs.%s/%02d/atmos/gfs.t%02dz.pgrb2.0p25.f%03d" % (GFS_BUCKET, m.run.strftime("%Y%m%d"), m.run.hour, m.run.hour, st)
@@ -782,7 +785,7 @@ def dias(eje, modelos_series, mac_id):
         d = (t - dt.timedelta(hours=dur[i] / 2)).astimezone(TZ).date()
         grupos.setdefault(d, []).append(i)
     out = []
-    for d, idx in sorted(grupos.items())[:8]:
+    for d, idx in sorted(grupos.items())[:16]:
         if sum(dur[i] for i in idx) < 6:
             continue
         val = lambda x: [cons[x][i] for i in idx if cons[x][i] is not None]
@@ -1011,8 +1014,12 @@ def main():
     eje = [t0 + dt.timedelta(hours=h) for h in range(HORARIO + 1)]
     while eje[-1].hour % PASO:
         eje.append(eje[-1] + dt.timedelta(hours=1))
-    while eje[-1] + dt.timedelta(hours=PASO) <= t0 + dt.timedelta(hours=HORAS):
+    while eje[-1] + dt.timedelta(hours=PASO) <= t0 + dt.timedelta(hours=MEDIO):
         eje.append(eje[-1] + dt.timedelta(hours=PASO))
+    while eje[-1].hour % PASO_LARGO:
+        eje.append(eje[-1] + dt.timedelta(hours=PASO))
+    while eje[-1] + dt.timedelta(hours=PASO_LARGO) <= t0 + dt.timedelta(hours=HORAS):
+        eje.append(eje[-1] + dt.timedelta(hours=PASO_LARGO))
     orog_proxy = None
     if "gfs" in modelos and modelos["gfs"].campos.get("orog"):
         orog_proxy = list(modelos["gfs"].campos["orog"].values())[0]

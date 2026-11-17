@@ -857,6 +857,7 @@ METEO_FAQ = [
 def meteo_metodo():
     return block("Cómo se hace esta previsión", prose([
         "Cada 6 horas un proceso automático descarga la última pasada de cuatro modelos meteorológicos: ECMWF IFS (Centro Europeo de Previsión a Plazo Medio, el de referencia en Europa), GFS (NOAA, Estados Unidos), ICON-EU (DWD, servicio meteorológico alemán, con más resolución pero solo a 5 días) y AROME (Météo-France, 2,5 km). AROME es de la misma familia que el HARMONIE-AROME de AEMET: con una rejilla tan fina ve bien el relieve, por eso es el más fiable para el viento en cordales y collados, pero solo llega a 51 horas y no cubre Sierra Nevada.",
+        "Hasta el día 7 la previsión combina los cuatro modelos (o los tres de mayor alcance); del día 8 al 10, ECMWF y GFS; y del 11 al 15 solo GFS, que es el único modelo libre que llega tan lejos. Por eso esos últimos días se marcan como «tendencia»: sirven para ver si viene un cambio de tiempo, no para planificar a la hora.",
         "En la cumbre, el viento de AROME es el viento real a 10 metros sobre el relieve del modelo; el de los otros tres es el viento en atmósfera libre a la altitud de la cima, que suele ser algo más fuerte. Con los cuatro tienes el rango completo.",
         "Para cada macizo calculamos dos puntos. En la cumbre, la temperatura y el viento se interpolan en la vertical entre el suelo del modelo y los niveles de 925, 850, 700, 600 y 500 hPa, a la altitud real de la cima: así se evita el error típico de las previsiones por municipio, que dan el tiempo del pueblo. En la base, la temperatura a 2 metros se corrige a la altitud del pueblo.",
         "La previsión principal es la mediana de los modelos disponibles. En las gráficas y en la comparación verás cada modelo por separado: cuanto más se parezcan, más fiable es la previsión.",
@@ -924,9 +925,9 @@ def build_caudales():
 def build_meteo():
     path = "/meteo/"
     regiones = ", ".join(REGIONES)
-    body = (hero("Herramientas", "Meteorología de montaña", "Previsión a 7 días en cumbre y en el pueblo base para %d macizos de España, calculada cada 6 horas directamente con los modelos ECMWF, GFS, ICON y AROME." % len(MACIZOS), METEO_IMG,
+    body = (hero("Herramientas", "Meteorología de montaña", "Previsión a 15 días en cumbre y en el pueblo base para %d macizos de España, calculada cada 6 horas directamente con los modelos ECMWF, GFS, ICON y AROME." % len(MACIZOS), METEO_IMG,
                  [("Inicio", "/"), ("Meteorología de montaña", "")], '<a class="btn btn-primary" href="#previsiones">Ver previsiones</a><a class="btn btn-ghost" href="#como">Cómo se calcula</a>') +
-            keybar([("Macizos", "%d" % len(MACIZOS)), ("Modelos", "ECMWF · GFS · ICON · AROME"), ("Alcance", "7 días, cada 3 horas"), ("Actualización", "4 veces al día")]) +
+            keybar([("Macizos", "%d" % len(MACIZOS)), ("Modelos", "ECMWF · GFS · ICON · AROME"), ("Alcance", "15 días"), ("Actualización", "4 veces al día")]) +
             '<section class="section" id="previsiones"><div class="wrap">' + meteo_selector() + '<div id="mt-index" class="mt"><p class="mt-cargando">Cargando previsiones…</p></div><div id="mt-mac" class="mt" hidden></div>'
             '<noscript><ul>' + "".join('<li><a href="/meteo/%s/">%s</a></li>' % (m["id"], e(m["nombre"])) for m in MACIZOS) + '</ul></noscript></div></section>' +
             '<section class="section alt" id="como"><div class="wrap split"><div class="stack" style="gap:0">' + meteo_metodo() + block("Preguntas frecuentes", faq_html(METEO_FAQ)) +
@@ -934,8 +935,8 @@ def build_meteo():
                 '<h3 style="font-size:1.2rem;margin-top:6px">%s</h3><p>%s</p>' % (e(rg), " · ".join('<a href="/meteo/%s/">%s</a>' % (m["id"], e(m["corto"])) for m in MACIZOS if m["region"] == rg)) for rg in REGIONES) +
             '</div></div></div></section>')
     ld = [crumbs_ld([("Inicio", "/"), ("Meteorología de montaña", path)]), faq_ld(METEO_FAQ)]
-    page(path, "Meteorología de montaña: previsión en cumbre a 7 días | Ad Astra",
-         "Previsión del tiempo en montaña a 7 días para %d macizos: temperatura y viento en cumbre, nieve, isocero y tormentas. Modelos ECMWF, GFS, ICON y AROME." % len(MACIZOS),
+    page(path, "Meteorología de montaña: previsión en cumbre a 15 días | Ad Astra",
+         "Previsión del tiempo en montaña a 15 días para %d macizos: temperatura y viento en cumbre, nieve, isocero y tormentas. Modelos ECMWF, GFS, ICON y AROME." % len(MACIZOS),
          body, "her", ld, priority="0.8", scripts='<script src="/js/meteo.js" defer></script>')
     for m in MACIZOS:
         build_meteo_macizo(m)
@@ -945,7 +946,7 @@ def build_meteo_macizo(m):
     c, b = m["cumbre"], m["base"]
     fmt = lambda x: "{:,}".format(x).replace(",", ".")
     h1 = "Tiempo en %s" % m["nombre"]
-    lead = "Previsión de montaña a 7 días en %s (%s m) y %s (%s m): temperatura, viento en cumbre, precipitación, nieve, isocero y tormentas. %s" % (c["nombre"], fmt(c["alt"]), b["nombre"], fmt(b["alt"]), m["texto"])
+    lead = "Previsión de montaña a 15 días en %s (%s m) y %s (%s m): temperatura, viento en cumbre, precipitación, nieve, isocero y tormentas. %s" % (c["nombre"], fmt(c["alt"]), b["nombre"], fmt(b["alt"]), m["texto"])
     acts = [x for x in ACTIVITIES if x["slug"] in METEO_ACT.get(m["id"], [])]
     otros = [x for x in MACIZOS if x["region"] == m["region"] and x["id"] != m["id"]]
     lateral = ""
@@ -963,10 +964,10 @@ def build_meteo_macizo(m):
           {"@context": "https://schema.org", "@type": "Place", "name": c["nombre"], "geo": {"@type": "GeoCoordinates", "latitude": c["lat"], "longitude": c["lon"], "elevation": c["alt"]},
            "containedInPlace": {"@type": "Place", "name": m["nombre"]}}]
     nom = {"gredos-macizo-central": "Gredos y el Almanzor", "gredos-macizo-oriental": "Gredos Oriental"}.get(m["id"], m["nombre"])
-    title = "Tiempo en %s: previsión de montaña a 7 días" % nom
+    title = "Tiempo en %s: previsión de montaña a 15 días" % nom
     if len(title) > 64:
         title = "Tiempo en %s: previsión de montaña" % nom
-    desc = _short("Previsión meteorológica de montaña en %s: tiempo en %s (%s m) y %s a 7 días, viento en cumbre, nieve, isocero y tormentas con ECMWF, GFS, ICON y AROME." % (m["nombre"], c["nombre"], fmt(c["alt"]), b["nombre"]), 158)
+    desc = _short("Previsión meteorológica de montaña en %s: tiempo en %s (%s m) y %s a 15 días, viento en cumbre, nieve, isocero y tormentas con ECMWF, GFS, ICON y AROME." % (m["nombre"], c["nombre"], fmt(c["alt"]), b["nombre"]), 158)
     page(path, title, desc, body, "her", ld, priority="0.6", scripts='<script src="/js/meteo.js" defer></script>')
 
 def build_service(s):
@@ -1177,7 +1178,7 @@ def main():
     L += ["- [Organización de eventos deportivos](%s/actividades/organizacion-eventos-deportivos/)" % D,
           "", "## Información útil", "- [Calendario de cursos y salidas con plazas libres](%s/calendario/)" % D,
           "- [Calculadora de tiempo de rutas (método MIDE) y perfil de GPX](%s/calculadora-rutas/)" % D,
-          "- [Meteorología de montaña](%s/meteo/): previsión a 7 días en cumbre y en el pueblo base para %d macizos (Gredos, Picos de Europa, Pirineos, Sierra Nevada…), calculada cada 6 horas con los modelos ECMWF, GFS, ICON-EU y AROME." % (D, len(MACIZOS)),
+          "- [Meteorología de montaña](%s/meteo/): previsión a 15 días en cumbre y en el pueblo base para %d macizos (Gredos, Picos de Europa, Pirineos, Sierra Nevada…), calculada cada 6 horas con los modelos ECMWF, GFS, ICON-EU y AROME." % (D, len(MACIZOS)),
           "- [Boulder en Las Tuerces (Palencia)](%s/actividades/boulder-las-tuerces/) y [boulder en Salamanca, Ávila y Cáceres](%s/actividades/boulder-zona-centro-salamanca-caceres/): mapas de sectores y croquis." % (D, D),
           "- [Contacto](%s/contacto/) · [Sobre nosotros](%s/sobre-nosotros/)" % (D, D), ""]
     open(os.path.join(OUT, "llms.txt"), "w", encoding="utf-8").write("\n".join(L))

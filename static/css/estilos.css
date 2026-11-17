@@ -604,3 +604,6 @@ details.adv[open] summary{margin-bottom:14px}
 .nv-ley span{display:inline-flex;align-items:center;gap:8px}
 .leaflet-tooltip{font-family:inherit}
 .nv-mapa.leaflet-container{background:#1b120c}
+.mt-dia.mt-lejos{opacity:.82}
+.mt-tend{display:block;font:600 .6rem/1.2 var(--label);letter-spacing:.08em;text-transform:uppercase;color:var(--dim);font-style:normal}
+.mt-aviso-lejos{background:rgba(233,196,106,.12);border:1px solid rgba(233,196,106,.45);border-radius:var(--r);padding:8px 12px;color:#ecd08e;font-size:.9rem}
