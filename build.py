@@ -12,7 +12,7 @@ TODAY = datetime.date.today().isoformat()
 PAGES = []  # (path, priority) para el sitemap
 import hashlib
 _ST = os.path.join(os.path.dirname(os.path.abspath(__file__)), "static")
-VER = {a: hashlib.md5(open(os.path.join(_ST, a), "rb").read()).hexdigest()[:8] for a in ("css/estilos.css", "js/app.js", "js/calculadora.js", "js/topografia.js", "js/meteo.js", "js/rios.js", "js/nieve.js", "config.js")}
+VER = {a: hashlib.md5(open(os.path.join(_ST, a), "rb").read()).hexdigest()[:8] for a in ("css/estilos.css", "js/app.js", "js/calculadora.js", "js/topografia.js", "js/meteo.js", "js/rios.js", "js/nieve.js", "js/mochila.js", "config.js")}
 
 def e(s):
     return html.escape(str(s), quote=True)
@@ -48,7 +48,7 @@ NAV_ACT = [("Todas las actividades", "/actividades/"), ("Barranquismo", "/activi
            ("Alpinismo y ascensiones", "/actividades/?categoria=Ascensiones"), ("Espeleología", "/actividades/?categoria=Espeleología"), ("Escalada y boulder", "/actividades/?categoria=Escalada"),
            ("Senderismo", "/actividades/?categoria=Senderismo"), ("Travesías y viajes", "/actividades/?categoria=Travesías y viajes")]
 NAV_CUR = [("Todos los cursos", "/formacion-cursos/")] + [(c["disc_label"], "/actividades/%s/" % c["slug"]) for c in COURSES]
-NAV_HER = [("Meteorología de montaña", "/meteo/"), ("Estado de la nieve", "/nieve/"), ("Caudal de barrancos", "/barrancos-caudal/"), ("Calculadora de rutas", "/calculadora-rutas/"), ("Topografía de barrancos", "/topografia-barrancos/"), ("Boulder en Las Tuerces", "/actividades/boulder-las-tuerces/"), ("Boulder en Zona Centro", "/actividades/boulder-zona-centro-salamanca-caceres/")]
+NAV_HER = [("Meteorología de montaña", "/meteo/"), ("Estado de la nieve", "/nieve/"), ("Caudal de barrancos", "/barrancos-caudal/"), ("Calculadora de rutas", "/calculadora-rutas/"), ("Cómo preparar la mochila", "/como-preparar-la-mochila/"), ("Teoría de las capas", "/teoria-de-las-capas/"), ("Topografía de barrancos", "/topografia-barrancos/"), ("Boulder en Las Tuerces", "/actividades/boulder-las-tuerces/"), ("Boulder en Zona Centro", "/actividades/boulder-zona-centro-salamanca-caceres/")]
 NAV_OTR = [("Iniciativas de turismo rural", "/iniciativas-turismo-rural/"), ("Creación y mantenimiento de senderos", "/creacion-mantenimiento-senderos/"), ("Route setting", "/route-setting/"), ("Organización de eventos", "/actividades/organizacion-eventos-deportivos/"), ("Gredos Limpio", "/actividades/gredos-limpio/"),
            ("Oeste de Gredos", "/actividades/comarca-natural-oeste-de-gredos/"), ("Vía Verde Ruta de la Plata", "/actividades/via-verde-ruta-de-la-plata/")]
 
@@ -98,7 +98,7 @@ def page(path, title, desc, body, active="", ld=None, og_type="website", image=N
            '<link rel="stylesheet" href="/css/estilos.css"><link rel="icon" href="/favicon.ico" sizes="any"><link rel="icon" href="/img/favicon-32.png" type="image/png" sizes="32x32"><link rel="icon" href="/img/favicon-48.png" type="image/png" sizes="48x48"><link rel="icon" href="/img/favicon-192.png" type="image/png" sizes="192x192"><link rel="apple-touch-icon" href="/img/apple-touch-icon.png">' + head + lds +
            '</head><body>' + header(active) + '<main id="contenido">' + body + '</main>' + footer() +
            '<script src="/config.js"></script><script src="/js/app.js" defer></script>' + scripts + '</body></html>')
-    for asset in ("css/estilos.css", "js/app.js", "js/calculadora.js", "js/topografia.js", "js/meteo.js", "js/rios.js", "js/nieve.js", "config.js"):
+    for asset in ("css/estilos.css", "js/app.js", "js/calculadora.js", "js/topografia.js", "js/meteo.js", "js/rios.js", "js/nieve.js", "js/mochila.js", "config.js"):
         doc = doc.replace('"/%s"' % asset, '"/%s?v=%s"' % (asset, VER.get(asset, "1")))
     if BASE:
         doc = doc.replace('href="/', 'href="%s/' % BASE).replace('src="/', 'src="%s/' % BASE)
@@ -909,6 +909,87 @@ def build_nieve():
          body, "her", ld, priority="0.6", scripts='<script src="/js/nieve.js" defer></script>')
 
 
+import guias_svg  # noqa: E402
+
+MOCHILA_FAQ = [
+    ("¿Dónde va lo más pesado de la mochila?", "Pegado a la espalda y centrado, entre los omóplatos. Así el centro de gravedad queda cerca del tuyo y la mochila no tira hacia atrás. En terreno técnico (trepadas, nieve, barrancos) bájalo un poco, a la altura de la mitad de la espalda: pierdes algo de comodidad pero ganas mucho equilibrio."),
+    ("¿Qué peso es razonable llevar?", "Como orientación, no más del 20 % de tu peso en travesías con vivac y bastante menos en una salida de un día. Cada kilo de más se nota en las rodillas en la bajada: revisa la lista y quita lo que no vayas a usar."),
+    ("¿En qué orden se ajustan las correas?", "Con la mochila cargada: primero el cinturón sobre las crestas de la cadera, que debe llevar la mayor parte del peso; después las hombreras; luego los tensores de carga (las cintas de encima de los hombros, a unos 45°) y por último la correa de pecho. Al final, cierra los compresores laterales para que nada baile."),
+    ("¿Se guarda lo que marco en la lista?", "Sí, en tu propio navegador: si cierras la página y vuelves, lo marcado sigue ahí. Con «Desmarcar todo» empiezas de cero para la siguiente salida, y puedes añadir cosas tuyas a cada lista."),
+]
+
+CAPAS_FAQ = [
+    ("¿Por qué no se debe llevar algodón en la montaña?", "Porque absorbe el sudor y tarda mucho en secarse. Mientras andas no lo notas, pero en cuanto paras o sopla el viento esa humedad pegada a la piel te enfría muy rápido. Para la capa base usa fibras sintéticas o lana merina."),
+    ("¿Plumón o fibra sintética?", "El plumón abriga más con menos peso y se comprime mejor, pero mojado pierde casi todo su abrigo. La fibra sintética abriga algo menos y pesa más, pero sigue abrigando húmeda. Para lluvia, barrancos o mucho sudor, fibra; para frío seco y paradas, plumón."),
+    ("¿Hace falta una chaqueta de membrana si hace buen tiempo?", "En montaña el tiempo cambia rápido y arriba siempre hace más frío y viento. Una chaqueta impermeable ligera pesa poco y es lo que te protege si te pilla una tormenta: llévala siempre en la mochila."),
+    ("¿Cómo se aplica a las piernas, las manos y la cabeza?", "Igual pero más simple: unas mallas térmicas bajo el pantalón si hace frío, y cubrepantalón impermeable con lluvia o nieve. En manos, guantes finos más unos gordos o manoplas encima. En la cabeza, buff y gorro: por ahí se pierde mucho calor."),
+]
+
+
+def build_mochila():
+    path = "/como-preparar-la-mochila/"
+    ajustes = [("Cinturón", "Ponlo sobre las crestas de la cadera y apriétalo: ahí debe ir la mayor parte del peso."),
+               ("Hombreras", "Ajústalas para que abracen el hombro sin cargar el peso sobre él."),
+               ("Tensores de carga", "Las cintas de encima de los hombros, a unos 45°: acercan la parte de arriba de la mochila a la espalda."),
+               ("Correa de pecho", "A la altura del esternón, sin que te apriete al respirar: estabiliza las hombreras."),
+               ("Compresores", "Ciérralos para que la carga no se mueva. Ajusta el cinturón otra vez al empezar a andar.")]
+    reglas = ["Lo más pesado, pegado a la espalda y centrado: el centro de gravedad cerca del tuyo.",
+              "En terreno técnico (trepadas, nieve, barrancos) baja un poco esa carga para ganar equilibrio.",
+              "Abajo, lo ligero y voluminoso que no vas a necesitar hasta la noche: saco, ropa de recambio.",
+              "Arriba y en la tapa, lo que usas durante el día: chubasquero, botiquín, frontal, mapa.",
+              "Reparte el peso igual a derecha e izquierda y rellena huecos para que nada se mueva.",
+              "Por fuera, lo mínimo: todo lo que cuelga se engancha, se moja y desequilibra."]
+    body = (hero("Herramientas", "Cómo preparar la mochila", "Cómo repartir el peso para que la mochila no te tire hacia atrás, cómo ajustarla y una lista para cada actividad que vas tachando mientras la preparas.", img("afe67801-cf88-4cef-a3ac-e25e4e971634/senderismo-avila-gredos.webp"),
+                 [("Inicio", "/"), ("Cómo preparar la mochila", "")], '<a class="btn btn-primary" href="#lista">Ir a la lista</a><a class="btn btn-ghost" href="/teoria-de-las-capas/">Teoría de las capas</a>') +
+            '<section class="section"><div class="wrap"><p class="eyebrow">El reparto del peso</p><h2>Lo pesado, pegado a la espalda</h2>'
+            '<div class="gd-fig">' + guias_svg.MOCHILA + '</div><ul class="gd-reglas">' + "".join("<li>%s</li>" % e(x) for x in reglas) + '</ul>'
+            '<div class="gd-fig">' + guias_svg.POSTURA + '</div></div></section>'
+            '<section class="section alt"><div class="wrap"><p class="eyebrow">El ajuste</p><h2>En este orden, con la mochila cargada</h2><ol class="gd-pasos">' +
+            "".join('<li><b>%s</b><span>%s</span></li>' % (e(a), e(b)) for a, b in ajustes) + '</ol></div></section>'
+            '<section class="section" id="lista"><div class="wrap"><p class="eyebrow">Qué llevar</p><h2>Elige la actividad y ve tachando</h2>'
+            '<div id="mo-app" class="mo"><p class="muted">Cargando la lista…</p></div></div></section>' +
+            '<section class="section alt"><div class="wrap split"><div class="stack" style="gap:0">' + block("Preguntas frecuentes", faq_html(MOCHILA_FAQ)) +
+            '</div><div class="sticky"><div class="panel"><p class="eyebrow">Con guía</p><p>En nuestras actividades te decimos qué traer y ponemos el material técnico. Si te falta algo, también lo <a href="/actividades/alquiler-material-montana/">alquilamos</a>.</p></div></div></div></section>')
+    ld = [crumbs_ld([("Inicio", "/"), ("Cómo preparar la mochila", path)]), faq_ld(MOCHILA_FAQ)]
+    page(path, "Cómo preparar la mochila de montaña y qué llevar | Ad Astra",
+         "Cómo repartir el peso en la mochila, cómo ajustarla y listas de material para barrancos, escalada, alpinismo, senderismo, montañismo y bivac que puedes ir tachando.",
+         body, "her", ld, priority="0.6", scripts='<script src="/js/mochila.js" defer></script>')
+
+
+def build_capas():
+    path = "/teoria-de-las-capas/"
+    capas = [("1", "Capa base", "#7cc47f", "Va pegada a la piel y su trabajo es sacar el sudor hacia fuera para que la piel esté seca. Camiseta (y mallas si hace frío) de fibra sintética, lana merina o mezcla. La merina abriga aunque esté húmeda y no huele; la sintética seca antes."),
+             ("2", "Capa intermedia", "#e9a53b", "Guarda el calor del cuerpo. Un forro polar transpira bien y sirve casi siempre; una chaqueta fina de fibra abriga más y se guarda en poco sitio. Elige el grosor según el frío: si subes sudando, es demasiado."),
+             ("3", "Capa exterior", "#6fb3e0", "Protege de la lluvia, la nieve y el viento. Una chaqueta con membrana impermeable y transpirable para el mal tiempo, o un cortavientos o softshell cuando solo hay viento. Las cremalleras de ventilación ayudan a no empaparte por dentro."),
+             ("4", "Capa de reserva", "#c9a7e8", "No siempre se cuenta, pero en montaña es clave: un plumífero o chaqueta de fibra que va en la mochila para la cima, las paradas, una espera o una emergencia. Te la pones al parar, encima de todo, y te la quitas antes de volver a andar.")]
+    tabla = [("Calor (más de 20 °C)", "Camiseta técnica", "—", "Cortavientos ligero en la mochila"),
+             ("Templado (10 a 20 °C)", "Camiseta técnica", "Forro fino en la mochila", "Chubasquero en la mochila"),
+             ("Fresco (0 a 10 °C)", "Térmica de manga larga", "Forro polar", "Chaqueta de membrana + plumífero ligero para parar"),
+             ("Frío (bajo 0 °C)", "Térmica (merina) arriba y abajo", "Forro grueso o chaqueta de fibra", "Membrana arriba y abajo + plumífero, guantes dobles y gorro")]
+    consejos = ["Empieza a andar con un poco de frío: en diez minutos entrarás en calor.",
+                "Quita capa antes de empezar a sudar, no después; ponte la de reserva en cuanto pares.",
+                "Lo que sobra, a la mochila: es mejor parar un minuto que empaparse.",
+                "Ventila: abre cremalleras al subir y ciérralas en las crestas con viento.",
+                "Lleva siempre una capa seca de recambio y, en invierno, guantes de repuesto."]
+    body = (hero("Herramientas", "La teoría de las capas", "Cómo vestirse para la montaña: tres capas que se ponen y se quitan según el esfuerzo y el tiempo, más una de reserva para las paradas. Explicado en viñetas.", METEO_IMG,
+                 [("Inicio", "/"), ("Teoría de las capas", "")], '<a class="btn btn-primary" href="#vinetas">Ver las viñetas</a><a class="btn btn-ghost" href="/como-preparar-la-mochila/">Preparar la mochila</a>') +
+            '<section class="section" id="vinetas"><div class="wrap"><p class="eyebrow">La idea</p><h2>Varias capas finas abrigan más que una gorda</h2>'
+            '<p class="lead-p">El aire que queda entre capa y capa también aísla, y con varias prendas puedes ajustar el abrigo a cada momento: quitar al subir, poner al parar. El objetivo es estar seco y a buena temperatura todo el día.</p>'
+            '<div class="gd-fig gd-cm">' + guias_svg.capas_comic() + '</div>'
+            '<div class="gd-capas">' + "".join('<article style="--c:%s"><span>%s</span><h3>%s</h3><p>%s</p></article>' % (c, n, e(t), e(x)) for n, t, c, x in capas) + '</div></div></section>'
+            '<section class="section alt"><div class="wrap"><p class="eyebrow">Qué ponerse</p><h2>Según la temperatura</h2><div class="gd-tw"><table class="gd-t"><thead><tr><th>Tiempo</th><th>Capa base</th><th>Capa intermedia</th><th>Exterior y reserva</th></tr></thead><tbody>' +
+            "".join("<tr><th>%s</th><td>%s</td><td>%s</td><td>%s</td></tr>" % tuple(e(x) for x in f) for f in tabla) +
+            '</tbody></table></div><p class="muted small">Orientativo: cuenta también el viento, la altitud (unos 6 °C menos por cada 1.000 m) y lo intensa que sea la actividad.</p></div></section>'
+            '<section class="section"><div class="wrap"><p class="eyebrow">Errores típicos</p><h2>Lo que no hay que hacer</h2><div class="gd-fig gd-cm">' + guias_svg.capas_errores() + '</div>'
+            '<ul class="gd-reglas">' + "".join("<li>%s</li>" % e(x) for x in consejos) + '</ul></div></section>' +
+            '<section class="section alt"><div class="wrap split"><div class="stack" style="gap:0">' + block("Preguntas frecuentes", faq_html(CAPAS_FAQ)) +
+            '</div><div class="sticky"><div class="panel"><p class="eyebrow">Fuentes</p><p class="small">Basado en las guías de <a href="https://www.salomon.com/es-es/running/trail-running-advice/how-properly-dress-layers-the-three-layer-system/" rel="noopener" target="_blank">Salomon</a> y <a href="https://www.iloveski.org/es/2021/10/01/sistema-por-capas-vestirse-en-la-montana/" rel="noopener" target="_blank">iLoveSki</a> y en la experiencia de nuestros guías.</p></div></div></div></section>')
+    ld = [crumbs_ld([("Inicio", "/"), ("Teoría de las capas", path)]), faq_ld(CAPAS_FAQ)]
+    page(path, "Teoría de las capas: cómo vestirse para la montaña | Ad Astra",
+         "La teoría de las tres capas (base, intermedia y exterior) más la capa de reserva, explicada con viñetas: qué ponerse según la temperatura y errores típicos.",
+         body, "her", ld, priority="0.6")
+
+
 def build_caudales():
     path = "/barrancos-caudal/"
     body = (hero("Herramientas", "Caudal de los barrancos", "Estado de nuestros barrancos con el caudal de los aforos oficiales del SAIH Tajo y del SAIH Duero, la tendencia de las últimas horas y la lluvia prevista. Se actualiza cada hora.", METEO_IMG,
@@ -1088,7 +1169,7 @@ def main():
     cfg = os.path.join(OUT, "config.js")
     c = open(cfg, encoding="utf-8").read().replace('calendarioURL: ""', 'calendarioURL: "",\n  // Carpeta donde está publicada la web ("" si está en la raíz del dominio)\n  base: "%s"' % BASE)
     open(cfg, "w", encoding="utf-8").write(c)
-    build_home(); build_activities_index(); build_courses_index(); build_calendar(); build_rental(); build_about(); build_contact(); build_404(); build_calculator(); build_topografia(); build_meteo(); build_caudales(); build_nieve()
+    build_home(); build_activities_index(); build_courses_index(); build_calendar(); build_rental(); build_about(); build_contact(); build_404(); build_calculator(); build_topografia(); build_meteo(); build_caudales(); build_nieve(); build_mochila(); build_capas()
     for a in ACTIVITIES:
         build_activity(a)
     build_ascensiones_macizos()
