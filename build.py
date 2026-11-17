@@ -929,6 +929,16 @@ CAPAS_FAQ = [
 COMIC_FONTS = '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bangers&family=Comic+Neue:wght@700&display=swap">'
 
 
+ZONAS_MOCHILA = [
+    ("#b48be0", "5", "Tapa:", "lo pequeño y a mano", "frontal, mapa, crema, navaja"),
+    ("#7cc47f", "4", "Arriba:", "lo que usas a menudo", "chubasquero, botiquín, comida del día"),
+    ("#e8574a", "2", "Pegado a la espalda:", "lo más pesado", "agua, cuerda, hornillo, comida"),
+    ("#e9a53b", "3", "Hacia fuera:", "peso medio", "ropa de abrigo, tienda, neopreno"),
+    ("#4f8fd6", "1", "Abajo:", "ligero y voluminoso", "saco de dormir, ropa de recambio"),
+    ("#bfb3a3", "6", "Todo el bulto:", "compacto y ceñido", "que no pase de la cabeza ni cuelgue bajo la cadera; fuera, solo bastones o piolet"),
+]
+
+
 def build_mochila():
     path = "/como-preparar-la-mochila/"
     ajustes = [("Cinturón", "Ponlo sobre las crestas de la cadera y apriétalo: ahí debe ir la mayor parte del peso."),
@@ -945,8 +955,11 @@ def build_mochila():
     body = (hero("Herramientas", "Cómo preparar la mochila", "Cómo repartir el peso para que la mochila no te tire hacia atrás, cómo ajustarla y una lista para cada actividad que vas tachando mientras la preparas.", img("afe67801-cf88-4cef-a3ac-e25e4e971634/senderismo-avila-gredos.webp"),
                  [("Inicio", "/"), ("Cómo preparar la mochila", "")], '<a class="btn btn-primary" href="#lista">Ir a la lista</a><a class="btn btn-ghost" href="/teoria-de-las-capas/">Teoría de las capas</a>') +
             '<section class="section"><div class="wrap"><p class="eyebrow">El reparto del peso</p><h2>Lo pesado, pegado a la espalda</h2>'
-            '<div class="gd-fig">' + guias_svg.MOCHILA + '</div><ul class="gd-reglas">' + "".join("<li>%s</li>" % e(x) for x in reglas) + '</ul>'
-            '<div class="gd-fig">' + guias_svg.POSTURA + '</div></div></section>'
+            '<div class="gd-zonas"><figure><img src="/img/guias/mochila-zonas.webp" width="569" height="994" loading="lazy" alt="Senderista con la mochila abierta en corte: cada zona con su material y el centro de gravedad pegado a la espalda"></figure>'
+            '<ol class="gd-ley">' + "".join('<li style="--c:%s"><span>%s</span><div><b>%s</b> %s<small>%s</small></div></li>' % z for z in ZONAS_MOCHILA) + '</ol></div>'
+            '<ul class="gd-reglas">' + "".join("<li>%s</li>" % e(x) for x in reglas) + '</ul>'
+            '<div class="gd-bm"><figure class="ok"><img src="/img/guias/mochila-bien.webp" width="403" height="994" loading="lazy" alt="Bien: mochila pegada a la espalda, la vertical del peso cae sobre los pies"><figcaption><b>Bien:</b> peso pegado y centrado. La vertical del peso cae sobre los pies.</figcaption></figure>'
+            '<figure class="ko"><img src="/img/guias/mochila-mal.webp" width="506" height="994" loading="lazy" alt="Mal: mochila alejada de la espalda y alta, tira hacia atrás"><figcaption><b>Mal:</b> peso lejos y alto. Tira hacia atrás y obliga a encorvarse.</figcaption></figure></div></div></section>'
             '<section class="section alt"><div class="wrap"><p class="eyebrow">El ajuste</p><h2>En este orden, con la mochila cargada</h2><ol class="gd-pasos">' +
             "".join('<li><b>%s</b><span>%s</span></li>' % (e(a), e(b)) for a, b in ajustes) + '</ol></div></section>'
             '<section class="section" id="lista"><div class="wrap"><p class="eyebrow">Qué llevar</p><h2>Elige la actividad y ve tachando</h2>'

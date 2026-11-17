@@ -5,7 +5,7 @@
   "use strict";
   var DATOS = "/meteo/datos/";
   var TZ = "Europe/Madrid";
-  var MOD = { ecmwf: { n: "ECMWF", c: "#e9a53b" }, gfs: { n: "GFS", c: "#6fb3e0" }, icon: { n: "ICON", c: "#9ccf7a" } };
+  var MOD = { ecmwf: { n: "ECMWF", c: "#e9a53b" }, gfs: { n: "GFS", c: "#6fb3e0" }, icon: { n: "ICON", c: "#9ccf7a" }, arome: { n: "AROME", c: "#d98ad6" } };
   var DIRS = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSO", "SO", "OSO", "O", "ONO", "NO", "NNO"];
   var fDia = new Intl.DateTimeFormat("es-ES", { timeZone: TZ, weekday: "short" });
   var fFecha = new Intl.DateTimeFormat("es-ES", { timeZone: TZ, day: "numeric", month: "short" });
@@ -104,13 +104,26 @@
   function avisos(d) {
     return (d.avisos || []).map(function (a) { return '<span class="mt-aviso">' + esc(a) + "</span>"; }).join("");
   }
+  var HORAS_ACT = [3, 9, 15, 21];  // ejecuciones programadas (UTC, minuto 40; tardan unos 15 min)
+  function proxima(g) {  // primera ejecución programada después de la que generó estos datos
+    var lim = g.getTime() + 36e5, d0 = Date.UTC(g.getUTCFullYear(), g.getUTCMonth(), g.getUTCDate());
+    for (var k = 0; k < 3; k++) for (var j = 0; j < HORAS_ACT.length; j++) {
+      var c = d0 + k * 864e5 + HORAS_ACT[j] * 36e5 + 55 * 6e4;
+      if (c > lim) return new Date(c);
+    }
+    return null;
+  }
   function actualizado(doc) {
-    var g = new Date(doc.generado.replace("Z", ":00Z").replace(/:(\d\d):00Z$/, ":$1:00Z"));
+    var g = new Date(doc.generado.replace("Z", ":00Z"));
     var mods = Object.keys(doc.modelos).map(function (k) {
       var m = doc.modelos[k], r = new Date(m.pasada.replace("Z", ":00Z"));
       return esc(m.nombre) + " (" + String(r.getUTCHours()).padStart(2, "0") + " UTC del " + r.getUTCDate() + ")";
     });
-    return "Actualizado el " + fAct.format(g) + " · Modelos: " + mods.join(", ");
+    var p = proxima(g), txt;
+    if (!p) txt = "";
+    else if (p.getTime() < Date.now()) txt = "en curso, en unos minutos";
+    else txt = (fYmd.format(p) === fYmd.format(new Date()) ? "hoy" : cap(diaCorto(fYmd.format(p)).toLowerCase())) + " hacia las " + fHora.format(p);
+    return '<span class="mt-upd"><b>Última actualización:</b> ' + fAct.format(g) + (txt ? ' · <b>Próxima:</b> ' + txt : "") + '</span><span class="mt-mods">Modelos: ' + mods.join(", ") + "</span>";
   }
 
   /* ---------------------------------------------------------------- índice */
@@ -125,7 +138,7 @@
         porReg[reg].forEach(function (m) {
           var dias = (m.dias || []).slice(0, 4), av = [];
           (m.dias || []).slice(0, 3).forEach(function (d) { (d.avisos || []).forEach(function (a) { if (av.indexOf(a) < 0) av.push(a); }); });
-          h += '<a class="mt-card" href="/meteo/' + m.id + '/"><div class="mt-card-h"><h3>' + esc(m.nombre) + '</h3><p class="muted small">' + esc(m.cumbre.nombre) + " " + m.cumbre.alt.toLocaleString("es-ES") + " m · " + esc(m.base.nombre) + " " + m.base.alt.toLocaleString("es-ES") + ' m</p></div><div class="mt-mini">';
+          h += '<a class="mt-card" data-mac="' + m.id + '" href="/meteo/' + m.id + '/"><div class="mt-card-h"><h3>' + esc(m.nombre) + '</h3><p class="muted small">' + esc(m.cumbre.nombre) + " " + m.cumbre.alt.toLocaleString("es-ES") + " m · " + esc(m.base.nombre) + " " + m.base.alt.toLocaleString("es-ES") + ' m</p></div><div class="mt-mini">';
           dias.forEach(function (d) {
             h += '<div><b>' + diaCorto(d.fecha) + "</b>" + icono(d.icono) + '<span class="mt-t"><i>' + n(d.tc_max, "°") + "</i> " + n(d.tc_min, "°") + '</span><span class="mt-s">' + (d.pr ? dec(d.pr) + " mm" : "&nbsp;") + '</span><span class="mt-s">' + n(d.wc_max) + " km/h</span></div>";
           });
@@ -134,9 +147,69 @@
         });
         h += "</div>";
       });
-      h += '<p class="mt-nota muted small">Temperaturas y viento en la cumbre de referencia de cada macizo. Mediana de los modelos ECMWF, GFS e ICON-EU.</p>';
+      h += '<p class="mt-nota muted small">Temperaturas y viento en la cumbre de referencia de cada macizo. Mediana de los modelos ECMWF, GFS, ICON-EU y AROME.</p>';
       el.innerHTML = h;
+      el.querySelectorAll("[data-mac]").forEach(function (a) {
+        a.addEventListener("click", function (ev) {
+          if (ev.ctrlKey || ev.metaKey || ev.shiftKey || ev.button) return;
+          ev.preventDefault(); elegir(a.getAttribute("data-mac"), true);
+        });
+      });
     }).catch(function () { el.innerHTML = '<p class="mt-err">La previsión se está generando. Vuelve a intentarlo en unos minutos.</p>'; });
+  }
+
+  /* ---------------------------------------------------------------- selector cordillera -> sierra (todo en la misma página) */
+  var LISTA = [], H1 = null, TIT0 = document.title, H10 = "";
+  function rellenarSierras(reg, sel) {
+    var s = document.getElementById("mt-sel");
+    s.innerHTML = '<option value="">Todas las sierras</option>' + LISTA.filter(function (m) { return !reg || m.region === reg; }).map(function (m) {
+      return '<option value="' + m.id + '"' + (m.id === sel ? " selected" : "") + ">" + esc(m.nombre) + "</option>";
+    }).join("");
+  }
+  function elegir(id, push) {
+    var idx = document.getElementById("mt-index"), mac = document.getElementById("mt-mac");
+    var m = LISTA.filter(function (x) { return x.id === id; })[0];
+    if (!m) {  // todas
+      if (!idx) { location.href = "/meteo/"; return; }
+      mac.hidden = true; mac.removeAttribute("data-id"); idx.hidden = false;
+      document.getElementById("mt-sel").value = "";
+      if (H1) H1.textContent = H10;
+      document.title = TIT0;
+      if (push) history.pushState({ id: "" }, "", "/meteo/");
+      return;
+    }
+    document.getElementById("mt-reg").value = m.region;
+    rellenarSierras(m.region, m.id);
+    if (idx) idx.hidden = true;
+    mac.hidden = false;
+    mac.innerHTML = '<p class="mt-cargando">Cargando previsión de ' + esc(m.nombre) + "…</p>";
+    if (H1) H1.textContent = "Tiempo en " + m.nombre;
+    document.title = "Tiempo en " + m.nombre + ": previsión de montaña | Ad Astra";
+    if (push) history.pushState({ id: id }, "", "/meteo/" + id + "/");
+    ficha(mac, id).catch(function () {});
+    var bar = document.getElementById("mt-selbar");
+    if (bar && bar.getBoundingClientRect().top < 0) bar.scrollIntoView({ block: "start" });
+  }
+  function selector() {
+    var l = document.getElementById("mt-lista");
+    if (!l) return;
+    try { LISTA = JSON.parse(l.textContent); } catch (e) { return; }
+    H1 = document.querySelector(".hero h1"); H10 = H1 ? H1.textContent : "";
+    var reg = document.getElementById("mt-reg"), sel = document.getElementById("mt-sel");
+    reg.addEventListener("change", function () {
+      rellenarSierras(reg.value, "");
+      var del = LISTA.filter(function (m) { return m.region === reg.value; });
+      if (del.length === 1) elegir(del[0].id, true);  // una sola sierra: se carga directamente
+      else if (!reg.value) elegir("", true);
+    });
+    sel.addEventListener("change", function () { elegir(sel.value, true); });
+    window.addEventListener("popstate", function () {
+      var mm = location.pathname.match(/^\/meteo\/([^\/]+)\/?$/);
+      elegir(mm ? mm[1] : "", false);
+      if (!mm) { reg.value = ""; rellenarSierras("", ""); }
+    });
+    var mac = document.getElementById("mt-mac");
+    if (mac && mac.getAttribute("data-id")) { history.replaceState({ id: mac.getAttribute("data-id") }, ""); H10 = "Meteorología de montaña"; TIT0 = "Meteorología de montaña: previsión en cumbre a 15 días | Ad Astra"; }
   }
 
   /* ---------------------------------------------------------------- gráficas */
@@ -190,12 +263,36 @@
     return '<div class="mt-ley">' + items.map(function (it) { return '<span><i style="background:' + it.c + (it.dash ? ";height:2px;border-top:2px dashed " + it.c + ";background:none" : "") + '"></i>' + esc(it.l) + "</span>"; }).join("") + "</div>";
   }
 
+  function duracion(a, b) { var m = Math.round((b - a) / 6e4); return Math.floor(m / 60) + " h " + String(m % 60).padStart(2, "0") + " min"; }
+  function sens(t, st) { return st == null || t == null || Math.round(st) === Math.round(t) ? "" : ' <span class="mt-st" title="Sensación térmica">' + n(st, "°") + "</span>"; }
+  var NUB = [500, 1000, 2000, 3000];
+  function celdaNube(v) {
+    if (v == null) return '<td class="mt-nb">–</td>';
+    var a = Math.min(1, Math.max(0, v / 100)) * 0.75;
+    return '<td class="mt-nb" style="background:rgba(200,192,182,' + a.toFixed(2) + ")" + (v >= 60 ? ";color:#1b120c" : "") + '">' + n(v, "%") + "</td>";
+  }
+
+  function webcams(id) {
+    var lista = LISTA;
+    if (!lista.length) { try { lista = JSON.parse(document.getElementById("mt-lista").textContent); } catch (e) { lista = []; } }
+    var m = lista.filter(function (x) { return x.id === id; })[0], c = (m && m.cams) || {};
+    var w = c.windy || [], en = c.enlaces || [];
+    if (!w.length && !en.length) return "";
+    return '<div class="mt-sec"><h2>Webcams</h2>' + (w.length ? '<div class="mt-cams">' + w.map(function (x) {
+      return '<figure class="mt-cam"><div class="mt-cam-v"><iframe src="https://webcams.windy.com/webcams/public/embed/player/' + esc(x[0]) + '/day" title="Webcam ' + esc(x[1]) + '" loading="lazy" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div><figcaption>' + esc(x[1]) + "</figcaption></figure>";
+    }).join("") + "</div>" : "") +
+      (en.length ? '<p class="mt-cam-links">' + (w.length ? "Más cámaras: " : "Cámaras de la zona (se abren en su web): ") + en.map(function (x) { return '<a href="' + esc(x[0]) + '" target="_blank" rel="noopener">' + esc(x[1]) + "</a>"; }).join(" · ") + "</p>" : "") +
+      (w.length ? '<p class="muted small">Imágenes de webcams de <a href="https://www.windy.com/webcams" target="_blank" rel="noopener">Windy.com</a> y sus propietarios. Muestran la evolución del día; pulsa para ampliar.</p>' : "") + "</div>";
+  }
+
   function C0(N, P) { var a = []; for (var i = 0; i < N; i++) a.push(i * P); return a; }
 
   /* ---------------------------------------------------------------- ficha de macizo */
-  function ficha(el) {
-    var id = el.getAttribute("data-id");
-    json(DATOS + id + ".json").then(function (doc) {
+  function ficha(el, id) {
+    id = id || el.getAttribute("data-id");
+    el.setAttribute("data-id", id);
+    return json(DATOS + id + ".json").then(function (doc) {
+      if (el.getAttribute("data-id") !== id) return;  // se eligió otro macizo mientras cargaba
       var t0 = new Date(doc.t0.replace("Z", ":00Z")), N = doc.consenso.tc.length, P = doc.paso;
       var HH = doc.h || C0(N, P);
       var T = HH.map(function (h) { return new Date(t0.getTime() + h * 36e5); });
@@ -211,7 +308,7 @@
 
       function tira() {
         return '<div class="mt-dias" role="tablist">' + dias.map(function (d, k) {
-          return '<button type="button" role="tab" class="mt-dia' + (k === sel ? " on" : "") + '" data-k="' + k + '" aria-selected="' + (k === sel) + '"><b>' + diaCorto(d.fecha) + "</b><small>" + fFecha.format(fechaLocal(d.fecha)) + "</small>" + icono(d.icono) +
+          return '<button type="button" role="tab" class="mt-dia' + (k === sel ? " on" : "") + (k >= 7 ? " mt-lejos" : "") + '" data-k="' + k + '" aria-selected="' + (k === sel) + '"><b>' + diaCorto(d.fecha) + (k >= 10 ? ' <em class="mt-tend">tendencia</em>' : "") + "</b><small>" + fFecha.format(fechaLocal(d.fecha)) + "</small>" + icono(d.icono) +
             '<span class="mt-t" title="Cumbre: máxima / mínima"><i>' + n(d.tc_max, "°") + "</i> " + n(d.tc_min, "°") + '</span><span class="mt-s">' + (d.pr ? dec(d.pr) + " mm" : "Sin precip.") + '</span><span class="mt-s">' + flecha(d.wc_dir) + n(d.wc_max) + " km/h</span>" + (d.avisos && d.avisos.length ? '<span class="mt-pt" title="' + esc(d.avisos.join(" · ")) + '">!</span>' : "") + aemetPunto(d.fecha) + "</button>";
         }).join("") + "</div>";
       }
@@ -225,12 +322,13 @@
         var sl = solDia(d.fecha, doc.base.lat, doc.base.lon);
         var aeDia = (doc.aemet || []).filter(function (x) { return avisoEnDia(x, d.fecha); });
         var h = '<div class="mt-res"><div><h3>' + cap(fLargo.format(fechaLocal(d.fecha))) + "</h3>" +
-          (sl ? '<p class="mt-sol">Amanece ' + fHora.format(sl.sale) + " · Anochece " + fHora.format(sl.pone) + "</p>" : "") +
+          (sl ? '<p class="mt-sol">Amanece ' + fHora.format(sl.sale) + " · Anochece " + fHora.format(sl.pone) + '<br>Horas de luz: ' + duracion(sl.sale, sl.pone) + "</p>" : "") +
           (d.horas < 24 ? '<p class="muted small">Desde ahora hasta medianoche.</p>' : "") +
+          (sel >= 10 ? '<p class="mt-aviso-lejos">Más allá de 10 días solo queda un modelo (GFS): tómalo como tendencia, no como previsión.</p>' : sel >= 7 ? '<p class="mt-aviso-lejos">Del día 8 al 10 la previsión es menos fiable: solo ECMWF y GFS.</p>' : "") +
           (aeDia.length ? '<div class="mt-avisos">' + aeDia.map(function (a) { return chipAemet(a, true); }).join("") + "</div>" : "") + avisos(d) + "</div>";
         h += '<dl class="mt-kv">' +
-          "<div><dt>Cumbre (" + esc(doc.cumbre.nombre) + ")</dt><dd>" + n(d.tc_min, "°") + " / " + n(d.tc_max, "°C") + "</dd></div>" +
-          "<div><dt>Base (" + esc(doc.base.nombre) + ")</dt><dd>" + n(d.tv_min, "°") + " / " + n(d.tv_max, "°C") + "</dd></div>" +
+          "<div><dt>Cumbre (" + esc(doc.cumbre.nombre) + ", " + doc.cumbre.alt.toLocaleString("es-ES") + " m)</dt><dd>" + n(d.tc_min, "°") + " / " + n(d.tc_max, "°C") + (d.st_min != null ? ' <small class="mt-st">sensación ' + n(d.st_min, "°") + "</small>" : "") + "</dd></div>" +
+          "<div><dt>Base (" + esc(doc.base.nombre) + ", " + doc.base.alt.toLocaleString("es-ES") + " m)</dt><dd>" + n(d.tv_min, "°") + " / " + n(d.tv_max, "°C") + (d.sv_min != null ? ' <small class="mt-st">sensación ' + n(d.sv_min, "°") + (d.sv_max != null && d.tv_max != null && d.sv_max > d.tv_max ? " / " + n(d.sv_max, "°") : "") + "</small>" : "") + "</dd></div>" +
           "<div><dt>Viento en cumbre</dt><dd>" + flecha(d.wc_dir) + n(d.wc_max) + " km/h " + dir(d.wc_dir) + "</dd></div>" +
           "<div><dt>Rachas en la base</dt><dd>" + n(d.gv_max) + " km/h</dd></div>" +
           "<div><dt>Precipitación</dt><dd>" + (d.pr ? dec(d.pr) + " mm" : "No") + (d.nieve_c ? " · " + d.nieve_c + " cm de nieve en cumbre" : "") + "</dd></div>" +
@@ -238,10 +336,11 @@
           "<div><dt>Tormentas</dt><dd>" + (d.tormenta >= 2 ? "Probables" : d.tormenta === 1 ? "Posibles" : "No") + "</dd></div>" +
           "<div><dt>Acuerdo entre modelos</dt><dd>" + (d.acuerdo ? cap(d.acuerdo) : "–") + "</dd></div></dl></div>";
         var hayHoras = ix.some(function (i) { return DUR[i] === 1; });
+        var hayNub = C.n3000 !== undefined;
         var filas = ix, m3 = !hayHoras || modo === "3h";
         if (m3) filas = ix.filter(function (i) { return T[i].getUTCHours() % 3 === 0; });
         if (hayHoras) h += '<div class="mt-modo" role="group" aria-label="Detalle de la tabla"><button type="button" data-modo="1h" class="' + (modo === "1h" ? "on" : "") + '">Cada hora</button><button type="button" data-modo="3h" class="' + (modo === "3h" ? "on" : "") + '">Cada 3 horas</button></div>';
-        h += '<div class="mt-scroll"><table class="mt-tab"><thead><tr><th>Hora</th><th>Cielo</th><th>Cumbre</th><th>Base</th><th>Viento cumbre</th><th>Racha base</th><th>Precip.</th><th>Nubes</th><th>Isocero</th><th>Cota nieve</th></tr></thead><tbody>';
+        h += '<div class="mt-scroll"><table class="mt-tab"><thead><tr><th>Hora</th><th>Cielo</th><th>Cumbre<br>' + doc.cumbre.alt.toLocaleString("es-ES") + ' m</th><th>Base<br>' + doc.base.alt.toLocaleString("es-ES") + ' m</th><th>Precip.</th><th>Viento cumbre</th><th>Racha base</th>' + (hayNub ? NUB.map(function (a) { return '<th class="mt-nb">Nubes<br>' + a.toLocaleString("es-ES") + " m</th>"; }).join("") : "<th>Nubes</th>") + "<th>Isocero</th><th>Cota nieve</th></tr></thead><tbody>";
         filas.forEach(function (i) {
           var noche = +fH.format(T[i]) < 8 || +fH.format(T[i]) >= 20;
           var horas = DUR[i], pr = C.pr[i];
@@ -249,10 +348,78 @@
             pr = null; horas = 0;
             for (var j = i; j >= 0 && horas < 3; j--) { if (C.pr[j] != null) pr = (pr || 0) + C.pr[j]; horas += DUR[j]; }
           }
-          h += "<tr><td>" + fHora.format(T[i]) + "</td><td>" + icono(iconoTramo(C, i, horas, pr), noche) + "</td><td><b>" + n(C.tc[i], "°") + "</b></td><td>" + n(C.tv[i], "°") + "</td><td>" + flecha(C.dc[i]) + n(C.wc[i]) + " km/h " + dir(C.dc[i]) + "</td><td>" + n(C.gv[i]) + " km/h</td><td>" + (pr ? dec(pr) + " mm" : "–") + "</td><td>" + n(C.cc[i], "%") + "</td><td>" + (C.i0[i] == null ? "–" : C.i0[i].toLocaleString("es-ES") + " m") + "</td><td>" + (C.sl[i] == null || !pr ? "–" : C.sl[i].toLocaleString("es-ES") + " m") + "</td></tr>";
+          h += "<tr><td>" + fHora.format(T[i]) + "</td><td>" + icono(iconoTramo(C, i, horas, pr), noche) + "</td><td><b>" + n(C.tc[i], "°") + "</b>" + sens(C.tc[i], C.st && C.st[i]) + "</td><td>" + n(C.tv[i], "°") + sens(C.tv[i], C.sv && C.sv[i]) + "</td><td>" + (pr ? dec(pr) + " mm" : "–") + "</td><td>" + flecha(C.dc[i]) + n(C.wc[i]) + " km/h " + dir(C.dc[i]) + "</td><td>" + n(C.gv[i]) + " km/h</td>" + (hayNub ? NUB.map(function (a) { return celdaNube(C["n" + a][i]); }).join("") : "<td>" + n(C.cc[i], "%") + "</td>") + "<td>" + (C.i0[i] == null ? "–" : C.i0[i].toLocaleString("es-ES") + " m") + "</td><td>" + (C.sl[i] == null || !pr ? "–" : C.sl[i].toLocaleString("es-ES") + " m") + "</td></tr>";
         });
-        h += "</tbody></table></div><p class=\"muted small\">La precipitación de cada fila es la caída desde la fila anterior (" + (m3 ? "3 horas" : "1 hora") + "); el resto, el valor a esa hora. Mediana de los modelos. Las primeras 72 horas van hora a hora (ECMWF solo da datos cada 3 horas: entre medias se interpola).</p>";
+        h += "</tbody></table></div><p class=\"muted small\">La precipitación de cada fila es la caída desde la fila anterior (" + (m3 ? "3 horas" : "1 hora") + "); el resto, el valor a esa hora. Mediana de los modelos. En azul, junto a la temperatura, la sensación térmica (frío por viento o calor por humedad). Nubes a cada altitud: estimadas con la humedad del aire a esa altura; «–» si esa altitud queda bajo el terreno de la zona. Las primeras 72 horas van hora a hora (ECMWF solo da datos cada 3 horas: entre medias se interpola).</p>";
         return h;
+      }
+
+      /* perfil del día seleccionado: icono cada 3 h, horas de luz y temperatura de cumbre y base */
+      function meteograma() {
+        var d = dias[sel], ix = idxDia[d.fecha];
+        if (!ix || !ix.length) return "";
+        var tA = T[ix[0]].getTime() - (ix.length > 1 ? DUR[ix[0]] * 36e5 : 0), tB = T[ix[ix.length - 1]].getTime();
+        if (tB - tA < 6 * 36e5) return '<p class="muted small">No hay datos suficientes para el perfil de este día.</p>';
+        var W = 760, L = 50, R = 18, Hh = 430, TOPD = 8, ICO = 46, T0 = TOPD + ICO + 18, B = 32;
+        var X = function (t) { return L + (W - L - R) * (t - tA) / (tB - tA); };
+        var mn = -20, mx = 45;
+        ix.forEach(function (i) { ["tv", "tc"].forEach(function (k) { var v = C[k][i]; if (v != null && v > -40 && v < 55) { mn = Math.min(mn, Math.floor(v / 5) * 5); mx = Math.max(mx, Math.ceil(v / 5) * 5); } }); });
+        var Y = function (v) { return T0 + (Hh - T0 - B) * (1 - (v - mn) / (mx - mn)); };
+        var g = '<svg class="mt-mg" viewBox="0 0 ' + W + " " + Hh + '" role="img" aria-label="Perfil del día: estado del cielo y temperatura">';
+        var sl = solDia(d.fecha, doc.base.lat, doc.base.lon);
+        if (sl) {
+          var a = Math.max(tA, sl.sale.getTime()), b = Math.min(tB, sl.pone.getTime());
+          if (b > a) g += '<rect x="' + X(a).toFixed(1) + '" y="' + TOPD + '" width="' + (X(b) - X(a)).toFixed(1) + '" height="' + (Hh - B - TOPD) + '" fill="rgba(233,165,59,.10)"/>';
+        }
+        for (var v = mn; v <= mx; v += 5) {
+          g += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + Y(v).toFixed(1) + '" y2="' + Y(v).toFixed(1) + '" stroke="' + (v === 0 ? "rgba(111,179,224,.75)" : "rgba(255,255,255," + (v % 10 ? ".04" : ".09") + ")") + '"' + (v === 0 ? ' stroke-dasharray="6 5"' : "") + "/>";
+          if (v % 10 === 0 || v === mn) g += '<text x="' + (L - 7) + '" y="' + (Y(v) + 5).toFixed(1) + '" class="mt-mg-y">' + v + "°</text>";
+        }
+        for (var t = Math.ceil(tA / 36e5) * 36e5; t <= tB; t += 36e5) {
+          var hh = +fH.format(new Date(t)) % 24;
+          if (hh % 3) continue;
+          g += '<line x1="' + X(t).toFixed(1) + '" x2="' + X(t).toFixed(1) + '" y1="' + T0 + '" y2="' + (Hh - B) + '" stroke="rgba(255,255,255,.05)"/><text x="' + X(t).toFixed(1) + '" y="' + (Hh - 9) + '" class="mt-mg-h">' + String(hh).padStart(2, "0") + "h</text>";
+        }
+        function curva(k, col, fill) {
+          var segs = [], seg = [], out = "";
+          ix.forEach(function (i) { var v = C[k][i]; if (v == null || v <= -40 || v >= 55) { if (seg.length) segs.push(seg); seg = []; } else seg.push([X(T[i].getTime()), Y(v)]); });
+          if (seg.length) segs.push(seg);
+          segs.forEach(function (sg) {
+            var p = sg.map(function (q, j) { return (j ? "L" : "M") + q[0].toFixed(1) + " " + q[1].toFixed(1); }).join("");
+            if (fill) out += '<path d="' + p + "L" + sg[sg.length - 1][0].toFixed(1) + " " + (Hh - B) + "L" + sg[0][0].toFixed(1) + " " + (Hh - B) + 'Z" fill="' + fill + '"/>';
+            out += '<path d="' + p + '" fill="none" stroke="' + col + '" stroke-width="3.2" stroke-linejoin="round"/>';
+            sg.forEach(function (q) { out += '<circle cx="' + q[0].toFixed(1) + '" cy="' + q[1].toFixed(1) + '" r="2.6" fill="' + col + '"/>'; });
+          });
+          return out;
+        }
+        g += curva("tv", "#e8574a", "rgba(232,87,74,.12)") + curva("tc", "#6fb3e0", "rgba(111,179,224,.10)");
+        [["tv", "#ffb3aa", -12], ["tc", "#bfe0f7", 26]].forEach(function (kc) {
+          var k = kc[0], iMx = -1, iMn = -1;
+          ix.forEach(function (i) { var v = C[k][i]; if (v == null || v <= -40 || v >= 55) return; if (iMx < 0 || v > C[k][iMx]) iMx = i; if (iMn < 0 || v < C[k][iMn]) iMn = i; });
+          if (iMx < 0) return;
+          var et = function (i, txt) { var x = Math.min(W - R - 26, Math.max(L + 26, X(T[i].getTime()))); return '<text x="' + x.toFixed(1) + '" y="' + (Y(C[k][i]) + kc[2]).toFixed(1) + '" class="mt-mg-v" fill="' + kc[1] + '">' + txt + Math.round(C[k][i]) + "°</text>"; };
+          g += et(iMx, "máx ");
+          if (iMn !== iMx) g += et(iMn, "mín ");
+        });
+        // un icono por cada dato: cada hora en las primeras 72 h (después los modelos dan cada 3 h)
+        var horario = ix.filter(function (i) { return DUR[i] === 1; }).length > ix.length / 2, IC = horario ? 26 : 44;
+        var prMax = 0; ix.forEach(function (i) { prMax = Math.max(prMax, C.pr[i] || 0); });
+        ix.forEach(function (i, n) {
+          if (n === 0 && ix.length > 1) return;  // el primer punto es el final del día anterior
+          var tm = T[i].getTime() - DUR[i] * 18e5, xc = X(tm);
+          var noche = sl ? (tm < sl.sale.getTime() || tm > sl.pone.getTime()) : false;
+          g += '<g transform="translate(' + (xc - IC / 2).toFixed(1) + " " + (TOPD + (ICO - IC) / 2) + ')">' + icono(iconoTramo(C, i, DUR[i], C.pr[i]), noche).replace('class="mt-ico"', 'width="' + IC + '" height="' + IC + '"') + "</g>";
+          var p = C.pr[i] || 0;
+          if (p >= 0.1) {  // barra de lluvia junto al eje inferior
+            var w = (W - L - R) * DUR[i] * 36e5 / (tB - tA) * 0.7, h = Math.max(3, 60 * p / Math.max(prMax, 2));
+            g += '<rect x="' + (xc - w / 2).toFixed(1) + '" y="' + (Hh - B - h).toFixed(1) + '" width="' + w.toFixed(1) + '" height="' + h.toFixed(1) + '" fill="rgba(111,179,224,.75)" rx="2"><title>' + dec(p) + " mm</title></rect>";
+          }
+        });
+        var prDia = ix.slice(ix.length > 1 ? 1 : 0).reduce(function (a, i) { return a + (C.pr[i] || 0); }, 0);
+        if (prDia >= 0.1) g += '<text x="' + (W - R) + '" y="' + (T0 - 2) + '" class="mt-mg-p" style="text-anchor:end">Lluvia del día: ' + dec(prDia) + " mm</text>";
+        g += "</svg>";
+        return '<div class="mt-mgw">' + g + "</div>" + leyenda([{ c: "#e8574a", l: "Base · " + doc.base.nombre + " (" + doc.base.alt.toLocaleString("es-ES") + " m)" }, { c: "#6fb3e0", l: "Cumbre · " + doc.cumbre.nombre + " (" + doc.cumbre.alt.toLocaleString("es-ES") + " m)" }]) +
+          '<p class="muted small">Un icono por hora (a partir del 4.º día los modelos dan datos cada 3 horas); barras azules: lluvia o nieve de cada hora; franja clara: horas de luz; línea azul discontinua: 0 °C. Cambia de día en la tira de arriba.</p>';
       }
 
       function graficas() {
@@ -286,7 +453,7 @@
           });
           h += "</tr>";
         });
-        return h + '</tbody></table></div><p class="muted small">ICON-EU llega a 5 días; ECMWF y GFS, a 7. Si los modelos no coinciden, la previsión es menos fiable.</p>';
+        return h + '</tbody></table></div><p class="muted small">AROME llega a 51 horas (y no cubre Sierra Nevada); ICON-EU, a 5 días; ECMWF, a 10 días; GFS, a 15 días. Si los modelos no coinciden, la previsión es menos fiable.</p>';
       }
 
       function pintar() {
@@ -294,9 +461,11 @@
         var bloque = ae.length ? '<div class="mt-aemet-box"><h3>Avisos de AEMET</h3><ul>' + ae.map(function (a) {
           return "<li>" + chipAemet(a, false) + " <b>" + esc(fenomeno(a)) + "</b> · " + esc(a.zona) + ' <span class="muted">(' + (a.inicio ? fAviso.format(new Date(a.inicio)) : "") + " – " + (a.fin ? fAviso.format(new Date(a.fin)) : "") + ")</span></li>";
         }).join("") + '</ul><p class="muted small">Avisos oficiales de la Agencia Estatal de Meteorología para la zona del pueblo base o de la cumbre. Consulta el detalle en <a href="https://www.aemet.es/es/eltiempo/prediccion/avisos" target="_blank" rel="noopener">aemet.es</a>.</p></div>' : "";
-        el.innerHTML = '<p class="mt-act">' + actualizado(doc) + "</p>" + bloque + tira() +
+        el.innerHTML = '<div class="mt-cab"><h2>Tiempo en ' + esc(doc.nombre) + '</h2><p class="muted small">Cumbre: ' + esc(doc.cumbre.nombre) + " " + doc.cumbre.alt.toLocaleString("es-ES") + " m · Base: " + esc(doc.base.nombre) + " " + doc.base.alt.toLocaleString("es-ES") + ' m</p></div><p class="mt-act">' + actualizado(doc) + "</p>" + bloque + tira() +
           '<div class="mt-sec">' + detalleDia() + "</div>" +
-          '<div class="mt-sec"><h2>Evolución a 7 días</h2>' + graficas() + "</div>" +
+          '<div class="mt-sec mt-perfil"><h2>Perfil del día</h2><p class="muted" style="margin-top:-8px">' + cap(fLargo.format(fechaLocal(dias[sel].fecha))) + "</p>" + meteograma() + "</div>" +
+          '<div class="mt-sec"><h2>Evolución a 15 días</h2>' + graficas() + "</div>" +
+          webcams(id) +
           '<div class="mt-sec"><h2>Comparación de modelos</h2>' + comparativa() + "</div>";
         el.querySelectorAll("[data-modo]").forEach(function (b) {
           b.addEventListener("click", function () { modo = b.getAttribute("data-modo"); var y = window.scrollY; pintar(); window.scrollTo(0, y); });
@@ -311,6 +480,7 @@
 
   document.addEventListener("DOMContentLoaded", function () {
     var a = document.getElementById("mt-index"); if (a) indice(a);
-    var b = document.getElementById("mt-mac"); if (b) ficha(b);
+    var b = document.getElementById("mt-mac"); if (b && b.getAttribute("data-id")) ficha(b).catch(function () {});
+    selector();
   });
 })();
