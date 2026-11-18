@@ -1,0 +1,42 @@
+name: Generar ilustraciones (Gemini)
+
+on:
+  workflow_dispatch:
+    inputs:
+      lote:
+        description: "Archivo del lote"
+        default: "tools/imagenes/lote-capas.json"
+      solo:
+        description: "Solo estas (nombres separados por comas, vacío = todas)"
+        default: ""
+      modelo:
+        description: "Modelo (vacío = el del lote)"
+        default: ""
+
+permissions:
+  contents: read
+
+jobs:
+  generar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install pillow
+      - name: Generar
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          LOTE: ${{ inputs.lote }}
+          SOLO: ${{ inputs.solo }}
+          MODELO: ${{ inputs.modelo }}
+        run: python tools/genera_imagenes.py "$LOTE" --solo "$SOLO" --modelo "$MODELO"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: imagenes-generadas
+          path: imagenes-generadas/
+          if-no-files-found: ignore
+          retention-days: 14
