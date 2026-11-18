@@ -81,8 +81,9 @@
     return out;
   }
   /* cont: elemento donde va el mapa; foco: id del macizo a destacar (o vacío para toda España) */
+  var MAPA_AVISOS_ACTIVO = false;  // desactivado a petición: se reactiva poniendo true
   function mapaAvisos(cont, foco, alElegir) {
-    if (!cont) return;
+    if (!cont || !MAPA_AVISOS_ACTIVO) return;
     avisosP = avisosP || json(DATOS + "avisos.json").catch(function () { return null; });
     avisosP.then(function (d) {
       if (!d || !d.avisos || !d.avisos.length) return;
