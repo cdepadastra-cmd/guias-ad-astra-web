@@ -899,8 +899,20 @@ def _dentro(lat, lon, poli):
 
 
 def _simplifica(pts, tol=0.004):
-    """Douglas-Peucker sobre (lat, lon) y redondeo a 3 decimales (~100 m): basta para el mapa de España."""
-    if len(pts) < 4:
+    """Douglas-Peucker sobre (lat, lon) y redondeo a 3 decimales (~100 m): basta para el mapa de España.
+    Los anillos cerrados se parten por el punto más lejano al primero (si no, el algoritmo los reduce a nada)."""
+    if len(pts) > 3 and tuple(pts[0]) == tuple(pts[-1]):
+        pts = pts[:-1]
+    if len(pts) > 3:
+        lejos = max(range(len(pts)), key=lambda k: (pts[k][0] - pts[0][0]) ** 2 + (pts[k][1] - pts[0][1]) ** 2)
+        a = _dp(pts[:lejos + 1], tol); b = _dp(list(pts[lejos:]) + [pts[0]], tol)
+        r = a + b[1:-1]
+        return r if len(r) >= 3 else [[round(x, 3), round(y, 3)] for x, y in pts]
+    return [[round(a, 3), round(o, 3)] for a, o in pts]
+
+
+def _dp(pts, tol):
+    if len(pts) < 3:
         return [[round(a, 3), round(o, 3)] for a, o in pts]
     def rec(ini, fin, keep):
         (a1, o1), (a2, o2) = pts[ini], pts[fin]
@@ -915,8 +927,7 @@ def _simplifica(pts, tol=0.004):
             rec(ini, idx, keep); keep.add(idx); rec(idx, fin, keep)
     keep = {0, len(pts) - 1}
     rec(0, len(pts) - 1, keep)
-    res = [[round(pts[k][0], 3), round(pts[k][1], 3)] for k in sorted(keep)]
-    return res if len(res) >= 3 else [[round(a, 3), round(o, 3)] for a, o in pts]
+    return [[round(pts[k][0], 3), round(pts[k][1], 3)] for k in sorted(keep)]
 
 
 WEB = "https://www.guiasadastra.com"
@@ -1015,6 +1026,28 @@ def avisos_oficiales():
                 clave = geo or _norm(zona)
                 if polis:
                     zonas_poli[clave] = {"n": zona, "p": [_simplifica(pl) for pl in polis]}
+        # delimitación oficial de AEMET (meteo/zonas-aemet.json): los CAP de MeteoAlarm llegan sin contorno
+        try:
+            oficial = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "zonas-aemet.json"), encoding="utf-8"))
+        except Exception as ex:
+            oficial = {}
+            log("Avisos: sin delimitación oficial de zonas (%s)" % ex)
+        por_nombre = {}
+        for cod, z in oficial.items():
+            por_nombre.setdefault(_norm(z["n"]), []).append(cod)
+        def costero(ev):
+            e = _norm(ev)
+            return "coast" in e or "coster" in e
+        for c in caps:
+            for zona, polis, geo in c["areas"]:
+                clave = geo or _norm(zona)
+                if polis or clave in zonas_poli and zonas_poli[clave].get("p"):
+                    continue
+                cods = por_nombre.get(_norm(zona), []) + por_nombre.get(_norm("Costa - " + zona), [])
+                if not cods:
+                    continue
+                pref = [k for k in cods if k.endswith("C") == costero(c["evento"])] or cods
+                zonas_poli[clave] = {"n": zona, "p": oficial[pref[0]]["p"]}
         vistos = set()
         for c in caps:
             try:

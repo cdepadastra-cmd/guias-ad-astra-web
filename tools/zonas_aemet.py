@@ -9,7 +9,20 @@ sys.path.insert(0, "meteo")
 
 
 def simplifica(pts, tol=0.004):
-    if len(pts) < 4:
+    """Douglas-Peucker para anillos cerrados: se parte por el punto más lejano al primero."""
+    if len(pts) > 3 and pts[0] == pts[-1]:
+        pts = pts[:-1]
+    if len(pts) > 3:
+        lejos = max(range(len(pts)), key=lambda k: (pts[k][0] - pts[0][0]) ** 2 + (pts[k][1] - pts[0][1]) ** 2)
+        a = _dp(pts[:lejos + 1], tol); b = _dp(pts[lejos:] + [pts[0]], tol)
+        r = a + b[1:-1]
+        return r + [r[0]] if len(r) >= 3 else []
+    return [[round(a, 3), round(o, 3)] for a, o in pts]
+
+
+def _dp(pts, tol):
+    if len(pts) < 3:
+        return [[round(a, 3), round(o, 3)] for a, o in pts]
         return [[round(a, 3), round(o, 3)] for a, o in pts]
     keep = {0, len(pts) - 1}
     pila = [(0, len(pts) - 1)]
