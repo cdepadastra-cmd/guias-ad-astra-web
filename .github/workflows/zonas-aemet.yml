@@ -1,7 +1,7 @@
 name: Zonas de aviso de AEMET (puntual)
 on: workflow_dispatch
 permissions:
-  contents: read
+  contents: write
 jobs:
   zonas:
     runs-on: ubuntu-latest
@@ -13,7 +13,9 @@ jobs:
           python-version: "3.12"
       - run: pip install pyshp pyproj
       - run: python tools/zonas_aemet.py
-      - uses: actions/upload-artifact@v4
-        with:
-          name: zonas-aemet
-          path: zonas-aemet.json
+      - name: Guardar en el repositorio
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add meteo/zonas-aemet.json
+          git diff --cached --quiet || (git commit -m "Zonas de aviso de AEMET (delimitación oficial, simplificada)" && git push)
