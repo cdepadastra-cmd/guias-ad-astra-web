@@ -898,8 +898,47 @@ def _dentro(lat, lon, poli):
     return dentro
 
 
+def _simplifica(pts, tol=0.004):
+    """Douglas-Peucker sobre (lat, lon) y redondeo a 3 decimales (~100 m): basta para el mapa de España."""
+    if len(pts) < 4:
+        return [[round(a, 3), round(o, 3)] for a, o in pts]
+    def rec(ini, fin, keep):
+        (a1, o1), (a2, o2) = pts[ini], pts[fin]
+        dmax, idx = 0, None
+        L = ((a2 - a1) ** 2 + (o2 - o1) ** 2) ** 0.5 or 1e-12
+        for k in range(ini + 1, fin):
+            a, o = pts[k]
+            d = abs((a2 - a1) * (o1 - o) - (a1 - a) * (o2 - o1)) / L
+            if d > dmax:
+                dmax, idx = d, k
+        if idx is not None and dmax > tol:
+            rec(ini, idx, keep); keep.add(idx); rec(idx, fin, keep)
+    keep = {0, len(pts) - 1}
+    rec(0, len(pts) - 1, keep)
+    res = [[round(pts[k][0], 3), round(pts[k][1], 3)] for k in sorted(keep)]
+    return res if len(res) >= 3 else [[round(a, 3), round(o, 3)] for a, o in pts]
+
+
+WEB = "https://www.guiasadastra.com"
+
+
+def _zonas_previas():
+    """Polígonos de zonas de aviso aprendidos en ejecuciones anteriores (para los CAP que llegan sin polígono)."""
+    try:
+        r = S.get(WEB + "/meteo/datos/avisos-zonas.json", params={"n": int(time.time())}, timeout=30)
+        r.raise_for_status()
+        return r.json()
+    except Exception as ex:
+        log("Avisos: sin zonas previas (%s)" % ex)
+        return {}
+
+
+MAPA_AVISOS = {"avisos": [], "zonas": {}}
+
+
 def avisos_oficiales():
-    """Avisos de AEMET en vigor o previstos: {macizo_id: [aviso, ...]}. Nunca hace fallar el proceso."""
+    """Avisos de AEMET en vigor o previstos: {macizo_id: [aviso, ...]}. Nunca hace fallar el proceso.
+    Además deja en MAPA_AVISOS todos los avisos de España con su polígono, para el mapa de la web."""
     out = {m["id"]: [] for m in MACIZOS}
     try:
         feed = S.get(METEOALARM, timeout=60)
@@ -939,7 +978,10 @@ def avisos_oficiales():
                     pts = [tuple(map(float, p.split(","))) for p in (pg.text or "").split() if "," in p]
                     if len(pts) >= 3:
                         polis.append(pts)
-                areas.append((ar.findtext(q("areaDesc"), "", ns), polis))
+                geo = ""
+                for gc in ar.findall(q("geocode"), ns):
+                    geo = geo or (gc.findtext(q("value"), "", ns) or "").strip()
+                areas.append((ar.findtext(q("areaDesc"), "", ns), polis, geo))
             return {"nivel": nivel, "evento": info.findtext(q("event"), "", ns), "titulo": info.findtext(q("headline"), "", ns),
                     "texto": (info.findtext(q("description"), "", ns) or "")[:400], "inicio": info.findtext(q("onset"), "", ns) or info.findtext(q("effective"), "", ns),
                     "fin": info.findtext(q("expires"), "", ns), "areas": areas}
@@ -955,7 +997,7 @@ def avisos_oficiales():
                     continue
             except Exception:
                 pass
-            for zona, polis in c["areas"]:
+            for zona, polis, _geo in c["areas"]:
                 if not polis:
                     sin_poligono += 1
                 for m in MACIZOS:
@@ -966,10 +1008,37 @@ def avisos_oficiales():
                               "inicio": c["inicio"], "fin": c["fin"], "texto": c["texto"]}
                         if av not in out[m["id"]]:
                             out[m["id"]].append(av)
+        # mapa de España: un elemento por aviso y zona; los polígonos se guardan aparte por zona y se reutilizan
+        zonas_poli = _zonas_previas()
+        for c in caps:
+            for zona, polis, geo in c["areas"]:
+                clave = geo or _norm(zona)
+                if polis:
+                    zonas_poli[clave] = {"n": zona, "p": [_simplifica(pl) for pl in polis]}
+        vistos = set()
+        for c in caps:
+            try:
+                if dt.datetime.fromisoformat(c["fin"].replace("Z", "+00:00")) < ahora:
+                    continue
+            except Exception:
+                pass
+            for zona, polis, geo in c["areas"]:
+                clave = geo or _norm(zona)
+                k = (clave, c["nivel"], c["evento"], c["inicio"], c["fin"])
+                if k in vistos:
+                    continue
+                vistos.add(k)
+                MAPA_AVISOS["avisos"].append({"z": clave, "zona": zona, "nivel": c["nivel"], "evento": c["evento"],
+                                              "inicio": c["inicio"], "fin": c["fin"]})
+        usadas = {a["z"] for a in MAPA_AVISOS["avisos"]}
+        MAPA_AVISOS["zonas"] = {k: v for k, v in zonas_poli.items() if k in usadas}
+        MAPA_AVISOS["todas"] = zonas_poli
+        log("Avisos: mapa con %d avisos, %d zonas dibujables, %d zonas conocidas" % (
+            len(MAPA_AVISOS["avisos"]), len(MAPA_AVISOS["zonas"]), len(zonas_poli)))
         orden = {"rojo": 0, "naranja": 1, "amarillo": 2}
         for k in out:
             out[k].sort(key=lambda a: (orden[a["nivel"]], a["inicio"] or ""))
-        zonas = sorted({z for c in caps for z, _ in c["areas"]})
+        zonas = sorted({ar[0] for c in caps for ar in c["areas"]})
         log("Avisos: zonas con aviso ahora: %s" % "; ".join(zonas)[:3000])
         log("Avisos: %d CAP leídos, %d zonas sin polígono, macizos con aviso: %s" % (
             len(caps), sin_poligono, ", ".join("%s(%d)" % (k, len(v)) for k, v in out.items() if v) or "ninguno"))
@@ -1042,6 +1111,11 @@ def main():
         log("%-28s hoy: cumbre %s/%s °C, viento %s km/h, precip %s mm, isocero %s m, %s" % (
             mac["id"], d0.get("tc_min"), d0.get("tc_max"), d0.get("wc_max"), d0.get("pr"), d0.get("i0_min"), ",".join(d0.get("avisos", []))))
     json.dump(resumen, open(os.path.join(a.out, "resumen.json"), "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
+    json.dump({"generado": gen, "avisos": MAPA_AVISOS["avisos"], "zonas": MAPA_AVISOS["zonas"],
+               "macizos": [{"id": m["id"], "n": m["corto"], "lat": m["cumbre"]["lat"], "lon": m["cumbre"]["lon"]} for m in MACIZOS]},
+              open(os.path.join(a.out, "avisos.json"), "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
+    if MAPA_AVISOS.get("todas"):
+        json.dump(MAPA_AVISOS["todas"], open(os.path.join(a.out, "avisos-zonas.json"), "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
     try:
         import nieve
         nieve.generar(a.out, MACIZOS, log)

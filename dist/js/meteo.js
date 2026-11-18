@@ -63,6 +63,82 @@
     return '<span class="mt-aemet mt-' + a.nivel + '" title="' + esc(a.titulo || a.evento) + '">Aviso ' + a.nivel + " AEMET" + (largo ? ": " + esc(fenomeno(a)) : "") + "</span>";
   }
 
+
+  /* ---------------------------------------------------------------- mapa de España con los avisos de AEMET */
+  var COL_AV = { amarillo: "#f5d33b", naranja: "#f08a24", rojo: "#d93a2b" }, ORD_AV = { amarillo: 1, naranja: 2, rojo: 3 };
+  var avisosP = null;
+  function cargarLeaflet(cb) {
+    if (window.L) return cb();
+    var css = document.createElement("link"); css.rel = "stylesheet"; css.href = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"; document.head.appendChild(css);
+    var js = document.createElement("script"); js.src = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"; js.onload = cb; document.head.appendChild(js);
+  }
+  function diasConAviso(avs) {
+    var out = [];
+    for (var k = 0; k < 4; k++) {
+      var iso = fYmd.format(new Date(Date.now() + k * 864e5));
+      if (avs.some(function (a) { return avisoEnDia(a, iso); })) out.push(iso);
+    }
+    return out;
+  }
+  /* cont: elemento donde va el mapa; foco: id del macizo a destacar (o vacío para toda España) */
+  function mapaAvisos(cont, foco, alElegir) {
+    if (!cont) return;
+    avisosP = avisosP || json(DATOS + "avisos.json").catch(function () { return null; });
+    avisosP.then(function (d) {
+      if (!d || !d.avisos || !d.avisos.length) return;
+      var dias = diasConAviso(d.avisos);
+      if (!dias.length) return;
+      var dia = dias[0];
+      cont.innerHTML = '<div class="mt-avmap"><div class="mt-avmap-h"><h3>' + (foco ? "Mapa de avisos" : "Avisos de AEMET en España") + '</h3><div class="mt-avdias" role="tablist">' +
+        dias.map(function (iso) { return '<button type="button" role="tab" data-dia="' + iso + '">' + diaCorto(iso) + " " + fFecha.format(fechaLocal(iso)) + "</button>"; }).join("") +
+        '</div></div><div class="mt-avmap-m"></div><div class="mt-avley"><span><i style="background:' + COL_AV.amarillo + '"></i>Amarillo</span><span><i style="background:' + COL_AV.naranja + '"></i>Naranja</span><span><i style="background:' + COL_AV.rojo + '"></i>Rojo</span><span><i class="mt-avpunto"></i>Nuestras sierras</span></div><p class="mt-avsin muted small"></p></div>';
+      cargarLeaflet(function () {
+        if (cont._mapa) { try { cont._mapa.remove(); } catch (e) {} }
+        var m = cont._mapa = L.map(cont.querySelector(".mt-avmap-m"), { scrollWheelZoom: false, zoomSnap: 0.25 });
+        var topo = L.tileLayer("https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png", { maxZoom: 12, subdomains: "abc", opacity: 0.75,
+          attribution: 'Mapa: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> · &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> · Avisos: AEMET vía MeteoAlarm' }).addTo(m);
+        var fallos = 0;
+        topo.on("tileerror", function () {
+          if (++fallos === 4) { m.removeLayer(topo); L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 12, opacity: 0.75, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> · Avisos: AEMET vía MeteoAlarm' }).addTo(m); }
+        });
+        var capa = L.layerGroup().addTo(m);
+        var fm = (d.macizos || []).filter(function (x) { return x.id === foco; })[0];
+        if (fm) m.setView([fm.lat, fm.lon], 7); else m.fitBounds([[36, -9.4], [43.8, 3.4]]);
+        function pintar() {
+          capa.clearLayers();
+          cont.querySelectorAll("[data-dia]").forEach(function (b) { b.classList.toggle("on", b.getAttribute("data-dia") === dia); b.setAttribute("aria-selected", b.getAttribute("data-dia") === dia); });
+          var porZona = {};
+          d.avisos.filter(function (a) { return avisoEnDia(a, dia); }).forEach(function (a) { (porZona[a.z] = porZona[a.z] || []).push(a); });
+          var sin = [];
+          Object.keys(porZona).sort(function (x, y) {  // los más graves encima
+            var mx = function (k) { return Math.max.apply(null, porZona[k].map(function (a) { return ORD_AV[a.nivel] || 0; })); };
+            return mx(x) - mx(y);
+          }).forEach(function (k) {
+            var lista = porZona[k], z = d.zonas[k];
+            var peor = lista.reduce(function (p, a) { return (ORD_AV[a.nivel] || 0) > (ORD_AV[p] || 0) ? a.nivel : p; }, "amarillo");
+            if (!z) { sin.push(lista[0].zona); return; }
+            var html = "<b>" + esc(z.n) + "</b><br>" + lista.map(function (a) {
+              return '<span class="mt-aemet mt-' + a.nivel + '">' + a.nivel + "</span> " + esc(fenomeno(a)) + '<br><small>' + (a.inicio ? fAviso.format(new Date(a.inicio)) : "") + " – " + (a.fin ? fAviso.format(new Date(a.fin)) : "") + "</small>";
+            }).join("<br>");
+            z.p.forEach(function (pl) {
+              L.polygon(pl, { color: "#3a2a1c", weight: 0.8, fillColor: COL_AV[peor], fillOpacity: 0.62 }).bindPopup(html).addTo(capa);
+            });
+          });
+          (d.macizos || []).forEach(function (x) {
+            var mk = L.circleMarker([x.lat, x.lon], { radius: x.id === foco ? 7 : 4.5, color: "#fff", weight: 2, fillColor: "#1d140d", fillOpacity: 1 })
+              .bindTooltip(esc(x.n), { direction: "top", permanent: x.id === foco }).addTo(capa);
+            if (alElegir) mk.on("click", function () { alElegir(x.id); });
+          });
+          var p = cont.querySelector(".mt-avsin");
+          p.textContent = sin.length ? "Sin dibujo en el mapa (AEMET no envía el contorno): " + sin.filter(function (v, i) { return sin.indexOf(v) === i; }).join(", ") + "." : "";
+        }
+        cont.querySelectorAll("[data-dia]").forEach(function (b) { b.addEventListener("click", function () { dia = b.getAttribute("data-dia"); pintar(); }); });
+        pintar();
+        setTimeout(function () { m.invalidateSize(); }, 60);
+      });
+    });
+  }
+
   /* ---------------------------------------------------------------- iconos */
   var SOL = '<circle cx="24" cy="24" r="8" fill="#f2c14e"/><g stroke="#f2c14e" stroke-width="2.6" stroke-linecap="round"><path d="M24 6v5M24 37v5M6 24h5M37 24h5M11.3 11.3l3.5 3.5M33.2 33.2l3.5 3.5M11.3 36.7l3.5-3.5M33.2 14.8l3.5-3.5"/></g>';
   var LUNA = '<path d="M30 9a14 14 0 1 0 9 22A12 12 0 0 1 30 9z" fill="#e8dcc0"/>';
@@ -131,7 +207,7 @@
     json(DATOS + "resumen.json").then(function (doc) {
       var porReg = {};
       doc.macizos.forEach(function (m) { (porReg[m.region] = porReg[m.region] || []).push(m); });
-      var h = '<p class="mt-act">' + actualizado(doc) + "</p>";
+      var h = '<p class="mt-act">' + actualizado(doc) + '</p><div id="mt-avmap-i"></div>';
       doc.regiones.forEach(function (reg) {
         if (!porReg[reg]) return;
         h += '<h2 class="mt-reg">' + esc(reg) + '</h2><div class="mt-grid">';
@@ -149,6 +225,7 @@
       });
       h += '<p class="mt-nota muted small">Temperaturas y viento en la cumbre de referencia de cada macizo. Mediana de los modelos ECMWF, GFS, ICON-EU y AROME.</p>';
       el.innerHTML = h;
+      mapaAvisos(document.getElementById("mt-avmap-i"), "", function (id) { if (document.getElementById("mt-sel")) elegir(id, true); else location.href = "/meteo/" + id + "/"; });
       el.querySelectorAll("[data-mac]").forEach(function (a) {
         a.addEventListener("click", function (ev) {
           if (ev.ctrlKey || ev.metaKey || ev.shiftKey || ev.button) return;
@@ -457,16 +534,19 @@
       }
 
       function pintar() {
-        var ae = doc.aemet || [];
+        var ae = doc.aemet || [], mapaViejo = el.querySelector(".mt-avmap-f");
         var bloque = ae.length ? '<div class="mt-aemet-box"><h3>Avisos de AEMET</h3><ul>' + ae.map(function (a) {
           return "<li>" + chipAemet(a, false) + " <b>" + esc(fenomeno(a)) + "</b> · " + esc(a.zona) + ' <span class="muted">(' + (a.inicio ? fAviso.format(new Date(a.inicio)) : "") + " – " + (a.fin ? fAviso.format(new Date(a.fin)) : "") + ")</span></li>";
-        }).join("") + '</ul><p class="muted small">Avisos oficiales de la Agencia Estatal de Meteorología para la zona del pueblo base o de la cumbre. Consulta el detalle en <a href="https://www.aemet.es/es/eltiempo/prediccion/avisos" target="_blank" rel="noopener">aemet.es</a>.</p></div>' : "";
+        }).join("") + '</ul><p class="muted small">Avisos oficiales de la Agencia Estatal de Meteorología para la zona del pueblo base o de la cumbre. Consulta el detalle en <a href="https://www.aemet.es/es/eltiempo/prediccion/avisos" target="_blank" rel="noopener">aemet.es</a>.</p><div class="mt-avmap-f"></div></div>' : "";
         el.innerHTML = '<div class="mt-cab"><h2>Tiempo en ' + esc(doc.nombre) + '</h2><p class="muted small">Cumbre: ' + esc(doc.cumbre.nombre) + " " + doc.cumbre.alt.toLocaleString("es-ES") + " m · Base: " + esc(doc.base.nombre) + " " + doc.base.alt.toLocaleString("es-ES") + ' m</p></div><p class="mt-act">' + actualizado(doc) + "</p>" + bloque + tira() +
           '<div class="mt-sec">' + detalleDia() + "</div>" +
           '<div class="mt-sec mt-perfil"><h2>Perfil del día</h2><p class="muted" style="margin-top:-8px">' + cap(fLargo.format(fechaLocal(dias[sel].fecha))) + "</p>" + meteograma() + "</div>" +
           '<div class="mt-sec"><h2>Evolución a 15 días</h2>' + graficas() + "</div>" +
           webcams(id) +
           '<div class="mt-sec"><h2>Comparación de modelos</h2>' + comparativa() + "</div>";
+        var mapaNuevo = el.querySelector(".mt-avmap-f");  // el mapa se conserva al cambiar de día o de vista
+        if (mapaNuevo && mapaViejo && mapaViejo._mapa) mapaNuevo.replaceWith(mapaViejo);
+        else if (mapaNuevo) mapaAvisos(mapaNuevo, id, function (x) { if (x !== id && document.getElementById("mt-sel")) elegir(x, true); });
         el.querySelectorAll("[data-modo]").forEach(function (b) {
           b.addEventListener("click", function () { modo = b.getAttribute("data-modo"); var y = window.scrollY; pintar(); window.scrollTo(0, y); });
         });
