@@ -979,6 +979,22 @@ def build_mochila():
 
 
 
+BPA_NOTAS = [  # (x %, y %, título, explicación) sobre la imagen del boletín de Guadarrama del 29-1-2026
+    (76, 4, "La zona.", "Cada boletín cubre un macizo entero, aquí la Sierra de Guadarrama. Las condiciones de tu ladera pueden ser mejores o peores que la media."),
+    (24, 10.5, "Fecha de emisión.", "Jueves 29 de enero. En Guadarrama sale los jueves y vale para el fin de semana: no uses el de la semana anterior."),
+    (46, 14, "Día de validez.", "«Pronóstico para el viernes, día 30»: lo de este recuadro es para el viernes. Debajo vienen los avances del sábado y del domingo. Todo vale fuera de las pistas de esquí balizadas y abiertas."),
+    (35, 21, "Nivel de peligro.", "«Notable (Limitado)»: el primer nivel es el de las cotas altas y el que va entre paréntesis, el de las bajas. Es decir, 3 arriba y 2 abajo."),
+    (64, 22, "Icono del nivel.", "El rombo naranja con dos exclamaciones es el icono europeo del nivel 3. La parte negra de la montaña señala en qué cotas se da ese nivel: las altas."),
+    (8, 33, "Distribución por cotas.", "El triángulo dice dónde está cada nivel: por encima de 2.100 m, 3 (notable); por debajo, 2 (limitado)."),
+    (27, 38.3, "Problema típico.", "Cada fila es un problema, del más al menos importante. Aquí, <b>placas de viento</b> (la manga de viento sobre la ladera) y <b>nieve reciente</b> (los copos). El de abajo del domingo, con sol y termómetro, es <b>nieve húmeda</b>."),
+    (40, 38.3, "Cota.", "La parte negra de la montaña son las cotas afectadas. «2000 ↑»: por encima de 2.000 m. La montaña entera en negro: a todas las cotas. «2100 ↓» (domingo): por debajo de 2.100 m."),
+    (61.5, 43, "Orientaciones.", "La rosa tiene ocho sectores (N, NE, E…). Los que están en negro son las orientaciones donde está el problema. Aquí está entera en negro, es decir, todas; lo normal es que sean solo unas pocas, por ejemplo N, NE y E tras viento del oeste."),
+    (72.5, 41, "Tamaño esperable.", "Escala de 1 a 5. <b>1</b>, pequeño: difícilmente sepulta, pero puede arrastrarte y tirarte. <b>2</b>, mediano: puede sepultar, herir o matar a una persona. <b>3</b>, grande: puede sepultar un coche o destruir una caseta. <b>4</b> y <b>5</b>: muy grande y extremo. Aquí, placas de tamaño 2 y nieve reciente de tamaño 1."),
+    (92, 41, "Innivación observada.", "Dato medido el 28 de enero: desde qué cota hay nieve continua en las caras norte (N) y sur (S). Aquí, desde unos 1.800 m en las dos."),
+    (46, 50, "Avances para el fin de semana.", "El sábado se mantiene igual. El domingo sigue el nivel 3 arriba, pero la nieve reciente da paso a nieve húmeda por debajo de 2.100 m: aviso de calentamiento."),
+]
+
+
 LEER_NIEVE_FAQ = [
     ("¿A partir de qué inclinación puede salir un alud?", "Los aludes de placa salen casi siempre en laderas de 30° o más, y la mayoría entre 35° y 45°. Por debajo de 30° es raro que se desencadenen, pero un alud que sale más arriba puede llegar hasta ti: cuenta también la pendiente que tienes encima."),
     ("¿Qué es una placa de viento?", "Una capa de nieve que el viento ha transportado y compactado a sotavento de crestas, collados y cambios de pendiente. Puede ser blanda o dura, pero es cohesiva: si debajo hay una capa débil, se rompe de golpe y desliza entera. Es el problema de aludes más habitual en nuestras sierras."),
@@ -1093,7 +1109,15 @@ def build_leer_nieve():
                     '<li><b>Cuándo</b><span>Si el problema es nieve húmeda, la hora importa: madruga y sal de las pendientes antes de que caliente.</span></li>'
                     '<li><b>El texto</b><span>Lee el estado del manto y la evolución: ahí están los detalles que no caben en los iconos (dónde se observaron aludes, qué capa preocupa, cómo influye el viento previsto).</span></li>'
                     '<li><b>Compruébalo en el terreno</b><span>El boletín describe una zona amplia. Busca sobre el sitio las señales del problema que anuncia y, si lo que ves es peor, hazle caso al terreno.</span></li></ol>'
-                    '<div class="panel" style="margin-top:22px"><p class="eyebrow">Un ejemplo</p><p>«Nivel 3 (notable) por encima de 2.000 m; 2 (limitado) por debajo. Problema: nieve venteada en orientaciones norte, noreste y este». Traducido: por encima de 2.000 m, en las laderas de sotavento con orientación N, NE y E, una sola persona puede desencadenar una placa. Una ruta por lomas o por las solanas puede ser razonable; el corredor norte que querías hacer, ese día no.</p></div>', False, "boletin") +
+                    '<h3 style="margin-top:38px">Un parte real, explicado</h3><p>Boletín de AEMET para Guadarrama emitido el jueves 29 de enero de 2026. Cada número de la imagen corresponde a una explicación.</p>'
+                    '<div class="bpa"><figure class="bpa-fig"><div class="bpa-img"><img src="/img/guias/boletin-aludes-aemet-guadarrama.webp" width="794" height="1006" loading="lazy" alt="Boletín de peligro de aludes de AEMET para Guadarrama del 29 de enero de 2026: nivel notable por encima de 2.100 m y limitado por debajo, con placas de viento y nieve reciente">' +
+                    "".join('<span class="bpa-n" style="left:%s%%;top:%s%%">%d</span>' % (x, y, k + 1) for k, (x, y, _, _) in enumerate(BPA_NOTAS)) +
+                    '</div><figcaption>Fuente: <a href="https://www.aemet.es/es/eltiempo/prediccion/montana" target="_blank" rel="noopener">AEMET</a>, boletín de información nivológica y de peligro de aludes de Guadarrama.</figcaption></figure>'
+                    '<ol class="bpa-lista">' + "".join('<li><span class="bpa-n">%d</span><div><b>%s</b> %s</div></li>' % (k + 1, e(t), x) for k, (_, _, t, x) in enumerate(BPA_NOTAS)) + '</ol></div>'
+                    '<div class="panel" style="margin-top:22px"><p class="eyebrow">Lo que nos dice este parte</p>'
+                    '<p><b>Viernes:</b> por encima de 2.100 m el peligro es notable (3), así que una sola persona puede desencadenar una placa de viento en las laderas empinadas. Las placas están por encima de 2.000 m y en todas las orientaciones, algo poco habitual que indica viento cambiante. Los aludes serían de tamaño mediano, suficientes para sepultar a una persona. La nieve reciente añade aludes pequeños a cualquier cota. En la práctica: nada de laderas de más de 30° cargadas en la parte alta; mejor lomas anchas y pendientes suaves, y mucha atención al pasar cerca de crestas y collados.</p>'
+                    '<p><b>Domingo:</b> el viento sigue siendo el problema arriba, pero la nieve reciente da paso a la <b>nieve húmeda por debajo de 2.100 m</b>: llega un calentamiento. Toca madrugar y salir de las pendientes antes de las horas centrales.</p>'
+                    '<p class="small muted">La imagen es solo la primera página. En las siguientes vienen el estado del manto, la evolución y la previsión meteorológica, que explican el porqué de estos iconos: léelas siempre.</p></div>', False, "boletin") +
             '<section class="section alt" id="laderas"><div class="wrap"><p class="eyebrow">Sobre el terreno</p><h2>Cómo leer una ladera</h2>'
             '<div class="gd-fig">' + guias_svg.nieve_pendiente() + '</div>' +
             '<div class="gd-pasos gd-pasos-sin">' + "".join('<li><b>%s</b><span>%s</span></li>' % (e(t), e(x)) for t, x in laderas) + '</div>'
