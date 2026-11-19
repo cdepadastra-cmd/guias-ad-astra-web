@@ -47,7 +47,7 @@ def faq_ld(faq):
 NAV_ACT = [("Todas las actividades", "/actividades/"), ("Barranquismo", "/actividades/?categoria=Barranquismo"), ("Vías ferratas", "/actividades/?categoria=Vías ferratas"),
            ("Alpinismo y ascensiones", "/actividades/?categoria=Ascensiones"), ("Espeleología", "/actividades/?categoria=Espeleología"), ("Escalada y boulder", "/actividades/?categoria=Escalada"),
            ("Senderismo", "/actividades/?categoria=Senderismo"), ("Travesías y viajes", "/actividades/?categoria=Travesías y viajes")]
-NAV_CUR = [("Todos los cursos", "/formacion-cursos/")] + [(c["disc_label"], "/actividades/%s/" % c["slug"]) for c in COURSES]
+NAV_CUR = [("Todos los cursos", "/formacion-cursos/"), ("Calendario de cursos", "/calendario/")] + [(c["disc_label"], "/actividades/%s/" % c["slug"]) for c in COURSES]
 NAV_HER = [("Meteorología de montaña", "/meteo/"), ("Estado de la nieve", "/nieve/"), ("Caudal de barrancos", "/barrancos-caudal/"), ("Calculadora de rutas", "/calculadora-rutas/"), ("Topografía de barrancos", "/topografia-barrancos/"), ("Boulder en Las Tuerces", "/actividades/boulder-las-tuerces/"), ("Boulder en Zona Centro", "/actividades/boulder-zona-centro-salamanca-caceres/")]
 ARTICULOS = [
     ("/como-leer-la-nieve-y-los-aludes/", "Cómo leer la nieve y el peligro de aludes", "Cómo cambia el manto, placas de viento, tipos de aludes, el boletín de AEMET y cómo leer una ladera.", "nieve"),
@@ -68,9 +68,9 @@ def header(active=""):
         return '<a href="%s"%s>%s</a>' % (h, ' aria-current="page"' if active == k else "", n)
     return ('<header class="site-header"><div class="wrap"><a class="brand" href="/" aria-label="Guías Ad Astra, inicio"><img src="/img/logo-adastra-112.png" width="42" height="56" alt="Logotipo de Guías Ad Astra"><span>AD ASTRA <small>Montaña y aventura</small></span></a>'
             '<button class="menu-toggle" aria-expanded="false" aria-controls="nav" aria-label="Abrir menú">☰</button>'
-            '<nav class="nav" id="nav" aria-label="Principal">' + a("/", "Inicio", "inicio") +
+            '<nav class="nav" id="nav" aria-label="Principal">' +
             dd("Actividades", NAV_ACT, "act", active) + dd("Formación–Cursos", NAV_CUR, "cur", active) +
-            a("/actividades/alquiler-material-montana/", "Alquiler", "alq") + a("/calendario/", "Calendario", "cal") + dd("Herramientas", NAV_HER, "her", active) + dd("Artículos", NAV_ART, "art", active) + dd("Otros", NAV_OTR, "otr", active) +
+            a("/actividades/alquiler-material-montana/", "Alquiler", "alq") + dd("Herramientas", NAV_HER, "her", active) + dd("Artículos", NAV_ART, "art", active) + dd("Otros", NAV_OTR, "otr", active) +
             a("/sobre-nosotros/", "Nosotros", "nos") + a("/contacto/", "Contacto", "con") +
             '<a class="btn btn-primary" href="/calendario/">Reservar</a></nav></div></header>')
 
@@ -601,7 +601,7 @@ def build_calendar():
             '<section class="section alt"><div class="wrap two"><div class="panel"><h3>¿No ves tu fecha?</h3><p class="muted">Organizamos cursos y actividades para grupos en el día que elijas.</p><a class="btn btn-wa" href="https://wa.me/%s?text=%s" target="_blank" rel="noopener">%s Pedir otra fecha</a></div>'
             '<div class="panel"><h3>Cómo funciona</h3>%s</div></div></section>' % (SITE["wa"], e("Hola, quería consultar fechas para un curso o actividad."), WA_SVG,
                                                                                  ticks(["Elige una fecha con plazas libres.", "Indica cuántas plazas quieres, tu nombre y teléfono.", "Tu plaza queda apartada y se abre WhatsApp para confirmar contigo."])))
-    page("/calendario/", "Calendario de cursos y actividades de montaña | Ad Astra", "Próximas fechas de cursos de barranquismo, alpinismo, escalada, ARVA y salidas guiadas en Gredos y Castilla y León. Consulta plazas libres y reserva online.", body, "cal",
+    page("/calendario/", "Calendario de cursos y actividades de montaña | Ad Astra", "Próximas fechas de cursos de barranquismo, alpinismo, escalada, ARVA y salidas guiadas en Gredos y Castilla y León. Consulta plazas libres y reserva online.", body, "cur",
          [crumbs_ld([("Inicio", "/"), ("Calendario", "/calendario/")])], priority="0.9")
 
 def build_home():
