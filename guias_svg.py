@@ -313,3 +313,81 @@ def capas_errores():
         ''.join('<path d="M%d 96 q 8 -12 0 -24 q -8 -12 0 -24" fill="none" stroke="#f4ead8" stroke-width="4" stroke-linecap="round" opacity=".7"/>' % xx for xx in (96, 130, 164))
     return '<div class="cm-grid">' + _panel(W, H, "✗", "Algodón", e1, "#e8574a", "Camiseta de algodón", "Retiene el sudor y, al parar,|te quedas helado.") + \
         _panel(W, H, "✗", "Demasiado abrigo", e2, "#e8574a", "Todas las capas subiendo", "Sudas, te mojas por dentro|y luego te enfrías.") + "</div>"
+
+
+# ------------------------------------------------------------------ guía «Cómo leer la nieve»: esquemas
+_NV_TXT = 'font-family="Inter,system-ui,sans-serif"'
+
+
+def nieve_viento():
+    """Corte de una cresta: barlovento erosionado, cornisa y placa de viento a sotavento."""
+    p = ['<svg viewBox="0 0 900 420" role="img" aria-label="El viento arrastra la nieve de la ladera de barlovento y la deposita a sotavento, donde forma la cornisa y la placa de viento" style="width:100%;height:auto;display:block;border-radius:16px">',
+         '<defs><linearGradient id="nvc" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7fb4dc"/><stop offset="1" stop-color="#d9ebf7"/></linearGradient></defs>',
+         '<rect width="900" height="420" fill="url(#nvc)"/>',
+         '<path d="M0 400 L0 330 L180 250 L330 160 L450 92 L470 96 L600 190 L760 300 L900 360 L900 420 L0 420Z" fill="#6b5a4a"/>',
+         '<path d="M0 330 L180 250 L330 160 L450 92 L450 99 L330 168 L180 258 L0 338Z" fill="#fff" opacity=".95"/>',
+         '<path d="M450 92 L520 84 Q540 86 528 98 Q500 104 482 108 L600 178 Q640 205 700 238 L760 282 L760 300 L600 190 L470 96Z" fill="#fff"/>',
+         '<path d="M482 108 L600 178 Q640 205 700 238 L760 282" fill="none" stroke="#e8574a" stroke-width="3" stroke-dasharray="9 7"/>']
+    for x, y in [(40, 120), (150, 70), (60, 200)]:
+        p.append('<path d="M%d %d q40 -18 80 0 t80 0" fill="none" stroke="#1d3b57" stroke-width="4" stroke-linecap="round"/>' % (x, y))
+        p.append('<path d="M%d %d l-14 -9 m14 9 l-14 9" stroke="#1d3b57" stroke-width="4" stroke-linecap="round" fill="none"/>' % (x + 160, y))
+    for x, y in [(470, 70), (505, 62), (540, 78), (575, 66), (520, 110), (560, 120)]:
+        p.append('<circle cx="%d" cy="%d" r="3" fill="#fff"/>' % (x, y))
+    p.append('<g %s font-weight="700" fill="#10202e">' % _NV_TXT)
+    p.append('<text x="110" y="300" font-size="22">BARLOVENTO</text><text x="110" y="325" font-size="16" font-weight="500">el viento se lleva la nieve:</text><text x="110" y="345" font-size="16" font-weight="500">dura, con surcos (sastrugi)</text>')
+    p.append('<text x="640" y="140" font-size="22">SOTAVENTO</text><text x="640" y="165" font-size="16" font-weight="500">la nieve se acumula:</text><text x="640" y="185" font-size="16" font-weight="500">placa lisa, blanda o dura</text>')
+    p.append('<text x="545" y="52" font-size="18">CORNISA</text><path d="M560 58 L520 86" stroke="#10202e" stroke-width="2"/>')
+    p.append('<text x="770" y="258" font-size="18" fill="#b5281c">PLACA</text><text x="770" y="278" font-size="15" font-weight="500" fill="#b5281c">de viento</text>')
+    p.append('<text x="22" y="40" font-size="20">VIENTO →</text></g></svg>')
+    return "".join(p)
+
+
+def nieve_pendiente():
+    """Escala de inclinación: dónde salen las placas."""
+    franjas = [(0, 25, "#cfe8cf", "< 25°: casi nunca salen (pero pueden llegar de arriba)"),
+               (25, 30, "#f6e6a7", "25–30°: raro, ojo con lo que hay encima"),
+               (30, 35, "#f5c27a", "30–35°: empiezan las placas"),
+               (35, 45, "#ef8f6a", "35–45°: la mayoría de los aludes de placa"),
+               (45, 60, "#d9c6e8", "> 45°: la nieve se purga sola con frecuencia")]
+    import math
+    cx, cy, R = 120, 380, 330
+    s = ('<svg viewBox="0 0 900 420" role="img" aria-label="Escala de inclinación de las laderas: los aludes de placa salen sobre todo entre 30 y 45 grados" style="width:100%;height:auto;display:block;border-radius:16px">'
+         '<rect width="900" height="420" fill="#f4efe7"/>')
+    for a0, a1, col, _ in franjas:
+        p0 = (cx + R * math.cos(math.radians(a0)), cy - R * math.sin(math.radians(a0)))
+        p1 = (cx + R * math.cos(math.radians(a1)), cy - R * math.sin(math.radians(a1)))
+        s += '<path d="M%d %d L%.1f %.1f A%d %d 0 0 0 %.1f %.1f Z" fill="%s" stroke="#fff" stroke-width="2"/>' % (cx, cy, p0[0], p0[1], R, R, p1[0], p1[1], col)
+    for a in (0, 25, 30, 35, 45, 60):
+        x, y = cx + (R + 14) * math.cos(math.radians(a)), cy - (R + 14) * math.sin(math.radians(a))
+        s += '<text x="%.0f" y="%.0f" %s font-size="18" font-weight="800" fill="#2a1d12" text-anchor="middle">%d°</text>' % (x, y + 6, _NV_TXT, a)
+    s += '<path d="M%d %d h%d" stroke="#2a1d12" stroke-width="3"/>' % (cx, cy, R)
+    y = 70
+    for _, _, col, txt in franjas:
+        s += '<rect x="520" y="%d" width="22" height="22" rx="5" fill="%s" stroke="#2a1d12" stroke-opacity=".3"/><text x="552" y="%d" %s font-size="15" fill="#2a1d12">%s</text>' % (y, col, y + 16, _NV_TXT, txt.split(": ")[0] + ":")
+        s += '<text x="552" y="%d" %s font-size="14" fill="#5c4a3a">%s</text>' % (y + 35, _NV_TXT, txt.split(": ", 1)[1])
+        y += 64
+    return s + '</svg>'
+
+
+def nieve_manto():
+    """Corte del manto con una capa débil enterrada bajo una placa."""
+    capas = [("#ffffff", 70, "Nieve reciente o venteada: la placa"),
+             ("#9fc6e6", 14, "Capa débil (escarcha, facetas)"),
+             ("#e7eef5", 60, "Nieve antigua asentada"),
+             ("#c7d6e4", 18, "Costra de rehielo o de lluvia"),
+             ("#dfe8f0", 70, "Base (cubiletes si hizo mucho frío)")]
+    s = ('<svg viewBox="0 0 900 330" role="img" aria-label="Corte del manto de nieve: una placa cohesiva apoyada sobre una capa débil enterrada" style="width:100%;height:auto;display:block;border-radius:16px">'
+         '<rect width="900" height="330" fill="#f4efe7"/>')
+    y = 30
+    for col, h, txt in capas:
+        s += '<rect x="40" y="%d" width="420" height="%d" fill="%s" stroke="#9aa7b4"/>' % (y, h, col)
+        if col == "#9fc6e6":
+            s += "".join('<path d="M%d %d l5 -8 l5 8" fill="none" stroke="#2f6b98" stroke-width="1.5"/>' % (x, y + h - 2) for x in range(48, 455, 14))
+        s += '<path d="M470 %d h40" stroke="#5c4a3a" stroke-width="2"/><text x="520" y="%d" %s font-size="17" fill="#2a1d12"%s>%s</text>' % (
+            y + h / 2, y + h / 2 + 6, _NV_TXT, ' font-weight="800"' if col == "#9fc6e6" else "", txt)
+        y += h
+    s += '<rect x="40" y="%d" width="420" height="40" fill="#6b5a4a"/><text x="250" y="%d" %s font-size="16" fill="#fff" text-anchor="middle">suelo</text>' % (y, y + 26, _NV_TXT)
+    # fractura
+    s += '<path d="M330 30 L330 100" stroke="#e8574a" stroke-width="4"/><path d="M60 100 H330" stroke="#e8574a" stroke-width="3" stroke-dasharray="8 6"/>'
+    s += '<text x="200" y="66" %s font-size="15" font-weight="700" fill="#b5281c" text-anchor="middle">la placa rompe y desliza sobre la capa débil</text>' % _NV_TXT
+    return s + '</svg>'

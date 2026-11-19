@@ -686,3 +686,20 @@ details.adv[open] summary{margin-bottom:14px}
 .mt-avley i.mt-avpunto{border-radius:50%;background:#1d140d;border:2px solid #fff;width:12px;height:12px}
 .mt-avsin:empty{display:none}
 @media (max-width:700px){.mt-avmap-m{height:340px}}
+/* guía: cómo leer la nieve */
+.gd-pasos-sin li::before{display:none}
+.gd-pasos-sin{list-style:none;padding:0}
+.gd-capas article h3{margin:2px 0 8px}
+.gd-pt{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:8px;vertical-align:-1px}
+.gd-t th[scope],.gd-t tbody th{white-space:normal;min-width:150px}
+.gd-escala{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-top:18px}
+.gd-escala div{background:var(--card);border:1px solid var(--line);border-top:8px solid var(--c);border-radius:var(--r);padding:14px}
+.gd-escala span{display:inline-grid;place-items:center;width:34px;height:34px;border-radius:8px;background:var(--c);color:#1b120c;font-weight:900;margin-right:8px}
+.gd-escala b{font-size:1.1rem}
+.gd-escala p{margin:10px 0 0;font-size:.92rem;line-height:1.5}
+.gd-dos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:28px}
+.gd-dos .gd-reglas{margin:10px 0}
+.gd-alarma li::marker{content:"⚠  ";color:#f08a24}
+.gd-links{padding-left:18px;display:grid;gap:8px;margin:8px 0 12px}
+@media (max-width:900px){.gd-escala{grid-template-columns:1fr}.gd-dos{grid-template-columns:1fr}}
+.gd-pasos li{align-content:start}

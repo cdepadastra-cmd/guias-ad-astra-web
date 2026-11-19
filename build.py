@@ -48,7 +48,7 @@ NAV_ACT = [("Todas las actividades", "/actividades/"), ("Barranquismo", "/activi
            ("Alpinismo y ascensiones", "/actividades/?categoria=Ascensiones"), ("Espeleología", "/actividades/?categoria=Espeleología"), ("Escalada y boulder", "/actividades/?categoria=Escalada"),
            ("Senderismo", "/actividades/?categoria=Senderismo"), ("Travesías y viajes", "/actividades/?categoria=Travesías y viajes")]
 NAV_CUR = [("Todos los cursos", "/formacion-cursos/")] + [(c["disc_label"], "/actividades/%s/" % c["slug"]) for c in COURSES]
-NAV_HER = [("Meteorología de montaña", "/meteo/"), ("Estado de la nieve", "/nieve/"), ("Caudal de barrancos", "/barrancos-caudal/"), ("Calculadora de rutas", "/calculadora-rutas/"), ("Cómo preparar la mochila", "/como-preparar-la-mochila/"), ("Teoría de las capas", "/teoria-de-las-capas/"), ("Topografía de barrancos", "/topografia-barrancos/"), ("Boulder en Las Tuerces", "/actividades/boulder-las-tuerces/"), ("Boulder en Zona Centro", "/actividades/boulder-zona-centro-salamanca-caceres/")]
+NAV_HER = [("Meteorología de montaña", "/meteo/"), ("Estado de la nieve", "/nieve/"), ("Cómo leer la nieve y los aludes", "/como-leer-la-nieve-y-los-aludes/"), ("Caudal de barrancos", "/barrancos-caudal/"), ("Calculadora de rutas", "/calculadora-rutas/"), ("Cómo preparar la mochila", "/como-preparar-la-mochila/"), ("Teoría de las capas", "/teoria-de-las-capas/"), ("Topografía de barrancos", "/topografia-barrancos/"), ("Boulder en Las Tuerces", "/actividades/boulder-las-tuerces/"), ("Boulder en Zona Centro", "/actividades/boulder-zona-centro-salamanca-caceres/")]
 NAV_OTR = [("Iniciativas de turismo rural", "/iniciativas-turismo-rural/"), ("Creación y mantenimiento de senderos", "/creacion-mantenimiento-senderos/"), ("Route setting", "/route-setting/"), ("Organización de eventos", "/actividades/organizacion-eventos-deportivos/"), ("Gredos Limpio", "/actividades/gredos-limpio/"),
            ("Oeste de Gredos", "/actividades/comarca-natural-oeste-de-gredos/"), ("Vía Verde Ruta de la Plata", "/actividades/via-verde-ruta-de-la-plata/")]
 
@@ -902,7 +902,7 @@ def build_nieve():
             '<section class="section" id="estado"><div class="wrap"><div id="nv-lista" class="nv"><p class="mt-cargando">Cargando el estado de la nieve…</p></div></div></section>'
             '<script type="application/json" id="nv-cams">' + cams + '</script>' +
             '<section class="section alt"><div class="wrap split"><div class="stack" style="gap:0">' + block("Preguntas frecuentes", faq_html(NIEVE_FAQ)) +
-            '</div><div class="sticky"><div class="panel"><p class="eyebrow">Importante</p><p>Esto no es un boletín de peligro de aludes. Consulta siempre el boletín oficial donde lo haya, valora el terreno y la nieve sobre el sitio y lleva el material adecuado (ARVA, pala y sonda en terreno de aludes).</p></div></div></div></section>')
+            '</div><div class="sticky"><div class="panel"><p class="eyebrow">Importante</p><p>Esto no es un boletín de peligro de aludes. Consulta siempre el boletín oficial donde lo haya, valora el terreno y la nieve sobre el sitio y lleva el material adecuado (ARVA, pala y sonda en terreno de aludes).</p><p><a href="/como-leer-la-nieve-y-los-aludes/">Cómo leer la nieve y el peligro de aludes →</a></p></div></div></div></section>')
     ld = [crumbs_ld([("Inicio", "/"), ("Estado de la nieve", path)]), faq_ld(NIEVE_FAQ)]
     page(path, "Estado de la nieve en Gredos, Picos, Pirineos y Sierra Nevada | Ad Astra",
          "Estado de la nieve por macizo: nieve reciente y prevista, placas de viento, costra de rehielo y nieve húmeda en Gredos, Guadarrama, Picos de Europa, Pirineos y Sierra Nevada.",
@@ -970,6 +970,124 @@ def build_mochila():
     page(path, "Cómo preparar la mochila de montaña y qué llevar | Ad Astra",
          "Cómo repartir el peso en la mochila, cómo ajustarla y listas de material para barrancos, escalada, alpinismo, senderismo, montañismo y vivac que puedes ir tachando.",
          body, "her", ld, priority="0.6", scripts=COMIC_FONTS + '<script src="/js/mochila.js" defer></script>')
+
+
+
+LEER_NIEVE_FAQ = [
+    ("¿A partir de qué inclinación puede salir un alud?", "Los aludes de placa salen casi siempre en laderas de 30° o más, y la mayoría entre 35° y 45°. Por debajo de 30° es raro que se desencadenen, pero un alud que sale más arriba puede llegar hasta ti: cuenta también la pendiente que tienes encima."),
+    ("¿Qué es una placa de viento?", "Una capa de nieve que el viento ha transportado y compactado a sotavento de crestas, collados y cambios de pendiente. Puede ser blanda o dura, pero es cohesiva: si debajo hay una capa débil, se rompe de golpe y desliza entera. Es el problema de aludes más habitual en nuestras sierras."),
+    ("Si el boletín dice peligro 2 (limitado), ¿puedo ir tranquilo?", "No del todo. Con peligro 2 se dan cerca de un tercio de las muertes por aludes y con 3 (notable), alrededor de la mitad, porque son los niveles en los que más gente sale. El nivel te dice cuánto cuidado poner; dónde está el problema te lo dicen las orientaciones, las cotas y el tipo de problema del boletín."),
+    ("¿Hay boletín de aludes para Gredos?", "No. AEMET publica boletín para el Pirineo, Picos de Europa, las sierras del Cordel y Peña Labra y la Sierra de Guadarrama. En Gredos, el de Guadarrama orienta sobre la situación general del Sistema Central, pero hay que completarlo con la previsión, el estado de la nieve y lo que observes sobre el terreno."),
+    ("¿El ARVA evita que te pille un alud?", "No: solo sirve para que tus compañeros te encuentren rápido si quedas sepultado, y para encontrar tú a otro. Por eso va siempre con pala y sonda, y hay que practicar. Lo que evita el alud es la elección del terreno y del momento."),
+    ("¿Qué hago si un compañero queda sepultado?", "Fíjate en el punto donde lo viste por última vez, comprueba que no hay peligro de otro alud, llama al 112 (o que lo haga otro) y empieza la búsqueda con el ARVA ya, sin esperar a nadie. Localiza con la sonda y palea con método. Los primeros 15 minutos son decisivos."),
+]
+
+
+def build_leer_nieve():
+    path = "/como-leer-la-nieve-y-los-aludes/"
+    cambios = [
+        ("Asentamiento y redondeo", "#7cc47f", "Con temperaturas suaves y poca diferencia de temperatura dentro del manto, los cristales se redondean y se unen. La nieve se asienta, pierde espesor y gana cohesión: el manto se estabiliza. Pasa en los días siguientes a una nevada sin frío intenso."),
+        ("Facetas y cubiletes", "#e8574a", "Con frío intenso, noches despejadas y poco espesor de nieve, el suelo está mucho más caliente que la superficie. Esa diferencia hace crecer cristales angulosos (facetas) y, en la base, cubiletes huecos. No se unen entre sí: son las capas débiles que duran semanas."),
+        ("Escarcha de superficie", "#9fc6e6", "En noches frías, claras y sin viento se forman cristales de escarcha sobre la nieve, como plumas que brillan al sol. Mientras están en superficie no pasa nada; si la siguiente nevada los entierra, forman una de las capas débiles más traicioneras."),
+        ("Fusión y rehielo", "#e9a53b", "El sol o el calor funden la superficie y por la noche se vuelve a helar. Sale una costra dura por la mañana, que se ablanda a lo largo del día. Es la nieve típica de primavera: segura a primera hora si ha helado bien, cada vez más húmeda e inestable según avanza la mañana."),
+        ("Costras de lluvia y de viento", "#c9a7e8", "La lluvia sobre la nieve deja al helarse una costra lisa; el viento, una superficie dura y pulida. Una vez enterradas son una superficie de deslizamiento para la nieve que caiga encima, y a veces generan facetas en sus bordes."),
+    ]
+    tipos = [
+        ("Alud de placa", "Una capa cohesiva se rompe a la vez en una fractura lineal y desliza entera sobre una capa débil. Es el que causa la gran mayoría de los accidentes, porque lo suele provocar la propia víctima o alguien de su grupo."),
+        ("Alud de nieve suelta", "Empieza en un punto y se va abriendo en forma de pera. Lo forma nieve sin cohesión: reciente y seca en pendientes fuertes, o húmeda con calor. Suele ser más pequeño, pero en terreno expuesto te puede arrastrar y tirar por un cortado."),
+        ("Alud de nieve húmeda", "Nieve pesada y lenta, que sale con calor o lluvia, sobre todo en las horas centrales del día y en solanas. Arrastra mucho material y al pararse se endurece como el cemento."),
+        ("Deslizamiento basal", "Todo el manto se desliza sobre el suelo, normalmente sobre hierba o roca lisa. Avisa con grietas abiertas en la nieve (bocas de ballena), pero puede caer en cualquier momento y no depende de que lo pises."),
+    ]
+    problemas = [
+        ("Nieve reciente", "#f5d33b", "La sobrecarga de una nevada importante, sobre todo si cae con viento o sobre una superficie lisa.",
+         "Durante la nevada y los 2 o 3 días siguientes, en casi todas las orientaciones.", "Esperar a que se asiente. Como referencia, más de 30 cm de nieve nueva (menos con viento o frío) ya es una señal de alarma."),
+        ("Nieve venteada (placas de viento)", "#f08a24", "La nieve transportada por el viento a sotavento de crestas, collados, canales y cambios de pendiente.",
+         "Durante y después del viento; se puede formar en horas, incluso sin nevar.", "Reconocer y evitar las acumulaciones en laderas empinadas. Saber de dónde ha soplado el viento los últimos días."),
+        ("Capas débiles persistentes", "#e8574a", "Capas de facetas, cubiletes o escarcha enterradas en el manto viejo.",
+         "Semanas o meses. Más en umbrías y zonas protegidas del viento, y donde el manto es fino.", "Muy difícil de ver: hay que fiarse del boletín, de los whumpfs y de un margen amplio. Cuidado al pasar de zonas de poca nieve a zonas de mucha."),
+        ("Nieve húmeda", "#9fc6e6", "El agua de fusión o de lluvia que entra en el manto y le quita cohesión.",
+         "Horas o días: en las solanas según calienta el día, en todas las orientaciones si llueve.", "Madrugar y volver pronto. Si la noche no ha helado (noches nubladas o templadas), el problema está ahí desde el principio."),
+        ("Deslizamientos basales", "#c9a7e8", "Todo el manto deslizando sobre hierba o losas de roca.",
+         "Días o meses; a cualquier hora, más en la segunda mitad del día en primavera.", "No pararse debajo de las grietas de deslizamiento ni pasar por encima de ellas."),
+    ]
+    escala = [("1", "Débil", "#cce8a6", "Condiciones generalmente estables. Solo con sobrecargas fuertes en pendientes extremas aisladas."),
+              ("2", "Limitado", "#f5e15b", "Estable en la mayoría del terreno, pero se pueden desencadenar placas con sobrecargas fuertes en las pendientes indicadas."),
+              ("3", "Notable", "#f5a442", "Condiciones peligrosas. Se puede desencadenar un alud con el paso de una sola persona en las pendientes indicadas. Algunos aludes espontáneos grandes."),
+              ("4", "Fuerte", "#e8574a", "Muy peligroso: desencadenamiento probable con una sola persona en muchas pendientes. Muchos aludes espontáneos grandes."),
+              ("5", "Muy fuerte", "#8e2a24", "Extraordinario: numerosos aludes espontáneos muy grandes, también en terreno moderadamente empinado.")]
+    alarmas = ["Aludes recientes en laderas parecidas a la tuya: es la señal más clara de todas.",
+               "Un «whumpf»: el ruido sordo del manto que se hunde bajo tus pies. Hay una capa débil que acaba de colapsar.",
+               "Grietas que salen disparadas desde tus esquís o tus botas.",
+               "Más de 30 cm de nieve nueva en las últimas 72 horas, o menos si ha caído con viento.",
+               "Viento que mueve nieve: penachos en las crestas, nieve que vuela, cornisas creciendo.",
+               "Calentamiento rápido, lluvia sobre la nieve o una noche sin helar: bolas que ruedan, te hundes hasta la rodilla."]
+    laderas = [("Inclinación", "Mide la pendiente en el mapa antes de salir (muchas apps de mapas tienen una capa de pendientes) y sobre el terreno. A partir de 30° estás en terreno de aludes, y cuenta también la pendiente que tienes encima, no solo la que pisas."),
+               ("Orientación", "Las umbrías (norte) guardan las capas débiles más tiempo porque reciben poco sol. Las solanas (sur) se humedecen antes con el calor del día. El boletín indica qué orientaciones son las peligrosas: mira la rosa de los vientos y compara con tu ruta."),
+               ("Altitud", "Por encima del bosque el viento mueve mucha más nieve y hay más placas. La cota también marca dónde nieva o llueve y hasta dónde llega el rehielo nocturno."),
+               ("Forma del terreno", "Las placas suelen romper en convexidades (donde la ladera se vuelve más empinada), en canales, depresiones y bajo cornisas. Las lomas y cordales suaves y anchos suelen ser los pasos más seguros."),
+               ("Trampas del terreno", "Lo que hay debajo cuenta tanto como la ladera: un barranco, una hoya o un arroyo donde la nieve se acumula metros, un cortado, rocas o árboles contra los que golpear. Un alud pequeño en una trampa puede ser mortal."),
+               ("Espesor del manto", "Donde hay poca nieve (rocas que asoman, bordes de crestas) las capas débiles son más fáciles de romper. Las transiciones de manto fino a grueso son puntos típicos de desencadenamiento.")]
+    antes = ["Lee el boletín de peligro de aludes del día: nivel, problema típico, orientaciones y cotas. Si no hay boletín para tu zona, el más cercano te da una idea general.",
+             "Mira cómo ha sido la última semana: nevadas, viento (de dónde y con qué fuerza), lluvia, noches que no helaron. Lo tienes en nuestra página de meteorología y en el estado de la nieve.",
+             "Elige la ruta según las condiciones, no al revés: busca lomas y bosque, evita canales y laderas de sotavento cargadas. Prepara alternativas más fáciles y un horario de vuelta.",
+             "ARVA, pala y sonda para cada persona del grupo, comprobación del ARVA al salir y práctica de búsqueda. Nunca vayas solo a terreno de aludes y deja dicho a dónde vas."]
+    durante = ["Observa todo el día: nieve que se mueve, aludes recientes, whumpfs, grietas, cambios de temperatura. Si las señales no coinciden con lo que esperabas, cambia el plan.",
+               "Pasa de uno en uno por las laderas dudosas, con distancia entre personas, y espera en sitios seguros: fuera de la trayectoria de los aludes, en lomas o detrás de rocas grandes.",
+               "No te pares ni te reagrupes en el fondo de canales o al pie de pendientes.",
+               "En primavera, madruga: sube con la nieve dura y sal de las pendientes antes de que se ablande. Si te hundes hasta la bota y la nieve hace bolas, es hora de irse.",
+               "Darse la vuelta siempre es una opción válida. La montaña sigue ahí mañana."]
+    rescate = [("Observa", "Fíjate en el punto donde viste a la persona por última vez: ahí empieza la zona de búsqueda. Comprueba que no hay peligro de otro alud."),
+               ("Avisa", "Llama al 112 (o que llame alguien mientras los demás buscan). Todos los ARVA del grupo en modo búsqueda."),
+               ("Busca con el ARVA", "Recorre la zona en franjas hasta captar señal, sigue la señal y afina cerca de la nieve en cruz."),
+               ("Sondea", "Sondea en espiral desde el punto más bajo que marque el ARVA hasta tocar a la persona; deja la sonda clavada."),
+               ("Palea", "Empieza un poco por debajo de la sonda, en forma de V, cambiando de palista. Libera primero la cara y las vías respiratorias.")]
+    seccion = lambda eyebrow, h2, inner, alt=False: '<section class="section%s"><div class="wrap"><p class="eyebrow">%s</p><h2>%s</h2>%s</div></section>' % (" alt" if alt else "", eyebrow, h2, inner)
+    tarjetas = lambda items: '<div class="gd-capas">' + "".join('<article style="--c:%s"><h3>%s</h3><p>%s</p></article>' % (c, e(t), e(x)) for t, c, x in items) + "</div>"
+    body = (hero("Herramientas", "Cómo leer la nieve y el peligro de aludes", "Cómo cambia el manto, cómo se forman las placas de viento, los tipos de aludes y cómo leer una ladera antes de meterte en ella. Lo que miramos los guías cada día de invierno.", METEO_IMG,
+                 [("Inicio", "/"), ("Cómo leer la nieve", "")], '<a class="btn btn-primary" href="#laderas">Leer una ladera</a><a class="btn btn-ghost" href="/nieve/">Estado de la nieve</a>') +
+            '<section class="section"><div class="wrap"><div class="panel" style="border-color:#e8574a"><p class="eyebrow" style="color:#e8574a">Antes de nada</p><p>Esta guía sirve para entender lo que ves y lo que dice el boletín, pero <b>no sustituye a un curso de nieve y aludes</b> ni a la experiencia. En terreno de aludes ve siempre con ARVA, pala y sonda, sabiendo usarlos y acompañado.</p></div></div></section>' +
+            seccion("El manto", "La nieve cambia en cuanto cae",
+                    '<p class="lead-p">El manto es una pila de capas, una por cada nevada, episodio de viento o de calor. Dentro, los cristales se transforman sin parar (es lo que se llama metamorfismo) y eso decide si las capas se unen entre sí o si queda una débil entre dos fuertes. Un alud de placa necesita las dos cosas: una capa cohesiva arriba y una débil debajo.</p>'
+                    '<div class="gd-fig">' + guias_svg.nieve_manto() + '</div>' + tarjetas(cambios)) +
+            seccion("El viento", "Placas de viento: el problema más habitual",
+                    '<p class="lead-p">El viento es el gran constructor de aludes. A partir de unos 20–30 km/h ya mueve la nieve suelta: la arranca de la ladera por donde sopla (barlovento) y la deposita al otro lado de crestas y collados (sotavento), en canales y en cambios de pendiente. Ahí forma placas y cornisas, a veces en pocas horas y sin que esté nevando.</p>'
+                    '<div class="gd-fig">' + guias_svg.nieve_viento() + '</div>'
+                    '<ul class="gd-reglas"><li><b>Barlovento:</b> nieve dura, ondulada o con surcos (sastrugi), rocas que asoman. Poca nieve, normalmente más segura.</li>'
+                    '<li><b>Sotavento:</b> superficies lisas y redondeadas, «almohadas», nieve que suena hueca o más blanda que alrededor, cornisas encima. Ahí están las placas.</li>'
+                    '<li><b>Las placas duras engañan:</b> parecen firmes porque sostienen tu peso, pero pueden romper más arriba de donde estás y llevarse toda la ladera.</li>'
+                    '<li><b>Las cornisas</b> se rompen más atrás de lo que parece: no te acerques al borde por arriba ni te quedes debajo, sobre todo con viento o calor.</li></ul>', True) +
+            seccion("Tipos de aludes", "Cómo se rompe la nieve",
+                    '<div class="gd-pasos gd-pasos-sin">' + "".join('<li><b>%s</b><span>%s</span></li>' % (e(t), e(x)) for t, x in tipos) + '</div>') +
+            seccion("Los problemas típicos", "Lo que vas a leer en el boletín",
+                    '<p class="lead-p">Los servicios de aludes europeos describen la situación con cinco problemas típicos. Cada uno se reconoce, se sitúa y se gestiona de una forma distinta: saber cuál hay ese día es más útil que el número del nivel de peligro.</p>'
+                    '<div class="gd-tw"><table class="gd-t"><thead><tr><th>Problema</th><th>Qué es</th><th>Cuándo y dónde</th><th>Cómo gestionarlo</th></tr></thead><tbody>' +
+                    "".join('<tr><th><i class="gd-pt" style="background:%s"></i>%s</th><td>%s</td><td>%s</td><td>%s</td></tr>' % (c, e(n), e(q), e(d), e(g)) for n, c, q, d, g in problemas) +
+                    '</tbody></table></div><p class="muted small">Además pueden aparecer las cornisas como problema propio, o «problema no diferenciado» cuando no domina ninguno: eso no significa que no haya peligro.</p>', True) +
+            seccion("La escala europea", "Los cinco niveles de peligro",
+                    '<div class="gd-escala">' + "".join('<div style="--c:%s"><span>%s</span><b>%s</b><p>%s</p></div>' % (c, n, e(t), e(x)) for n, t, c, x in escala) + '</div>'
+                    '<p class="lead-p" style="margin-top:18px">El nivel 3 (notable) se da aproximadamente un 30 % del invierno y concentra cerca de la mitad de las muertes por aludes; el 2 (limitado), alrededor de un tercio. No es que sean los más peligrosos: es que en esos días sale mucha gente y la nieve parece buena. Fíjate en el problema, las orientaciones y las cotas que señala el boletín.</p>') +
+            '<section class="section alt" id="laderas"><div class="wrap"><p class="eyebrow">Sobre el terreno</p><h2>Cómo leer una ladera</h2>'
+            '<div class="gd-fig">' + guias_svg.nieve_pendiente() + '</div>' +
+            '<div class="gd-pasos gd-pasos-sin">' + "".join('<li><b>%s</b><span>%s</span></li>' % (e(t), e(x)) for t, x in laderas) + '</div>'
+            '<h3 style="margin-top:34px">Señales de alarma</h3><p>Si ves cualquiera de estas, el manto te está avisando: aléjate de las pendientes de más de 30°.</p>'
+            '<ul class="gd-reglas gd-alarma">' + "".join("<li>%s</li>" % e(x) for x in alarmas) + '</ul></div></section>' +
+            seccion("Planificar", "Antes de salir y durante la actividad",
+                    '<div class="gd-dos"><div><h3>Antes de salir</h3><ul class="gd-reglas">' + "".join("<li>%s</li>" % e(x) for x in antes) + '</ul></div>'
+                    '<div><h3>Durante la actividad</h3><ul class="gd-reglas">' + "".join("<li>%s</li>" % e(x) for x in durante) + '</ul></div></div>') +
+            seccion("Si ocurre", "Rescate de un compañero: cada minuto cuenta",
+                    '<p class="lead-p">Si una persona sepultada se saca en los primeros 15 minutos, la gran mayoría sobrevive; a partir de ahí las posibilidades caen muy deprisa. El rescate lo hace el propio grupo: la ayuda de fuera casi nunca llega a tiempo.</p>'
+                    '<ol class="gd-pasos">' + "".join('<li><b>%s</b><span>%s</span></li>' % (e(t), e(x)) for t, x in rescate) + '</ol>', True) +
+            '<section class="section"><div class="wrap split"><div class="stack" style="gap:0">' + block("Preguntas frecuentes", faq_html(LEER_NIEVE_FAQ)) +
+            '</div><div class="sticky"><div class="panel"><p class="eyebrow">Boletines y datos</p><ul class="gd-links">'
+            '<li><a href="https://www.aemet.es/es/eltiempo/prediccion/montana" target="_blank" rel="noopener">AEMET: predicción de montaña y boletín de aludes</a> (Pirineo, Picos de Europa, Cordel y Peña Labra, Guadarrama)</li>'
+            '<li><a href="https://www.icgc.cat/" target="_blank" rel="noopener">ICGC</a> (Institut Cartogràfic i Geològic de Catalunya): boletín del Pirineo catalán</li>'
+            '<li><a href="/nieve/">Estado de la nieve</a> y <a href="/meteo/">meteorología</a> de nuestras sierras</li></ul>'
+            '<p class="small muted">Problemas típicos y escala de peligro según el <a href="https://www.avalanches.org/" target="_blank" rel="noopener">EAWS</a> (servicios europeos de aviso de aludes).</p></div>'
+            '<div class="panel" style="margin-top:16px"><p class="eyebrow">Aprende con guías</p><p>En nuestros <a href="/actividades/cursos-alpinismo/">cursos de alpinismo</a> practicamos sobre el terreno la lectura de la nieve, el uso del ARVA y el rescate.</p></div></div></div></section>')
+    ld = [crumbs_ld([("Inicio", "/"), ("Cómo leer la nieve", path)]), faq_ld(LEER_NIEVE_FAQ)]
+    page(path, "Cómo leer la nieve: manto, placas de viento y aludes | Ad Astra",
+         "Guía para entender la nieve: cómo cambia el manto, placas de viento, tipos de aludes, los problemas típicos y la escala de peligro, cómo leer una ladera y qué hacer si ocurre un alud.",
+         body, "her", ld, priority="0.6")
 
 
 PRENDAS = {
@@ -1193,7 +1311,7 @@ def main():
     cfg = os.path.join(OUT, "config.js")
     c = open(cfg, encoding="utf-8").read().replace('calendarioURL: ""', 'calendarioURL: "",\n  // Carpeta donde está publicada la web ("" si está en la raíz del dominio)\n  base: "%s"' % BASE)
     open(cfg, "w", encoding="utf-8").write(c)
-    build_home(); build_activities_index(); build_courses_index(); build_calendar(); build_rental(); build_about(); build_contact(); build_404(); build_calculator(); build_topografia(); build_meteo(); build_caudales(); build_nieve(); build_mochila(); build_capas()
+    build_home(); build_activities_index(); build_courses_index(); build_calendar(); build_rental(); build_about(); build_contact(); build_404(); build_calculator(); build_topografia(); build_meteo(); build_caudales(); build_nieve(); build_mochila(); build_capas(); build_leer_nieve()
     for a in ACTIVITIES:
         build_activity(a)
     build_ascensiones_macizos()
