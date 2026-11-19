@@ -81,8 +81,9 @@
     return out;
   }
   /* cont: elemento donde va el mapa; foco: id del macizo a destacar (o vacío para toda España) */
+  var MAPA_AVISOS_ACTIVO = true;  // poner false para ocultar el mapa de avisos
   function mapaAvisos(cont, foco, alElegir) {
-    if (!cont) return;
+    if (!cont || !MAPA_AVISOS_ACTIVO) return;
     avisosP = avisosP || json(DATOS + "avisos.json").catch(function () { return null; });
     avisosP.then(function (d) {
       if (!d || !d.avisos || !d.avisos.length) return;
@@ -173,6 +174,14 @@
     if (cc == null || cc < 25) return "sol";
     return cc < 60 ? "poco-nuboso" : cc < 85 ? "nuboso" : "cubierto";
   }
+  /* nieve: 1 mm de agua ≈ 1 cm de nieve (relación habitual 10:1); se considera nieve con la cumbre a 0,5 °C o menos */
+  function esNieve(c, i) { return c.tc[i] != null && c.tc[i] <= 0.5; }
+  function precip(mm, nieve) { return nieve ? dec(mm) + " cm nieve" : dec(mm) + " mm"; }
+  function precipDia(d, vacio) {
+    if (!d.pr) return vacio;
+    if (d.nieve_c >= 1 && d.nieve_c >= 0.5 * d.pr) return '<span title="' + dec(d.pr) + ' mm de agua">' + d.nieve_c + " cm nieve</span>";
+    return dec(d.pr) + " mm";
+  }
   function flecha(d) {
     if (d == null) return "";
     return '<svg class="mt-dir" viewBox="0 0 20 20" aria-hidden="true"><path transform="rotate(' + Math.round(d + 180) + ' 10 10)" d="M10 2l5 13-5-3-5 3z" fill="currentColor"/></svg>';
@@ -216,7 +225,7 @@
           (m.dias || []).slice(0, 3).forEach(function (d) { (d.avisos || []).forEach(function (a) { if (av.indexOf(a) < 0) av.push(a); }); });
           h += '<a class="mt-card" data-mac="' + m.id + '" href="/meteo/' + m.id + '/"><div class="mt-card-h"><h3>' + esc(m.nombre) + '</h3><p class="muted small">' + esc(m.cumbre.nombre) + " " + m.cumbre.alt.toLocaleString("es-ES") + " m · " + esc(m.base.nombre) + " " + m.base.alt.toLocaleString("es-ES") + ' m</p></div><div class="mt-mini">';
           dias.forEach(function (d) {
-            h += '<div><b>' + diaCorto(d.fecha) + "</b>" + icono(d.icono) + '<span class="mt-t"><i>' + n(d.tc_max, "°") + "</i> " + n(d.tc_min, "°") + '</span><span class="mt-s">' + (d.pr ? dec(d.pr) + " mm" : "&nbsp;") + '</span><span class="mt-s">' + n(d.wc_max) + " km/h</span></div>";
+            h += '<div><b>' + diaCorto(d.fecha) + "</b>" + icono(d.icono) + '<span class="mt-t"><i>' + n(d.tc_max, "°") + "</i> " + n(d.tc_min, "°") + '</span><span class="mt-s">' + precipDia(d, "&nbsp;") + '</span><span class="mt-s">' + n(d.wc_max) + " km/h</span></div>";
           });
           var ae = (m.aemet || []).filter(function (a) { return Date.parse(a.inicio) < Date.now() + 3 * 864e5; });
           h += "</div>" + (ae.length ? '<div class="mt-avisos">' + chipAemet(ae[0], true) + (ae.length > 1 ? '<span class="mt-s">+' + (ae.length - 1) + "</span>" : "") + "</div>" : "") + (av.length ? '<div class="mt-avisos">' + av.map(function (a) { return '<span class="mt-aviso">' + esc(a) + "</span>"; }).join("") + "</div>" : "") + "</a>";
@@ -386,7 +395,7 @@
       function tira() {
         return '<div class="mt-dias" role="tablist">' + dias.map(function (d, k) {
           return '<button type="button" role="tab" class="mt-dia' + (k === sel ? " on" : "") + (k >= 7 ? " mt-lejos" : "") + '" data-k="' + k + '" aria-selected="' + (k === sel) + '"><b>' + diaCorto(d.fecha) + (k >= 10 ? ' <em class="mt-tend">tendencia</em>' : "") + "</b><small>" + fFecha.format(fechaLocal(d.fecha)) + "</small>" + icono(d.icono) +
-            '<span class="mt-t" title="Cumbre: máxima / mínima"><i>' + n(d.tc_max, "°") + "</i> " + n(d.tc_min, "°") + '</span><span class="mt-s">' + (d.pr ? dec(d.pr) + " mm" : "Sin precip.") + '</span><span class="mt-s">' + flecha(d.wc_dir) + n(d.wc_max) + " km/h</span>" + (d.avisos && d.avisos.length ? '<span class="mt-pt" title="' + esc(d.avisos.join(" · ")) + '">!</span>' : "") + aemetPunto(d.fecha) + "</button>";
+            '<span class="mt-t" title="Cumbre: máxima / mínima"><i>' + n(d.tc_max, "°") + "</i> " + n(d.tc_min, "°") + '</span><span class="mt-s">' + precipDia(d, "Sin precip.") + '</span><span class="mt-s">' + flecha(d.wc_dir) + n(d.wc_max) + " km/h</span>" + (d.avisos && d.avisos.length ? '<span class="mt-pt" title="' + esc(d.avisos.join(" · ")) + '">!</span>' : "") + aemetPunto(d.fecha) + "</button>";
         }).join("") + "</div>";
       }
 
@@ -425,7 +434,7 @@
             pr = null; horas = 0;
             for (var j = i; j >= 0 && horas < 3; j--) { if (C.pr[j] != null) pr = (pr || 0) + C.pr[j]; horas += DUR[j]; }
           }
-          h += "<tr><td>" + fHora.format(T[i]) + "</td><td>" + icono(iconoTramo(C, i, horas, pr), noche) + "</td><td><b>" + n(C.tc[i], "°") + "</b>" + sens(C.tc[i], C.st && C.st[i]) + "</td><td>" + n(C.tv[i], "°") + sens(C.tv[i], C.sv && C.sv[i]) + "</td><td>" + (pr ? dec(pr) + " mm" : "–") + "</td><td>" + flecha(C.dc[i]) + n(C.wc[i]) + " km/h " + dir(C.dc[i]) + "</td><td>" + n(C.gv[i]) + " km/h</td>" + (hayNub ? NUB.map(function (a) { return celdaNube(C["n" + a][i]); }).join("") : "<td>" + n(C.cc[i], "%") + "</td>") + "<td>" + (C.i0[i] == null ? "–" : C.i0[i].toLocaleString("es-ES") + " m") + "</td><td>" + (C.sl[i] == null || !pr ? "–" : C.sl[i].toLocaleString("es-ES") + " m") + "</td></tr>";
+          h += "<tr><td>" + fHora.format(T[i]) + "</td><td>" + icono(iconoTramo(C, i, horas, pr), noche) + "</td><td><b>" + n(C.tc[i], "°") + "</b>" + sens(C.tc[i], C.st && C.st[i]) + "</td><td>" + n(C.tv[i], "°") + sens(C.tv[i], C.sv && C.sv[i]) + "</td><td>" + (pr ? precip(pr, esNieve(C, i)) : "–") + "</td><td>" + flecha(C.dc[i]) + n(C.wc[i]) + " km/h " + dir(C.dc[i]) + "</td><td>" + n(C.gv[i]) + " km/h</td>" + (hayNub ? NUB.map(function (a) { return celdaNube(C["n" + a][i]); }).join("") : "<td>" + n(C.cc[i], "%") + "</td>") + "<td>" + (C.i0[i] == null ? "–" : C.i0[i].toLocaleString("es-ES") + " m") + "</td><td>" + (C.sl[i] == null || !pr ? "–" : C.sl[i].toLocaleString("es-ES") + " m") + "</td></tr>";
         });
         h += "</tbody></table></div><p class=\"muted small\">La precipitación de cada fila es la caída desde la fila anterior (" + (m3 ? "3 horas" : "1 hora") + "); el resto, el valor a esa hora. Mediana de los modelos. En azul, junto a la temperatura, la sensación térmica (frío por viento o calor por humedad). Nubes a cada altitud: estimadas con la humedad del aire a esa altura; «–» si esa altitud queda bajo el terreno de la zona. Las primeras 72 horas van hora a hora (ECMWF solo da datos cada 3 horas: entre medias se interpola).</p>";
         return h;
@@ -489,14 +498,18 @@
           var p = C.pr[i] || 0;
           if (p >= 0.1) {  // barra de lluvia junto al eje inferior
             var w = (W - L - R) * DUR[i] * 36e5 / (tB - tA) * 0.7, h = Math.max(3, 60 * p / Math.max(prMax, 2));
-            g += '<rect x="' + (xc - w / 2).toFixed(1) + '" y="' + (Hh - B - h).toFixed(1) + '" width="' + w.toFixed(1) + '" height="' + h.toFixed(1) + '" fill="rgba(111,179,224,.75)" rx="2"><title>' + dec(p) + " mm</title></rect>";
+            g += '<rect x="' + (xc - w / 2).toFixed(1) + '" y="' + (Hh - B - h).toFixed(1) + '" width="' + w.toFixed(1) + '" height="' + h.toFixed(1) + '" fill="' + (esNieve(C, i) ? "rgba(235,242,250,.95)" : "rgba(111,179,224,.75)") + '" stroke="' + (esNieve(C, i) ? "#8fb8d8" : "none") + '" rx="2"><title>' + precip(p, esNieve(C, i)) + "</title></rect>";
           }
         });
-        var prDia = ix.slice(ix.length > 1 ? 1 : 0).reduce(function (a, i) { return a + (C.pr[i] || 0); }, 0);
-        if (prDia >= 0.1) g += '<text x="' + (W - R) + '" y="' + (T0 - 2) + '" class="mt-mg-p" style="text-anchor:end">Lluvia del día: ' + dec(prDia) + " mm</text>";
+        var prDia = 0, nvDia = 0;
+        ix.slice(ix.length > 1 ? 1 : 0).forEach(function (i) { var p = C.pr[i] || 0; if (esNieve(C, i)) nvDia += p; else prDia += p; });
+        var txt = [];
+        if (nvDia >= 0.5) txt.push("Nieve del día: " + Math.round(nvDia) + " cm");
+        if (prDia >= 0.1) txt.push("Lluvia del día: " + dec(prDia) + " mm");
+        if (txt.length) g += '<text x="' + (W - R) + '" y="' + (T0 - 2) + '" class="mt-mg-p" style="text-anchor:end">' + txt.join(" · ") + "</text>";
         g += "</svg>";
         return '<div class="mt-mgw">' + g + "</div>" + leyenda([{ c: "#e8574a", l: "Base · " + doc.base.nombre + " (" + doc.base.alt.toLocaleString("es-ES") + " m)" }, { c: "#6fb3e0", l: "Cumbre · " + doc.cumbre.nombre + " (" + doc.cumbre.alt.toLocaleString("es-ES") + " m)" }]) +
-          '<p class="muted small">Un icono por hora (a partir del 4.º día los modelos dan datos cada 3 horas); barras azules: lluvia o nieve de cada hora; franja clara: horas de luz; línea azul discontinua: 0 °C. Cambia de día en la tira de arriba.</p>';
+          '<p class="muted small">Un icono por hora (a partir del 4.º día los modelos dan datos cada 3 horas); barras azules: lluvia de cada hora (mm); barras blancas: nieve en cumbre (cm); franja clara: horas de luz; línea azul discontinua: 0 °C. Cambia de día en la tira de arriba.</p>';
       }
 
       function graficas() {
