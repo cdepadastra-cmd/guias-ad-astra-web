@@ -703,3 +703,5 @@ details.adv[open] summary{margin-bottom:14px}
 .gd-links{padding-left:18px;display:grid;gap:8px;margin:8px 0 12px}
 @media (max-width:900px){.gd-escala{grid-template-columns:1fr}.gd-dos{grid-template-columns:1fr}}
 .gd-pasos li{align-content:start}
+.mt-tabbar{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;margin:22px 0 12px}.mt-tabbar .mt-modo{margin:0}
+.gd-dos{margin-top:24px}
