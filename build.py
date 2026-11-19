@@ -48,7 +48,13 @@ NAV_ACT = [("Todas las actividades", "/actividades/"), ("Barranquismo", "/activi
            ("Alpinismo y ascensiones", "/actividades/?categoria=Ascensiones"), ("Espeleología", "/actividades/?categoria=Espeleología"), ("Escalada y boulder", "/actividades/?categoria=Escalada"),
            ("Senderismo", "/actividades/?categoria=Senderismo"), ("Travesías y viajes", "/actividades/?categoria=Travesías y viajes")]
 NAV_CUR = [("Todos los cursos", "/formacion-cursos/")] + [(c["disc_label"], "/actividades/%s/" % c["slug"]) for c in COURSES]
-NAV_HER = [("Meteorología de montaña", "/meteo/"), ("Estado de la nieve", "/nieve/"), ("Cómo leer la nieve y los aludes", "/como-leer-la-nieve-y-los-aludes/"), ("Caudal de barrancos", "/barrancos-caudal/"), ("Calculadora de rutas", "/calculadora-rutas/"), ("Cómo preparar la mochila", "/como-preparar-la-mochila/"), ("Teoría de las capas", "/teoria-de-las-capas/"), ("Topografía de barrancos", "/topografia-barrancos/"), ("Boulder en Las Tuerces", "/actividades/boulder-las-tuerces/"), ("Boulder en Zona Centro", "/actividades/boulder-zona-centro-salamanca-caceres/")]
+NAV_HER = [("Meteorología de montaña", "/meteo/"), ("Estado de la nieve", "/nieve/"), ("Caudal de barrancos", "/barrancos-caudal/"), ("Calculadora de rutas", "/calculadora-rutas/"), ("Topografía de barrancos", "/topografia-barrancos/"), ("Boulder en Las Tuerces", "/actividades/boulder-las-tuerces/"), ("Boulder en Zona Centro", "/actividades/boulder-zona-centro-salamanca-caceres/")]
+ARTICULOS = [
+    ("/como-leer-la-nieve-y-los-aludes/", "Cómo leer la nieve y el peligro de aludes", "Cómo cambia el manto, placas de viento, tipos de aludes, el boletín de AEMET y cómo leer una ladera.", "nieve"),
+    ("/como-preparar-la-mochila/", "Cómo preparar la mochila", "Cómo repartir el peso, cómo ajustarla y listas de material por actividad que vas tachando.", "mochila"),
+    ("/teoria-de-las-capas/", "La teoría de las capas", "Cómo vestirse para la montaña: base, intermedia, exterior y la capa de reserva, en viñetas.", "capas"),
+]
+NAV_ART = [("Todos los artículos", "/articulos/")] + [(t, h) for h, t, _, _ in ARTICULOS]
 NAV_OTR = [("Iniciativas de turismo rural", "/iniciativas-turismo-rural/"), ("Creación y mantenimiento de senderos", "/creacion-mantenimiento-senderos/"), ("Route setting", "/route-setting/"), ("Organización de eventos", "/actividades/organizacion-eventos-deportivos/"), ("Gredos Limpio", "/actividades/gredos-limpio/"),
            ("Oeste de Gredos", "/actividades/comarca-natural-oeste-de-gredos/"), ("Vía Verde Ruta de la Plata", "/actividades/via-verde-ruta-de-la-plata/")]
 
@@ -64,7 +70,7 @@ def header(active=""):
             '<button class="menu-toggle" aria-expanded="false" aria-controls="nav" aria-label="Abrir menú">☰</button>'
             '<nav class="nav" id="nav" aria-label="Principal">' + a("/", "Inicio", "inicio") +
             dd("Actividades", NAV_ACT, "act", active) + dd("Formación–Cursos", NAV_CUR, "cur", active) +
-            a("/actividades/alquiler-material-montana/", "Alquiler", "alq") + a("/calendario/", "Calendario", "cal") + dd("Herramientas", NAV_HER, "her", active) + dd("Otros", NAV_OTR, "otr", active) +
+            a("/actividades/alquiler-material-montana/", "Alquiler", "alq") + a("/calendario/", "Calendario", "cal") + dd("Herramientas", NAV_HER, "her", active) + dd("Artículos", NAV_ART, "art", active) + dd("Otros", NAV_OTR, "otr", active) +
             a("/sobre-nosotros/", "Nosotros", "nos") + a("/contacto/", "Contacto", "con") +
             '<a class="btn btn-primary" href="/calendario/">Reservar</a></nav></div></header>')
 
@@ -952,8 +958,8 @@ def build_mochila():
               "Arriba y en la tapa, lo que usas durante el día: chubasquero, botiquín, frontal, mapa.",
               "Reparte el peso igual a derecha e izquierda y rellena huecos para que nada se mueva.",
               "Por fuera, lo mínimo: todo lo que cuelga se engancha, se moja y desequilibra."]
-    body = (hero("Herramientas", "Cómo preparar la mochila", "Cómo repartir el peso para que la mochila no te tire hacia atrás, cómo ajustarla y una lista para cada actividad que vas tachando mientras la preparas.", img("afe67801-cf88-4cef-a3ac-e25e4e971634/senderismo-avila-gredos.webp"),
-                 [("Inicio", "/"), ("Cómo preparar la mochila", "")], '<a class="btn btn-primary" href="#lista">Ir a la lista</a><a class="btn btn-ghost" href="/teoria-de-las-capas/">Teoría de las capas</a>') +
+    body = (hero("Artículos", "Cómo preparar la mochila", "Cómo repartir el peso para que la mochila no te tire hacia atrás, cómo ajustarla y una lista para cada actividad que vas tachando mientras la preparas.", img("afe67801-cf88-4cef-a3ac-e25e4e971634/senderismo-avila-gredos.webp"),
+                 [("Inicio", "/"), ("Artículos", "/articulos/"), ("Cómo preparar la mochila", "")], '<a class="btn btn-primary" href="#lista">Ir a la lista</a><a class="btn btn-ghost" href="/teoria-de-las-capas/">Teoría de las capas</a>') +
             '<section class="section"><div class="wrap"><p class="eyebrow">El reparto del peso</p><h2>Lo pesado, pegado a la espalda</h2>'
             '<div class="gd-zonas"><figure><img src="/img/guias/mochila-zonas.webp" width="569" height="994" loading="lazy" alt="Senderista con la mochila abierta en corte: cada zona con su material y el centro de gravedad pegado a la espalda"></figure>'
             '<ol class="gd-ley">' + "".join('<li style="--c:%s"><span>%s</span><div><b>%s</b> %s<small>%s</small></div></li>' % z for z in ZONAS_MOCHILA) + '</ol></div>'
@@ -966,10 +972,10 @@ def build_mochila():
             '<div id="mo-app" class="mo"><p class="muted">Cargando la lista…</p></div></div></section>' +
             '<section class="section alt"><div class="wrap split"><div class="stack" style="gap:0">' + block("Preguntas frecuentes", faq_html(MOCHILA_FAQ)) +
             '</div><div class="sticky"><div class="panel"><p class="eyebrow">Con guía</p><p>En nuestras actividades te decimos qué traer y ponemos el material técnico. Si te falta algo, también lo <a href="/actividades/alquiler-material-montana/">alquilamos</a>.</p></div></div></div></section>')
-    ld = [crumbs_ld([("Inicio", "/"), ("Cómo preparar la mochila", path)]), faq_ld(MOCHILA_FAQ)]
+    ld = [crumbs_ld([("Inicio", "/"), ("Artículos", "/articulos/"), ("Cómo preparar la mochila", path)]), faq_ld(MOCHILA_FAQ)]
     page(path, "Cómo preparar la mochila de montaña y qué llevar | Ad Astra",
          "Cómo repartir el peso en la mochila, cómo ajustarla y listas de material para barrancos, escalada, alpinismo, senderismo, montañismo y vivac que puedes ir tachando.",
-         body, "her", ld, priority="0.6", scripts=COMIC_FONTS + '<script src="/js/mochila.js" defer></script>')
+         body, "art", ld, priority="0.6", scripts=COMIC_FONTS + '<script src="/js/mochila.js" defer></script>')
 
 
 
@@ -1043,8 +1049,8 @@ def build_leer_nieve():
                ("Palea", "Empieza un poco por debajo de la sonda, en forma de V, cambiando de palista. Libera primero la cara y las vías respiratorias.")]
     seccion = lambda eyebrow, h2, inner, alt=False, ide="": '<section class="section%s"%s><div class="wrap"><p class="eyebrow">%s</p><h2>%s</h2>%s</div></section>' % (" alt" if alt else "", ' id="%s"' % ide if ide else "", eyebrow, h2, inner)
     tarjetas = lambda items: '<div class="gd-capas">' + "".join('<article style="--c:%s"><h3>%s</h3><p>%s</p></article>' % (c, e(t), e(x)) for t, c, x in items) + "</div>"
-    body = (hero("Herramientas", "Cómo leer la nieve y el peligro de aludes", "Cómo cambia el manto, cómo se forman las placas de viento, los tipos de aludes y cómo leer una ladera antes de meterte en ella. Lo que miramos los guías cada día de invierno.", METEO_IMG,
-                 [("Inicio", "/"), ("Cómo leer la nieve", "")], '<a class="btn btn-primary" href="#laderas">Leer una ladera</a><a class="btn btn-ghost" href="#boletin">El parte de AEMET</a>') +
+    body = (hero("Artículos", "Cómo leer la nieve y el peligro de aludes", "Cómo cambia el manto, cómo se forman las placas de viento, los tipos de aludes y cómo leer una ladera antes de meterte en ella. Lo que miramos los guías cada día de invierno.", METEO_IMG,
+                 [("Inicio", "/"), ("Artículos", "/articulos/"), ("Cómo leer la nieve", "")], '<a class="btn btn-primary" href="#laderas">Leer una ladera</a><a class="btn btn-ghost" href="#boletin">El parte de AEMET</a>') +
             '<section class="section"><div class="wrap"><div class="panel" style="border-color:#e8574a"><p class="eyebrow" style="color:#e8574a">Antes de nada</p><p>Esta guía sirve para entender lo que ves y lo que dice el boletín, pero <b>no sustituye a un curso de nieve y aludes</b> ni a la experiencia. En terreno de aludes ve siempre con ARVA, pala y sonda, sabiendo usarlos y acompañado.</p></div></div></section>' +
             seccion("El manto", "La nieve cambia en cuanto cae",
                     '<p class="lead-p">El manto es una pila de capas, una por cada nevada, episodio de viento o de calor. Dentro, los cristales se transforman sin parar (es lo que se llama metamorfismo) y eso decide si las capas se unen entre sí o si queda una débil entre dos fuertes. Un alud de placa necesita las dos cosas: una capa cohesiva arriba y una débil debajo.</p>'
@@ -1106,10 +1112,28 @@ def build_leer_nieve():
             '<li><a href="/nieve/">Estado de la nieve</a> y <a href="/meteo/">meteorología</a> de nuestras sierras</li></ul>'
             '<p class="small muted">Problemas típicos y escala de peligro según el <a href="https://www.avalanches.org/" target="_blank" rel="noopener">EAWS</a> (servicios europeos de aviso de aludes).</p></div>'
             '<div class="panel" style="margin-top:16px"><p class="eyebrow">Aprende con guías</p><p>En nuestros <a href="/actividades/cursos-alpinismo/">cursos de alpinismo</a> practicamos sobre el terreno la lectura de la nieve, el uso del ARVA y el rescate.</p></div></div></div></section>')
-    ld = [crumbs_ld([("Inicio", "/"), ("Cómo leer la nieve", path)]), faq_ld(LEER_NIEVE_FAQ)]
+    ld = [crumbs_ld([("Inicio", "/"), ("Artículos", "/articulos/"), ("Cómo leer la nieve", path)]), faq_ld(LEER_NIEVE_FAQ)]
     page(path, "Cómo leer la nieve: manto, placas de viento y aludes | Ad Astra",
          "Guía para entender la nieve: cómo cambia el manto, placas de viento, tipos de aludes, los problemas típicos y la escala de peligro, cómo leer una ladera y qué hacer si ocurre un alud.",
-         body, "her", ld, priority="0.6")
+         body, "art", ld, priority="0.6")
+
+
+ART_ICO = {
+    "nieve": '<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M4 54 L24 22 L32 32 L40 18 L60 54Z" fill="#6b5a4a"/><path d="M24 22 L18 32 L24 30 L28 34 L32 32Z M40 18 L35 27 L40 25 L44 29 L47 28Z" fill="#fff"/><path d="M40 18 L60 54 L50 54 L44 40Z" fill="#e8574a" opacity=".55"/></svg>',
+    "mochila": '<svg viewBox="0 0 64 64" aria-hidden="true"><rect x="16" y="12" width="32" height="44" rx="10" fill="#e9a53b"/><rect x="20" y="30" width="24" height="14" rx="4" fill="#c27f1f"/><path d="M24 12 Q32 2 40 12" fill="none" stroke="#8a5a14" stroke-width="4"/><rect x="16" y="18" width="32" height="8" rx="3" fill="#c27f1f"/></svg>',
+    "capas": '<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M14 20 L24 12 H40 L50 20 L46 28 L42 26 V54 H22 V26 L18 28Z" fill="#6fb3e0"/><path d="M22 26 V54 H42 V26" fill="none" stroke="#e9a53b" stroke-width="4"/><path d="M28 12 Q32 18 36 12" fill="none" stroke="#7cc47f" stroke-width="4"/></svg>',
+}
+
+
+def build_articulos():
+    path = "/articulos/"
+    cards = "".join('<a class="art-card" href="%s"><span class="art-ico">%s</span><div><h2>%s</h2><p>%s</p><span class="art-mas">Leer el artículo →</span></div></a>' % (h, ART_ICO[ic], e(t), e(d)) for h, t, d, ic in ARTICULOS)
+    body = (hero("Artículos", "Artículos de montaña", "Guías prácticas escritas por nuestros guías: nieve y aludes, cómo preparar la mochila, cómo vestirse para la montaña y más.", METEO_IMG,
+                 [("Inicio", "/"), ("Artículos", "")]) +
+            '<section class="section"><div class="wrap"><div class="art-grid">' + cards + '</div></div></section>')
+    page(path, "Artículos de montaña: nieve, aludes, mochila y capas | Ad Astra",
+         "Guías prácticas de montaña de Guías Ad Astra: cómo leer la nieve y el peligro de aludes, cómo preparar la mochila y la teoría de las capas.",
+         body, "art", [crumbs_ld([("Inicio", "/"), ("Artículos", path)])], priority="0.6")
 
 
 PRENDAS = {
@@ -1135,8 +1159,8 @@ def build_capas():
                 "Lo que sobra, a la mochila: es mejor parar un minuto que empaparse.",
                 "Ventila: abre cremalleras al subir y ciérralas en las crestas con viento.",
                 "Lleva siempre una capa seca de recambio y, en invierno, guantes de repuesto."]
-    body = (hero("Herramientas", "La teoría de las capas", "Cómo vestirse para la montaña: tres capas que se ponen y se quitan según el esfuerzo y el tiempo, más una de reserva para las paradas. Explicado en viñetas.", METEO_IMG,
-                 [("Inicio", "/"), ("Teoría de las capas", "")], '<a class="btn btn-primary" href="#vinetas">Ver las viñetas</a><a class="btn btn-ghost" href="/como-preparar-la-mochila/">Preparar la mochila</a>') +
+    body = (hero("Artículos", "La teoría de las capas", "Cómo vestirse para la montaña: tres capas que se ponen y se quitan según el esfuerzo y el tiempo, más una de reserva para las paradas. Explicado en viñetas.", METEO_IMG,
+                 [("Inicio", "/"), ("Artículos", "/articulos/"), ("Teoría de las capas", "")], '<a class="btn btn-primary" href="#vinetas">Ver las viñetas</a><a class="btn btn-ghost" href="/como-preparar-la-mochila/">Preparar la mochila</a>') +
             '<section class="section" id="vinetas"><div class="wrap"><p class="eyebrow">La idea</p><h2>Varias capas finas abrigan más que una gorda</h2>'
             '<p class="lead-p">El aire que queda entre capa y capa también aísla, y con varias prendas puedes ajustar el abrigo a cada momento: quitar al subir, poner al parar. El objetivo es estar seco y a buena temperatura todo el día.</p>'
             '<div class="gd-fig gd-cm">' + guias_svg.capas_comic() + '</div>'
@@ -1148,10 +1172,10 @@ def build_capas():
             '<ul class="gd-reglas">' + "".join("<li>%s</li>" % e(x) for x in consejos) + '</ul></div></section>' +
             '<section class="section alt"><div class="wrap split"><div class="stack" style="gap:0">' + block("Preguntas frecuentes", faq_html(CAPAS_FAQ)) +
             '</div><div class="sticky"><div class="panel"><p class="eyebrow">Fuentes</p><p class="small">Basado en las guías de <a href="https://www.salomon.com/es-es/running/trail-running-advice/how-properly-dress-layers-the-three-layer-system/" rel="noopener" target="_blank">Salomon</a> y <a href="https://www.iloveski.org/es/2021/10/01/sistema-por-capas-vestirse-en-la-montana/" rel="noopener" target="_blank">iLoveSki</a> y en la experiencia de nuestros guías.</p></div></div></div></section>')
-    ld = [crumbs_ld([("Inicio", "/"), ("Teoría de las capas", path)]), faq_ld(CAPAS_FAQ)]
+    ld = [crumbs_ld([("Inicio", "/"), ("Artículos", "/articulos/"), ("Teoría de las capas", path)]), faq_ld(CAPAS_FAQ)]
     page(path, "Teoría de las capas: cómo vestirse para la montaña | Ad Astra",
          "La teoría de las tres capas (base, intermedia y exterior) más la capa de reserva, explicada con viñetas: qué ponerse según la temperatura y errores típicos.",
-         body, "her", ld, priority="0.6", scripts=COMIC_FONTS)
+         body, "art", ld, priority="0.6", scripts=COMIC_FONTS)
 
 
 def build_caudales():
@@ -1333,7 +1357,7 @@ def main():
     cfg = os.path.join(OUT, "config.js")
     c = open(cfg, encoding="utf-8").read().replace('calendarioURL: ""', 'calendarioURL: "",\n  // Carpeta donde está publicada la web ("" si está en la raíz del dominio)\n  base: "%s"' % BASE)
     open(cfg, "w", encoding="utf-8").write(c)
-    build_home(); build_activities_index(); build_courses_index(); build_calendar(); build_rental(); build_about(); build_contact(); build_404(); build_calculator(); build_topografia(); build_meteo(); build_caudales(); build_nieve(); build_mochila(); build_capas(); build_leer_nieve()
+    build_home(); build_activities_index(); build_courses_index(); build_calendar(); build_rental(); build_about(); build_contact(); build_404(); build_calculator(); build_topografia(); build_meteo(); build_caudales(); build_nieve(); build_mochila(); build_capas(); build_leer_nieve(); build_articulos()
     for a in ACTIVITIES:
         build_activity(a)
     build_ascensiones_macizos()

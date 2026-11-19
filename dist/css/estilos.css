@@ -705,3 +705,10 @@ details.adv[open] summary{margin-bottom:14px}
 .gd-pasos li{align-content:start}
 .mt-tabbar{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;margin:22px 0 12px}.mt-tabbar .mt-modo{margin:0}
 .gd-dos{margin-top:24px}
+.art-grid{display:grid;gap:16px;max-width:900px}
+.art-card{display:grid;grid-template-columns:72px 1fr;gap:18px;align-items:start;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:20px;color:inherit;text-decoration:none;transition:border-color .2s,transform .2s}
+.art-card:hover{border-color:var(--gold);transform:translateY(-2px)}
+.art-ico svg{width:72px;height:72px;display:block}
+.art-card h2{font-size:1.35rem;margin:0 0 6px}
+.art-card p{margin:0 0 10px;color:var(--dim)}
+.art-mas{color:var(--gold);font-weight:700;font-size:.9rem}
