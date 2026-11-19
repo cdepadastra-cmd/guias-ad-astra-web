@@ -666,7 +666,7 @@ def series_modelo(m, eje, orog_proxy):
         orog_v = orog_proxy
     for k, mac in enumerate(MACIZOS):
         b, c = 2 * k, 2 * k + 1
-        s = {x: [] for x in ("tv", "tc", "wc", "dc", "wv", "gv", "pr", "cc", "i0", "sl", "cp", "sv", "st", "sn", "snb") + tuple("n%d" % h for h in ALTURAS_NUBES)}
+        s = {x: [] for x in ("tv", "tc", "wc", "dc", "wv", "db", "gv", "gc", "pr", "prb", "prc", "cc", "i0", "sl", "cp", "sv", "st", "sn", "snb") + tuple("n%d" % h for h in ALTURAS_NUBES)}
         for ii, t in enumerate(eje):
             g = lambda var, p: (lambda a: None if a is None else float(a[p]))(en_tiempo(m.campos.get(var), t))
             t2b, t2c = g("t2", b), g("t2", c)
@@ -694,15 +694,19 @@ def series_modelo(m, eje, orog_proxy):
                 dc = (math.degrees(math.atan2(-uc, -vc)) + 360) % 360
             u10b, v10b = g("u10", b), g("v10", b)
             wv = None if u10b is None or v10b is None else math.hypot(u10b, v10b) * 3.6
-            gb = g("gust", b)
+            db = None if u10b is None or v10b is None else (math.degrees(math.atan2(-u10b, -v10b)) + 360) % 360
+            gb, gcc = g("gust", b), g("gust", c)
             gv = None if gb is None else gb * 3.6
+            gc_ = None if gcc is None else gcc * 3.6
             # precipitación de las 3 h anteriores (media de base y cumbre)
             tprev = eje[ii - 1] if ii else t - dt.timedelta(hours=1)
             a1, a0 = en_tiempo(m.acc, t, 6), en_tiempo(m.acc, tprev, 6)
-            pr = None
+            pr = prb = prc = None
             if a1 is not None and a0 is not None:
-                pr = float((a1[b] - a0[b] + a1[c] - a0[c]) / 2)
-                pr = None if math.isnan(pr) else max(0.0, pr)
+                prb, prc = float(a1[b] - a0[b]), float(a1[c] - a0[c])
+                prb = None if math.isnan(prb) else max(0.0, prb)
+                prc = None if math.isnan(prc) else max(0.0, prc)
+                pr = None if prb is None or prc is None else (prb + prc) / 2
             ccb, ccc = g("tcc", b), g("tcc", c)
             cc = None if ccb is None and ccc is None else np.nanmean([x for x in (ccb, ccc) if x is not None])
             i0 = g("iso0", c)
@@ -733,7 +737,7 @@ def series_modelo(m, eje, orog_proxy):
                 nub["n%d" % hh] = None if rr_ is None else r(nube_por_humedad(rr_))
             # espesor de nieve del modelo (cm) en el punto de rejilla de la cumbre y de la base
             snc, snb_ = g("snd", c), g("snd", b)
-            vals = dict(sn=None if snc is None else r(max(0.0, snc)), snb=None if snb_ is None else r(max(0.0, snb_)), tv=r(tv, 1), tc=r(tc, 1), wc=r(wc), dc=r(dc), wv=r(wv), gv=r(gv), pr=r(pr, 1), cc=r(cc), sv=r(sv), st=r(st_), **nub,
+            vals = dict(sn=None if snc is None else r(max(0.0, snc)), snb=None if snb_ is None else r(max(0.0, snb_)), tv=r(tv, 1), tc=r(tc, 1), wc=r(wc), dc=r(dc), wv=r(wv), db=r(db), gv=r(gv), gc=r(gc_), pr=r(pr, 1), prb=r(prb, 1), prc=r(prc, 1), cc=r(cc), sv=r(sv), st=r(st_), **nub,
                         i0=None if i0 is None else int(round(i0 / 10.0) * 10), sl=None if sl is None else int(round(sl / 10.0) * 10), cp=r(cp))
             for x in s:
                 s[x].append(vals[x])
@@ -767,17 +771,18 @@ def dias(eje, modelos_series, mac_id):
     """Resumen por día local (consenso = mediana de los modelos disponibles)."""
     ms = {m: s[mac_id] for m, s in modelos_series.items()}
     n = len(eje)
-    claves = ("tv", "tc", "wc", "dc", "wv", "gv", "pr", "cc", "i0", "sl", "cp", "sv", "st", "sn", "snb") + tuple("n%d" % h for h in ALTURAS_NUBES)
+    claves = ("tv", "tc", "wc", "dc", "wv", "db", "gv", "gc", "pr", "prb", "prc", "cc", "i0", "sl", "cp", "sv", "st", "sn", "snb") + tuple("n%d" % h for h in ALTURAS_NUBES)
     cons = {x: [mediana([ms[m].get(x, [None] * n)[i] for m in ms]) for i in range(n)] for x in claves}
-    def dir_media(i):  # media circular de la dirección del viento
-        d = [ms[m]["dc"][i] for m in ms if ms[m]["dc"][i] is not None]
+    def dir_media(i, k="dc"):  # media circular de la dirección del viento
+        d = [ms[m].get(k, [None] * n)[i] for m in ms if ms[m].get(k, [None] * n)[i] is not None]
         if not d:
             return None
         sx, sy = sum(math.sin(math.radians(v)) for v in d), sum(math.cos(math.radians(v)) for v in d)
         return (math.degrees(math.atan2(sx, sy)) + 360) % 360
     cons["dc"] = [dir_media(i) for i in range(n)]
+    cons["db"] = [dir_media(i, "db") for i in range(n)]
     for x in cons:
-        nd = 1 if x in ("tv", "tc", "pr") else 0
+        nd = 1 if x in ("tv", "tc", "pr", "prb", "prc") else 0
         cons[x] = [None if v is None else (round(v, 1) if nd else (int(round(v / 10.0) * 10) if x in ("i0", "sl") else int(round(v)))) for v in cons[x]]
     grupos = {}
     dur = [(eje[i] - eje[i - 1]).total_seconds() / 3600 if i else 1.0 for i in range(n)]
@@ -791,8 +796,13 @@ def dias(eje, modelos_series, mac_id):
         val = lambda x: [cons[x][i] for i in idx if cons[x][i] is not None]
         prs = val("pr")
         pr = round(sum(prs), 1) if prs else None
-        nieve_c = sum((cons["pr"][i] or 0) for i in idx if cons["tc"][i] is not None and cons["tc"][i] <= 0.5)
-        nieve_b = sum((cons["pr"][i] or 0) for i in idx if cons["tv"][i] is not None and cons["tv"][i] <= 1.0)
+        # precipitación en cada punto (si un modelo antiguo no la trae, la media de los dos)
+        pc_ = [cons["prc"][i] if cons["prc"][i] is not None else cons["pr"][i] for i in idx]
+        pb_ = [cons["prb"][i] if cons["prb"][i] is not None else cons["pr"][i] for i in idx]
+        pr_c = round(sum(v for v in pc_ if v is not None), 1) if any(v is not None for v in pc_) else None
+        pr_b = round(sum(v for v in pb_ if v is not None), 1) if any(v is not None for v in pb_) else None
+        nieve_c = sum((pc_[k] or 0) for k, i in enumerate(idx) if cons["tc"][i] is not None and cons["tc"][i] <= 0.5)
+        nieve_b = sum((pb_[k] or 0) for k, i in enumerate(idx) if cons["tv"][i] is not None and cons["tv"][i] <= 1.0)
         # tormenta: algún modelo con CAPE >= 500 J/kg y precipitación >= 0,3 mm en el mismo tramo
         votos = 0
         for m in ms:
@@ -802,7 +812,9 @@ def dias(eje, modelos_series, mac_id):
         nubes = sum(diurnas) / len(diurnas) if diurnas else None
         wcs = [(cons["wc"][i], cons["dc"][i]) for i in idx if cons["wc"][i] is not None]
         wmax = max(wcs) if wcs else (None, None)
-        gvs = val("gv")
+        wbs = [(cons["wv"][i], cons["db"][i]) for i in idx if cons["wv"][i] is not None]
+        wbmax = max(wbs) if wbs else (None, None)
+        gvs, gcs = val("gv"), val("gc")
         tc, tv, i0 = val("tc"), val("tv"), val("i0")
         # acuerdo entre modelos (precipitación del día y máxima en cumbre)
         prm, tmm = [], []
@@ -843,7 +855,10 @@ def dias(eje, modelos_series, mac_id):
             "tc_min": r(min(tc), 0) if tc else None, "tc_max": r(max(tc), 0) if tc else None,
             "st_min": r(min(val("st")), 0) if val("st") else None, "sv_min": r(min(val("sv")), 0) if val("sv") else None, "sv_max": r(max(val("sv")), 0) if val("sv") else None,
             "wc_max": r(wmax[0]), "wc_dir": r(wmax[1]), "gv_max": r(max(gvs)) if gvs else None,
-            "pr": pr, "nieve_c": round(nieve_c), "nieve_b": round(nieve_b),
+            "pr": pr, "nieve_c": round(nieve_c), "nieve_b": round(nieve_b), "pr_c": pr_c, "pr_b": pr_b,
+            "icono_c": icono(pr_c, nieve_c >= max(0.3, 0.5 * (pr_c or 0)), votos >= 2 or (votos == 1 and len(ms) == 1), nubes),
+            "icono_b": icono(pr_b, nieve_b >= max(0.3, 0.5 * (pr_b or 0)), votos >= 2 or (votos == 1 and len(ms) == 1), nubes),
+            "wv_max": r(wbmax[0]), "wv_dir": r(wbmax[1]), "gc_max": r(max(gcs)) if gcs else None,
             "i0_min": min(i0) if i0 else None, "i0_max": max(i0) if i0 else None,
             "nubes": r(nubes), "tormenta": votos, "acuerdo": acuerdo, "avisos": avisos,
         })
