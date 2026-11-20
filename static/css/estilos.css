@@ -854,3 +854,15 @@ input[type=radio],input[type=checkbox]{width:auto;padding:0}
 .gx-sw{display:inline-flex;border:1px solid var(--line-2);border-radius:999px;overflow:hidden}
 .gx-sw button{border:0;background:transparent;color:var(--fg);padding:7px 12px;font-size:.82rem;cursor:pointer}
 .gx-sw button.on{background:var(--gold);color:#1b120c;font-weight:700}
+.rel{border-top:1px solid var(--line)}
+.rel-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-top:18px}
+.rel-card{display:grid;gap:6px;align-content:start;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px;color:inherit;transition:border-color .2s,transform .2s}
+.rel-card:hover{border-color:var(--gold);transform:translateY(-2px)}
+.rel-card small{font:600 .72rem/1 var(--label);letter-spacing:.16em;text-transform:uppercase;color:var(--gold)}
+.rel-card b{font-size:1.05rem}.rel-card span{font-size:.88rem;color:var(--muted);line-height:1.5}
+.rel-mas{margin-top:18px;font-size:.92rem}
+.art-grid2{grid-template-columns:repeat(2,minmax(0,1fr));max-width:none}
+.lista-cta{display:flex;flex-wrap:wrap;gap:18px 30px;align-items:center;justify-content:space-between}
+.lista-cta > div{max-width:640px}.lista-cta h2{margin:6px 0 8px}
+@media (max-width:900px){.rel-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.art-grid2{grid-template-columns:1fr}}
+@media (max-width:520px){.rel-grid{grid-template-columns:1fr}}

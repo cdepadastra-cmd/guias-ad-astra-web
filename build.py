@@ -12,7 +12,8 @@ TODAY = datetime.date.today().isoformat()
 PAGES = []  # (path, priority) para el sitemap
 import hashlib
 _ST = os.path.join(os.path.dirname(os.path.abspath(__file__)), "static")
-VER = {a: hashlib.md5(open(os.path.join(_ST, a), "rb").read()).hexdigest()[:8] for a in ("css/estilos.css", "js/app.js", "js/calculadora.js", "js/topografia.js", "js/meteo.js", "js/rios.js", "js/nieve.js", "js/mochila.js", "config.js")}
+ASSETS = ("css/estilos.css", "js/app.js", "js/calculadora.js", "js/topografia.js", "js/meteo.js", "js/rios.js", "js/nieve.js", "js/mochila.js", "js/gpx.js", "js/video3d.js", "config.js")
+VER = {a: hashlib.md5(open(os.path.join(_ST, a), "rb").read()).hexdigest()[:8] for a in ASSETS}
 
 def e(s):
     return html.escape(str(s), quote=True)
@@ -36,6 +37,44 @@ ORG = {
     "founder": {"@type": "Person", "name": "Jairo Hernández"},
 }
 
+RELACION = {  # qué enlazar al final de cada herramienta y artículo
+    "/meteo/": ["/nieve/", "/barrancos-caudal/", "/calculadora-rutas/", "/como-leer-la-nieve-y-los-aludes/"],
+    "/nieve/": ["/meteo/", "/como-leer-la-nieve-y-los-aludes/", "/lista-material-montana/", "/teoria-de-las-capas/"],
+    "/barrancos-caudal/": ["/meteo/", "/topografia-barrancos/", "/lista-material-montana/", "/como-preparar-la-mochila/"],
+    "/calculadora-rutas/": ["/editor-gpx/", "/video-ruta-3d/", "/meteo/", "/lista-material-montana/"],
+    "/editor-gpx/": ["/video-ruta-3d/", "/calculadora-rutas/", "/meteo/", "/como-preparar-la-mochila/"],
+    "/video-ruta-3d/": ["/editor-gpx/", "/calculadora-rutas/", "/meteo/", "/teoria-de-las-capas/"],
+    "/lista-material-montana/": ["/como-preparar-la-mochila/", "/teoria-de-las-capas/", "/meteo/", "/calculadora-rutas/"],
+    "/topografia-barrancos/": ["/barrancos-caudal/", "/lista-material-montana/", "/meteo/", "/editor-gpx/"],
+    "/como-leer-la-nieve-y-los-aludes/": ["/nieve/", "/meteo/", "/teoria-de-las-capas/", "/lista-material-montana/"],
+    "/como-preparar-la-mochila/": ["/lista-material-montana/", "/teoria-de-las-capas/", "/calculadora-rutas/", "/meteo/"],
+    "/teoria-de-las-capas/": ["/como-preparar-la-mochila/", "/lista-material-montana/", "/meteo/", "/como-leer-la-nieve-y-los-aludes/"],
+}
+
+
+def relacionados(path):
+    if path not in RELACION:
+        return ""
+    todo = {h: (t, d, "Herramienta") for h, t, d, _ in HERRAMIENTAS}
+    todo.update({h: (t, d, "Artículo") for h, t, d, _ in ARTICULOS})
+    cards = "".join('<a class="rel-card" href="%s"><small>%s</small><b>%s</b><span>%s</span></a>' % (h, todo[h][2], e(todo[h][0]), e(todo[h][1])) for h in RELACION[path] if h in todo)
+    return ('<section class="section rel"><div class="wrap"><p class="eyebrow">Sigue explorando</p><h2>Herramientas y artículos relacionados</h2><div class="rel-grid">' + cards +
+            '</div><p class="rel-mas"><a href="/herramientas/">Todas las herramientas</a> · <a href="/articulos/">Todos los artículos</a></p></div></section>')
+
+
+def articulo_ld(path, titulo, desc, publicado):
+    slug = path.strip("/")
+    return {"@context": "https://schema.org", "@type": "Article", "headline": titulo, "description": desc, "inLanguage": "es",
+            "image": D + "/img/og/" + slug + ".png", "datePublished": publicado, "dateModified": TODAY,
+            "author": {"@type": "Person", "name": "Jairo Hernández", "url": D + "/sobre-nosotros/", "jobTitle": "Guía de montaña"},
+            "publisher": {"@id": D + "/#empresa"}, "mainEntityOfPage": url(path)}
+
+
+def app_ld(path, nombre, desc, cat="UtilitiesApplication"):
+    return {"@context": "https://schema.org", "@type": "WebApplication", "name": nombre, "url": url(path), "applicationCategory": cat, "operatingSystem": "Web",
+            "description": desc, "inLanguage": "es", "isAccessibleForFree": True, "offers": {"@type": "Offer", "price": 0, "priceCurrency": "EUR"}, "provider": {"@id": D + "/#empresa"}}
+
+
 def crumbs_ld(items):
     return {"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [
         {"@type": "ListItem", "position": i + 1, "name": n, "item": url(p)} for i, (n, p) in enumerate(items)]}
@@ -48,11 +87,21 @@ NAV_ACT = [("Todas las actividades", "/actividades/"), ("Barranquismo", "/activi
            ("Alpinismo y ascensiones", "/actividades/?categoria=Ascensiones"), ("Espeleología", "/actividades/?categoria=Espeleología"), ("Escalada y boulder", "/actividades/?categoria=Escalada"),
            ("Senderismo", "/actividades/?categoria=Senderismo"), ("Travesías y viajes", "/actividades/?categoria=Travesías y viajes")]
 NAV_CUR = [("Todos los cursos", "/formacion-cursos/"), ("Calendario de cursos", "/calendario/")] + [(c["disc_label"], "/actividades/%s/" % c["slug"]) for c in COURSES]
-NAV_HER = [("Meteorología de montaña", "/meteo/"), ("Estado de la nieve", "/nieve/"), ("Caudal de barrancos", "/barrancos-caudal/"), ("Calculadora de rutas", "/calculadora-rutas/"), ("Editor GPX", "/editor-gpx/"), ("Vídeo 3D de la ruta", "/video-ruta-3d/"), ("Topografía de barrancos", "/topografia-barrancos/"), ("Boulder en Las Tuerces", "/actividades/boulder-las-tuerces/"), ("Boulder en Zona Centro", "/actividades/boulder-zona-centro-salamanca-caceres/")]
+NAV_HER = [("Todas las herramientas", "/herramientas/"), ("Meteorología de montaña", "/meteo/"), ("Estado de la nieve", "/nieve/"), ("Caudal de barrancos", "/barrancos-caudal/"), ("Calculadora de rutas", "/calculadora-rutas/"), ("Editor GPX", "/editor-gpx/"), ("Vídeo 3D de la ruta", "/video-ruta-3d/"), ("Lista de material", "/lista-material-montana/"), ("Topografía de barrancos", "/topografia-barrancos/"), ("Boulder en Las Tuerces", "/actividades/boulder-las-tuerces/"), ("Boulder en Zona Centro", "/actividades/boulder-zona-centro-salamanca-caceres/")]
 ARTICULOS = [
     ("/como-leer-la-nieve-y-los-aludes/", "Cómo leer la nieve y el peligro de aludes", "Cómo cambia el manto, placas de viento, tipos de aludes, el boletín de AEMET y cómo leer una ladera.", "nieve"),
-    ("/como-preparar-la-mochila/", "Cómo preparar la mochila", "Cómo repartir el peso, cómo ajustarla y listas de material por actividad que vas tachando.", "mochila"),
+    ("/como-preparar-la-mochila/", "Cómo preparar la mochila", "Dónde va cada cosa, por qué lo pesado va pegado a la espalda y cómo ajustar las correas, con ilustraciones.", "mochila"),
     ("/teoria-de-las-capas/", "La teoría de las capas", "Cómo vestirse para la montaña: base, intermedia, exterior y la capa de reserva, en viñetas.", "capas"),
+]
+HERRAMIENTAS = [
+    ("/meteo/", "Meteorología de montaña", "Previsión a 15 días en cumbre y base para 27 macizos, con viento, nieve, isocero, avisos de AEMET y webcams.", "meteo"),
+    ("/nieve/", "Estado de la nieve", "Nieve reciente, placas de viento, costras y nieve húmeda estimadas cada día por macizo, con mapa.", "nieve"),
+    ("/barrancos-caudal/", "Caudal de barrancos", "Caudal en tiempo real de los barrancos del Jerte, Mazobre y Valporquero con su estado para hacerlos.", "caudal"),
+    ("/calculadora-rutas/", "Calculadora de rutas MIDE", "Tiempo de una ruta por distancia y desnivel, o a partir de tu GPX, con perfil y ficha descargables.", "calc"),
+    ("/editor-gpx/", "Editor GPX", "Une, divide y corrige tracks, dibuja tramos, añade waypoints y descarga mapa y perfil en imagen.", "gpx"),
+    ("/video-ruta-3d/", "Vídeo 3D de la ruta", "Crea un vídeo de tu ruta sobre el relieve en 3D, con perfil, datos y waypoints. Tipo Relive, gratis.", "video"),
+    ("/lista-material-montana/", "Lista de material", "Qué llevar en la mochila para barrancos, escalada, alpinismo, senderismo, montañismo o vivac, para ir tachando.", "lista"),
+    ("/topografia-barrancos/", "Topografía de barrancos", "Dibuja el croquis de un barranco con rápeles y destrepes y calcula la cuerda necesaria.", "topo"),
 ]
 NAV_ART = [("Todos los artículos", "/articulos/")] + [(t, h) for h, t, _, _ in ARTICULOS]
 NAV_OTR = [("Iniciativas de turismo rural", "/iniciativas-turismo-rural/"), ("Creación y mantenimiento de senderos", "/creacion-mantenimiento-senderos/"), ("Route setting", "/route-setting/"), ("Organización de eventos", "/actividades/organizacion-eventos-deportivos/"), ("Gredos Limpio", "/actividades/gredos-limpio/"),
@@ -89,7 +138,11 @@ def page(path, title, desc, body, active="", ld=None, og_type="website", image=N
     ld = list(ld or [])
     if path != "/404" and not any(isinstance(x, dict) and x.get("@id") == D + "/#empresa" for x in ld):
         ld.append({"@context": "https://schema.org", "@type": "Organization", "@id": D + "/#empresa", "name": SITE["name"], "url": D + "/", "logo": ORG["logo"], "sameAs": [SITE["instagram"], SITE["facebook"]]})
+    slug = path.strip("/").replace("/", "-")
+    if not image and slug and os.path.exists(os.path.join(_ST, "img", "og", slug + ".png")):
+        image = D + "/img/og/" + slug + ".png"
     image = image or SITE["og_image"]
+    body = body + relacionados(path)
     lds = "".join('<script type="application/ld+json">%s</script>' % json.dumps(x, ensure_ascii=False) for x in ld)
     doc = ('<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">'
            '<title>%s</title><meta name="description" content="%s">' % (e(title), e(desc)) +
@@ -104,7 +157,7 @@ def page(path, title, desc, body, active="", ld=None, og_type="website", image=N
            '<link rel="stylesheet" href="/css/estilos.css"><link rel="icon" href="/favicon.ico" sizes="any"><link rel="icon" href="/img/favicon-32.png" type="image/png" sizes="32x32"><link rel="icon" href="/img/favicon-48.png" type="image/png" sizes="48x48"><link rel="icon" href="/img/favicon-192.png" type="image/png" sizes="192x192"><link rel="apple-touch-icon" href="/img/apple-touch-icon.png">' + head + lds +
            '</head><body>' + header(active) + '<main id="contenido">' + body + '</main>' + footer() +
            '<script src="/config.js"></script><script src="/js/app.js" defer></script>' + scripts + '</body></html>')
-    for asset in ("css/estilos.css", "js/app.js", "js/calculadora.js", "js/topografia.js", "js/meteo.js", "js/rios.js", "js/nieve.js", "js/mochila.js", "config.js"):
+    for asset in ASSETS:
         doc = doc.replace('"/%s"' % asset, '"/%s?v=%s"' % (asset, VER.get(asset, "1")))
     if BASE:
         doc = doc.replace('href="/', 'href="%s/' % BASE).replace('src="/', 'src="%s/' % BASE)
@@ -775,7 +828,7 @@ def build_calculator():
     head = '<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">'
     scripts = '<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="" defer></script><script src="/js/calculadora.js" defer></script>'
     page(path, "Calculadora MIDE de tiempo de rutas y perfil GPX | Ad Astra",
-         "Calcula gratis la duración de una ruta con el método MIDE según distancia y desnivel. Sube tu GPX y descarga el perfil de altitud, el mapa y la ficha de la ruta.",
+         "Calcula gratis la duración de una ruta con el método MIDE según distancia y desnivel. Sube tu GPX y descarga el perfil, el mapa y la ficha de la ruta.",
          body, "her", ld, priority="0.8", head=head, scripts=scripts)
 
 
@@ -817,7 +870,7 @@ def build_topografia():
           {"@context": "https://schema.org", "@type": "WebApplication", "name": "Topografía de barrancos", "url": url(path), "applicationCategory": "DesignApplication", "operatingSystem": "Web",
            "description": "Dibuja la topografía de un barranco añadiendo rápeles, destrepes y tramos andando. Calcula la cuerda necesaria y descarga el croquis en PNG o SVG.",
            "offers": {"@type": "Offer", "price": 0, "priceCurrency": "EUR"}, "provider": {"@id": D + "/#empresa"}}]
-    page(path, "Topografía de barrancos: crea el croquis de rápeles | Ad Astra",
+    page(path, "Topografía de barrancos: croquis de rápeles | Ad Astra",
          "Crea gratis la topografía de un barranco: añade rápeles (R), destrepes (D) y tramos andando, calcula la cuerda necesaria y descarga el croquis en PNG o JPG.",
          body, "her", ld, priority="0.7", scripts='<script src="/js/topografia.js" defer></script>')
 
@@ -910,8 +963,9 @@ def build_nieve():
             '<section class="section alt"><div class="wrap split"><div class="stack" style="gap:0">' + block("Preguntas frecuentes", faq_html(NIEVE_FAQ)) +
             '</div><div class="sticky"><div class="panel"><p class="eyebrow">Importante</p><p>Esto no es un boletín de peligro de aludes. Consulta siempre el boletín oficial donde lo haya, valora el terreno y la nieve sobre el sitio y lleva el material adecuado (ARVA, pala y sonda en terreno de aludes).</p><p><a href="/como-leer-la-nieve-y-los-aludes/">Cómo leer la nieve y el peligro de aludes →</a></p></div></div></div></section>')
     ld = [crumbs_ld([("Inicio", "/"), ("Estado de la nieve", path)]), faq_ld(NIEVE_FAQ)]
-    page(path, "Estado de la nieve en Gredos, Picos, Pirineos y Sierra Nevada | Ad Astra",
-         "Estado de la nieve por macizo: nieve reciente y prevista, placas de viento, costra de rehielo y nieve húmeda en Gredos, Guadarrama, Picos de Europa, Pirineos y Sierra Nevada.",
+    ld.append(app_ld(path, "Estado de la nieve por macizo", "Estimación diaria del estado de la nieve: nieve reciente, placas de viento, costras y nieve húmeda."))
+    page(path, "Estado de la nieve hoy en Gredos, Picos y Pirineos | Ad Astra",
+         "Estado de la nieve por macizo: nieve reciente y prevista, placas de viento, costras y nieve húmeda en Gredos, Guadarrama, Picos, Pirineos y Sierra Nevada.",
          body, "her", ld, priority="0.6", scripts='<script src="/js/nieve.js" defer></script>')
 
 
@@ -921,7 +975,6 @@ MOCHILA_FAQ = [
     ("¿Dónde va lo más pesado de la mochila?", "Pegado a la espalda y centrado, entre los omóplatos. Así el centro de gravedad queda cerca del tuyo y la mochila no tira hacia atrás. En terreno técnico (trepadas, nieve, barrancos) bájalo un poco, a la altura de la mitad de la espalda: pierdes algo de comodidad pero ganas mucho equilibrio."),
     ("¿Qué peso es razonable llevar?", "Como orientación, no más del 20 % de tu peso en travesías con vivac y bastante menos en una salida de un día. Cada kilo de más se nota en las rodillas en la bajada: revisa la lista y quita lo que no vayas a usar."),
     ("¿En qué orden se ajustan las correas?", "Con la mochila cargada: primero el cinturón sobre las crestas de la cadera, que debe llevar la mayor parte del peso; después las hombreras; luego los tensores de carga (las cintas de encima de los hombros, a unos 45°) y por último la correa de pecho. Al final, cierra los compresores laterales para que nada baile."),
-    ("¿Se guarda lo que marco en la lista?", "Sí, en tu propio navegador: si cierras la página y vuelves, lo marcado sigue ahí. Con «Desmarcar todo» empiezas de cero para la siguiente salida, y puedes añadir cosas tuyas a cada lista."),
 ]
 
 CAPAS_FAQ = [
@@ -959,7 +1012,7 @@ def build_mochila():
               "Reparte el peso igual a derecha e izquierda y rellena huecos para que nada se mueva.",
               "Por fuera, lo mínimo: todo lo que cuelga se engancha, se moja y desequilibra."]
     body = (hero("Artículos", "Cómo preparar la mochila", "Cómo repartir el peso para que la mochila no te tire hacia atrás, cómo ajustarla y una lista para cada actividad que vas tachando mientras la preparas.", img("afe67801-cf88-4cef-a3ac-e25e4e971634/senderismo-avila-gredos.webp"),
-                 [("Inicio", "/"), ("Artículos", "/articulos/"), ("Cómo preparar la mochila", "")], '<a class="btn btn-primary" href="#lista">Ir a la lista</a><a class="btn btn-ghost" href="/teoria-de-las-capas/">Teoría de las capas</a>') +
+                 [("Inicio", "/"), ("Artículos", "/articulos/"), ("Cómo preparar la mochila", "")], '<a class="btn btn-primary" href="/lista-material-montana/">Lista de material</a><a class="btn btn-ghost" href="/teoria-de-las-capas/">Teoría de las capas</a>') +
             '<section class="section"><div class="wrap"><p class="eyebrow">El reparto del peso</p><h2>Lo pesado, pegado a la espalda</h2>'
             '<div class="gd-zonas"><figure><img src="/img/guias/mochila-zonas.webp" width="569" height="994" loading="lazy" alt="Senderista con la mochila abierta en corte: cada zona con su material y el centro de gravedad pegado a la espalda"></figure>'
             '<ol class="gd-ley">' + "".join('<li style="--c:%s"><span>%s</span><div><b>%s</b> %s<small>%s</small></div></li>' % z for z in ZONAS_MOCHILA) + '</ol></div>'
@@ -968,14 +1021,67 @@ def build_mochila():
             '<figure class="ko"><img src="/img/guias/mochila-mal.webp" width="506" height="994" loading="lazy" alt="Mal: mochila alejada de la espalda y alta, tira hacia atrás"><figcaption><b>Mal:</b> peso lejos y alto. Tira hacia atrás y obliga a encorvarse.</figcaption></figure></div></div></section>'
             '<section class="section alt"><div class="wrap"><p class="eyebrow">El ajuste</p><h2>En este orden, con la mochila cargada</h2><ol class="gd-pasos">' +
             "".join('<li><b>%s</b><span>%s</span></li>' % (e(a), e(b)) for a, b in ajustes) + '</ol></div></section>'
-            '<section class="section" id="lista"><div class="wrap"><p class="eyebrow">Qué llevar</p><h2>Elige la actividad y ve tachando</h2>'
-            '<div id="mo-app" class="mo"><p class="muted">Cargando la lista…</p></div></div></section>' +
+            '<section class="section" id="lista"><div class="wrap"><div class="panel lista-cta"><div><p class="eyebrow">Qué llevar</p><h2>Lista de material por actividad</h2>'
+            '<p>Barrancos, escalada deportiva y clásica, alpinismo, senderismo, montañismo y vivac: elige la actividad y ve tachando lo que ya has metido en la mochila. Se guarda en tu navegador y la puedes imprimir.</p></div>'
+            '<a class="btn btn-primary" href="/lista-material-montana/">Abrir la lista de material</a></div></div></section>' +
             '<section class="section alt"><div class="wrap split"><div class="stack" style="gap:0">' + block("Preguntas frecuentes", faq_html(MOCHILA_FAQ)) +
             '</div><div class="sticky"><div class="panel"><p class="eyebrow">Con guía</p><p>En nuestras actividades te decimos qué traer y ponemos el material técnico. Si te falta algo, también lo <a href="/actividades/alquiler-material-montana/">alquilamos</a>.</p></div></div></div></section>')
-    ld = [crumbs_ld([("Inicio", "/"), ("Artículos", "/articulos/"), ("Cómo preparar la mochila", path)]), faq_ld(MOCHILA_FAQ)]
-    page(path, "Cómo preparar la mochila de montaña y qué llevar | Ad Astra",
-         "Cómo repartir el peso en la mochila, cómo ajustarla y listas de material para barrancos, escalada, alpinismo, senderismo, montañismo y vivac que puedes ir tachando.",
-         body, "art", ld, priority="0.6", scripts=COMIC_FONTS + '<script src="/js/mochila.js" defer></script>')
+    ld = [crumbs_ld([("Inicio", "/"), ("Artículos", "/articulos/"), ("Cómo preparar la mochila", path)]), faq_ld([x for x in MOCHILA_FAQ if "lista" not in x[0]]),
+          articulo_ld(path, "Cómo preparar la mochila de montaña", "Dónde va cada cosa en la mochila, cómo repartir el peso y cómo ajustarla, con ilustraciones.", "2026-11-18")]
+    page(path, "Cómo preparar la mochila de montaña | Ad Astra",
+         "Dónde va cada cosa en la mochila, por qué lo pesado va pegado a la espalda y cómo ajustar las correas, con ilustraciones. Y la lista de material por actividad.",
+         body, "art", ld, priority="0.6", scripts=COMIC_FONTS)
+
+
+LISTA_FAQ = [
+    ("¿Se guarda lo que marco?", "Sí, en tu propio navegador: si cierras la página y vuelves, lo marcado sigue ahí. Cada actividad tiene su lista por separado, y con «Desmarcar todo» empiezas de cero para la siguiente salida."),
+    ("¿Puedo añadir cosas mías?", "Sí: escribe abajo lo que quieras añadir y se queda en la lista de esa actividad. Lo que añadas también se guarda en tu navegador y lo puedes quitar con la ×."),
+    ("¿La puedo imprimir?", "Sí, con el botón «Imprimir la lista». Sale limpia, sin menús, para que la taches a boli."),
+    ("¿Qué actividades tiene?", "Barrancos, escalada deportiva, escalada clásica, alpinismo, senderismo, montañismo y vivac. A todas se les suma lo básico de seguridad, comida y agua que hay que llevar siempre."),
+    ("¿Lleváis vosotros el material técnico en las actividades guiadas?", "Sí: en nuestras actividades ponemos el material técnico (cuerdas, arneses, cascos, neoprenos…) y te decimos qué traer. Si quieres salir por tu cuenta, también alquilamos material."),
+]
+
+
+def build_lista_material():
+    path = "/lista-material-montana/"
+    body = (hero("Herramientas", "Lista de material de montaña", "Qué llevar en la mochila según la actividad: elige barrancos, escalada, alpinismo, senderismo, montañismo o vivac y ve tachando lo que ya tienes preparado.", img("afe67801-cf88-4cef-a3ac-e25e4e971634/senderismo-avila-gredos.webp"),
+                 [("Inicio", "/"), ("Herramientas", "/herramientas/"), ("Lista de material", "")]) +
+            '<section class="section" id="lista"><div class="wrap"><div id="mo-app" class="mo"><p class="muted">Cargando la lista…</p></div></div></section>'
+            '<section class="section alt"><div class="wrap split"><div class="stack" style="gap:0">' + block("Preguntas frecuentes", faq_html(LISTA_FAQ)) +
+            '</div><div class="sticky"><div class="panel"><p class="eyebrow">Antes de cargarla</p><p>Lo que llevas importa tanto como dónde lo metes: lo pesado, pegado a la espalda. Lo explicamos con dibujos en <a href="/como-preparar-la-mochila/">cómo preparar la mochila</a>, y qué ropa ponerte en <a href="/teoria-de-las-capas/">la teoría de las capas</a>.</p>'
+            '<p>¿Te falta algo? <a href="/actividades/alquiler-material-montana/">Alquilamos material</a> en Valladolid y Béjar.</p></div></div></div></section>')
+    ld = [crumbs_ld([("Inicio", "/"), ("Herramientas", "/herramientas/"), ("Lista de material", path)]), faq_ld(LISTA_FAQ),
+          app_ld(path, "Lista de material de montaña", "Listas de material para barrancos, escalada, alpinismo, senderismo, montañismo y vivac para ir tachando.")]
+    page(path, "Lista de material de montaña por actividad | Ad Astra",
+         "Qué llevar a la montaña: listas de material para barrancos, escalada, alpinismo, senderismo, montañismo y vivac que vas tachando. Gratis e imprimible.",
+         body, "her", ld, priority="0.7", scripts='<script src="/js/mochila.js" defer></script>')
+
+
+HER_ICO = {k: '<svg viewBox="0 0 64 64" aria-hidden="true">%s</svg>' % v for k, v in {
+    "meteo": '<circle cx="24" cy="24" r="10" fill="#f5c84b"/><path d="M18 46h28a9 9 0 0 0 0-18 13 13 0 0 0-25 3 8 8 0 0 0-3 15z" fill="#e8eef3"/>',
+    "nieve": '<g stroke="#bfe0f7" stroke-width="4" stroke-linecap="round"><path d="M32 8v48M11 20l42 24M11 44l42-24"/></g>',
+    "caudal": '<path d="M6 30q8-8 16 0t16 0 16 0M6 42q8-8 16 0t16 0 16 0" fill="none" stroke="#6fb3e0" stroke-width="5" stroke-linecap="round"/>',
+    "calc": '<rect x="14" y="8" width="36" height="48" rx="6" fill="#e9a53b"/><rect x="20" y="14" width="24" height="10" rx="2" fill="#1b120c"/><g fill="#1b120c"><circle cx="24" cy="34" r="3"/><circle cx="32" cy="34" r="3"/><circle cx="40" cy="34" r="3"/><circle cx="24" cy="44" r="3"/><circle cx="32" cy="44" r="3"/><circle cx="40" cy="44" r="3"/></g>',
+    "gpx": '<path d="M10 50 L24 26 L34 38 L54 12" fill="none" stroke="#4fb3e8" stroke-width="5" stroke-linejoin="round"/><circle cx="10" cy="50" r="5" fill="#3fae5a"/><circle cx="54" cy="12" r="5" fill="#e8574a"/>',
+    "video": '<path d="M4 50 L22 22 L32 34 L44 14 L60 50Z" fill="#6b5a4a"/><path d="M44 14 L50 26 L44 23 L40 27Z" fill="#fff"/><circle cx="48" cy="48" r="12" fill="#e8574a"/><path d="M45 42v12l10-6z" fill="#fff"/>',
+    "lista": '<rect x="14" y="8" width="36" height="48" rx="5" fill="#f3e9df"/><g stroke="#7cc47f" stroke-width="4" fill="none" stroke-linecap="round"><path d="M20 22l4 4 7-8M20 38l4 4 7-8"/></g><g stroke="#8a7564" stroke-width="3"><path d="M35 23h10M35 39h10"/></g>',
+    "topo": '<path d="M16 8v48M16 18h20M16 32h26M16 46h18" stroke="#e9a53b" stroke-width="4" fill="none" stroke-linecap="round"/><circle cx="16" cy="18" r="4" fill="#e8574a"/><circle cx="16" cy="32" r="4" fill="#e8574a"/><circle cx="16" cy="46" r="4" fill="#e8574a"/>',
+}.items()}
+
+
+def build_herramientas():
+    path = "/herramientas/"
+    cards = "".join('<a class="art-card" href="%s"><span class="art-ico">%s</span><div><h2>%s</h2><p>%s</p><span class="art-mas">Abrir la herramienta →</span></div></a>' % (h, HER_ICO[ic], e(t), e(d)) for h, t, d, ic in HERRAMIENTAS)
+    body = (hero("Herramientas", "Herramientas de montaña gratis", "Previsión del tiempo en cumbre, estado de la nieve, caudal de barrancos, editor GPX, vídeo 3D de tus rutas y más. Gratis, sin registro y hechas por guías de montaña.", METEO_IMG,
+                 [("Inicio", "/"), ("Herramientas", "")]) +
+            '<section class="section"><div class="wrap"><div class="art-grid art-grid2">' + cards + '</div>'
+            '<p class="rel-mas" style="margin-top:28px">Y para aprender: <a href="/articulos/">artículos sobre nieve y aludes, mochila y ropa de montaña</a>.</p></div></section>')
+    ld = [crumbs_ld([("Inicio", "/"), ("Herramientas", path)]),
+          {"@context": "https://schema.org", "@type": "ItemList", "name": "Herramientas de montaña de Guías Ad Astra", "itemListElement": [
+              {"@type": "ListItem", "position": i + 1, "url": url(h), "name": t} for i, (h, t, _, _) in enumerate(HERRAMIENTAS)]}]
+    page(path, "Herramientas de montaña gratis: tiempo, nieve, GPX | Ad Astra",
+         "Herramientas gratis para la montaña: previsión en cumbre a 15 días, estado de la nieve, caudal de barrancos, editor GPX, vídeo 3D de rutas y lista de material.",
+         body, "her", ld, priority="0.8")
 
 
 
@@ -1013,7 +1119,16 @@ def build_editor_gpx():
     body = (hero("Herramientas", "Editor de tracks GPX", "Une, divide y recorta tracks, dibuja tramos por los senderos, añade waypoints, limpia los errores del GPS y descarga el mapa y el perfil en imagen. Gratis y sin subir tus archivos a ningún sitio.", METEO_IMG,
                  [("Inicio", "/"), ("Editor GPX", "")]) +
             '<section class="section gx-sec"><div class="wrap"><div id="gx-app" class="gx"><noscript>El editor necesita JavaScript.</noscript></div></div></section>'
-            '<section class="section alt"><div class="wrap split"><div class="stack" style="gap:0">' + block("Preguntas frecuentes", faq_html(GPX_FAQ)) +
+            '<section class="section alt"><div class="wrap"><p class="eyebrow">Qué puedes hacer</p><h2>Un editor GPX completo, en el navegador</h2><div class="gd-capas">' +
+            "".join('<article style="--c:%s"><h3>%s</h3><p>%s</p></article>' % x for x in [
+                ("#4fb3e8", "Unir y dividir tracks", "Abre varios GPX a la vez, ordénalos y únelos en uno solo: si alguno va al revés, se gira solo. O corta un track en dos en el punto que elijas."),
+                ("#e8574a", "Quitar y recortar tramos", "Marca el inicio y el final de un trozo y quítalo, sepáralo en otro track o quédate solo con él. También puedes mover o borrar puntos uno a uno."),
+                ("#7cc47f", "Corregir errores del GPS", "Quita los saltos que da el GPS cuando pierde señal y limpia las paradas en las que los puntos bailan en el sitio y suman metros y desnivel falsos."),
+                ("#e9a53b", "Dibujar rutas", "Crea un track nuevo o alarga uno existente pinchando en el mapa, campo a través o siguiendo los senderos de OpenStreetMap, con la altitud del terreno."),
+                ("#c78bf0", "Waypoints", "Añade, mueve y nombra puntos de interés: fuentes, collados, avituallamientos… Se guardan en el GPX y salen en el vídeo 3D."),
+                ("#f07ab8", "Mapa y perfil en imagen", "Descarga en PNG el mapa del recorrido sobre topográfico, IGN u ortofoto, el perfil de altitud o una ficha con todo, del track completo o de un tramo."),
+            ]) + '</div><p style="margin-top:22px">Funciona con los archivos de Garmin, Wikiloc, Strava, Komoot, Suunto, Coros u OruxMaps, y guarda en GPX 1.1, que abre cualquier GPS o aplicación. Para planificar el tiempo de la ruta usa la <a href="/calculadora-rutas/">calculadora MIDE</a>, y para compartirla, el <a href="/video-ruta-3d/">vídeo 3D</a>.</p></div></section>'
+            '<section class="section"><div class="wrap split"><div class="stack" style="gap:0">' + block("Preguntas frecuentes", faq_html(GPX_FAQ)) +
             '</div><div class="sticky"><div class="panel"><p class="eyebrow">Atajos</p><ul class="gd-reglas"><li><b>Ctrl + Z / Ctrl + Y:</b> deshacer y rehacer.</li><li><b>Supr:</b> borra el punto elegido en el modo «Puntos».</li><li><b>Esc:</b> sale del modo de edición.</li><li>Pasa el ratón por el perfil para ver cada punto en el mapa.</li></ul>'
             '<p><a href="/video-ruta-3d/">Haz un vídeo 3D de tu ruta →</a></p><p><a href="/calculadora-rutas/">Calcula el tiempo con el método MIDE →</a></p></div></div></div></section>')
     ld = [crumbs_ld([("Inicio", "/"), ("Editor GPX", path)]), faq_ld(GPX_FAQ),
@@ -1021,8 +1136,8 @@ def build_editor_gpx():
            "description": "Editor GPX gratuito en el navegador: unir, dividir y recortar tracks, mover o borrar puntos y corregir errores del GPS.", "offers": {"@type": "Offer", "price": 0, "priceCurrency": "EUR"}, "provider": {"@id": D + "/#empresa"}}]
     head = '<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">'
     scripts = '<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="" defer></script><script src="/js/gpx.js" defer></script>'
-    page(path, "Editor GPX online gratis: unir, dividir y corregir tracks | Ad Astra",
-         "Edita tus tracks GPX gratis en el navegador: une y divide tracks, quita tramos, mueve puntos y corrige saltos del GPS y paradas. Sin subir tus archivos.",
+    page(path, "Editor GPX online gratis: unir, cortar y corregir | Ad Astra",
+         "Edita tracks GPX gratis: une, divide y recorta, dibuja tramos, añade waypoints, corrige saltos del GPS y descarga mapa y perfil. Sin subir tus archivos.",
          body, "her", ld, priority="0.7", head=head, scripts=scripts)
 
 
@@ -1042,7 +1157,14 @@ def build_video3d():
     body = (hero("Herramientas", "Vídeo 3D de tu ruta", "Sube tu track y crea un vídeo de la ruta sobrevolando el relieve en 3D, con el perfil, la distancia y el desnivel. Gratis, sin registro y sin subir tu GPX a ningún sitio.", METEO_IMG,
                  [("Inicio", "/"), ("Vídeo 3D de la ruta", "")]) +
             '<section class="section gx-sec"><div class="wrap"><div id="v3-app" class="v3"><noscript>Esta herramienta necesita JavaScript.</noscript></div></div></section>'
-            '<section class="section alt"><div class="wrap split"><div class="stack" style="gap:0">' + block("Preguntas frecuentes", faq_html(VIDEO3D_FAQ)) +
+            '<section class="section alt"><div class="wrap"><p class="eyebrow">Cómo se hace</p><h2>Tu ruta en vídeo 3D en cuatro pasos</h2><ol class="gd-pasos">' +
+            "".join('<li><b>%s</b><span>%s</span></li>' % x for x in [
+                ("Sube el track", "Arrastra tu GPX, KML o TCX (de tu reloj, Wikiloc, Strava, Komoot…). Si tiene errores del GPS, límpialo antes en el editor GPX."),
+                ("Elige el estilo", "Mapa (ortofoto del PNOA, satélite, topográfico IGN u OpenTopoMap), formato horizontal, vertical o cuadrado, duración, cámara y color."),
+                ("Añade tus puntos", "Los waypoints del archivo salen solos; puedes quitarlos o añadir otros por kilómetro. Al llegar a cada uno, el vídeo se para y muestra el nombre."),
+                ("Crea y descarga el MP4", "Mira la animación y crea el vídeo: se genera fotograma a fotograma en tu ordenador y lo descargas listo para Instagram, YouTube o WhatsApp."),
+            ]) + '</ol><p style="margin-top:22px">Es una alternativa gratuita a Relive para hacer vídeos de rutas de senderismo, montaña, trail o bici: sin registro, sin límite de vídeos y sin subir tu track a ningún servidor.</p></div></section>'
+            '<section class="section"><div class="wrap split"><div class="stack" style="gap:0">' + block("Preguntas frecuentes", faq_html(VIDEO3D_FAQ)) +
             '</div><div class="sticky"><div class="panel"><p class="eyebrow">Consejo</p><p>Si tu track tiene saltos del GPS o paradas que dibujan una maraña, límpialo antes en el <a href="/editor-gpx/">editor GPX</a>: desde allí puedes mandarlo directamente a esta herramienta con «Hacer vídeo 3D».</p></div></div></div></section>')
     ld = [crumbs_ld([("Inicio", "/"), ("Vídeo 3D de la ruta", path)]), faq_ld(VIDEO3D_FAQ),
           {"@context": "https://schema.org", "@type": "WebApplication", "name": "Vídeo 3D de rutas", "url": url(path), "applicationCategory": "MultimediaApplication", "operatingSystem": "Web",
@@ -1050,7 +1172,7 @@ def build_video3d():
     head = '<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.css" crossorigin="">'
     scripts = '<script src="https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.js" crossorigin="" defer></script><script src="/js/video3d.js" defer></script>'
     page(path, "Vídeo 3D de tu ruta GPX gratis, tipo Relive | Ad Astra",
-         "Crea gratis un vídeo de tu ruta sobrevolando el relieve en 3D, con perfil, distancia y desnivel. Sube tu GPX y descarga el MP4 en horizontal, vertical o cuadrado.",
+         "Crea gratis un vídeo de tu ruta en 3D sobre el relieve, con perfil, desnivel y waypoints. Sube tu GPX y descarga el MP4 en horizontal, vertical o cuadrado.",
          body, "her", ld, priority="0.7", head=head, scripts=scripts)
 
 
@@ -1196,8 +1318,9 @@ def build_leer_nieve():
             '<p class="small muted">Problemas típicos y escala de peligro según el <a href="https://www.avalanches.org/" target="_blank" rel="noopener">EAWS</a> (servicios europeos de aviso de aludes).</p></div>'
             '<div class="panel" style="margin-top:16px"><p class="eyebrow">Aprende con guías</p><p>En nuestros <a href="/actividades/cursos-alpinismo/">cursos de alpinismo</a> practicamos sobre el terreno la lectura de la nieve, el uso del ARVA y el rescate.</p></div></div></div></section>')
     ld = [crumbs_ld([("Inicio", "/"), ("Artículos", "/articulos/"), ("Cómo leer la nieve", path)]), faq_ld(LEER_NIEVE_FAQ)]
-    page(path, "Cómo leer la nieve: manto, placas de viento y aludes | Ad Astra",
-         "Guía para entender la nieve: cómo cambia el manto, placas de viento, tipos de aludes, los problemas típicos y la escala de peligro, cómo leer una ladera y qué hacer si ocurre un alud.",
+    ld.append(articulo_ld(path, "Cómo leer la nieve y el peligro de aludes", "Cómo cambia el manto, placas de viento, tipos de aludes, el boletín de AEMET explicado y cómo leer una ladera.", "2026-11-19"))
+    page(path, "Cómo leer la nieve y el peligro de aludes | Ad Astra",
+         "Manto de nieve, placas de viento, tipos de aludes, el boletín de AEMET explicado paso a paso y cómo leer una ladera antes de meterte en ella.",
          body, "art", ld, priority="0.6")
 
 
@@ -1214,9 +1337,11 @@ def build_articulos():
     body = (hero("Artículos", "Artículos de montaña", "Guías prácticas escritas por nuestros guías: nieve y aludes, cómo preparar la mochila, cómo vestirse para la montaña y más.", METEO_IMG,
                  [("Inicio", "/"), ("Artículos", "")]) +
             '<section class="section"><div class="wrap"><div class="art-grid">' + cards + '</div></div></section>')
+    ld = [crumbs_ld([("Inicio", "/"), ("Artículos", path)]), {"@context": "https://schema.org", "@type": "ItemList", "name": "Artículos de montaña de Guías Ad Astra", "itemListElement": [
+        {"@type": "ListItem", "position": i + 1, "url": url(h), "name": t} for i, (h, t, _, _) in enumerate(ARTICULOS)]}]
     page(path, "Artículos de montaña: nieve, aludes, mochila y capas | Ad Astra",
          "Guías prácticas de montaña de Guías Ad Astra: cómo leer la nieve y el peligro de aludes, cómo preparar la mochila y la teoría de las capas.",
-         body, "art", [crumbs_ld([("Inicio", "/"), ("Artículos", path)])], priority="0.6")
+         body, "art", ld, priority="0.6")
 
 
 PRENDAS = {
@@ -1256,7 +1381,8 @@ def build_capas():
             '<section class="section alt"><div class="wrap split"><div class="stack" style="gap:0">' + block("Preguntas frecuentes", faq_html(CAPAS_FAQ)) +
             '</div><div class="sticky"><div class="panel"><p class="eyebrow">Fuentes</p><p class="small">Basado en las guías de <a href="https://www.salomon.com/es-es/running/trail-running-advice/how-properly-dress-layers-the-three-layer-system/" rel="noopener" target="_blank">Salomon</a> y <a href="https://www.iloveski.org/es/2021/10/01/sistema-por-capas-vestirse-en-la-montana/" rel="noopener" target="_blank">iLoveSki</a> y en la experiencia de nuestros guías.</p></div></div></div></section>')
     ld = [crumbs_ld([("Inicio", "/"), ("Artículos", "/articulos/"), ("Teoría de las capas", path)]), faq_ld(CAPAS_FAQ)]
-    page(path, "Teoría de las capas: cómo vestirse para la montaña | Ad Astra",
+    ld.append(articulo_ld(path, "La teoría de las capas: cómo vestirse para la montaña", "Capa base, intermedia, exterior y de reserva explicadas en viñetas, con el tipo de prenda de cada una.", "2026-11-18"))
+    page(path, "Teoría de las capas: cómo vestirse en montaña | Ad Astra",
          "La teoría de las tres capas (base, intermedia y exterior) más la capa de reserva, explicada con viñetas: qué ponerse según la temperatura y errores típicos.",
          body, "art", ld, priority="0.6", scripts=COMIC_FONTS)
 
@@ -1269,8 +1395,9 @@ def build_caudales():
             '<section class="section alt"><div class="wrap split"><div class="stack" style="gap:0">' + block("Preguntas frecuentes", faq_html(CAUDAL_FAQ)) +
             '</div><div class="sticky"><div class="panel"><p class="eyebrow">Aviso</p><p>Datos oficiales en tiempo real, provisionales. Los umbrales son orientativos y los fija Guías Ad Astra para sus barrancos. En barrancos, la última palabra la tiene siempre lo que se ve en el sitio.</p></div></div></div></section>')
     ld = [crumbs_ld([("Inicio", "/"), ("Caudal de barrancos", path)]), faq_ld(CAUDAL_FAQ)]
-    page(path, "Caudal de barrancos: estado del Jerte, Valporquero y Mazobre | Ad Astra",
-         "Caudal en tiempo real de los barrancos de los Hoyos, Papúos, Mazobre y la Cueva de Valporquero con los aforos del SAIH Tajo y Duero, tendencia y lluvia prevista.",
+    ld.append(app_ld(path, "Caudal de barrancos en tiempo real", "Caudal de los barrancos de los Hoyos, Papúos, Mazobre y Valporquero con los aforos del SAIH Tajo y Duero."))
+    page(path, "Caudal de barrancos hoy: Jerte, Mazobre y Valporquero | Ad Astra",
+         "Caudal en tiempo real de los barrancos de los Hoyos, Papúos, Mazobre y Valporquero con los aforos del SAIH Tajo y Duero, tendencia y lluvia prevista.",
          body, "her", ld, priority="0.6", scripts='<script src="/js/rios.js" defer></script>')
 
 
@@ -1287,7 +1414,8 @@ def build_meteo():
                 '<h3 style="font-size:1.2rem;margin-top:6px">%s</h3><p>%s</p>' % (e(rg), " · ".join('<a href="/meteo/%s/">%s</a>' % (m["id"], e(m["corto"])) for m in MACIZOS if m["region"] == rg)) for rg in REGIONES) +
             '</div></div></div></section>')
     ld = [crumbs_ld([("Inicio", "/"), ("Meteorología de montaña", path)]), faq_ld(METEO_FAQ)]
-    page(path, "Meteorología de montaña: previsión en cumbre a 15 días | Ad Astra",
+    ld.append(app_ld(path, "Meteorología de montaña", "Previsión del tiempo en montaña a 15 días en cumbre y base, con varios modelos y avisos de AEMET.", "WeatherApplication"))
+    page(path, "Tiempo en montaña: previsión a 15 días en cumbre | Ad Astra",
          "Previsión del tiempo en montaña a 15 días para %d macizos: temperatura y viento en cumbre, nieve, isocero y tormentas. Modelos ECMWF, GFS, ICON y AROME." % len(MACIZOS),
          body, "her", ld, priority="0.8", scripts='<script src="/js/meteo.js" defer></script>')
     for m in MACIZOS:
@@ -1440,7 +1568,7 @@ def main():
     cfg = os.path.join(OUT, "config.js")
     c = open(cfg, encoding="utf-8").read().replace('calendarioURL: ""', 'calendarioURL: "",\n  // Carpeta donde está publicada la web ("" si está en la raíz del dominio)\n  base: "%s"' % BASE)
     open(cfg, "w", encoding="utf-8").write(c)
-    build_home(); build_activities_index(); build_courses_index(); build_calendar(); build_rental(); build_about(); build_contact(); build_404(); build_calculator(); build_topografia(); build_meteo(); build_caudales(); build_nieve(); build_mochila(); build_capas(); build_leer_nieve(); build_articulos(); build_editor_gpx(); build_video3d()
+    build_home(); build_activities_index(); build_courses_index(); build_calendar(); build_rental(); build_about(); build_contact(); build_404(); build_calculator(); build_topografia(); build_meteo(); build_caudales(); build_nieve(); build_mochila(); build_capas(); build_leer_nieve(); build_articulos(); build_editor_gpx(); build_video3d(); build_lista_material(); build_herramientas()
     for a in ACTIVITIES:
         build_activity(a)
     build_ascensiones_macizos()
