@@ -433,7 +433,9 @@
     var t = sel();
     if (modo === "wpt") { modoEl.innerHTML = '<div class="gx-aviso">Pulsa en el mapa donde quieras poner cada waypoint. Luego puedes cambiarles el nombre en la lista o arrastrarlos. <button type="button" class="gx-ib" data-x="salir">Terminar</button></div>'; return; }
     if (modo === "dibujar" && dib && t) {
-      modoEl.innerHTML = '<div class="gx-aviso">' + (ocupado ? "Buscando el camino…" : t.pts.length ? "Pulsa en el mapa para seguir dibujando (" + ent(t.pts.length) + " puntos, " + km(stats(t).total) + " km)." : "Pulsa en el mapa para poner el primer punto.") +
+      modoEl.innerHTML = '<div class="gx-aviso"><span class="gx-sw" role="group" aria-label="Cómo unir los puntos"><button type="button" data-x="ruta-si" class="' + (crearOpc.seguir ? "on" : "") + '">Por caminos</button><button type="button" data-x="ruta-no" class="' + (crearOpc.seguir ? "" : "on") + '">Campo a través</button></span> ' +
+        (ocupado ? "Buscando el camino…" : t.pts.length ? "Pulsa en el mapa para seguir dibujando (" + ent(t.pts.length) + " puntos, " + km(stats(t).total) + " km)." : "Pulsa en el mapa para poner el primer punto.") +
+        ' <small class="gx-mini">Puedes cambiar entre «Por caminos» y «Campo a través» en cada clic. Atajo: mantén pulsada la tecla Mayúsculas para ir en línea recta.</small>' +
         (dib.pasos.length ? ' <button type="button" class="btn btn-ghost" data-x="atras">Quitar el último tramo</button>' : "") + ' <button type="button" class="btn btn-primary" data-x="salir">Terminar</button></div>';
       return;
     }
@@ -463,6 +465,7 @@
     var x = e.target.getAttribute("data-x"), t = sel(); if (!x) return;
     if (x === "salir") { cambiarModo(null); refrescar(); return; }
     if (x === "atras") { quitarTramoDibujado(); return; }
+    if (x === "ruta-si" || x === "ruta-no") { crearOpc.seguir = x === "ruta-si"; pintarModo(); pintarCrear(); return; }
     if (!t) return;
     guardar();
     var i = tracks.indexOf(t);
@@ -513,7 +516,7 @@
   }
   map.on("click", function (e) {
     if (modo === "wpt") { ponerWpt(e.latlng); return; }
-    if (modo === "dibujar") { clicDibujo(e.latlng); return; }
+    if (modo === "dibujar") { clicDibujo(e.latlng, e.originalEvent && e.originalEvent.shiftKey); return; }
     var t = sel(); if (!modo || !t) return;
     var k = cercano(t, e.latlng);
     if (k < 0) { avisar("Pulsa más cerca del track seleccionado."); return; }
@@ -606,7 +609,7 @@
       '<button type="button" class="gx-tb' + (modo === "dibujar" && dib && !dib.nuevo && dib.at === "fin" ? " on" : "") + '" data-c="fin"' + (t && !(dib && dib.nuevo) ? "" : " disabled") + '><b>⟶ Alargar</b><span>por el final</span></button>' +
       '<button type="button" class="gx-tb' + (modo === "dibujar" && dib && !dib.nuevo && dib.at === "ini" ? " on" : "") + '" data-c="ini"' + (t && !(dib && dib.nuevo) ? "" : " disabled") + '><b>⟵ Alargar</b><span>por el principio</span></button>' +
       '<button type="button" class="gx-tb' + (modo === "wpt" ? " on" : "") + '" data-c="wpt"><b>📍 Waypoint</b><span>añadir puntos</span></button></div>' +
-      '<label class="gx-op"><input type="checkbox" id="gx-seguir"' + (crearOpc.seguir ? " checked" : "") + '> Seguir senderos y caminos al dibujar</label>' +
+      '<label class="gx-op"><input type="checkbox" id="gx-seguir"' + (crearOpc.seguir ? " checked" : "") + '> Seguir senderos y caminos al dibujar (desmárcalo para ir campo a través)</label>' +
       '<div class="gx-fila"><label>Para <select id="gx-perfil"><option value="hiking-mountain"' + (crearOpc.perfil === "hiking-mountain" ? " selected" : "") + '>Ir a pie</option><option value="trekking"' + (crearOpc.perfil === "trekking" ? " selected" : "") + '>Bicicleta</option></select></label></div>' +
       '<p class="gx-mini">Los caminos se calculan con <a href="https://brouter.de" target="_blank" rel="noopener">BRouter</a> sobre los datos de OpenStreetMap; la altitud de los puntos dibujados sale de un modelo del terreno.</p>';
     if (wpts.length) {
@@ -633,7 +636,7 @@
     if (a === "del") { guardar(); wpts.splice(+li.getAttribute("data-w"), 1); refrescar(); }
   });
   crearEl.addEventListener("change", function (e) {
-    if (e.target.id === "gx-seguir") crearOpc.seguir = e.target.checked;
+    if (e.target.id === "gx-seguir") { crearOpc.seguir = e.target.checked; pintarModo(); }
     if (e.target.id === "gx-perfil") crearOpc.perfil = e.target.value;
     if (e.target.classList.contains("gx-wnom")) { guardar(); wpts[+e.target.closest("[data-w]").getAttribute("data-w")].name = e.target.value.trim(); dibujar(); }
   });
@@ -666,10 +669,10 @@
     var n = dib.pasos.pop(); t.pts.splice(t.pts.length - n, n);
     refrescar(true);
   }
-  async function clicDibujo(ll) {
+  async function clicDibujo(ll, recto) {
     var t = trackDib(); if (!t || ocupado) return;
     var nuevoP = { lat: ll.lat, lon: ll.lng, ele: NaN, t: NaN }, add = [nuevoP];
-    if (t.pts.length && crearOpc.seguir) {
+    if (t.pts.length && crearOpc.seguir && !recto) {
       ocupado = true; pintarModo();
       try { add = await camino(t.pts[t.pts.length - 1], nuevoP, crearOpc.perfil); }
       catch (er) { avisar("No se ha encontrado camino entre esos puntos: se une en línea recta."); add = [nuevoP]; }

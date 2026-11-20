@@ -846,3 +846,11 @@ details.adv[open] summary{margin-bottom:14px}
 .gx-wpt{background:#1d140d;color:#fff;border:1px solid #e9a53b;font-size:11px;font-weight:700;padding:2px 6px;box-shadow:none}
 .gx-wpt::before{display:none}
 .gx-tramimg{display:inline-flex;gap:6px;align-items:center;flex-wrap:wrap;font-size:.85rem;color:var(--muted)}
+input[type=radio],input[type=checkbox]{width:auto;padding:0}
+.leaflet-control-layers label{display:block;margin:0;cursor:pointer}
+.leaflet-control-layers label > span,.leaflet-control-layers label > div{display:flex;align-items:center;gap:6px}
+.leaflet-control-layers-selector{width:14px!important;height:14px;margin:0!important;padding:0!important;border:0;flex:none;accent-color:#e9a53b}
+.leaflet-control-layers-list{color:#222;font-size:13px;line-height:1.9}
+.gx-sw{display:inline-flex;border:1px solid var(--line-2);border-radius:999px;overflow:hidden}
+.gx-sw button{border:0;background:transparent;color:var(--fg);padding:7px 12px;font-size:.82rem;cursor:pointer}
+.gx-sw button.on{background:var(--gold);color:#1b120c;font-weight:700}
