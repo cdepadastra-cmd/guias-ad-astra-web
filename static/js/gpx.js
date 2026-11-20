@@ -433,9 +433,9 @@
     var t = sel();
     if (modo === "wpt") { modoEl.innerHTML = '<div class="gx-aviso">Pulsa en el mapa donde quieras poner cada waypoint. Luego puedes cambiarles el nombre en la lista o arrastrarlos. <button type="button" class="gx-ib" data-x="salir">Terminar</button></div>'; return; }
     if (modo === "dibujar" && dib && t) {
-      modoEl.innerHTML = '<div class="gx-aviso"><span class="gx-sw" role="group" aria-label="Cómo unir los puntos"><button type="button" data-x="ruta-si" class="' + (crearOpc.seguir ? "on" : "") + '">Por caminos</button><button type="button" data-x="ruta-no" class="' + (crearOpc.seguir ? "" : "on") + '">Campo a través</button></span> ' +
+      modoEl.innerHTML = '<div class="gx-aviso"><span class="gx-sw" role="group" aria-label="Cómo unir los puntos"><button type="button" data-x="ruta-no" class="' + (crearOpc.seguir ? "" : "on") + '">Campo a través (por donde pinches)</button><button type="button" data-x="ruta-si" class="' + (crearOpc.seguir ? "on" : "") + '">Por caminos</button></span> ' +
         (ocupado ? "Buscando el camino…" : t.pts.length ? "Pulsa en el mapa para seguir dibujando (" + ent(t.pts.length) + " puntos, " + km(stats(t).total) + " km)." : "Pulsa en el mapa para poner el primer punto.") +
-        ' <small class="gx-mini">Puedes cambiar entre «Por caminos» y «Campo a través» en cada clic. Atajo: mantén pulsada la tecla Mayúsculas para ir en línea recta.</small>' +
+        ' <small class="gx-mini">«Campo a través» une tus clics en línea recta: dibuja exactamente por donde pinches. «Por caminos» busca el sendero de OpenStreetMap entre clic y clic. Puedes cambiar en cualquier momento (o mantener Mayúsculas para un tramo recto).</small>' +
         (dib.pasos.length ? ' <button type="button" class="btn btn-ghost" data-x="atras">Quitar el último tramo</button>' : "") + ' <button type="button" class="btn btn-primary" data-x="salir">Terminar</button></div>';
       return;
     }
@@ -600,7 +600,7 @@
   });
 
   /* ---------------------------------------------------------------- crear: dibujar tracks y poner waypoints */
-  var crearOpc = { seguir: true, perfil: "hiking-mountain" };
+  var crearOpc = { seguir: false, perfil: "hiking-mountain" };
   var crearEl = document.getElementById("gx-crear");
   function pintarCrear() {
     var t = sel();
@@ -690,7 +690,13 @@
       var c = g.features[0].geometry.coordinates;
       var pts = c.map(function (x) { return { lat: x[1], lon: x[0], ele: x[2] != null ? +x[2] : NaN, t: NaN }; });
       if (pts.length && hav(pts[0], a) < 25) pts.shift();
-      if (!pts.length || hav(pts[pts.length - 1], b) > 300) throw new Error("lejos");
+      if (!pts.length) throw new Error("sin camino");
+      // si el clic está fuera de un camino, el último trozo va en línea recta hasta donde se ha pulsado
+      if (hav(pts[pts.length - 1], b) > 12) pts.push(b);
+      // si el camino da un rodeo enorme para una distancia corta, mejor en línea recta
+      var largo = 0, prevP = a; pts.forEach(function (q) { largo += hav(prevP, q); prevP = q; });
+      var recta = hav(a, b);
+      if (recta < 400 && largo > 3 * recta + 50) return [b];
       return pts;
     });
   }
