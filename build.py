@@ -48,7 +48,7 @@ NAV_ACT = [("Todas las actividades", "/actividades/"), ("Barranquismo", "/activi
            ("Alpinismo y ascensiones", "/actividades/?categoria=Ascensiones"), ("Espeleología", "/actividades/?categoria=Espeleología"), ("Escalada y boulder", "/actividades/?categoria=Escalada"),
            ("Senderismo", "/actividades/?categoria=Senderismo"), ("Travesías y viajes", "/actividades/?categoria=Travesías y viajes")]
 NAV_CUR = [("Todos los cursos", "/formacion-cursos/"), ("Calendario de cursos", "/calendario/")] + [(c["disc_label"], "/actividades/%s/" % c["slug"]) for c in COURSES]
-NAV_HER = [("Meteorología de montaña", "/meteo/"), ("Estado de la nieve", "/nieve/"), ("Caudal de barrancos", "/barrancos-caudal/"), ("Calculadora de rutas", "/calculadora-rutas/"), ("Topografía de barrancos", "/topografia-barrancos/"), ("Boulder en Las Tuerces", "/actividades/boulder-las-tuerces/"), ("Boulder en Zona Centro", "/actividades/boulder-zona-centro-salamanca-caceres/")]
+NAV_HER = [("Meteorología de montaña", "/meteo/"), ("Estado de la nieve", "/nieve/"), ("Caudal de barrancos", "/barrancos-caudal/"), ("Calculadora de rutas", "/calculadora-rutas/"), ("Editor GPX", "/editor-gpx/"), ("Topografía de barrancos", "/topografia-barrancos/"), ("Boulder en Las Tuerces", "/actividades/boulder-las-tuerces/"), ("Boulder en Zona Centro", "/actividades/boulder-zona-centro-salamanca-caceres/")]
 ARTICULOS = [
     ("/como-leer-la-nieve-y-los-aludes/", "Cómo leer la nieve y el peligro de aludes", "Cómo cambia el manto, placas de viento, tipos de aludes, el boletín de AEMET y cómo leer una ladera.", "nieve"),
     ("/como-preparar-la-mochila/", "Cómo preparar la mochila", "Cómo repartir el peso, cómo ajustarla y listas de material por actividad que vas tachando.", "mochila"),
@@ -995,6 +995,34 @@ BPA_NOTAS = [  # (x %, y %, título, explicación) sobre la imagen del boletín 
 ]
 
 
+GPX_FAQ = [
+    ("¿Se suben mis tracks a algún servidor?", "No. El editor funciona entero en tu navegador: los archivos se leen y se guardan en tu propio ordenador. Ni nosotros ni nadie los ve."),
+    ("¿Qué corrige la corrección automática?", "Tres cosas típicas de los GPS: los saltos (puntos sueltos a cientos de metros que aparecen cuando se pierde la señal, sobre todo al empezar o en valles cerrados), las paradas en las que el GPS sigue apuntando puntos que «bailan» alrededor del mismo sitio y suman metros y desnivel falsos, y el exceso de puntos. Antes de aplicarla puedes ver en el mapa qué se va a quitar."),
+    ("¿Cómo uno dos tracks?", "Ábrelos a la vez (o uno detrás de otro), marca la casilla de los que quieras unir y pulsa «Unir los marcados». Se unen en el orden de la lista, que puedes cambiar con las flechas, y si alguno está en sentido contrario se gira solo."),
+    ("¿Cómo quito un trozo del track?", "Selecciona el track, pulsa «Tramo», marca en el mapa el inicio y el final del trozo y elige: quitarlo y unir los extremos, quitarlo dejando dos tracks separados o quedarte solo con ese trozo."),
+    ("¿Qué formatos puedo abrir?", "GPX (de Garmin, Wikiloc, Strava, Komoot, OruxMaps, Suunto…), KML de Google Earth y TCX. Siempre guarda en GPX 1.1, que abre cualquier GPS o aplicación."),
+    ("Me he equivocado, ¿puedo volver atrás?", "Sí: el botón «Deshacer» (o Ctrl+Z) recupera los últimos 40 cambios."),
+]
+
+
+def build_editor_gpx():
+    path = "/editor-gpx/"
+    body = (hero("Herramientas", "Editor de tracks GPX", "Une, divide y recorta tracks, mueve o borra puntos y limpia los errores del GPS: saltos, paradas que bailan y puntos sobrantes. Gratis y sin subir tus archivos a ningún sitio.", METEO_IMG,
+                 [("Inicio", "/"), ("Editor GPX", "")]) +
+            '<section class="section gx-sec"><div class="wrap"><div id="gx-app" class="gx"><noscript>El editor necesita JavaScript.</noscript></div></div></section>'
+            '<section class="section alt"><div class="wrap split"><div class="stack" style="gap:0">' + block("Preguntas frecuentes", faq_html(GPX_FAQ)) +
+            '</div><div class="sticky"><div class="panel"><p class="eyebrow">Atajos</p><ul class="gd-reglas"><li><b>Ctrl + Z / Ctrl + Y:</b> deshacer y rehacer.</li><li><b>Supr:</b> borra el punto elegido en el modo «Puntos».</li><li><b>Esc:</b> sale del modo de edición.</li><li>Pasa el ratón por el perfil para ver cada punto en el mapa.</li></ul>'
+            '<p><a href="/video-ruta-3d/">Haz un vídeo 3D de tu ruta →</a></p><p><a href="/calculadora-rutas/">Calcula el tiempo con el método MIDE →</a></p></div></div></div></section>')
+    ld = [crumbs_ld([("Inicio", "/"), ("Editor GPX", path)]), faq_ld(GPX_FAQ),
+          {"@context": "https://schema.org", "@type": "WebApplication", "name": "Editor de tracks GPX", "url": url(path), "applicationCategory": "UtilitiesApplication", "operatingSystem": "Web",
+           "description": "Editor GPX gratuito en el navegador: unir, dividir y recortar tracks, mover o borrar puntos y corregir errores del GPS.", "offers": {"@type": "Offer", "price": 0, "priceCurrency": "EUR"}, "provider": {"@id": D + "/#empresa"}}]
+    head = '<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">'
+    scripts = '<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="" defer></script><script src="/js/gpx.js" defer></script>'
+    page(path, "Editor GPX online gratis: unir, dividir y corregir tracks | Ad Astra",
+         "Edita tus tracks GPX gratis en el navegador: une y divide tracks, quita tramos, mueve puntos y corrige saltos del GPS y paradas. Sin subir tus archivos.",
+         body, "her", ld, priority="0.7", head=head, scripts=scripts)
+
+
 LEER_NIEVE_FAQ = [
     ("¿A partir de qué inclinación puede salir un alud?", "Los aludes de placa salen casi siempre en laderas de 30° o más, y la mayoría entre 35° y 45°. Por debajo de 30° es raro que se desencadenen, pero un alud que sale más arriba puede llegar hasta ti: cuenta también la pendiente que tienes encima."),
     ("¿Qué es una placa de viento?", "Una capa de nieve que el viento ha transportado y compactado a sotavento de crestas, collados y cambios de pendiente. Puede ser blanda o dura, pero es cohesiva: si debajo hay una capa débil, se rompe de golpe y desliza entera. Es el problema de aludes más habitual en nuestras sierras."),
@@ -1381,7 +1409,7 @@ def main():
     cfg = os.path.join(OUT, "config.js")
     c = open(cfg, encoding="utf-8").read().replace('calendarioURL: ""', 'calendarioURL: "",\n  // Carpeta donde está publicada la web ("" si está en la raíz del dominio)\n  base: "%s"' % BASE)
     open(cfg, "w", encoding="utf-8").write(c)
-    build_home(); build_activities_index(); build_courses_index(); build_calendar(); build_rental(); build_about(); build_contact(); build_404(); build_calculator(); build_topografia(); build_meteo(); build_caudales(); build_nieve(); build_mochila(); build_capas(); build_leer_nieve(); build_articulos()
+    build_home(); build_activities_index(); build_courses_index(); build_calendar(); build_rental(); build_about(); build_contact(); build_404(); build_calculator(); build_topografia(); build_meteo(); build_caudales(); build_nieve(); build_mochila(); build_capas(); build_leer_nieve(); build_articulos(); build_editor_gpx()
     for a in ACTIVITIES:
         build_activity(a)
     build_ascensiones_macizos()
