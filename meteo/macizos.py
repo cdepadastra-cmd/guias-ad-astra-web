@@ -128,12 +128,12 @@ MACIZOS = [
 # Webcams. "windy": cámaras de Windy.com que se pueden insertar en la página (su reproductor público).
 # "enlaces": otras cámaras que no permiten insertarlas; se ponen como enlace.
 WEBCAMS = {
-    "gredos-macizo-central": {"windy": [("1369739199", "Hoyos del Espino · Sierra de Gredos")]},
-    "sierra-del-barco": {"windy": [("1369739199", "Hoyos del Espino · Sierra de Gredos (cámara cercana)")],
+    "gredos-macizo-central": {"meteosierra": [('laguna-grande-de-gredos', 'Refugio Laguna Grande', 1940), ('cinco-lagunas', 'Cinco Lagunas', 2404), ('navarredonda-de-gredos', 'Navarredonda de Gredos', 1540), ('sierra-de-gredos', 'Sierra de Gredos', 1540)], "windy": [("1369739199", "Hoyos del Espino · Sierra de Gredos")]},
+    "sierra-del-barco": {"meteosierra": [('cinco-lagunas', 'Cinco Lagunas', 2404), ('laguna-grande-de-gredos', 'Refugio Laguna Grande', 1940)], "windy": [("1369739199", "Hoyos del Espino · Sierra de Gredos (cámara cercana)")],
                          "enlaces": [("https://www.windfinder.com/webcams/la_covatilla_estacion_de_esqui", "La Covatilla (Windfinder)")]},
-    "los-galayos": {"windy": [("1369739199", "Hoyos del Espino · cara norte de Gredos (cámara cercana)"), ("1584619519", "Navaquesera (cámara cercana)")],
+    "los-galayos": {"meteosierra": [('guisando', 'Guisando', 784), ('laguna-grande-de-gredos', 'Refugio Laguna Grande', 1940)], "windy": [("1369739199", "Hoyos del Espino · cara norte de Gredos (cámara cercana)"), ("1584619519", "Navaquesera (cámara cercana)")],
                     "enlaces": [("https://es.windfinder.com/webcams/pedro_bernardo", "Pedro Bernardo · Valle del Tiétar (Windfinder)"), ("https://www.windfinder.com/webcams/piedralaves", "Piedralaves (Windfinder)")]},
-    "gredos-macizo-oriental": {"windy": [("1584619519", "Navaquesera"), ("1584619412", "Navalacruz · La Paramera"), ("1793896805", "Cepeda la Mora · La Serrota")],
+    "gredos-macizo-oriental": {"meteosierra": [('guisando', 'Guisando', 784), ('navarredonda-de-gredos', 'Navarredonda de Gredos', 1540)], "windy": [("1584619519", "Navaquesera"), ("1584619412", "Navalacruz · La Paramera"), ("1793896805", "Cepeda la Mora · La Serrota")],
                                "enlaces": [("https://www.windfinder.com/webcams/piedralaves", "Piedralaves (Windfinder)")]},
     "valle-del-jerte": {"enlaces": [("https://www.windfinder.com/webcams/plasencia", "Plasencia (Windfinder)"), ("https://www.windfinder.com/webcams/la_covatilla_estacion_de_esqui", "La Covatilla (Windfinder)")]},
     "sierra-de-tonda": {"enlaces": [("https://www.windfinder.com/webcams/bejar", "Béjar (Windfinder)"), ("https://www.windfinder.com/webcams/la_covatilla_estacion_de_esqui", "La Covatilla (Windfinder)")]},
@@ -143,9 +143,9 @@ WEBCAMS = {
     "sierra-de-candelario": {"enlaces": [("https://www.windfinder.com/webcams/la_covatilla_estacion_de_esqui", "La Covatilla (Windfinder)"),
                                          ("https://www.skiinfo.fr/systeme-central/sierra-de-bejar-la-covatilla/webcams", "La Covatilla (Skiinfo)")]},
     "sierra-de-francia": {"enlaces": [("https://www.skylinewebcams.com/webcam/espana/castilla-y-leon/salamanca/la-alberca.html", "La Alberca (SkylineWebcams)")]},
-    "guadarrama": {"windy": [("1705743145", "Segovia mirando a la Sierra de Guadarrama")], "enlaces": [("https://www.enterat.com/servicios/webcams-navacerrada.php", "Navacerrada y Cotos: listado de cámaras"),
+    "guadarrama": {"meteosierra": [('telegrafo', 'Telégrafo · Navacerrada', 1802), ('puerto-de-navacerrada', 'Puerto de Navacerrada', 1802), ('la-pedriza', 'La Pedriza', 962), ('sierra-de-guadarrama', 'Sierra de Guadarrama', 923)], "windy": [("1705743145", "Segovia mirando a la Sierra de Guadarrama")], "enlaces": [("https://www.enterat.com/servicios/webcams-navacerrada.php", "Navacerrada y Cotos: listado de cámaras"),
                                ("https://www.windfinder.com/webcams/puerto_de_navacerrada", "Puerto de Navacerrada (Windfinder)")]},
-    "ayllon": {"enlaces": [("https://www.onthesnow.co.uk/spain/la-pinilla/webcams", "La Pinilla (OnTheSnow)")]},
+    "ayllon": {"meteosierra": [('cantalojas', 'Cantalojas', 1320), ('sierra-de-ayllon', 'Sierra de Ayllón', 1320), ('galve-de-sorbe', 'Galve de Sorbe', 1359)], "enlaces": [("https://www.onthesnow.co.uk/spain/la-pinilla/webcams", "La Pinilla (OnTheSnow)")]},
     "montanas-de-leon": {"enlaces": [("https://www.skylinewebcams.com/webcam/espana/castilla-y-leon/leon/riano-y-pico-yordas.html", "Riaño y Pico Yordas (SkylineWebcams)")]},
     "puerto-de-san-isidro": {"enlaces": [("https://www.skylinewebcams.com/webcam/espana/castilla-y-leon/leon/estacion-invernal-y-de-montana-san-isidro.html", "Estación de San Isidro (SkylineWebcams)"),
                                          ("https://www.skiresort.info/ski-resort/san-isidro-zona-cebolledo/webcams/wcn72071", "San Isidro · Cebolledo (Skiresort.info)")]},

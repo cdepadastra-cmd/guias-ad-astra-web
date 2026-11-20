@@ -363,9 +363,13 @@
     var lista = LISTA;
     if (!lista.length) { try { lista = JSON.parse(document.getElementById("mt-lista").textContent); } catch (e) { lista = []; } }
     var m = lista.filter(function (x) { return x.id === id; })[0], c = (m && m.cams) || {};
-    var w = c.windy || [], en = c.enlaces || [];
-    if (!w.length && !en.length) return "";
-    return '<div class="mt-sec"><h2>Webcams</h2>' + (w.length ? '<div class="mt-cams">' + w.map(function (x) {
+    var w = c.windy || [], en = c.enlaces || [], ms = c.meteosierra || [];
+    if (!w.length && !en.length && !ms.length) return "";
+    return '<div class="mt-sec"><h2>Webcams</h2>' +
+      (ms.length ? '<div class="mt-ms">' + ms.map(function (x) {
+        return '<a class="mt-msc" href="https://meteosierra.com/webcams/' + esc(x[0]) + '/" target="_blank" rel="noopener"><b>' + esc(x[1]) + "</b><small>" + Number(x[2]).toLocaleString("es-ES") + ' m · Meteosierra</small><span>Ver la cámara →</span></a>';
+      }).join("") + '</div><p class="muted small">Cámaras de <a href="https://meteosierra.com/webcams/" target="_blank" rel="noopener">Meteosierra</a>: foto cada pocos minutos, timelapse del día y directo. Se abren en su web.</p>' : "") +
+      (w.length ? '<div class="mt-cams">' + w.map(function (x) {
       return '<figure class="mt-cam"><div class="mt-cam-v"><iframe src="https://webcams.windy.com/webcams/public/embed/player/' + esc(x[0]) + '/day" title="Webcam ' + esc(x[1]) + '" loading="lazy" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div><figcaption>' + esc(x[1]) + "</figcaption></figure>";
     }).join("") + "</div>" : "") +
       (en.length ? '<p class="mt-cam-links">' + (w.length ? "Más cámaras: " : "Cámaras de la zona (se abren en su web): ") + en.map(function (x) { return '<a href="' + esc(x[0]) + '" target="_blank" rel="noopener">' + esc(x[1]) + "</a>"; }).join(" · ") + "</p>" : "") +
