@@ -154,7 +154,7 @@
     '<div class="v3-f2"><label class="v3-l">Relieve<select id="v3-rel"><option value="1">Real</option><option value="1.4" selected>Algo exagerado</option><option value="2">Muy exagerado</option></select></label>' +
     '<label class="v3-l">Color<input type="color" id="v3-col" value="' + opt.color + '"></label></div>' +
     '<div class="v3-wps"><div class="v3-wh"><b>Puntos del vídeo</b><small id="v3-wn"></small></div><ul id="v3-wl" class="v3-wl"></ul>' +
-    '<div class="v3-wadd"><input id="v3-wkm" type="number" min="0" step="0.1" placeholder="km" aria-label="Kilómetro"><input id="v3-wnom" maxlength="40" placeholder="Nombre del punto" aria-label="Nombre del punto"><button type="button" class="gx-ib" id="v3-wbtn">Añadir</button></div>' +
+    '<div class="v3-wadd"><input id="v3-wkm" type="text" inputmode="decimal" placeholder="km" aria-label="Kilómetro"><input id="v3-wnom" maxlength="40" placeholder="Nombre del punto" aria-label="Nombre del punto"><button type="button" class="gx-ib" id="v3-wbtn">Añadir</button></div>' +
     '<label class="v3-ch"><input type="checkbox" id="v3-wpausa" checked> Pararse un momento en cada punto</label></div>' +
     '<label class="v3-ch"><input type="checkbox" id="v3-perf" checked> Perfil y datos en el vídeo</label>' +
     '<label class="v3-ch"><input type="checkbox" id="v3-hd"> Full HD (más pesado y más lento de crear)</label>' +
