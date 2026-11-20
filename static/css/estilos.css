@@ -870,3 +870,13 @@ input[type=radio],input[type=checkbox]{width:auto;padding:0}
 .mt-msc{display:grid;gap:3px;padding:14px 16px;border-radius:12px;border:1px solid var(--line-2);background:linear-gradient(135deg,rgba(111,179,224,.12),rgba(233,165,59,.08));color:inherit;transition:border-color .2s,transform .2s}
 .mt-msc:hover{border-color:var(--gold);transform:translateY(-2px)}
 .mt-msc b{font-size:1.02rem}.mt-msc small{color:var(--muted)}.mt-msc span{color:var(--gold);font-weight:700;font-size:.88rem;margin-top:4px}
+.mt-visor{background:#1b120c;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;max-width:980px}
+.mt-visor .mt-cam-v img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.mt-visor-cap{padding:10px 14px;font-size:.9rem;color:var(--muted)}.mt-visor-cap b{color:var(--fg)}
+.mt-camtira{display:flex;gap:8px;overflow-x:auto;padding:12px 0 6px;max-width:980px}
+.mt-camb{flex:0 0 auto;display:grid;gap:2px;text-align:left;padding:10px 14px;border-radius:10px;border:1px solid var(--line-2);background:var(--card);color:var(--fg);cursor:pointer;min-width:180px}
+.mt-camb small{color:var(--muted);font-size:.75rem}
+.mt-camb.on{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold) inset;background:rgba(233,165,59,.1)}
+.mt-camb:hover{border-color:var(--gold)}
+.mt-camb-ext{border-style:dashed}
+.mt-camb b{font-size:.9rem;font-weight:700}
