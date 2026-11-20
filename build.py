@@ -48,7 +48,7 @@ NAV_ACT = [("Todas las actividades", "/actividades/"), ("Barranquismo", "/activi
            ("Alpinismo y ascensiones", "/actividades/?categoria=Ascensiones"), ("Espeleología", "/actividades/?categoria=Espeleología"), ("Escalada y boulder", "/actividades/?categoria=Escalada"),
            ("Senderismo", "/actividades/?categoria=Senderismo"), ("Travesías y viajes", "/actividades/?categoria=Travesías y viajes")]
 NAV_CUR = [("Todos los cursos", "/formacion-cursos/"), ("Calendario de cursos", "/calendario/")] + [(c["disc_label"], "/actividades/%s/" % c["slug"]) for c in COURSES]
-NAV_HER = [("Meteorología de montaña", "/meteo/"), ("Estado de la nieve", "/nieve/"), ("Caudal de barrancos", "/barrancos-caudal/"), ("Calculadora de rutas", "/calculadora-rutas/"), ("Editor GPX", "/editor-gpx/"), ("Topografía de barrancos", "/topografia-barrancos/"), ("Boulder en Las Tuerces", "/actividades/boulder-las-tuerces/"), ("Boulder en Zona Centro", "/actividades/boulder-zona-centro-salamanca-caceres/")]
+NAV_HER = [("Meteorología de montaña", "/meteo/"), ("Estado de la nieve", "/nieve/"), ("Caudal de barrancos", "/barrancos-caudal/"), ("Calculadora de rutas", "/calculadora-rutas/"), ("Editor GPX", "/editor-gpx/"), ("Vídeo 3D de la ruta", "/video-ruta-3d/"), ("Topografía de barrancos", "/topografia-barrancos/"), ("Boulder en Las Tuerces", "/actividades/boulder-las-tuerces/"), ("Boulder en Zona Centro", "/actividades/boulder-zona-centro-salamanca-caceres/")]
 ARTICULOS = [
     ("/como-leer-la-nieve-y-los-aludes/", "Cómo leer la nieve y el peligro de aludes", "Cómo cambia el manto, placas de viento, tipos de aludes, el boletín de AEMET y cómo leer una ladera.", "nieve"),
     ("/como-preparar-la-mochila/", "Cómo preparar la mochila", "Cómo repartir el peso, cómo ajustarla y listas de material por actividad que vas tachando.", "mochila"),
@@ -1023,6 +1023,33 @@ def build_editor_gpx():
          body, "her", ld, priority="0.7", head=head, scripts=scripts)
 
 
+VIDEO3D_FAQ = [
+    ("¿Cuesta algo o tengo que registrarme?", "No. Es gratis, sin registro y sin marcas de agua de terceros: solo lleva un pequeño logo de Guías Ad Astra en una esquina."),
+    ("¿Se sube mi track a algún sitio?", "No. El vídeo se crea en tu propio navegador: el track no sale de tu ordenador. Lo único que se descarga de internet son las imágenes del mapa y del relieve."),
+    ("¿Qué navegador necesito?", "Uno actualizado de ordenador: Chrome, Edge, Safari o Firefox (versión 130 o posterior). En el móvil también funciona, pero tarda más. Si tu navegador no puede crear el vídeo, te lo dirá."),
+    ("¿Cuánto tarda en crearse?", "Depende del ordenador y de la conexión: un vídeo de 30 segundos suele tardar entre uno y tres minutos. Se crea fotograma a fotograma, así que aunque tarde, el vídeo sale fluido."),
+    ("¿Qué mapas puedo usar?", "La ortofoto del PNOA del Instituto Geográfico Nacional (la mejor calidad en España), el satélite Sentinel-2 para fuera de España, el mapa topográfico del IGN y OpenTopoMap. El relieve 3D sale de los datos abiertos Terrain Tiles."),
+    ("¿Puedo subirlo a Instagram o a Strava?", "Sí: elige el formato vertical para Reels e historias, o el horizontal para YouTube. El vídeo es MP4 y lleva incluidas las atribuciones de los mapas que piden sus licencias."),
+]
+
+
+def build_video3d():
+    path = "/video-ruta-3d/"
+    body = (hero("Herramientas", "Vídeo 3D de tu ruta", "Sube tu track y crea un vídeo de la ruta sobrevolando el relieve en 3D, con el perfil, la distancia y el desnivel. Gratis, sin registro y sin subir tu GPX a ningún sitio.", METEO_IMG,
+                 [("Inicio", "/"), ("Vídeo 3D de la ruta", "")]) +
+            '<section class="section gx-sec"><div class="wrap"><div id="v3-app" class="v3"><noscript>Esta herramienta necesita JavaScript.</noscript></div></div></section>'
+            '<section class="section alt"><div class="wrap split"><div class="stack" style="gap:0">' + block("Preguntas frecuentes", faq_html(VIDEO3D_FAQ)) +
+            '</div><div class="sticky"><div class="panel"><p class="eyebrow">Consejo</p><p>Si tu track tiene saltos del GPS o paradas que dibujan una maraña, límpialo antes en el <a href="/editor-gpx/">editor GPX</a>: desde allí puedes mandarlo directamente a esta herramienta con «Hacer vídeo 3D».</p></div></div></div></section>')
+    ld = [crumbs_ld([("Inicio", "/"), ("Vídeo 3D de la ruta", path)]), faq_ld(VIDEO3D_FAQ),
+          {"@context": "https://schema.org", "@type": "WebApplication", "name": "Vídeo 3D de rutas", "url": url(path), "applicationCategory": "MultimediaApplication", "operatingSystem": "Web",
+           "description": "Crea gratis un vídeo de tu ruta sobre un mapa 3D con relieve y perfil a partir de un archivo GPX.", "offers": {"@type": "Offer", "price": 0, "priceCurrency": "EUR"}, "provider": {"@id": D + "/#empresa"}}]
+    head = '<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.css" crossorigin="">'
+    scripts = '<script src="https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.js" crossorigin="" defer></script><script src="/js/video3d.js" defer></script>'
+    page(path, "Vídeo 3D de tu ruta GPX gratis, tipo Relive | Ad Astra",
+         "Crea gratis un vídeo de tu ruta sobrevolando el relieve en 3D, con perfil, distancia y desnivel. Sube tu GPX y descarga el MP4 en horizontal, vertical o cuadrado.",
+         body, "her", ld, priority="0.7", head=head, scripts=scripts)
+
+
 LEER_NIEVE_FAQ = [
     ("¿A partir de qué inclinación puede salir un alud?", "Los aludes de placa salen casi siempre en laderas de 30° o más, y la mayoría entre 35° y 45°. Por debajo de 30° es raro que se desencadenen, pero un alud que sale más arriba puede llegar hasta ti: cuenta también la pendiente que tienes encima."),
     ("¿Qué es una placa de viento?", "Una capa de nieve que el viento ha transportado y compactado a sotavento de crestas, collados y cambios de pendiente. Puede ser blanda o dura, pero es cohesiva: si debajo hay una capa débil, se rompe de golpe y desliza entera. Es el problema de aludes más habitual en nuestras sierras."),
@@ -1409,7 +1436,7 @@ def main():
     cfg = os.path.join(OUT, "config.js")
     c = open(cfg, encoding="utf-8").read().replace('calendarioURL: ""', 'calendarioURL: "",\n  // Carpeta donde está publicada la web ("" si está en la raíz del dominio)\n  base: "%s"' % BASE)
     open(cfg, "w", encoding="utf-8").write(c)
-    build_home(); build_activities_index(); build_courses_index(); build_calendar(); build_rental(); build_about(); build_contact(); build_404(); build_calculator(); build_topografia(); build_meteo(); build_caudales(); build_nieve(); build_mochila(); build_capas(); build_leer_nieve(); build_articulos(); build_editor_gpx()
+    build_home(); build_activities_index(); build_courses_index(); build_calendar(); build_rental(); build_about(); build_contact(); build_404(); build_calculator(); build_topografia(); build_meteo(); build_caudales(); build_nieve(); build_mochila(); build_capas(); build_leer_nieve(); build_articulos(); build_editor_gpx(); build_video3d()
     for a in ACTIVITIES:
         build_activity(a)
     build_ascensiones_macizos()
