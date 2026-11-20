@@ -51,7 +51,9 @@
     cand.sort(function (a, b) { return b.pts.length - a.pts.length; });
     if (!cand.length || cand[0].pts.length < 2) throw new Error("No hemos encontrado ningún track en el archivo.");
     var docName = (doc.querySelector("metadata > name") || {}).textContent;
-    return { name: (cand[0].name || docName || nombre.replace(/\.[^.]+$/, "")).trim(), pts: cand[0].pts };
+    var wps = Array.prototype.map.call(doc.getElementsByTagName("wpt"), function (n) { var p = pt(n); p.name = (h(n, "name") || "").trim(); return p; })
+      .filter(function (w) { return isFinite(w.lat) && isFinite(w.lon); });
+    return { name: (cand[0].name || docName || nombre.replace(/\.[^.]+$/, "")).trim(), pts: cand[0].pts, wpts: wps };
   }
 
   /* prepara el track: distancias, altitud suavizada, remuestreo y rumbo de la cámara */
@@ -105,7 +107,14 @@
     }
     var lats = p.map(function (x) { return x.lat; }), lons = p.map(function (x) { return x.lon; });
     var t0 = p[0].t, t1 = p[p.length - 1].t;
-    return { name: tr.name, pts: p, d: d, total: total, ele: hayEle ? ele : null, up: up, C: C, B: B, N: N,
+    var wps = [];
+    (tr.wpts || []).forEach(function (w, n) {
+      var best = -1, bd = Infinity;
+      for (var z = 0; z < p.length; z++) { var dz = hav(w, p[z]); if (dz < bd) { bd = dz; best = z; } }
+      if (bd <= 500) wps.push({ id: n + 1, name: w.name || "Punto " + (n + 1), dist: d[best], on: true });
+    });
+    wps.sort(function (a, b) { return a.dist - b.dist; });
+    return { name: tr.name, pts: p, d: d, total: total, wps: wps, wpsLejos: (tr.wpts || []).length - wps.length, ele: hayEle ? ele : null, up: up, C: C, B: B, N: N,
       bounds: [[Math.min.apply(null, lons), Math.min.apply(null, lats)], [Math.max.apply(null, lons), Math.max.apply(null, lats)]],
       tiempo: isFinite(t0) && isFinite(t1) && t1 > t0 ? [t0, t1] : null,
       emin: hayEle ? Math.min.apply(null, ele) : null, emax: hayEle ? Math.max.apply(null, ele) : null };
@@ -126,11 +135,11 @@
   var MAPAS = {
     pnoa: { n: "Satélite PNOA (España)", tiles: [ign.replace("{c}", "pnoa-ma").replace("{l}", "OI.OrthoimageCoverage")], max: 19, attr: "Ortofoto PNOA © Instituto Geográfico Nacional" },
     s2: { n: "Satélite Sentinel-2 (todo el mundo)", tiles: ["https://tiles.maps.eox.at/wmts/1.0.0/s2cloudless_3857/default/g/{z}/{y}/{x}.jpg"], max: 15, attr: "Sentinel-2 cloudless 2016 by EOX IT Services GmbH (contiene datos modificados de Copernicus Sentinel)" },
-    ign: { n: "Mapa topográfico IGN (España)", tiles: [ign.replace("{c}", "mapa-raster").replace("{l}", "MTN")], max: 17, attr: "Mapa © Instituto Geográfico Nacional" },
-    otm: { n: "OpenTopoMap (todo el mundo)", tiles: ["https://a.tile.opentopomap.org/{z}/{x}/{y}.png", "https://b.tile.opentopomap.org/{z}/{x}/{y}.png", "https://c.tile.opentopomap.org/{z}/{x}/{y}.png"], max: 17, attr: "© OpenTopoMap (CC-BY-SA) · © colaboradores de OpenStreetMap" }
+    ign: { n: "Mapa topográfico IGN (España)", tiles: [ign.replace("{c}", "mapa-raster").replace("{l}", "MTN")], max: 16, attr: "Mapa © Instituto Geográfico Nacional" },
+    otm: { n: "OpenTopoMap (todo el mundo)", tiles: ["https://a.tile.opentopomap.org/{z}/{x}/{y}.png", "https://b.tile.opentopomap.org/{z}/{x}/{y}.png", "https://c.tile.opentopomap.org/{z}/{x}/{y}.png"], max: 16, attr: "© OpenTopoMap (CC-BY-SA) · © colaboradores de OpenStreetMap" }
   };
   var DEM_ATTR = "Relieve: Terrain Tiles (Mapzen, AWS Open Data)";
-  var opt = { fmt: "h", hd: false, dur: 30, mapa: "pnoa", relieve: 1.4, zoom: 0, color: "#ff7a1a", perfil: true, titulo: "" };
+  var opt = { fmt: "h", hd: false, dur: 30, mapa: "pnoa", relieve: 1.4, zoom: 0, color: "#ff7a1a", perfil: true, titulo: "", pausa: true };
 
   app.innerHTML =
     '<div class="v3-grid"><aside class="v3-panel">' +
@@ -141,9 +150,12 @@
     '<label class="v3-l">Mapa<select id="v3-mapa">' + Object.keys(MAPAS).map(function (k) { return '<option value="' + k + '">' + MAPAS[k].n + "</option>"; }).join("") + "</select></label>" +
     '<label class="v3-l">Formato<select id="v3-fmt">' + Object.keys(FORMATOS).map(function (k) { return '<option value="' + k + '">' + FORMATOS[k].n + "</option>"; }).join("") + "</select></label>" +
     '<div class="v3-f2"><label class="v3-l">Duración<select id="v3-dur"><option value="20">20 s</option><option value="30" selected>30 s</option><option value="45">45 s</option><option value="60">60 s</option></select></label>' +
-    '<label class="v3-l">Cámara<select id="v3-zoom"><option value="0.7">Cerca</option><option value="0" selected>Normal</option><option value="-0.7">Lejos</option></select></label></div>' +
+    '<label class="v3-l">Cámara<select id="v3-zoom"><option value="1.5">Muy cerca</option><option value="0.8">Cerca</option><option value="0" selected>Normal</option><option value="-0.7">Lejos</option></select></label></div>' +
     '<div class="v3-f2"><label class="v3-l">Relieve<select id="v3-rel"><option value="1">Real</option><option value="1.4" selected>Algo exagerado</option><option value="2">Muy exagerado</option></select></label>' +
     '<label class="v3-l">Color<input type="color" id="v3-col" value="' + opt.color + '"></label></div>' +
+    '<div class="v3-wps"><div class="v3-wh"><b>Puntos del vídeo</b><small id="v3-wn"></small></div><ul id="v3-wl" class="v3-wl"></ul>' +
+    '<div class="v3-wadd"><input id="v3-wkm" type="number" min="0" step="0.1" placeholder="km" aria-label="Kilómetro"><input id="v3-wnom" maxlength="40" placeholder="Nombre del punto" aria-label="Nombre del punto"><button type="button" class="gx-ib" id="v3-wbtn">Añadir</button></div>' +
+    '<label class="v3-ch"><input type="checkbox" id="v3-wpausa" checked> Pararse un momento en cada punto</label></div>' +
     '<label class="v3-ch"><input type="checkbox" id="v3-perf" checked> Perfil y datos en el vídeo</label>' +
     '<label class="v3-ch"><input type="checkbox" id="v3-hd"> Full HD (más pesado y más lento de crear)</label>' +
     '<div class="v3-acc"><button type="button" class="btn btn-ghost" id="v3-play" disabled>▶ Ver animación</button><button type="button" class="btn btn-primary" id="v3-rec" disabled>Crear vídeo MP4</button></div>' +
@@ -172,7 +184,8 @@
         hill: { type: "raster-dem", tiles: ["https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png"], encoding: "terrarium", tileSize: 256, maxzoom: 15 },
         todo: { type: "geojson", data: { type: "Feature", geometry: { type: "LineString", coordinates: [] } } },
         hecho: { type: "geojson", data: { type: "Feature", geometry: { type: "LineString", coordinates: [] } } },
-        pos: { type: "geojson", data: { type: "Feature", geometry: { type: "Point", coordinates: [0, 0] } } }
+        pos: { type: "geojson", data: { type: "Feature", geometry: { type: "Point", coordinates: [0, 0] } } },
+        wps: { type: "geojson", data: { type: "FeatureCollection", features: [] } }
       },
       layers: [
         { id: "base", type: "raster", source: "base", paint: { "raster-fade-duration": 0 } },
@@ -180,6 +193,7 @@
         { id: "todo", type: "line", source: "todo", layout: { "line-cap": "round", "line-join": "round" }, paint: { "line-color": "#ffffff", "line-width": 3, "line-opacity": 0.55 } },
         { id: "hecho-b", type: "line", source: "hecho", layout: { "line-cap": "round", "line-join": "round" }, paint: { "line-color": "#1b120c", "line-width": 8, "line-opacity": 0.5 } },
         { id: "hecho", type: "line", source: "hecho", layout: { "line-cap": "round", "line-join": "round" }, paint: { "line-color": opt.color, "line-width": 5 } },
+        { id: "wps", type: "circle", source: "wps", paint: { "circle-radius": 6, "circle-color": "#ffffff", "circle-stroke-color": "#1b120c", "circle-stroke-width": 2.5 } },
         { id: "pos-h", type: "circle", source: "pos", paint: { "circle-radius": 14, "circle-color": opt.color, "circle-opacity": 0.3 } },
         { id: "pos", type: "circle", source: "pos", paint: { "circle-radius": 7, "circle-color": opt.color, "circle-stroke-color": "#fff", "circle-stroke-width": 3 } }
       ],
@@ -204,11 +218,22 @@
     var coords = T.pts.map(function (p) { return [p.lon, p.lat]; });
     map.getSource("todo").setData({ type: "Feature", geometry: { type: "LineString", coordinates: coords } });
     map.getSource("hecho").setData({ type: "Feature", geometry: { type: "LineString", coordinates: [coords[0], coords[0]] } });
+    pintarWps();
+  }
+  function wpsActivos() { return T ? T.wps.filter(function (w) { return w.on; }) : []; }
+  function pintarWps() {
+    if (listo && T) map.getSource("wps").setData({ type: "FeatureCollection", features: wpsActivos().map(function (w) { var p = enDist(T, w.dist); return { type: "Feature", geometry: { type: "Point", coordinates: [p.lon, p.lat] } }; }) });
+    var ul = $("v3-wl"); if (!ul) return;
+    if (!T) { ul.innerHTML = ""; $("v3-wn").textContent = ""; return; }
+    $("v3-wn").textContent = T.wps.length ? " (" + wpsActivos().length + " de " + T.wps.length + ")" : "";
+    ul.innerHTML = T.wps.length ? T.wps.map(function (w) {
+      return '<li data-id="' + w.id + '"><input type="checkbox"' + (w.on ? " checked" : "") + ' aria-label="Mostrar"><input class="v3-wnm" value="' + esc(w.name) + '" maxlength="40" aria-label="Nombre"><span>' + km(w.dist) + ' km</span><button type="button" class="v3-wdel" aria-label="Quitar">×</button></li>';
+    }).join("") : '<li class="v3-wvac">Sin puntos. Se leen los waypoints del GPX o puedes añadirlos por kilómetro.' + (T.wpsLejos ? " (" + T.wpsLejos + " waypoints del archivo quedan a más de 500 m del track y no se usan.)" : "") + "</li>";
   }
 
   /* ---------------------------------------------------------------- animación */
   var TI = 3, TF = 3.5;  // segundos de entrada y de salida
-  function zoomBase() { return Math.max(11, Math.min(15.2, 14.1 - 0.72 * Math.log2(Math.max(500, T.total) / 10000))) + opt.zoom + (opt.fmt === "v" ? -0.35 : 0); }
+  function zoomBase() { return Math.max(11, Math.min(16.8, 14.1 - 0.72 * Math.log2(Math.max(500, T.total) / 10000))) + opt.zoom + (opt.fmt === "v" ? -0.35 : 0); }
   function camInicio() { return { center: [T.C[0].lon, T.C[0].lat], zoom: zoomBase(), pitch: 62, bearing: T.B[0] }; }
   function camVista(bearing, pitch) {
     var d = dims(), pad = Math.round(Math.min(d.w, d.h) * 0.14);
@@ -224,12 +249,28 @@
   function mezcla(a, b, t) {
     return { center: [lerp(a.center[0], b.center[0], t), lerp(a.center[1], b.center[1], t)], zoom: lerp(a.zoom, b.zoom, t), pitch: lerp(a.pitch, b.pitch, t), bearing: angLerp(a.bearing, b.bearing, t) };
   }
+  /* avance 0..1 a lo largo del track en el segundo s, con una pequeña parada en cada punto */
+  var PAUSA = 1.6;
+  function avance(s) {
+    var D = opt.dur, RS = D - TI - TF;
+    if (s <= TI) return 0;
+    if (s >= D - TF) return 1;
+    var sr = s - TI, ws = opt.pausa ? wpsActivos().filter(function (w) { return w.dist > 0 && w.dist < T.total; }) : [];
+    var pausa = Math.min(PAUSA, ws.length ? RS * 0.35 / ws.length : 0), M = RS - pausa * ws.length, acc = 0;
+    for (var i = 0; i < ws.length; i++) {
+      var llega = ws[i].dist / T.total * M + acc;
+      if (sr < llega) break;
+      if (sr < llega + pausa) return ws[i].dist / T.total;
+      acc += pausa;
+    }
+    return Math.min(1, Math.max(0, (sr - acc) / M));
+  }
   /* coloca la cámara y la línea en el segundo s del vídeo; devuelve el avance 0..1 */
   function camara(s) {
-    var D = opt.dur, fase, prog;
-    if (s < TI) { fase = "ini"; prog = 0; }
-    else if (s > D - TF) { fase = "fin"; prog = 1; }
-    else { fase = "ruta"; prog = (s - TI) / (D - TI - TF); }
+    var D = opt.dur, fase, prog = avance(s);
+    if (s < TI) fase = "ini";
+    else if (s > D - TF) fase = "fin";
+    else fase = "ruta";
     var dist = T.total * prog, pos = enDist(T, dist);
     var q = Math.min(T.N - 1, Math.round(prog * (T.N - 1)));
     var ruta = { center: [T.C[q].lon, T.C[q].lat], zoom: zoomBase(), pitch: 62, bearing: T.B[q] };
@@ -254,7 +295,7 @@
     if (propio) { if (ov.width !== d.w || ov.height !== d.h) { ov.width = d.w; ov.height = d.h; } ctx = ov.getContext("2d"); ctx.clearRect(0, 0, d.w, d.h); }
     if (!T) return;
     var k = Math.min(d.w, d.h) / 720, m = 26 * k, D = opt.dur;
-    var prog = s < TI ? 0 : s > D - TF ? 1 : (s - TI) / (D - TI - TF), pos = enDist(T, T.total * prog);
+    var prog = avance(s), pos = enDist(T, T.total * prog);
     var ent0 = 1, sal = 1;
     ctx.save(); ctx.globalAlpha = ent0 * sal;
     ctx.shadowColor = "rgba(0,0,0,.55)"; ctx.shadowBlur = 10 * k;
@@ -298,6 +339,11 @@
         }
         camino(T.total); ctx.fillStyle = "rgba(255,255,255,.22)"; ctx.fill();
         if (prog > 0) { camino(T.total * prog); ctx.fillStyle = opt.color; ctx.globalAlpha = ent0 * 0.85; ctx.fill(); ctx.globalAlpha = ent0; }
+        wpsActivos().forEach(function (w) {
+          var wx = X(w.dist), we = enDist(T, w.dist).ele;
+          ctx.strokeStyle = "rgba(255,255,255,.55)"; ctx.lineWidth = 1.5 * k; ctx.beginPath(); ctx.moveTo(wx, pt + phh); ctx.lineTo(wx, Y(we)); ctx.stroke();
+          ctx.beginPath(); ctx.arc(wx, Y(we), 4.5 * k, 0, 2 * Math.PI); ctx.fillStyle = w.dist <= T.total * prog ? opt.color : "#fff"; ctx.fill(); ctx.lineWidth = 2 * k; ctx.strokeStyle = "#1b120c"; ctx.stroke();
+        });
         var cx = X(T.total * prog), cy = Y(pos.ele);
         ctx.beginPath(); ctx.arc(cx, cy, 6 * k, 0, 2 * Math.PI); ctx.fillStyle = "#fff"; ctx.fill(); ctx.lineWidth = 3 * k; ctx.strokeStyle = opt.color; ctx.stroke();
         ctx.fillStyle = "rgba(255,255,255,.75)"; ctx.font = "600 " + Math.round(12 * k) + "px Inter, system-ui, sans-serif"; ctx.textBaseline = "top";
@@ -308,6 +354,35 @@
         caja(ctx, bx2, py + ph / 2 - 5 * k, Math.max(10 * k, bw2 * prog), 10 * k, 5 * k); ctx.fillStyle = opt.color; ctx.fill();
       }
       ctx.restore();
+    }
+    // nombres de los puntos sobre el mapa y aviso al llegar a cada uno
+    if (listo && wpsActivos().length) {
+      var dAhora = T.total * prog, activo = null;
+      ctx.save(); ctx.font = "700 " + Math.round(15 * k) + "px Inter, system-ui, sans-serif"; ctx.textBaseline = "middle";
+      wpsActivos().forEach(function (w) {
+        var wp = enDist(T, w.dist), sp;
+        try { sp = map.project([wp.lon, wp.lat]); } catch (e) { return; }
+        if (!sp || sp.x < 0 || sp.y < 60 * k || sp.x > d.w || sp.y > d.h * 0.72) return;
+        var tw = ctx.measureText(w.name).width, bx = sp.x - tw / 2 - 9 * k, by = sp.y - 40 * k;
+        ctx.globalAlpha = 0.95; ctx.shadowColor = "rgba(0,0,0,.45)"; ctx.shadowBlur = 8 * k;
+        caja(ctx, bx, by, tw + 18 * k, 26 * k, 7 * k); ctx.fillStyle = w.dist <= dAhora ? opt.color : "rgba(255,255,255,.95)"; ctx.fill();
+        ctx.shadowBlur = 0; ctx.beginPath(); ctx.moveTo(sp.x - 6 * k, by + 26 * k); ctx.lineTo(sp.x + 6 * k, by + 26 * k); ctx.lineTo(sp.x, sp.y - 8 * k); ctx.closePath(); ctx.fill();
+        ctx.fillStyle = w.dist <= dAhora ? "#fff" : "#1b120c"; ctx.fillText(w.name, bx + 9 * k, by + 13.5 * k);
+        if (w.dist <= dAhora && dAhora - w.dist < Math.max(150, T.total * 0.03)) activo = w;
+      });
+      ctx.restore();
+      if (activo && prog < 1) {
+        var ae = enDist(T, activo.dist), txt2 = activo.name, sub2 = "km " + km(activo.dist) + (ae.ele != null ? " · " + ent(ae.ele) + " m" : "");
+        ctx.save(); ctx.font = "800 " + Math.round(26 * k) + "px Inter, system-ui, sans-serif";
+        var w1 = ctx.measureText(txt2).width; ctx.font = "600 " + Math.round(16 * k) + "px Inter, system-ui, sans-serif";
+        var w2 = Math.max(w1, ctx.measureText(sub2).width) + 40 * k, x2 = (d.w - w2) / 2, y2 = m + 84 * k;
+        ctx.shadowColor = "rgba(0,0,0,.5)"; ctx.shadowBlur = 14 * k;
+        caja(ctx, x2, y2, w2, 76 * k, 14 * k); ctx.fillStyle = "rgba(20,12,8,.78)"; ctx.fill();
+        ctx.shadowBlur = 0; ctx.fillStyle = opt.color; caja(ctx, x2, y2, 8 * k, 76 * k, 4 * k); ctx.fill();
+        ctx.textAlign = "center"; ctx.textBaseline = "top"; ctx.fillStyle = "#fff"; ctx.font = "800 " + Math.round(26 * k) + "px Inter, system-ui, sans-serif"; ctx.fillText(txt2, d.w / 2, y2 + 12 * k);
+        ctx.font = "600 " + Math.round(16 * k) + "px Inter, system-ui, sans-serif"; ctx.fillStyle = "rgba(255,255,255,.8)"; ctx.fillText(sub2, d.w / 2, y2 + 46 * k);
+        ctx.restore();
+      }
     }
     // marca
     ctx.save(); ctx.globalAlpha = 0.92; ctx.shadowColor = "rgba(0,0,0,.6)"; ctx.shadowBlur = 8 * k;
@@ -324,11 +399,34 @@
     ctx.restore();
   }
 
+  /* ---------------------------------------------------------------- precarga: recorre la ruta para bajar antes las teselas */
+  var precargado = "", precargando = false;
+  async function precargar() {
+    var clave = [opt.mapa, opt.fmt, opt.hd, opt.zoom, opt.relieve, T && T.name, T && T.total].join("|");
+    if (precargado === clave) return true;
+    precargando = true;
+    prepararVistas();
+    var n = 28;
+    for (var i = 0; i <= n; i++) {
+      if (!precargando) return false;
+      camara(opt.dur * i / n);
+      await esperarRender(5000);
+      estado.innerHTML = '<div class="v3-bar"><i style="width:' + (i / n * 100).toFixed(0) + '%"></i></div>Cargando el mapa de la ruta: ' + Math.round(i / n * 100) + " %";
+    }
+    precargando = false; precargado = clave; estado.innerHTML = "";
+    camara(0); dibujarOverlay(0);
+    return true;
+  }
+
   /* ---------------------------------------------------------------- reproducción en directo */
   var anim = null;
-  function reproducir() {
-    if (!T || !listo) return;
+  async function reproducir() {
+    if (!T || !listo || precargando) return;
     if (anim) { cancelAnimationFrame(anim.id); anim = null; $("v3-play").textContent = "▶ Ver animación"; return; }
+    $("v3-play").disabled = true;
+    var ok = await precargar();
+    $("v3-play").disabled = false;
+    if (!ok) return;
     prepararVistas();
     var t0 = performance.now();
     $("v3-play").textContent = "■ Parar";
@@ -376,6 +474,10 @@
     var d = dims(), cfg = await elegirCodec(d.w, d.h);
     if (!cfg) { aviso("Tu navegador no puede codificar vídeo MP4 a este tamaño. Prueba sin Full HD.", true); return; }
     try { await cargarMuxer(); } catch (e) { aviso(e.message, true); return; }
+    $("v3-rec").disabled = true;
+    var ok = await precargar();
+    $("v3-rec").disabled = false;
+    if (!ok) return;
     grabando = true; cancelar = false;
     $("v3-rec").textContent = "Cancelar"; $("v3-play").disabled = true;
     var fps = 30, total = Math.round(opt.dur * fps), errorCod = null;
@@ -423,7 +525,7 @@
     try {
       T = preparar(leer(texto, nombre));
       $("v3-nom").innerHTML = "<b>" + esc(T.name) + "</b><br>" + km(T.total) + " km" + (T.ele ? " · +" + ent(T.up[T.up.length - 1]) + " m · " + ent(T.emin) + "–" + ent(T.emax) + " m" : " · sin altitud") + (T.tiempo ? " · " + dur(T.tiempo[1] - T.tiempo[0]) : "");
-      $("v3-tit").placeholder = T.name;
+      $("v3-tit").placeholder = T.name; pintarWps();
       $("v3-play").disabled = false; $("v3-rec").disabled = false; $("v3-drop").style.display = "none";
       estado.innerHTML = "";
       if (listo) { cargarTrack(); prepararVistas(); camara(0); map.jumpTo(vistaIni); dibujarOverlay(0); }
@@ -444,6 +546,7 @@
   });
   function cambio(rehacer) {
     if (grabando) return;
+    precargando = false;
     if (anim) reproducir();
     if (rehacer) crearMapa();
     else if (listo && T) { ajustarEscala(); prepararVistas(); camara(0); map.jumpTo(vistaIni); dibujarOverlay(0); }
@@ -461,6 +564,26 @@
     dibujarOverlay(0);
   });
   $("v3-perf").addEventListener("change", function (e) { opt.perfil = e.target.checked; cambio(false); });
+  $("v3-wl").addEventListener("change", function (e) {
+    var li = e.target.closest("li[data-id]"); if (!li || !T) return;
+    var w = T.wps.filter(function (x) { return x.id === +li.getAttribute("data-id"); })[0];
+    if (e.target.type === "checkbox") w.on = e.target.checked; else w.name = e.target.value.trim() || w.name;
+    pintarWps(); if (listo) dibujarOverlay(0);
+  });
+  $("v3-wl").addEventListener("click", function (e) {
+    if (!e.target.classList.contains("v3-wdel") || !T) return;
+    var id = +e.target.closest("li").getAttribute("data-id");
+    T.wps = T.wps.filter(function (x) { return x.id !== id; }); pintarWps(); if (listo) dibujarOverlay(0);
+  });
+  $("v3-wbtn").addEventListener("click", function () {
+    if (!T) return;
+    var k0 = parseFloat(String($("v3-wkm").value).replace(",", ".")), nm = $("v3-wnom").value.trim();
+    if (!isFinite(k0) || k0 < 0 || k0 * 1000 > T.total + 1) { aviso("Escribe un kilómetro entre 0 y " + km(T.total) + ".", true); return; }
+    T.wps.push({ id: Date.now(), name: nm || "Km " + km(k0 * 1000), dist: Math.min(T.total, k0 * 1000), on: true });
+    T.wps.sort(function (a, b) { return a.dist - b.dist; });
+    $("v3-wkm").value = ""; $("v3-wnom").value = ""; estado.innerHTML = ""; pintarWps(); if (listo) dibujarOverlay(0);
+  });
+  $("v3-wpausa").addEventListener("change", function (e) { opt.pausa = e.target.checked; });
   $("v3-play").addEventListener("click", reproducir);
   $("v3-rec").addEventListener("click", grabar);
   window.addEventListener("resize", function () { if (!grabando) ajustarEscala(); });

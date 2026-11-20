@@ -1001,13 +1001,16 @@ GPX_FAQ = [
     ("¿Cómo uno dos tracks?", "Ábrelos a la vez (o uno detrás de otro), marca la casilla de los que quieras unir y pulsa «Unir los marcados». Se unen en el orden de la lista, que puedes cambiar con las flechas, y si alguno está en sentido contrario se gira solo."),
     ("¿Cómo quito un trozo del track?", "Selecciona el track, pulsa «Tramo», marca en el mapa el inicio y el final del trozo y elige: quitarlo y unir los extremos, quitarlo dejando dos tracks separados o quedarte solo con ese trozo."),
     ("¿Qué formatos puedo abrir?", "GPX (de Garmin, Wikiloc, Strava, Komoot, OruxMaps, Suunto…), KML de Google Earth y TCX. Siempre guarda en GPX 1.1, que abre cualquier GPS o aplicación."),
+    ("¿Puedo dibujar un track o un trozo a mano?", "Sí. Con «Dibujar» creas un track nuevo pinchando en el mapa, y con «Alargar» lo continúas por el final o por el principio. Si dejas marcada la opción «Seguir senderos y caminos», entre un clic y el siguiente el track va por los caminos de OpenStreetMap (calculados con BRouter); si no, en línea recta. La altitud se añade sola."),
+    ("¿Cómo añado waypoints?", "Pulsa «Waypoint» y pincha en el mapa donde quieras cada uno. Les puedes cambiar el nombre en la lista, arrastrarlos para moverlos o borrarlos, y se guardan en el GPX que descargues. También se leen los que traigan tus archivos."),
+    ("¿Puedo descargar el mapa y el perfil en imagen?", "Sí, en «Descargar imágenes»: el mapa con el recorrido, el perfil de altitud o una ficha con las dos cosas y los datos de la ruta, en PNG y con el mapa que elijas (topográfico, IGN, ortofoto u OpenStreetMap). Para un trozo, márcalo con «Tramo» y descárgalo desde ahí."),
     ("Me he equivocado, ¿puedo volver atrás?", "Sí: el botón «Deshacer» (o Ctrl+Z) recupera los últimos 40 cambios."),
 ]
 
 
 def build_editor_gpx():
     path = "/editor-gpx/"
-    body = (hero("Herramientas", "Editor de tracks GPX", "Une, divide y recorta tracks, mueve o borra puntos y limpia los errores del GPS: saltos, paradas que bailan y puntos sobrantes. Gratis y sin subir tus archivos a ningún sitio.", METEO_IMG,
+    body = (hero("Herramientas", "Editor de tracks GPX", "Une, divide y recorta tracks, dibuja tramos por los senderos, añade waypoints, limpia los errores del GPS y descarga el mapa y el perfil en imagen. Gratis y sin subir tus archivos a ningún sitio.", METEO_IMG,
                  [("Inicio", "/"), ("Editor GPX", "")]) +
             '<section class="section gx-sec"><div class="wrap"><div id="gx-app" class="gx"><noscript>El editor necesita JavaScript.</noscript></div></div></section>'
             '<section class="section alt"><div class="wrap split"><div class="stack" style="gap:0">' + block("Preguntas frecuentes", faq_html(GPX_FAQ)) +
@@ -1029,6 +1032,7 @@ VIDEO3D_FAQ = [
     ("¿Qué navegador necesito?", "Uno actualizado de ordenador: Chrome, Edge, Safari o Firefox (versión 130 o posterior). En el móvil también funciona, pero tarda más. Si tu navegador no puede crear el vídeo, te lo dirá."),
     ("¿Cuánto tarda en crearse?", "Depende del ordenador y de la conexión: un vídeo de 30 segundos suele tardar entre uno y tres minutos. Se crea fotograma a fotograma, así que aunque tarde, el vídeo sale fluido."),
     ("¿Qué mapas puedo usar?", "La ortofoto del PNOA del Instituto Geográfico Nacional (la mejor calidad en España), el satélite Sentinel-2 para fuera de España, el mapa topográfico del IGN y OpenTopoMap. El relieve 3D sale de los datos abiertos Terrain Tiles."),
+    ("¿Salen los waypoints en el vídeo?", "Sí. Se leen los waypoints del GPX que estén a menos de 500 m del recorrido, y también puedes añadir puntos escribiendo el kilómetro y el nombre, o quitar los que no quieras. Aparecen con su nombre sobre el mapa y en el perfil, y al llegar a cada uno la cámara se para un momento y sale un cartel con el nombre, el kilómetro y la altitud."),
     ("¿Puedo subirlo a Instagram o a Strava?", "Sí: elige el formato vertical para Reels e historias, o el horizontal para YouTube. El vídeo es MP4 y lleva incluidas las atribuciones de los mapas que piden sus licencias."),
 ]
 

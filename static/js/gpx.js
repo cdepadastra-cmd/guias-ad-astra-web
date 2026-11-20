@@ -92,6 +92,7 @@
   }
   function stats(tr) {
     var p = tr.pts, d = [0];
+    if (!p.length) return { dist: [0], total: 0, up: 0, dn: 0, sm: null, emin: null, emax: null, tiempo: NaN, mov: 0 };
     for (var i = 1; i < p.length; i++) d.push(d[i - 1] + hav(p[i - 1], p[i]));
     var sm = eleSuave(p, d), up = 0, dn = 0, emin = null, emax = null;
     if (sm) {
@@ -217,10 +218,12 @@
   }
 
   /* ---------------------------------------------------------------- estado */
-  var tracks = [], wpts = [], selId = null, modo = null, marca = [], prev = null, puntoSel = null;
+  var tracks = [], wpts = [], selId = null, modo = null, marca = [], prev = null, puntoSel = null, dib = null, ocupado = false;
   var hist = [], rehacer = [];
+  function copiaW(w) { return { lat: w.lat, lon: w.lon, ele: w.ele, t: w.t, name: w.name }; }
+  function foto() { return { t: clonar(tracks), w: wpts.map(copiaW), sel: selId }; }
   function guardar() {
-    hist.push({ t: clonar(tracks), sel: selId });
+    hist.push(foto());
     if (hist.length > 40) hist.shift();
     rehacer = [];
   }
@@ -228,12 +231,12 @@
 
   /* ---------------------------------------------------------------- interfaz */
   app.innerHTML =
-    '<div class="gx-bar"><label class="btn btn-primary gx-abrir">Abrir GPX, KML o TCX<input type="file" id="gx-file" accept=".gpx,.kml,.tcx,application/gpx+xml" multiple hidden></label>' +
+    '<div class="gx-bar"><label class="btn btn-primary gx-abrir"><span id="gx-abrir-t">Abrir GPX, KML o TCX</span><input type="file" id="gx-file" accept=".gpx,.kml,.tcx,application/gpx+xml" multiple hidden></label>' +
     '<button type="button" class="btn btn-ghost" id="gx-demo">Probar con un ejemplo</button>' +
     '<span class="gx-sep"></span><button type="button" class="gx-ib" id="gx-undo" title="Deshacer (Ctrl+Z)" disabled>↶ Deshacer</button><button type="button" class="gx-ib" id="gx-redo" title="Rehacer (Ctrl+Y)" disabled>↷ Rehacer</button>' +
     '<span class="gx-sep"></span><button type="button" class="btn btn-primary" id="gx-save" disabled>Descargar GPX</button></div>' +
     '<p class="gx-priv">Tus archivos no se suben a ningún servidor: todo se procesa en tu navegador.</p>' +
-    '<div class="gx-main"><aside class="gx-panel"><div id="gx-lista"></div><div id="gx-tools"></div></aside>' +
+    '<div class="gx-main"><aside class="gx-panel"><div id="gx-lista"></div><div id="gx-crear"></div><div id="gx-tools"></div></aside>' +
     '<div class="gx-der"><div class="gx-mapa" id="gx-mapa"><div class="gx-drop" id="gx-drop"><b>Arrastra aquí tus archivos GPX</b><span>o pulsa «Abrir GPX»</span></div></div><div id="gx-modo"></div><div class="gx-perfil" id="gx-perfil"></div></div></div>';
   var $ = function (id) { return document.getElementById(id); };
   var lista = $("gx-lista"), tools = $("gx-tools"), perfilEl = $("gx-perfil"), modoEl = $("gx-modo");
@@ -256,7 +259,7 @@
   function dibujar() {
     capaTr.clearLayers(); capaWp.clearLayers();
     tracks.forEach(function (t) {
-      if (!t.vis) return;
+      if (!t.vis || !t.pts.length) return;
       var ll = t.pts.map(function (p) { return [p.lat, p.lon]; });
       if (t.id === selId) L.polyline(ll, { color: "#000", weight: 7, opacity: 0.45, interactive: false }).addTo(capaTr);
       var pl = L.polyline(ll, { color: t.color, weight: t.id === selId ? 4.5 : 3, opacity: t.id === selId ? 1 : 0.8 }).addTo(capaTr);
@@ -264,7 +267,11 @@
       L.circleMarker(ll[0], { radius: 5, color: "#fff", weight: 2, fillColor: "#3fae5a", fillOpacity: 1, interactive: false }).addTo(capaTr);
       L.circleMarker(ll[ll.length - 1], { radius: 5, color: "#fff", weight: 2, fillColor: "#d9372b", fillOpacity: 1, interactive: false }).addTo(capaTr);
     });
-    wpts.forEach(function (w) { L.circleMarker([w.lat, w.lon], { radius: 4, color: "#1b120c", weight: 1, fillColor: "#fff", fillOpacity: 1 }).bindTooltip(esc(w.name || "Punto")).addTo(capaWp); });
+    wpts.forEach(function (w) {
+      var mk = L.marker([w.lat, w.lon], { draggable: true, icon: L.divIcon({ className: "gx-wpi", html: "<i></i>", iconSize: [18, 18], iconAnchor: [9, 18] }) })
+        .bindTooltip(esc(w.name || "Waypoint"), { permanent: true, direction: "top", offset: [0, -16], className: "gx-wpt" }).addTo(capaWp);
+      mk.on("dragend", function () { guardar(); var ll = mk.getLatLng(); w.lat = ll.lat; w.lon = ll.lng; w.ele = NaN; altitud(w.lat, w.lon).then(function (v) { w.ele = v; pintarCrear(); }); });
+    });
     dibujarExtra();
   }
   function encuadrar(t) {
@@ -275,7 +282,7 @@
 
   /* lista de tracks */
   function pintarLista() {
-    if (!tracks.length) { lista.innerHTML = '<p class="gx-vacio">Abre uno o varios archivos para empezar. Puedes abrir varios a la vez para unirlos.</p>'; return; }
+    if (!tracks.length) { lista.innerHTML = '<p class="gx-vacio">Abre uno o varios archivos (puedes elegir varios a la vez o ir añadiendo más) o dibuja un track nuevo en el mapa.</p>'; return; }
     var h = '<h3 class="gx-h">Tracks <small>(' + tracks.length + ")</small></h3><ul class=\"gx-tracks\">";
     tracks.forEach(function (t, i) {
       var s = stats(t);
@@ -349,7 +356,8 @@
   function pintarTools() {
     var t = sel();
     if (!t) { tools.innerHTML = ""; return; }
-    var tieneT = isFinite(t.pts[0].t);
+    var tieneT = t.pts.length > 0 && isFinite(t.pts[0].t);
+    if (t.pts.length < 2) { tools.innerHTML = ""; return; }
     tools.innerHTML =
       '<h3 class="gx-h">Editar «' + esc(t.name) + '»</h3><div class="gx-btns">' +
       '<button type="button" class="gx-tb' + (modo === "dividir" ? " on" : "") + '" data-m="dividir"><b>✂ Dividir</b><span>en un punto</span></button>' +
@@ -365,6 +373,9 @@
       '<div class="gx-fila"><label>Tolerancia <input type="number" data-o="tol" value="' + opc.tol + '" min="0.5" max="50" step="0.5"> m</label></div>' +
       '<label class="gx-op"><input type="checkbox" data-o="altitud"' + (opc.altitud ? " checked" : "") + '> Suavizar la altitud</label>' +
       '<div class="gx-fila"><button type="button" class="btn btn-ghost" id="gx-ver">Ver qué se quita</button><button type="button" class="btn btn-primary" id="gx-apl">Aplicar</button></div><div id="gx-res"></div></details>' +
+      '<details class="gx-corr"><summary>Descargar imágenes</summary>' + opcImagenes() +
+      '<div class="gx-fila gx-wrap"><button type="button" class="gx-ib" data-img="mapa">Mapa</button><button type="button" class="gx-ib" data-img="perfil">Perfil</button><button type="button" class="gx-ib" data-img="ficha">Ficha (mapa + perfil)</button></div>' +
+      '<p class="gx-mini">Del track completo. Para un trozo, usa «Tramo», márcalo en el mapa y descárgalo desde ahí.</p></details>' +
       '<details class="gx-corr"><summary>Más opciones</summary><div class="gx-fila gx-wrap">' +
       '<button type="button" class="gx-ib" id="gx-notime"' + (tieneT ? "" : " disabled") + '>Quitar las horas</button>' +
       '<button type="button" class="gx-ib" id="gx-noele">Quitar la altitud</button>' +
@@ -375,6 +386,8 @@
     var b = e.target.closest("[data-m]");
     if (b) { cambiarModo(modo === b.getAttribute("data-m") ? null : b.getAttribute("data-m")); return; }
     var t = sel(); if (!t) return;
+    var bi = e.target.closest("[data-img]");
+    if (bi) { exportarImagen(bi.getAttribute("data-img"), t.pts, t.name, t.color); return; }
     if (e.target.id === "gx-ver") { previsualizar(); return; }
     if (e.target.id === "gx-apl") {
       var r = corregir(t.pts, opc);
@@ -386,7 +399,7 @@
     if (e.target.id === "gx-notime") { guardar(); t.pts.forEach(function (p) { p.t = NaN; }); refrescar(); avisar("Horas quitadas."); }
     if (e.target.id === "gx-noele") { guardar(); t.pts.forEach(function (p) { p.ele = NaN; }); refrescar(); avisar("Altitud quitada."); }
     if (e.target.id === "gx-cerrar") { guardar(); var f = t.pts[0]; t.pts.push({ lat: f.lat, lon: f.lon, ele: f.ele, t: NaN }); refrescar(); avisar("Añadido un punto final igual al de salida."); }
-    if (e.target.id === "gx-video") { try { sessionStorage.setItem("gx-video", gpxTexto([t], [], t.name)); } catch (er) {} }
+    if (e.target.id === "gx-video") { try { sessionStorage.setItem("gx-video", gpxTexto([t], wpts, t.name)); } catch (er) {} }
   });
   tools.addEventListener("change", function (e) {
     var k = e.target.getAttribute("data-o");
@@ -411,12 +424,19 @@
 
   /* modos de edición sobre el mapa */
   function cambiarModo(m) {
+    if (modo === "dibujar" && m !== "dibujar") terminarDibujo();
     modo = m; marca = []; puntoSel = null; prev = null;
     map.getContainer().classList.toggle("gx-cruz", !!m);
     pintarTools(); pintarModo(); dibujarExtra();
   }
   function pintarModo() {
     var t = sel();
+    if (modo === "wpt") { modoEl.innerHTML = '<div class="gx-aviso">Pulsa en el mapa donde quieras poner cada waypoint. Luego puedes cambiarles el nombre en la lista o arrastrarlos. <button type="button" class="gx-ib" data-x="salir">Terminar</button></div>'; return; }
+    if (modo === "dibujar" && dib && t) {
+      modoEl.innerHTML = '<div class="gx-aviso">' + (ocupado ? "Buscando el camino…" : t.pts.length ? "Pulsa en el mapa para seguir dibujando (" + ent(t.pts.length) + " puntos, " + km(stats(t).total) + " km)." : "Pulsa en el mapa para poner el primer punto.") +
+        (dib.pasos.length ? ' <button type="button" class="btn btn-ghost" data-x="atras">Quitar el último tramo</button>' : "") + ' <button type="button" class="btn btn-primary" data-x="salir">Terminar</button></div>';
+      return;
+    }
     if (!modo || !t) { modoEl.innerHTML = ""; return; }
     var h = '<div class="gx-aviso">';
     if (modo === "dividir") {
@@ -426,7 +446,8 @@
       else {
         var a = Math.min(marca[0], marca[1]), b = Math.max(marca[0], marca[1]), s = 0;
         for (var i = a + 1; i <= b; i++) s += hav(t.pts[i - 1], t.pts[i]);
-        h += "Tramo de " + km(s) + " km (" + ent(b - a + 1) + ' puntos). <button type="button" class="btn btn-primary" data-x="quitar">Quitar y unir los extremos</button><button type="button" class="btn btn-ghost" data-x="separar">Quitar y dejar dos tracks</button><button type="button" class="btn btn-ghost" data-x="solo">Quedarme solo con este tramo</button>';
+        h += "Tramo de " + km(s) + " km (" + ent(b - a + 1) + ' puntos). <button type="button" class="btn btn-primary" data-x="quitar">Quitar y unir los extremos</button><button type="button" class="btn btn-ghost" data-x="separar">Quitar y dejar dos tracks</button><button type="button" class="btn btn-ghost" data-x="solo">Quedarme solo con este tramo</button>' +
+          '<span class="gx-tramimg">Imágenes del tramo: <button type="button" class="gx-ib" data-ti="mapa">Mapa</button><button type="button" class="gx-ib" data-ti="perfil">Perfil</button><button type="button" class="gx-ib" data-ti="ficha">Ficha</button></span>';
       }
     } else if (modo === "punto") {
       h += puntoSel != null ? "Punto " + ent(puntoSel + 1) + ': arrástralo para moverlo. <button type="button" class="btn btn-ghost" data-x="borrapt">Borrar este punto</button>' : "Pulsa sobre el track para elegir un punto. Luego puedes arrastrarlo o borrarlo (tecla Supr).";
@@ -434,8 +455,15 @@
     modoEl.innerHTML = h + ' <button type="button" class="gx-ib" data-x="salir">Terminar</button></div>';
   }
   modoEl.addEventListener("click", function (e) {
-    var x = e.target.getAttribute("data-x"), t = sel(); if (!x || !t) return;
-    if (x === "salir") { cambiarModo(null); return; }
+    var ti = e.target.getAttribute("data-ti");
+    if (ti && modo === "tramo" && marca.length === 2) {
+      var t0 = sel(), a0 = Math.min(marca[0], marca[1]), b0 = Math.max(marca[0], marca[1]), sd = stats({ pts: t0.pts.slice(0, a0 + 1) }).total, ed = sd + stats({ pts: t0.pts.slice(a0, b0 + 1) }).total;
+      exportarImagen(ti, t0.pts.slice(a0, b0 + 1), t0.name + " (km " + km(sd) + "–" + km(ed) + ")", t0.color); return;
+    }
+    var x = e.target.getAttribute("data-x"), t = sel(); if (!x) return;
+    if (x === "salir") { cambiarModo(null); refrescar(); return; }
+    if (x === "atras") { quitarTramoDibujado(); return; }
+    if (!t) return;
     guardar();
     var i = tracks.indexOf(t);
     if (x === "cortar") {
@@ -474,7 +502,8 @@
     if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "z") { e.preventDefault(); deshacer(); }
     if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "y") { e.preventDefault(); hacerOtraVez(); }
     if ((e.key === "Delete" || e.key === "Backspace") && modo === "punto" && puntoSel != null) { e.preventDefault(); guardar(); borrarPunto(); }
-    if (e.key === "Escape" && modo) cambiarModo(null);
+    if (e.key === "Escape" && modo) { cambiarModo(null); refrescar(); }
+    if (e.key === "Backspace" && modo === "dibujar") { e.preventDefault(); quitarTramoDibujado(); }
   });
   function cercano(t, ll) {
     var best = -1, bd = Infinity, p = { lat: ll.lat, lon: ll.lng };
@@ -483,6 +512,8 @@
     return px <= 24 ? best : -1;
   }
   map.on("click", function (e) {
+    if (modo === "wpt") { ponerWpt(e.latlng); return; }
+    if (modo === "dibujar") { clicDibujo(e.latlng); return; }
     var t = sel(); if (!modo || !t) return;
     var k = cercano(t, e.latlng);
     if (k < 0) { avisar("Pulsa más cerca del track seleccionado."); return; }
@@ -565,6 +596,250 @@
     if (ln) ln.setAttribute("visibility", "hidden"); if (tip) tip.style.display = "none";
   });
 
+  /* ---------------------------------------------------------------- crear: dibujar tracks y poner waypoints */
+  var crearOpc = { seguir: true, perfil: "hiking-mountain" };
+  var crearEl = document.getElementById("gx-crear");
+  function pintarCrear() {
+    var t = sel();
+    var h = '<h3 class="gx-h">Crear</h3><div class="gx-btns gx-btns2">' +
+      '<button type="button" class="gx-tb' + (modo === "dibujar" && dib && dib.nuevo ? " on" : "") + '" data-c="nuevo"><b>✎ Dibujar</b><span>track nuevo</span></button>' +
+      '<button type="button" class="gx-tb' + (modo === "dibujar" && dib && !dib.nuevo && dib.at === "fin" ? " on" : "") + '" data-c="fin"' + (t && !(dib && dib.nuevo) ? "" : " disabled") + '><b>⟶ Alargar</b><span>por el final</span></button>' +
+      '<button type="button" class="gx-tb' + (modo === "dibujar" && dib && !dib.nuevo && dib.at === "ini" ? " on" : "") + '" data-c="ini"' + (t && !(dib && dib.nuevo) ? "" : " disabled") + '><b>⟵ Alargar</b><span>por el principio</span></button>' +
+      '<button type="button" class="gx-tb' + (modo === "wpt" ? " on" : "") + '" data-c="wpt"><b>📍 Waypoint</b><span>añadir puntos</span></button></div>' +
+      '<label class="gx-op"><input type="checkbox" id="gx-seguir"' + (crearOpc.seguir ? " checked" : "") + '> Seguir senderos y caminos al dibujar</label>' +
+      '<div class="gx-fila"><label>Para <select id="gx-perfil"><option value="hiking-mountain"' + (crearOpc.perfil === "hiking-mountain" ? " selected" : "") + '>Ir a pie</option><option value="trekking"' + (crearOpc.perfil === "trekking" ? " selected" : "") + '>Bicicleta</option></select></label></div>' +
+      '<p class="gx-mini">Los caminos se calculan con <a href="https://brouter.de" target="_blank" rel="noopener">BRouter</a> sobre los datos de OpenStreetMap; la altitud de los puntos dibujados sale de un modelo del terreno.</p>';
+    if (wpts.length) {
+      h += '<h3 class="gx-h" style="margin-top:14px">Waypoints <small>(' + wpts.length + ')</small></h3><ul class="gx-wl">' + wpts.map(function (w, i) {
+        return '<li data-w="' + i + '"><input class="gx-wnom" value="' + esc(w.name || "") + '" placeholder="Sin nombre" aria-label="Nombre del waypoint"><span>' + (isFinite(w.ele) ? ent(w.ele) + " m" : "") + '</span><button type="button" data-wa="zoom" title="Ver en el mapa">⤢</button><button type="button" data-wa="del" title="Borrar">🗑</button></li>';
+      }).join("") + "</ul>";
+    }
+    crearEl.innerHTML = h;
+  }
+  crearEl.addEventListener("click", function (e) {
+    var b = e.target.closest("[data-c]");
+    if (b && !b.disabled) {
+      var c = b.getAttribute("data-c");
+      if (c === "wpt") { cambiarModo(modo === "wpt" ? null : "wpt"); pintarCrear(); return; }
+      var mismo = modo === "dibujar" && dib && ((c === "nuevo" && dib.nuevo) || (!dib.nuevo && dib.at === c));
+      cambiarModo(null);
+      if (!mismo) empezarDibujo(c);
+      refrescar(); return;
+    }
+    var li = e.target.closest("[data-w]"), a = e.target.getAttribute("data-wa");
+    if (!li || !a) return;
+    var w = wpts[+li.getAttribute("data-w")];
+    if (a === "zoom") map.setView([w.lat, w.lon], Math.max(map.getZoom(), 15));
+    if (a === "del") { guardar(); wpts.splice(+li.getAttribute("data-w"), 1); refrescar(); }
+  });
+  crearEl.addEventListener("change", function (e) {
+    if (e.target.id === "gx-seguir") crearOpc.seguir = e.target.checked;
+    if (e.target.id === "gx-perfil") crearOpc.perfil = e.target.value;
+    if (e.target.classList.contains("gx-wnom")) { guardar(); wpts[+e.target.closest("[data-w]").getAttribute("data-w")].name = e.target.value.trim(); dibujar(); }
+  });
+  function ponerWpt(ll) {
+    guardar();
+    var w = { lat: ll.lat, lon: ll.lng, ele: NaN, t: NaN, name: "Waypoint " + (wpts.length + 1) };
+    wpts.push(w); refrescar(true);
+    var idx = wpts.length - 1;
+    altitud(w.lat, w.lon).then(function (v) { w.ele = v; var sp = crearEl.querySelector('[data-w="' + idx + '"] span'); if (sp && isFinite(v)) sp.textContent = ent(v) + " m"; });
+    var inp = crearEl.querySelector('[data-w="' + (wpts.length - 1) + '"] .gx-wnom'); if (inp) { inp.focus(); inp.select(); }
+  }
+  function empezarDibujo(c) {
+    guardar();
+    var t;
+    if (c === "nuevo") { t = nuevoTrack("Track dibujado", []); tracks.push(t); selId = t.id; }
+    else { t = sel(); if (!t) return; if (c === "ini") t.pts.reverse(); }
+    dib = { id: t.id, nuevo: c === "nuevo", at: c === "ini" ? "ini" : "fin", pasos: [] };
+    modo = "dibujar"; map.getContainer().classList.add("gx-cruz");
+    if (c === "nuevo") avisar("Pulsa en el mapa para ir poniendo puntos." + (crearOpc.seguir ? " El track seguirá los senderos entre un punto y otro." : ""));
+  }
+  function trackDib() { return dib ? tracks.filter(function (x) { return x.id === dib.id; })[0] : null; }
+  function terminarDibujo() {
+    var t = trackDib(); if (!t) { dib = null; return; }
+    if (dib.at === "ini") t.pts.reverse();
+    if (t.pts.length < 2) { tracks.splice(tracks.indexOf(t), 1); if (dib.nuevo) avisar("Track descartado: hacen falta al menos dos puntos."); }
+    dib = null; map.getContainer().classList.remove("gx-cruz");
+  }
+  function quitarTramoDibujado() {
+    var t = trackDib(); if (!t || !dib.pasos.length || ocupado) return;
+    var n = dib.pasos.pop(); t.pts.splice(t.pts.length - n, n);
+    refrescar(true);
+  }
+  async function clicDibujo(ll) {
+    var t = trackDib(); if (!t || ocupado) return;
+    var nuevoP = { lat: ll.lat, lon: ll.lng, ele: NaN, t: NaN }, add = [nuevoP];
+    if (t.pts.length && crearOpc.seguir) {
+      ocupado = true; pintarModo();
+      try { add = await camino(t.pts[t.pts.length - 1], nuevoP, crearOpc.perfil); }
+      catch (er) { avisar("No se ha encontrado camino entre esos puntos: se une en línea recta."); add = [nuevoP]; }
+      ocupado = false;
+    }
+    await Promise.all(add.map(function (p) { return isFinite(p.ele) ? null : altitud(p.lat, p.lon).then(function (v) { p.ele = v; }); }));
+    if (!dib || trackDib() !== t) return;
+    t.pts = t.pts.concat(add); dib.pasos.push(add.length);
+    refrescar(true);
+  }
+  /* camino por senderos entre dos puntos (BRouter, datos de OpenStreetMap) */
+  function camino(a, b, perfil) {
+    var u = "https://brouter.de/brouter?lonlats=" + a.lon.toFixed(6) + "," + a.lat.toFixed(6) + "|" + b.lon.toFixed(6) + "," + b.lat.toFixed(6) + "&profile=" + perfil + "&alternativeidx=0&format=geojson";
+    return fetch(u).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }).then(function (g) {
+      var c = g.features[0].geometry.coordinates;
+      var pts = c.map(function (x) { return { lat: x[1], lon: x[0], ele: x[2] != null ? +x[2] : NaN, t: NaN }; });
+      if (pts.length && hav(pts[0], a) < 25) pts.shift();
+      if (!pts.length || hav(pts[pts.length - 1], b) > 300) throw new Error("lejos");
+      return pts;
+    });
+  }
+  /* altitud del terreno en un punto (teselas Terrarium, Terrain Tiles de AWS Open Data) */
+  var teselas = {};
+  function altitud(lat, lon) {
+    var z = 13, n = Math.pow(2, z), xf = (lon + 180) / 360 * n, yf = (1 - Math.log(Math.tan(lat * R) + 1 / Math.cos(lat * R)) / Math.PI) / 2 * n;
+    var x = Math.floor(xf), y = Math.floor(yf), k = z + "/" + x + "/" + y;
+    if (!teselas[k]) teselas[k] = new Promise(function (ok, ko) {
+      var im = new Image(); im.crossOrigin = "anonymous";
+      im.onload = function () { var c = document.createElement("canvas"); c.width = c.height = 256; var cx = c.getContext("2d", { willReadFrequently: true }); cx.drawImage(im, 0, 0); ok(cx); };
+      im.onerror = ko; im.src = "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/" + k + ".png";
+    });
+    return teselas[k].then(function (cx) {
+      var px = cx.getImageData(Math.min(255, Math.floor((xf - x) * 256)), Math.min(255, Math.floor((yf - y) * 256)), 1, 1).data;
+      return Math.round((px[0] * 256 + px[1] + px[2] / 256 - 32768) * 10) / 10;
+    }).catch(function () { return NaN; });
+  }
+
+  /* ---------------------------------------------------------------- imágenes: mapa, perfil y ficha en PNG */
+  var imgOpc = { base: "otm", fmt: "h" };
+  var BASES = {
+    otm: { n: "Topográfico (OpenTopoMap)", max: 17, url: function (z, x, y) { return "https://" + "abc"[(x + y) % 3] + ".tile.opentopomap.org/" + z + "/" + x + "/" + y + ".png"; }, attr: "© OpenTopoMap (CC-BY-SA) · © colaboradores de OpenStreetMap" },
+    ign: { n: "Mapa IGN", max: 17, url: function (z, x, y) { return ign.replace("{c}", "mapa-raster").replace("{f}", "jpeg").replace("{l}", "MTN").replace("{z}", z).replace("{y}", y).replace("{x}", x); }, attr: "© Instituto Geográfico Nacional" },
+    pnoa: { n: "Ortofoto PNOA", max: 19, url: function (z, x, y) { return ign.replace("{c}", "pnoa-ma").replace("{f}", "jpeg").replace("{l}", "OI.OrthoimageCoverage").replace("{z}", z).replace("{y}", y).replace("{x}", x); }, attr: "PNOA © Instituto Geográfico Nacional" },
+    osm: { n: "OpenStreetMap", max: 18, url: function (z, x, y) { return "https://tile.openstreetmap.org/" + z + "/" + x + "/" + y + ".png"; }, attr: "© colaboradores de OpenStreetMap" }
+  };
+  function cargarImg(u) {
+    return new Promise(function (ok) { var im = new Image(); im.crossOrigin = "anonymous"; im.onload = function () { ok(im); }; im.onerror = function () { ok(null); }; im.src = u; });
+  }
+  function merc(lat, lon, z) { var n = 256 * Math.pow(2, z); return { x: (lon + 180) / 360 * n, y: (1 - Math.log(Math.tan(lat * R) + 1 / Math.cos(lat * R)) / Math.PI) / 2 * n }; }
+  async function dibujarMapaEn(ctx, x0, y0, W, H, pts, color) {
+    var b = BASES[imgOpc.base], pad = Math.round(Math.min(W, H) * 0.08);
+    var la = pts.map(function (p) { return p.lat; }), lo = pts.map(function (p) { return p.lon; });
+    var n0 = Math.max.apply(null, la), s0 = Math.min.apply(null, la), e0 = Math.max.apply(null, lo), w0 = Math.min.apply(null, lo), z = b.max;
+    for (; z > 3; z--) { var a1 = merc(n0, w0, z), a2 = merc(s0, e0, z); if (a2.x - a1.x <= W - 2 * pad && a2.y - a1.y <= H - 2 * pad) break; }
+    var c1 = merc(n0, w0, z), c2 = merc(s0, e0, z);
+    // ampliación fraccionaria (hasta 1,6) para que el recorrido llene la imagen
+    var sc = Math.max(1, Math.min(1.6, (W - 2 * pad) / Math.max(1, c2.x - c1.x), (H - 2 * pad) / Math.max(1, c2.y - c1.y))), TS = 256 * sc;
+    var cx = (c1.x + c2.x) / 2 * sc, cy = (c1.y + c2.y) / 2 * sc, ox = cx - W / 2, oy = cy - H / 2;
+    ctx.save(); ctx.beginPath(); ctx.rect(x0, y0, W, H); ctx.clip();
+    ctx.fillStyle = "#e9e4da"; ctx.fillRect(x0, y0, W, H);
+    var tx0 = Math.floor(ox / TS), ty0 = Math.floor(oy / TS), tx1 = Math.floor((ox + W) / TS), ty1 = Math.floor((oy + H) / TS), fallos = 0, total = 0;
+    var tareas = [];
+    for (var tx = tx0; tx <= tx1; tx++) for (var ty = ty0; ty <= ty1; ty++) {
+      (function (tx, ty) {
+        var nT = Math.pow(2, z), xx = ((tx % nT) + nT) % nT; total++;
+        tareas.push(cargarImg(b.url(z, xx, ty)).then(function (im) { if (im) ctx.drawImage(im, x0 + tx * TS - ox, y0 + ty * TS - oy, TS + 0.5, TS + 0.5); else fallos++; }));
+      })(tx, ty);
+    }
+    await Promise.all(tareas);
+    var P = function (p) { var m = merc(p.lat, p.lon, z); return [x0 + m.x * sc - ox, y0 + m.y * sc - oy]; };
+    var k = Math.max(1, Math.min(W, H) / 900);
+    ctx.lineJoin = ctx.lineCap = "round";
+    [["rgba(0,0,0,.45)", 9 * k], ["#fff", 7 * k], [color, 4.5 * k]].forEach(function (st) {
+      ctx.beginPath(); pts.forEach(function (p, i) { var q = P(p); if (i) ctx.lineTo(q[0], q[1]); else ctx.moveTo(q[0], q[1]); }); ctx.strokeStyle = st[0]; ctx.lineWidth = st[1]; ctx.stroke();
+    });
+    function bola(p, col, txt) { var q = P(p); ctx.beginPath(); ctx.arc(q[0], q[1], 9 * k, 0, 2 * Math.PI); ctx.fillStyle = col; ctx.fill(); ctx.lineWidth = 3 * k; ctx.strokeStyle = "#fff"; ctx.stroke(); }
+    bola(pts[0], "#3fae5a"); bola(pts[pts.length - 1], "#d9372b");
+    // waypoints cercanos al recorrido
+    ctx.font = "700 " + Math.round(13 * k) + "px Inter, system-ui, sans-serif"; ctx.textBaseline = "middle";
+    wpts.forEach(function (w) {
+      if (!pts.some(function (p) { return hav(p, w) < 300; })) return;
+      var q = P(w); if (q[0] < x0 || q[0] > x0 + W || q[1] < y0 || q[1] > y0 + H) return;
+      ctx.beginPath(); ctx.arc(q[0], q[1], 6 * k, 0, 2 * Math.PI); ctx.fillStyle = "#e8574a"; ctx.fill(); ctx.lineWidth = 2 * k; ctx.strokeStyle = "#fff"; ctx.stroke();
+      if (w.name) { var tw = ctx.measureText(w.name).width; ctx.fillStyle = "rgba(255,255,255,.88)"; ctx.fillRect(q[0] + 9 * k, q[1] - 10 * k, tw + 10 * k, 20 * k); ctx.fillStyle = "#1b120c"; ctx.fillText(w.name, q[0] + 14 * k, q[1]); }
+    });
+    // escala
+    var mpp = 156543.03392 * Math.cos((n0 + s0) / 2 * R) / Math.pow(2, z) / sc, objetivo = W * 0.18 * mpp, paso = [10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000].filter(function (v) { return v <= objetivo; }).pop() || 10;
+    var lw = paso / mpp, sx = x0 + 16 * k, sy = y0 + H - 22 * k;
+    ctx.fillStyle = "rgba(255,255,255,.85)"; ctx.fillRect(sx - 8 * k, sy - 30 * k, lw + 16 * k, 42 * k);
+    ctx.fillStyle = "#1b120c"; ctx.fillRect(sx, sy, lw, 4 * k); ctx.fillRect(sx, sy - 6 * k, 2 * k, 10 * k); ctx.fillRect(sx + lw - 2 * k, sy - 6 * k, 2 * k, 10 * k);
+    ctx.font = "700 " + Math.round(13 * k) + "px Inter, system-ui, sans-serif"; ctx.textBaseline = "bottom"; ctx.textAlign = "left"; ctx.fillText(paso >= 1000 ? paso / 1000 + " km" : paso + " m", sx, sy - 6 * k);
+    // atribución
+    ctx.font = "500 " + Math.round(11 * k) + "px Inter, system-ui, sans-serif"; ctx.textAlign = "right"; ctx.textBaseline = "bottom";
+    var at = b.attr + " · guiasadastra.com", aw = ctx.measureText(at).width;
+    ctx.fillStyle = "rgba(255,255,255,.8)"; ctx.fillRect(x0 + W - aw - 14 * k, y0 + H - 20 * k, aw + 14 * k, 20 * k); ctx.fillStyle = "#333"; ctx.fillText(at, x0 + W - 7 * k, y0 + H - 4 * k);
+    ctx.restore();
+    return { fallos: fallos, total: total };
+  }
+  function dibujarPerfilEn(ctx, x0, y0, W, H, pts, color) {
+    var st = stats({ pts: pts }), k = Math.max(1, W / 1600);
+    ctx.save(); ctx.fillStyle = "#fff"; ctx.fillRect(x0, y0, W, H);
+    if (!st.sm) { ctx.fillStyle = "#666"; ctx.font = "600 " + 20 * k + "px Inter, system-ui"; ctx.fillText("Este track no tiene altitud", x0 + 30 * k, y0 + H / 2); ctx.restore(); return st; }
+    var L0 = x0 + 70 * k, R0 = x0 + W - 24 * k, T0 = y0 + 24 * k, B0 = y0 + H - 46 * k;
+    var e0 = Math.floor(st.emin / 50) * 50, e1 = Math.ceil(st.emax / 50) * 50; if (e1 - e0 < 100) e1 = e0 + 100;
+    var X = function (d) { return L0 + (R0 - L0) * d / (st.total || 1); }, Y = function (v) { return B0 - (B0 - T0) * (v - e0) / (e1 - e0); };
+    ctx.font = "600 " + Math.round(14 * k) + "px Inter, system-ui, sans-serif"; ctx.fillStyle = "#555"; ctx.strokeStyle = "#e3ddd5"; ctx.lineWidth = 1 * k;
+    var pa = [50, 100, 200, 250, 500, 1000].filter(function (v) { return (e1 - e0) / v <= 6; })[0] || 2000;
+    ctx.textAlign = "right"; ctx.textBaseline = "middle";
+    for (var v = Math.ceil(e0 / pa) * pa; v <= e1; v += pa) { ctx.beginPath(); ctx.moveTo(L0, Y(v)); ctx.lineTo(R0, Y(v)); ctx.stroke(); ctx.fillText(ent(v) + " m", L0 - 8 * k, Y(v)); }
+    var pk = [0.5, 1, 2, 5, 10, 20, 50].filter(function (q) { return st.total / 1000 / q <= 12; })[0] || 100;
+    ctx.textAlign = "center"; ctx.textBaseline = "top";
+    for (var q = 0; q * 1000 <= st.total + 1; q += pk) { ctx.beginPath(); ctx.moveTo(X(q * 1000), T0); ctx.lineTo(X(q * 1000), B0); ctx.stroke(); ctx.fillText(String(q).replace(".", ",") + " km", X(q * 1000), B0 + 10 * k); }
+    var g = ctx.createLinearGradient(0, T0, 0, B0); g.addColorStop(0, color); g.addColorStop(1, "rgba(255,255,255,.2)");
+    ctx.beginPath(); ctx.moveTo(L0, B0); pts.forEach(function (p, i) { ctx.lineTo(X(st.dist[i]), Y(st.sm[i])); }); ctx.lineTo(R0, B0); ctx.closePath();
+    ctx.globalAlpha = 0.55; ctx.fillStyle = g; ctx.fill(); ctx.globalAlpha = 1;
+    ctx.beginPath(); pts.forEach(function (p, i) { if (i) ctx.lineTo(X(st.dist[i]), Y(st.sm[i])); else ctx.moveTo(X(0), Y(st.sm[0])); }); ctx.strokeStyle = color; ctx.lineWidth = 3 * k; ctx.stroke();
+    ctx.strokeStyle = "#999"; ctx.lineWidth = 1.5 * k; ctx.beginPath(); ctx.moveTo(L0, T0); ctx.lineTo(L0, B0); ctx.lineTo(R0, B0); ctx.stroke();
+    // cumbre y waypoints
+    var imax = st.sm.indexOf(Math.max.apply(null, st.sm));
+    ctx.fillStyle = "#1b120c"; ctx.font = "700 " + Math.round(14 * k) + "px Inter, system-ui, sans-serif"; ctx.textBaseline = "bottom";
+    ctx.fillText("▲ " + ent(st.sm[imax]) + " m", Math.min(R0 - 50 * k, Math.max(L0 + 50 * k, X(st.dist[imax]))), Y(st.sm[imax]) - 6 * k);
+    wpts.forEach(function (w) {
+      var bi = -1, bd = 300; pts.forEach(function (p, i) { var d = hav(p, w); if (d < bd) { bd = d; bi = i; } });
+      if (bi < 0) return;
+      var wx = X(st.dist[bi]), wy = Y(st.sm[bi]);
+      ctx.strokeStyle = "#e8574a"; ctx.setLineDash([4 * k, 4 * k]); ctx.beginPath(); ctx.moveTo(wx, wy); ctx.lineTo(wx, B0); ctx.stroke(); ctx.setLineDash([]);
+      ctx.beginPath(); ctx.arc(wx, wy, 5 * k, 0, 2 * Math.PI); ctx.fillStyle = "#e8574a"; ctx.fill();
+      if (w.name) { ctx.save(); ctx.translate(wx + 4 * k, wy - 10 * k); ctx.rotate(-Math.PI / 4); ctx.fillStyle = "#1b120c"; ctx.font = "600 " + Math.round(12 * k) + "px Inter, system-ui, sans-serif"; ctx.textAlign = "left"; ctx.fillText(w.name, 0, 0); ctx.restore(); }
+    });
+    ctx.restore();
+    return st;
+  }
+  function cabecera(ctx, x0, y0, W, nombre, st, color) {
+    var k = Math.max(1, W / 1600);
+    ctx.fillStyle = "#fff"; ctx.fillRect(x0, y0, W, 120 * k);
+    ctx.fillStyle = color; ctx.fillRect(x0, y0, 10 * k, 120 * k);
+    ctx.fillStyle = "#1b120c"; ctx.font = "800 " + Math.round(34 * k) + "px Inter, system-ui, sans-serif"; ctx.textBaseline = "top"; ctx.textAlign = "left";
+    var t = nombre; while (ctx.measureText(t).width > W - 80 * k && t.length > 5) t = t.slice(0, -2); if (t !== nombre) t += "…";
+    ctx.fillText(t, x0 + 34 * k, y0 + 20 * k);
+    var datos = [km(st.total) + " km", "+" + ent(st.up) + " m", "−" + ent(st.dn) + " m"];
+    if (st.emax != null) datos.push("máx. " + ent(st.emax) + " m");
+    if (isFinite(st.tiempo)) datos.push(dur(st.tiempo));
+    ctx.font = "600 " + Math.round(20 * k) + "px Inter, system-ui, sans-serif"; ctx.fillStyle = "#555"; ctx.fillText(datos.join("   ·   "), x0 + 34 * k, y0 + 72 * k);
+    ctx.textAlign = "right"; ctx.fillStyle = "#b5671a"; ctx.font = "800 " + Math.round(16 * k) + "px Inter, system-ui, sans-serif"; ctx.fillText("guiasadastra.com", x0 + W - 24 * k, y0 + 24 * k);
+  }
+  function guardarPng(cv, nombre) {
+    cv.toBlob(function (bl) {
+      var a = document.createElement("a"); a.href = URL.createObjectURL(bl); a.download = nombre.replace(/[\\/:*?"<>|]+/g, "-").slice(0, 80) + ".png";
+      document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 800);
+    }, "image/png");
+  }
+  async function exportarImagen(tipo, pts, nombre, color) {
+    if (!pts || pts.length < 2) return;
+    avisar("Preparando la imagen…");
+    var vert = imgOpc.fmt === "v", W = vert ? 1400 : 2000, cv = document.createElement("canvas"), ctx = cv.getContext("2d"), st = stats({ pts: pts }), r = null;
+    try {
+      if (tipo === "perfil") { cv.width = 2000; cv.height = 820; cabecera(ctx, 0, 0, 2000, nombre, st, color); dibujarPerfilEn(ctx, 0, 150, 2000, 670, pts, color); }
+      else if (tipo === "mapa") { cv.width = W; cv.height = vert ? 2000 : 1400; r = await dibujarMapaEn(ctx, 0, 0, cv.width, cv.height, pts, color); }
+      else { cv.width = W; var hm = vert ? 1500 : 1200, hp = vert ? 520 : 600; cv.height = 150 + hm + hp; cabecera(ctx, 0, 0, W, nombre, st, color); r = await dibujarMapaEn(ctx, 0, 150, W, hm, pts, color); dibujarPerfilEn(ctx, 0, 150 + hm, W, hp, pts, color); }
+      guardarPng(cv, nombre + " - " + tipo);
+      if (r && r.fallos) avisar("Imagen descargada, pero " + r.fallos + " de " + r.total + " trozos del mapa no se han podido cargar. Prueba con otro mapa.");
+      else avisar("Imagen descargada.");
+    } catch (er) { console.error(er); avisar("No se ha podido crear la imagen con este mapa. Prueba con otro."); }
+  }
+  function opcImagenes() {
+    return '<div class="gx-fila gx-wrap"><label>Mapa <select data-io="base">' + Object.keys(BASES).map(function (k) { return '<option value="' + k + '"' + (imgOpc.base === k ? " selected" : "") + ">" + BASES[k].n + "</option>"; }).join("") + "</select></label>" +
+      '<label>Formato <select data-io="fmt"><option value="h"' + (imgOpc.fmt === "h" ? " selected" : "") + '>Horizontal</option><option value="v"' + (imgOpc.fmt === "v" ? " selected" : "") + ">Vertical</option></select></label></div>";
+  }
+  document.addEventListener("change", function (e) { var k = e.target.getAttribute && e.target.getAttribute("data-io"); if (k) imgOpc[k] = e.target.value; document.querySelectorAll('[data-io="' + k + '"]').forEach(function (x) { x.value = imgOpc[k]; }); });
+
   /* ---------------------------------------------------------------- flujo general */
   var avisoT;
   function avisar(txt) {
@@ -572,25 +847,27 @@
     if (!a) { a = document.createElement("div"); a.id = "gx-toast"; a.className = "gx-toast"; a.setAttribute("role", "status"); document.body.appendChild(a); }
     a.textContent = txt; a.classList.add("on"); clearTimeout(avisoT); avisoT = setTimeout(function () { a.classList.remove("on"); }, 4200);
   }
-  function seleccionar(id) { selId = id; modo = null; marca = []; puntoSel = null; prev = null; map.getContainer().classList.remove("gx-cruz"); refrescar(); }
+  function seleccionar(id) { if (modo === "dibujar") terminarDibujo(); selId = id; modo = null; marca = []; puntoSel = null; prev = null; map.getContainer().classList.remove("gx-cruz"); refrescar(); }
   function refrescar(mantenerRes) {
     if (selId != null && !sel()) selId = tracks.length ? tracks[0].id : null;
     if (selId == null && tracks.length) selId = tracks[0].id;
     var res = mantenerRes && $("gx-res") ? $("gx-res").innerHTML : "";
-    pintarLista(); pintarTools(); pintarModo(); dibujar(); pintarPerfil();
+    pintarLista(); pintarCrear(); pintarTools(); pintarModo(); dibujar(); pintarPerfil();
     if (res && $("gx-res")) $("gx-res").innerHTML = res;
     $("gx-undo").disabled = !hist.length; $("gx-redo").disabled = !rehacer.length;
-    $("gx-save").disabled = !tracks.length;
-    $("gx-drop").style.display = tracks.length ? "none" : "";
+    $("gx-save").disabled = !tracks.length && !wpts.length;
+    $("gx-abrir-t").textContent = tracks.length ? "Añadir más GPX" : "Abrir GPX, KML o TCX";
+    $("gx-drop").style.display = tracks.length || wpts.length || modo ? "none" : "";
     $("gx-save").textContent = tracks.some(function (t) { return t.marcado; }) ? "Descargar los marcados" : "Descargar GPX";
   }
-  function deshacer() { if (!hist.length) return; rehacer.push({ t: clonar(tracks), sel: selId }); var h = hist.pop(); tracks = h.t; selId = h.sel; modo = null; prev = null; refrescar(); }
-  function hacerOtraVez() { if (!rehacer.length) return; hist.push({ t: clonar(tracks), sel: selId }); var h = rehacer.pop(); tracks = h.t; selId = h.sel; modo = null; prev = null; refrescar(); }
+  function restaurar(h) { tracks = h.t; wpts = h.w || wpts; selId = h.sel; modo = null; dib = null; prev = null; map.getContainer().classList.remove("gx-cruz"); refrescar(); }
+  function deshacer() { if (!hist.length || ocupado) return; rehacer.push(foto()); restaurar(hist.pop()); }
+  function hacerOtraVez() { if (!rehacer.length || ocupado) return; hist.push(foto()); restaurar(rehacer.pop()); }
   $("gx-undo").addEventListener("click", deshacer);
   $("gx-redo").addEventListener("click", hacerOtraVez);
   $("gx-save").addEventListener("click", function () {
     var ms = tracks.filter(function (t) { return t.marcado; }), lst = ms.length ? ms : tracks;
-    var nombre = lst.length === 1 ? lst[0].name : (lst[0].name + " y " + (lst.length - 1) + " más");
+    var nombre = !lst.length ? "Waypoints" : lst.length === 1 ? lst[0].name : (lst[0].name + " y " + (lst.length - 1) + " más");
     descargar(gpxTexto(lst, wpts, nombre), nombre);
   });
 
