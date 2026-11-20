@@ -471,7 +471,8 @@
         var X = function (t) { return L + (W - L - R) * (t - tA) / (tB - tA); };
         var mn = -20, mx = 45;
         var kp = K();
-        ix.forEach(function (i) { [kp.t].forEach(function (k) { var v = C[k][i]; if (v != null && v > -40 && v < 55) { mn = Math.min(mn, Math.floor(v / 5) * 5); mx = Math.max(mx, Math.ceil(v / 5) * 5); } }); });
+        var kOtro = kp.p === "c" ? "tv" : "tc";
+        ix.forEach(function (i) { [kp.t, kOtro].forEach(function (k) { var v = C[k][i]; if (v != null && v > -40 && v < 55) { mn = Math.min(mn, Math.floor(v / 5) * 5); mx = Math.max(mx, Math.ceil(v / 5) * 5); } }); });
         var Y = function (v) { return T0 + (Hh - T0 - B) * (1 - (v - mn) / (mx - mn)); };
         var g = '<svg class="mt-mg" viewBox="0 0 ' + W + " " + Hh + '" role="img" aria-label="Perfil del día: estado del cielo y temperatura">';
         var sl = solDia(d.fecha, doc.base.lat, doc.base.lon);
@@ -488,19 +489,21 @@
           if (hh % 3) continue;
           g += '<line x1="' + X(t).toFixed(1) + '" x2="' + X(t).toFixed(1) + '" y1="' + T0 + '" y2="' + (Hh - B) + '" stroke="rgba(255,255,255,.05)"/><text x="' + X(t).toFixed(1) + '" y="' + (Hh - 9) + '" class="mt-mg-h">' + String(hh).padStart(2, "0") + "h</text>";
         }
-        function curva(k, col, fill) {
+        function curva(k, col, fill, fina) {
           var segs = [], seg = [], out = "";
           ix.forEach(function (i) { var v = C[k][i]; if (v == null || v <= -40 || v >= 55) { if (seg.length) segs.push(seg); seg = []; } else seg.push([X(T[i].getTime()), Y(v)]); });
           if (seg.length) segs.push(seg);
           segs.forEach(function (sg) {
             var p = sg.map(function (q, j) { return (j ? "L" : "M") + q[0].toFixed(1) + " " + q[1].toFixed(1); }).join("");
             if (fill) out += '<path d="' + p + "L" + sg[sg.length - 1][0].toFixed(1) + " " + (Hh - B) + "L" + sg[0][0].toFixed(1) + " " + (Hh - B) + 'Z" fill="' + fill + '"/>';
-            out += '<path d="' + p + '" fill="none" stroke="' + col + '" stroke-width="3.2" stroke-linejoin="round"/>';
-            sg.forEach(function (q) { out += '<circle cx="' + q[0].toFixed(1) + '" cy="' + q[1].toFixed(1) + '" r="2.6" fill="' + col + '"/>'; });
+            out += '<path d="' + p + '" fill="none" stroke="' + col + '" stroke-width="' + (fina ? 2 : 3.2) + '" stroke-linejoin="round"' + (fina ? ' stroke-dasharray="6 5" opacity=".8"' : "") + "/>";
+            if (!fina) sg.forEach(function (q) { out += '<circle cx="' + q[0].toFixed(1) + '" cy="' + q[1].toFixed(1) + '" r="2.6" fill="' + col + '"/>'; });
           });
           return out;
         }
         var colP = kp.p === "c" ? ["#6fb3e0", "rgba(111,179,224,.12)", "#bfe0f7"] : ["#e8574a", "rgba(232,87,74,.12)", "#ffb3aa"];
+        var colO = kp.p === "c" ? "#e8574a" : "#6fb3e0", lugO = kp.p === "c" ? doc.base : doc.cumbre;
+        g += curva(kOtro, colO, null, true);
         g += curva(kp.t, colP[0], colP[1]);
         [[kp.t, colP[2], -12]].forEach(function (kc) {
           var k = kc[0], iMx = -1, iMn = -1;
@@ -531,7 +534,7 @@
         if (prDia >= 0.1) txt.push("Lluvia del día: " + dec(prDia) + " mm");
         if (txt.length) g += '<text x="' + (W - R) + '" y="' + (T0 - 2) + '" class="mt-mg-p" style="text-anchor:end">' + txt.join(" · ") + "</text>";
         g += "</svg>";
-        return '<div class="mt-mgw">' + g + "</div>" + leyenda([{ c: colP[0], l: kp.lbl + " · " + kp.lugar.nombre + " (" + kp.lugar.alt.toLocaleString("es-ES") + " m)" }]) +
+        return '<div class="mt-mgw">' + g + "</div>" + leyenda([{ c: colP[0], l: kp.lbl + " · " + kp.lugar.nombre + " (" + kp.lugar.alt.toLocaleString("es-ES") + " m)" }, { c: colO, l: (kp.p === "c" ? "Base" : "Cumbre") + " · " + lugO.nombre + " (" + lugO.alt.toLocaleString("es-ES") + " m), para comparar" }]) +
           '<p class="muted small">Un icono por hora (a partir del 4.º día los modelos dan datos cada 3 horas); barras azules: lluvia de cada hora (mm); barras blancas: nieve (cm); franja clara: horas de luz; línea azul discontinua: 0 °C. Cambia de día en la tira de arriba.</p>';
       }
 
