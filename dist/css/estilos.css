@@ -880,3 +880,4 @@ input[type=radio],input[type=checkbox]{width:auto;padding:0}
 .mt-camb:hover{border-color:var(--gold)}
 .mt-camb-ext{border-style:dashed}
 .mt-camb b{font-size:.9rem;font-weight:700}
+.mt-cam-v.mt-cam-ms{aspect-ratio:auto;height:min(78vh,760px)}.mt-cam-v.mt-cam-ms iframe{background:#fff}

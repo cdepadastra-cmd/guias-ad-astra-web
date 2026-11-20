@@ -360,8 +360,8 @@
   }
 
   /* Visor de webcams: una cámara grande y una tira para cambiar de cámara.
-     Meteosierra: su foto solo se muestra dentro del visor si tenemos su permiso (MS_PERMISO); si no, se abre en su web. */
-  var MS_PERMISO = false;
+     Las de Meteosierra se muestran con su propia página dentro del visor (su web, con su marca y sus enlaces). */
+  var MS_PERMISO = true;
   function webcams(id) {
     var lista = LISTA;
     if (!lista.length) { try { lista = JSON.parse(document.getElementById("mt-lista").textContent); } catch (e) { lista = []; } }
@@ -369,10 +369,10 @@
     var w = c.windy || [], en = c.enlaces || [], ms = c.meteosierra || [];
     if (!w.length && !en.length && !ms.length) return "";
     var cams = w.map(function (x) { return { t: "windy", id: x[0], n: x[1], sub: "Windy · evolución del día" }; });
-    ms.forEach(function (x) { cams[MS_PERMISO ? "unshift" : "push"]({ t: "ms", id: x[0], n: x[1], sub: Number(x[2]).toLocaleString("es-ES") + " m · Meteosierra" }); });
+    ms.forEach(function (x) { cams[MS_PERMISO ? "unshift" : "push"]({ t: "ms", id: x[0], n: x[1], sub: Number(x[2]).toLocaleString("es-ES") + " m · Meteosierra (foto, timelapse y directo)" }); });
     var visor = cams.filter(function (x) { return x.t === "windy" || MS_PERMISO; });
     var h = '<div class="mt-sec"><h2>Webcams</h2>';
-    if (visor.length) h += '<div class="mt-visor" data-mac="' + esc(id) + '"><div class="mt-cam-v" id="mt-visor-v">' + camHtml(visor[0]) + '</div><div class="mt-visor-cap" id="mt-visor-cap">' + capHtml(visor[0]) + "</div></div>";
+    if (visor.length) h += '<div class="mt-visor" data-mac="' + esc(id) + '"><div class="mt-cam-v' + (visor[0].t === "ms" ? " mt-cam-ms" : "") + '" id="mt-visor-v">' + camHtml(visor[0]) + '</div><div class="mt-visor-cap" id="mt-visor-cap">' + capHtml(visor[0]) + "</div></div>";
     h += '<div class="mt-camtira" role="tablist" aria-label="Elegir webcam">' + cams.map(function (x, k) {
       var enVisor = x.t === "windy" || MS_PERMISO;
       return enVisor
@@ -386,13 +386,13 @@
   }
   function camHtml(x) {
     if (x.t === "windy") return '<iframe src="https://webcams.windy.com/webcams/public/embed/player/' + esc(x.id) + '/day" title="Webcam ' + esc(x.n) + '" loading="lazy" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>';
-    return '<a href="https://meteosierra.com/webcams/' + esc(x.id) + '/" target="_blank" rel="noopener"><img src="https://meteosierra.com/cams/' + esc(x.id) + '/thumb.jpg?t=' + Math.floor(Date.now() / 3e5) + '" alt="Webcam ' + esc(x.n) + ' (Meteosierra)" loading="lazy"></a>';
+    return '<iframe src="https://meteosierra.com/webcams/' + esc(x.id) + '/" title="Webcam ' + esc(x.n) + ' · Meteosierra" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>';
   }
   function capHtml(x) { return "<b>" + esc(x.n) + "</b> <span>" + esc(x.sub) + "</span>" + (x.t === "ms" ? ' · <a href="https://meteosierra.com/webcams/' + esc(x.id) + '/" target="_blank" rel="noopener">ver en Meteosierra</a>' : ""); }
   document.addEventListener("click", function (e) {
     var b = e.target.closest && e.target.closest("[data-cam]"); if (!b || !webcams.cams) return;
     var x = webcams.cams[+b.getAttribute("data-cam")], v = document.getElementById("mt-visor-v"); if (!x || !v) return;
-    v.innerHTML = camHtml(x); document.getElementById("mt-visor-cap").innerHTML = capHtml(x);
+    v.innerHTML = camHtml(x); v.classList.toggle("mt-cam-ms", x.t === "ms"); document.getElementById("mt-visor-cap").innerHTML = capHtml(x);
     document.querySelectorAll(".mt-camb.on").forEach(function (o) { o.classList.remove("on"); }); b.classList.add("on");
   });
 
