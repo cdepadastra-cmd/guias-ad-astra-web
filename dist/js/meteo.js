@@ -369,7 +369,8 @@
     var w = c.windy || [], en = c.enlaces || [], ms = c.meteosierra || [];
     if (!w.length && !en.length && !ms.length) return "";
     var cams = w.map(function (x) { return { t: "windy", id: x[0], n: x[1], sub: "Windy · evolución del día" }; });
-    ms.forEach(function (x) { cams[MS_PERMISO ? "unshift" : "push"]({ t: "ms", id: x[0], n: x[1], sub: Number(x[2]).toLocaleString("es-ES") + " m · Meteosierra (foto, timelapse y directo)" }); });
+    var cms = ms.map(function (x) { return { t: "ms", id: x[0], n: x[1], sub: Number(x[2]).toLocaleString("es-ES") + " m · Meteosierra (foto, timelapse y directo)" }; });
+    cams = MS_PERMISO ? cms.concat(cams) : cams.concat(cms);
     var visor = cams.filter(function (x) { return x.t === "windy" || MS_PERMISO; });
     var h = '<div class="mt-sec"><h2>Webcams</h2>';
     if (visor.length) h += '<div class="mt-visor" data-mac="' + esc(id) + '"><div class="mt-cam-v' + (visor[0].t === "ms" ? " mt-cam-ms" : "") + '" id="mt-visor-v">' + camHtml(visor[0]) + '</div><div class="mt-visor-cap" id="mt-visor-cap">' + capHtml(visor[0]) + "</div></div>";
