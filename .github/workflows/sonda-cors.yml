@@ -9,10 +9,7 @@ jobs:
       - run: |
           for u in \
             "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/10/499/388.png" \
-            "https://www.ign.es/wmts/pnoa-ma?service=WMTS&request=GetTile&version=1.0.0&Format=image/jpeg&layer=OI.OrthoimageCoverage&style=default&tilematrixset=GoogleMapsCompatible&TileMatrix=12&TileRow=1552&TileCol=1988" \
-            "https://www.ign.es/wmts/mapa-raster?service=WMTS&request=GetTile&version=1.0.0&Format=image/jpeg&layer=MTN&style=default&tilematrixset=GoogleMapsCompatible&TileMatrix=12&TileRow=1552&TileCol=1988" \
-            "https://tiles.maps.eox.at/wmts/1.0.0/s2cloudless_3857/default/g/12/1552/1988.jpg" \
-            "https://a.tile.opentopomap.org/12/1988/1552.png" \
-            "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/12/1552/1988" ; do
+            "https://elevation-tiles-prod.s3.amazonaws.com/terrarium/10/499/388.png" \
+            "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/14/7988/6211.png" ; do
             echo "== $u"
-            curl -s -o /dev/null -D - -H "Origin: https://www.guiasadastra.com" -A "Mozilla/5.0" "$u" | grep -i -E "^HTTP|access-control-allow-origin|content-type" ; done
+            curl -s -o /dev/null -D - -H "Origin: https://www.guiasadastra.com" -A "Mozilla/5.0" "$u" ; done
