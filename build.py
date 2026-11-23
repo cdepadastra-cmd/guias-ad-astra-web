@@ -99,7 +99,7 @@ NAV_ACT = [("Todas las actividades", "/actividades/"), ("Barranquismo", "/activi
            ("Senderismo", "/actividades/?categoria=Senderismo"), ("Travesías y viajes", "/actividades/?categoria=Travesías y viajes")]
 NAV_CUR = [("Todos los cursos", "/formacion-cursos/"), ("Calendario de cursos", "/calendario/")] + [(c["disc_label"], "/actividades/%s/" % c["slug"]) for c in COURSES]
 NAV_HER = [("Todas las herramientas", "/herramientas/"), ("Meteorología de montaña", "/meteo/"), ("Estado de la nieve", "/nieve/"), ("Caudal de barrancos", "/barrancos-caudal/"), ("Calculadora de rutas", "/calculadora-rutas/"), ("Editor GPX", "/editor-gpx/"), ("Vídeo 3D de la ruta", "/video-ruta-3d/"), ("Lista de material", "/lista-material-montana/"), ("Topografía de barrancos", "/topografia-barrancos/"), ("Boulder en Las Tuerces", "/actividades/boulder-las-tuerces/"), ("Boulder en Zona Centro", "/actividades/boulder-zona-centro-salamanca-caceres/")]
-import arts_a, arts_b
+import arts_a, arts_b, arts_util
 NUEVOS = arts_a.ARTS + arts_b.ARTS
 ARTICULOS = [
     ("/como-leer-la-nieve-y-los-aludes/", "Cómo leer la nieve y el peligro de aludes", "Cómo cambia el manto, placas de viento, tipos de aludes, el boletín de AEMET y cómo leer una ladera.", "nieve"),
@@ -1305,7 +1305,7 @@ def build_nuevos():
         body = (hero("Artículos", a["titulo"], a["lead"], a["hero"] if a["hero"].startswith("/") else img(a["hero"]), crumbs, a.get("actions", "")) + a["cuerpo"] +
                 '<section class="section alt"><div class="wrap split"><div class="stack" style="gap:0">' + block("Preguntas frecuentes", faq_html(a["faq"])) +
                 '</div><div class="sticky"><div class="panel"><p class="eyebrow">Fuentes</p><ul class="gd-links">' + fuentes + '</ul>' +
-                ('<p class="small muted">%s</p>' % a["nota"] if a.get("nota") else "") + '</div></div></div></section>')
+                ('<p class="small muted">%s</p>' % a["nota"] if a.get("nota") else "") + arts_util.credito_portada(a["hero"]) + '</div></div></div></section>')
         ld = [crumbs_ld([("Inicio", "/"), ("Artículos", "/articulos/"), (a["corto"], path)]), faq_ld(a["faq"]),
               articulo_ld(path, a["titulo"], a["meta_desc"], a["publicado"])]
         page(path, a["meta_title"], a["meta_desc"], body, "art", ld, priority="0.6")

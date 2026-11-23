@@ -67,3 +67,15 @@ def blog(titulo, enlaces):
     """Recuadro con enlaces a crónicas del blog de Jairo: enlaces = [(url, texto)]"""
     return ('<div class="panel gd-blog" style="margin-top:18px;border-left:5px solid var(--gold,#e9a53b)"><p class="eyebrow" style="margin:0 0 6px">%s</p><ul class="gd-links" style="margin:0">' % titulo +
             "".join('<li><a href="%s" target="_blank" rel="noopener">%s</a></li>' % u for u in enlaces) + "</ul></div>")
+
+
+_BLOG = _json.load(open(_os.path.join(_os.path.dirname(__file__), "tools", "fotos", "blog-origen.json")))
+
+
+def credito_portada(hero):
+    n = hero.rsplit("/", 1)[-1].rsplit(".", 1)[0]
+    if n in _BLOG:
+        return '<p class="small muted">Foto de portada: Jairo Hernández, <a href="%s" target="_blank" rel="noopener">blog de Jairo</a>.</p>' % _BLOG[n]
+    if n in _CRED:
+        return '<p class="small muted">Portada. %s</p>' % _credito(n)
+    return ""

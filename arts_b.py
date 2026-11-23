@@ -12,7 +12,7 @@ ARTS.append(dict(
     meta_title="Orientación en montaña: mapa, brújula y señales | Ad Astra",
     meta_desc="Cómo leer un mapa topográfico y sus curvas de nivel, usar la brújula para seguir un rumbo, entender las señales GR, PR y SL y qué hacer si te pierdes.",
     lead="Cómo leer un mapa topográfico y sus curvas de nivel, cómo usar la brújula para seguir un rumbo en la niebla, qué significan las marcas blancas y rojas de los senderos y qué hacer si te pierdes. El GPS ayuda, pero la batería se acaba.",
-    hero="afe67801-cf88-4cef-a3ac-e25e4e971634/senderismo-avila-gredos.webp",
+    hero="/img/fotos/portada-orientacion.webp",
     actions='<a class="btn btn-primary" href="#curvas">Curvas de nivel</a><a class="btn btn-ghost" href="#brujula">Brújula</a><a class="btn btn-ghost" href="#senales">Señales</a>',
     ico="orientacion", og=("Artículo", "Orientación en montaña", "Mapa, brújula y señales GR, PR y SL", "#7cc47f"),
     publicado="2026-11-23",
@@ -110,7 +110,7 @@ ARTS.append(dict(
     meta_title="Vivac y acampada libre en España: qué es legal | Ad Astra",
     meta_desc="Diferencia entre vivac y acampada libre, y qué está permitido en Gredos, Guadarrama, Picos de Europa, Ordesa, Sierra Nevada y Aigüestortes.",
     lead="Dormir en la montaña es una de las mejores experiencias que hay, pero no se puede hacer en cualquier sitio ni de cualquier manera. Qué diferencia hay entre vivac y acampada, y qué dicen las normas de los espacios naturales más visitados.",
-    hero="398c4c45-1d97-4c78-a790-e6efe5fea909/otros-media-1.webp",
+    hero="/img/fotos/vivac-noche.webp",
     actions='<a class="btn btn-primary" href="#normas">Normas por zona</a><a class="btn btn-ghost" href="/lista-material-montana/">Material para vivac</a>',
     ico="vivac", og=("Artículo", "Vivac y acampada libre", "Qué está permitido en los parques de España", "#e9a53b"),
     publicado="2026-11-23",
@@ -122,7 +122,6 @@ ARTS.append(dict(
                     ("#e8574a", "Acampada libre", "Instalar una tienda fuera de un camping y quedarse durante el día o varios días en el mismo sitio. Está prohibida en casi todos los espacios naturales protegidos de España."),
                     ("#4fb3e8", "Pernocta en refugio", "Dormir en un refugio guardado (con reserva) o en un refugio libre. En los libres no hay reserva: si está lleno, muchas normas permiten vivaquear al lado."),
                 ]) +
-                '<div style="max-width:520px;margin:0 auto">' + foto("vivac-noche", "Noche de vivac bajo las estrellas.") + '</div>' +
                 '<p style="margin-top:16px">Fuera de los espacios protegidos, la acampada depende de la normativa de cada comunidad autónoma y de cada ayuntamiento, y en terreno privado necesitas permiso del propietario. Y en verano, en todo el país, <b>hacer fuego en el monte suele estar prohibido</b> (también con hornillos de llama en algunas épocas y zonas de alto riesgo).</p>') +
         seccion("Por zonas", "Qué está permitido en los espacios naturales más visitados",
                 tabla(["Espacio", "Qué dicen las normas"], [
@@ -172,7 +171,7 @@ ARTS.append(dict(
     meta_title="Licencia de montaña y rescates: quién paga | Ad Astra",
     meta_desc="Qué cubre la licencia federativa de montaña, qué modalidad elegir según adónde vayas y en qué comunidades te pueden cobrar un rescate.",
     lead="Qué cubre la licencia de la federación de montaña, qué modalidad necesitas según adónde vayas, en qué comunidades te pueden cobrar un rescate y cómo pedir ayuda bien. Un trámite de diez minutos que puede ahorrarte mucho dinero y disgustos.",
-    hero="41645da1-a007-4ff0-8526-61ca467dddb5/curso-arva.webp",
+    hero="/img/fotos/rescate-helicoptero.webp",
     actions='<a class="btn btn-primary" href="#modalidades">Modalidades</a><a class="btn btn-ghost" href="#quien-paga">¿Quién paga el rescate?</a>',
     ico="seguro", og=("Artículo", "Federarse y rescates", "Qué cubre la licencia y quién paga un rescate", "#4fb3e8"),
     publicado="2026-11-23",
@@ -249,7 +248,7 @@ ARTS.append(dict(
     meta_title="Raquetas de nieve y esquí de travesía: guía | Ad Astra",
     meta_desc="Cómo elegir raquetas de nieve, qué material necesitas para empezar en el esquí de travesía (esquís, fijaciones, pieles, botas) y cómo ir seguro.",
     lead="Las dos formas más bonitas de recorrer la montaña nevada. Cómo elegir unas raquetas, qué material hace falta para el esquí de travesía (o de montaña), cuál te conviene según tu nivel y qué precauciones hay que tomar.",
-    hero="41645da1-a007-4ff0-8526-61ca467dddb5/curso-arva.webp",
+    hero="/img/fotos/portada-raquetas.webp",
     actions='<a class="btn btn-primary" href="#raquetas">Raquetas</a><a class="btn btn-ghost" href="#esqui">Esquí de travesía</a><a class="btn btn-ghost" href="#seguridad">Seguridad</a>',
     ico="raquetas", og=("Artículo", "Raquetas y esquí de travesía", "Material y primeros pasos en la nieve", "#bfe0f7"),
     publicado="2026-11-23",
@@ -323,7 +322,7 @@ ARTS.append(dict(
     meta_title="Rutas clásicas de Gredos: Almanzor y Laguna Grande | Ad Astra",
     meta_desc="Las rutas más clásicas de la Sierra de Gredos: Laguna Grande, Almanzor, La Mira y Los Galayos. Distancia, desnivel, dificultad y cuándo ir.",
     lead="Cuatro rutas que todo montañero debería hacer alguna vez en Gredos, contadas por quienes las recorremos cada semana: la Laguna Grande, el Almanzor (techo del Sistema Central), La Mira y Los Galayos. Datos, dificultad y consejos.",
-    hero="afe67801-cf88-4cef-a3ac-e25e4e971634/senderismo-avila-gredos.webp",
+    hero="/img/fotos/portada-gredos.webp",
     actions='<a class="btn btn-primary" href="/meteo/gredos-macizo-central/">Tiempo en Gredos</a><a class="btn btn-ghost" href="/actividades/ascensiones-sierra-de-gredos/">Subir con guía</a>',
     ico="gredos", og=("Artículo", "Rutas clásicas de Gredos", "Laguna Grande, Almanzor, La Mira y Los Galayos", "#7cc47f"),
     publicado="2026-11-23",
