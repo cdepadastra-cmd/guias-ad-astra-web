@@ -1,4 +1,5 @@
 # Busca o descarga fotos con licencia libre de Wikimedia Commons para los artículos (puntual).
+# Deja el resultado en la rama "fotos-tmp" (no toca main).
 name: Fotos de Wikimedia Commons (puntual)
 on:
   workflow_dispatch:
@@ -9,6 +10,8 @@ on:
       lista:
         description: "Archivo JSON"
         default: "tools/fotos/busquedas.json"
+permissions:
+  contents: write
 jobs:
   fotos:
     runs-on: ubuntu-latest
@@ -16,7 +19,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: python tools/fotos_commons.py ${{ inputs.modo }} ${{ inputs.lista }}
-      - uses: actions/upload-artifact@v4
-        with:
-          name: fotos
-          path: salida/
+      - run: |
+          mkdir /tmp/r && cp -r salida /tmp/r/ && cd /tmp/r
+          git init -q -b fotos-tmp && git add -A
+          git -c user.name=bot -c user.email=bot@users.noreply.github.com commit -qm "fotos ${{ inputs.modo }}"
+          git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" fotos-tmp
