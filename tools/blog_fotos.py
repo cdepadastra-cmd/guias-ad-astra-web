@@ -62,7 +62,7 @@ if sys.argv[1] == "blog-listar":
                 print("error", p["n"], k, ex)
     json.dump(posts, open("salida/posts.json", "w"), ensure_ascii=False, indent=1)
     print(len(posts), "entradas")
-else:
+elif sys.argv[1] == "blog-bajar":
     for nombre, u in json.load(open(sys.argv[2])).items():
         open("salida/%s.jpg" % nombre, "wb").write(get(tam(u.replace("http://", "https://"), "s1600")))
         print(nombre)
