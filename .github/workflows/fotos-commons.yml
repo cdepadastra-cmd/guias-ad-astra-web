@@ -18,7 +18,11 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
-      - run: python tools/fotos_commons.py ${{ inputs.modo }} ${{ inputs.lista }}
+      - run: |
+          case "${{ inputs.modo }}" in
+            blog-*) python tools/blog_fotos.py "${{ inputs.modo }}" ${{ inputs.lista }} ;;
+            *) python tools/fotos_commons.py ${{ inputs.modo }} ${{ inputs.lista }} ;;
+          esac
       - run: |
           mkdir /tmp/r && cp -r salida /tmp/r/ && cd /tmp/r
           git init -q -b fotos-tmp && git add -A
