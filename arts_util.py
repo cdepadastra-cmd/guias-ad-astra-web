@@ -79,3 +79,14 @@ def credito_portada(hero):
     if n in _CRED:
         return '<p class="small muted">Portada. %s</p>' % _credito(n)
     return ""
+
+
+def fblog(n, pie, url):
+    """Foto del blog de Jairo (static/img/fotos/<n>.webp)."""
+    return ('<figure class="gd-foto"><img src="/img/fotos/%s.webp" alt="%s" loading="lazy" decoding="async">'
+            '<figcaption>%s<small>Foto: Jairo Hernández · <a href="%s" target="_blank" rel="noopener">blog de Jairo</a></small></figcaption></figure>') % (n, pie, pie, url)
+
+
+def ruta_blog(url, a, pa, b, pb, texto="Leer la crónica de la ruta en el blog de Jairo"):
+    return ('<div class="gd-fotos">' + fblog(a, pa, url) + fblog(b, pb, url) + '</div>'
+            '<p style="margin-top:6px"><a class="btn btn-ghost" href="%s" target="_blank" rel="noopener">%s →</a></p>' % (url, texto))

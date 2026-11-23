@@ -1,5 +1,5 @@
 """Artículos: orientación, vivac y acampada, federarse y rescates, raquetas y esquí de travesía, rutas clásicas de Gredos."""
-from arts_util import seccion, tabla, tarjetas, escala, reglas, dos, p, aviso, foto, fotos, ilustracion, blog
+from arts_util import seccion, tabla, tarjetas, escala, reglas, dos, p, aviso, foto, fotos, ilustracion, blog, ruta_blog
 
 ARTS = []
 
@@ -321,7 +321,7 @@ ARTS.append(dict(
     titulo="Rutas clásicas de Gredos: Laguna Grande, Almanzor, La Mira y Los Galayos",
     meta_title="Rutas clásicas de Gredos: Almanzor y Laguna Grande | Ad Astra",
     meta_desc="Las rutas más clásicas de la Sierra de Gredos: Laguna Grande, Almanzor, La Mira y Los Galayos. Distancia, desnivel, dificultad y cuándo ir.",
-    lead="Cuatro rutas que todo montañero debería hacer alguna vez en Gredos, contadas por quienes las recorremos cada semana: la Laguna Grande, el Almanzor (techo del Sistema Central), La Mira y Los Galayos. Datos, dificultad y consejos.",
+    lead="Cuatro rutas que todo montañero debería hacer alguna vez en Gredos, contadas por quienes las recorremos cada semana: la Laguna Grande, el Almanzor (techo del Sistema Central), La Mira y Los Galayos. Y tres de nuestra zona: las Cuatro Lagunas, La Ceja por Hoya Moros y la Laguna del Duque. Datos, dificultad, fotos y crónicas.",
     hero="/img/fotos/portada-gredos.webp",
     actions='<a class="btn btn-primary" href="/meteo/gredos-macizo-central/">Tiempo en Gredos</a><a class="btn btn-ghost" href="/actividades/ascensiones-sierra-de-gredos/">Subir con guía</a>',
     ico="gredos", og=("Artículo", "Rutas clásicas de Gredos", "Laguna Grande, Almanzor, La Mira y Los Galayos", "#7cc47f"),
@@ -338,7 +338,7 @@ ARTS.append(dict(
                 '<p class="small muted" style="margin-top:10px">Datos orientativos sin nieve. Calcula el tiempo con tu ritmo en nuestra <a href="/calculadora-rutas/">calculadora de rutas</a>.</p>') +
         seccion("Ruta 1", "La Laguna Grande de Gredos",
                 p("La ruta más famosa de Gredos y una de las más bonitas del Sistema Central. Sale de la <b>Plataforma</b> (al final de la carretera de Hoyos del Espino, con aparcamiento de pago) y sigue el <b>PR-AV 17</b>, un camino empedrado que sube por el Prado de las Pozas hasta el mirador de <b>Los Barrerones</b> (2.170 m). Desde ahí aparece de golpe el Circo de Gredos con el Almanzor al fondo, y se baja a la <b>Laguna Grande</b> (1.935 m), con el refugio Elola en su orilla.") +
-                foto("laguna-grande-gredos", "La Laguna Grande de Gredos.") +
+                ruta_blog("https://jairogredos.blogspot.com/2008/05/laguna-grande.html", "ruta-laguna-grande", "El Circo de Gredos nevado desde Los Barrerones.", "ruta-laguna-grande-2", "Bajando hacia la Laguna Grande en invierno.") +
                 reglas(["<b>Cuándo:</b> de mayo a noviembre sin nieve. En invierno el camino se cubre y se hiela, sobre todo en Los Barrerones: crampones y piolet, o raquetas con nieve blanda.",
                         "<b>Ojo con:</b> el viento en Los Barrerones y la vuelta, que tiene una subida de unos 250 m desde la laguna cuando ya estás cansado.",
                         "<b>Agua:</b> hay fuentes en el camino, pero no se garantiza que sea potable. Lleva la tuya.",
@@ -346,7 +346,7 @@ ARTS.append(dict(
                         "Mira la <a href=\"/meteo/gredos-macizo-central/\">previsión del Macizo Central</a> y la webcam de la Laguna Grande antes de ir."])) +
         seccion("Ruta 2", "El Almanzor, techo del Sistema Central",
                 p("Con 2.591 m, el pico Almanzor es la cumbre más alta del Sistema Central. La vía normal sigue el camino de la Laguna Grande y continúa por la <b>Hoya de Antón</b> hasta la <b>canal de la Portilla del Crampón</b>, una canal estrecha y empinada de piedra suelta (de 40–50° en los tramos más fuertes). Desde la Portilla del Crampón (2.538 m) se hace una travesía sobre las Canales Oscuras y una <b>trepada final de grado II</b> hasta el vértice.") +
-                foto("almanzor", "El pico Almanzor (2.591 m), techo del Sistema Central.") +
+                ruta_blog("https://jairogredos.blogspot.com/2009/04/almanzor-por-la-canal-este.html", "ruta-almanzor", "El Almanzor en invierno, con el itinerario de subida marcado.", "ruta-almanzor-2", "Cerca de la cumbre del Almanzor en verano.") +
                 reglas(["<b>No es una excursión:</b> la canal tiene piedras sueltas (casco) y la trepada final es expuesta. No es para personas con vértigo o sin experiencia de trepar.",
                         "<b>En invierno</b> es una ascensión de alpinismo (PD): nieve de hasta 50°, a menudo dura, y riesgo de aludes en la canal. Crampones, piolet, casco y saber autodetenerse; en algunas condiciones, cuerda. Lo explicamos en <a href=\"/crampones-piolet-botas-material-invernal/\">material invernal</a> y <a href=\"/escalas-dificultad-escalada-ferratas-alpinismo-barrancos/\">escalas de dificultad</a>.",
                         "<b>La bajada</b> por la canal es más delicada que la subida: muchos accidentes pasan ahí.",
@@ -354,26 +354,29 @@ ARTS.append(dict(
                         "Si quieres subirlo con seguridad, lo hacemos con guía en verano y en invierno: <a href=\"/actividades/ascensiones-sierra-de-gredos/\">ascensiones en Gredos</a>."])) +
         seccion("Ruta 3", "La Mira, el mejor mirador del Circo",
                 p("La Mira (2.343 m) está al este del Circo de Gredos y tiene una de las mejores vistas de la sierra: el Circo, Los Galayos y el valle del Tiétar a tus pies. Desde la Plataforma se sube por la <b>Vereda de la Mira</b> hasta el cordal cimero (unos 2.070 m) y se sigue por la cuerda, pasando por Los Campanarios y la Portilla Pelucas, hasta la cumbre. Cerca de la cima están las ruinas del refugio de Los Pelaos.") +
-                foto("la-mira-galayos", "La Mira y Los Galayos.") +
+                ruta_blog("https://jairogredos.blogspot.com/2008/04/la-mira.html", "ruta-la-mira", "Por la cuerda hacia La Mira, sobre un mar de nubes.", "ruta-la-mira-2", "Agujas de granito desde la cuerda de La Mira.") +
                 reglas(["<b>Variante circular:</b> se puede bajar por El Raso y el Puerto del Peón hasta la carretera de la Plataforma (hace falta un segundo coche o caminar por la carretera).",
                         "<b>Cuándo:</b> sin nieve es una ruta larga de cordal sin pasos técnicos. En invierno, la cuerda se hiela y el viento es fuerte: crampones y piolet.",
                         "<b>Orientación:</b> en la cuerda el camino a veces se pierde entre bloques. Con niebla, mapa y brújula (<a href=\"/orientacion-en-montana-mapa-brujula/\">cómo usarlos</a>)."]),
                 True) +
         seccion("Ruta 4", "Los Galayos desde Guisando",
                 p("Los Galayos son las agujas de granito de la cara sur de Gredos, uno de los lugares de escalada clásica más importantes de España. La ruta sale del aparcamiento de <b>El Nogal del Barranco</b>, encima de Guisando, y sube por el camino de la garganta hasta el <b>refugio Victory</b>, al pie de las agujas (el Gran Galayo, la Galana, el Torreón…). Según la Junta, son unos <b>6,5 km con 870 m de subida y unas 3 horas</b>, de dificultad media-alta.") +
-                foto("galayos", "Las agujas de granito de Los Galayos.") +
+                ruta_blog("https://jairogredos.blogspot.com/2009/10/pequeno-galayo.html", "ruta-galayos", "Una de las agujas de Los Galayos.", "ruta-galayos-2", "Al pie de las agujas, tras escalar el Pequeño Galayo.") +
                 reglas(["<b>La subida es dura y continua</b>, por la cara sur: en verano hace mucho calor. Sal temprano y lleva bastante agua.",
                         "<b>El refugio Victory</b> es un refugio de escaladores; consulta si está abierto antes de contar con él.",
                         "<b>Prolongación:</b> los más montañeros siguen hasta la Portilla de los Galayos y bajan al Circo o enlazan con La Mira.",
                         "<b>Escalada:</b> las vías de Los Galayos son clásicas de verdad: graduación dura y seguros que hay que poner. Mira cómo leer los grados en <a href=\"/escalas-dificultad-escalada-ferratas-alpinismo-barrancos/\">escalas de dificultad</a>."])) +
         seccion("Gredos occidental", "Nuestras rutas: Cuatro Lagunas, La Ceja–Hoya Moros y Laguna del Duque",
-                p("Además de las rutas del Circo, en la parte occidental de Gredos y la Sierra de Béjar y Candelario hay tres recorridos que son los más característicos de nuestra zona y que hacemos a menudo con grupos. Tienes las crónicas con fotos en el blog de Jairo.") +
-                tarjetas([
-                    ("#4fb3e8", "Ruta de las Cuatro Lagunas", "En la Sierra del Barco: un recorrido por varias lagunas glaciares al pie de La Covacha (2.399 m), una de las cumbres más altas de Gredos occidental. <a href=\"https://jairogredos.blogspot.com/2008/04/ruta-de-las-cuatro-lagunas-y-la-covacha.html\" target=\"_blank\" rel=\"noopener\">Leer la crónica en el blog</a>"),
-                    ("#e9a53b", "La Ceja por Hoya Moros", "Desde Candelario por el circo glaciar de Hoya Moros hasta el Canchal de la Ceja (2.428 m), techo de Salamanca, con el Calvitero, techo de Extremadura, al lado. <a href=\"https://jairogredos.blogspot.com/2008/02/circo-de-hoya-moros.html\" target=\"_blank\" rel=\"noopener\">Leer la crónica en el blog</a>"),
-                    ("#7cc47f", "Laguna del Duque", "Desde Solana de Ávila, por un paredón de roca que parece inaccesible y que se sube cómodamente hasta la laguna. Una ruta asequible para todos los niveles. <a href=\"https://jairogredos.blogspot.com/2008/02/laguna-del-duque.html\" target=\"_blank\" rel=\"noopener\">Leer la crónica en el blog</a>"),
-                ]) +
-                '<p style="margin-top:18px">Las hacemos con guía: mira las actividades de la <a href="/actividades/comarca-natural-oeste-de-gredos/">comarca del Oeste de Gredos</a>.</p>', True) +
+                p("Además de las rutas del Circo, en la parte occidental de Gredos y en la Sierra de Béjar y Candelario hay tres recorridos que son los más característicos de nuestra zona y que hacemos a menudo con grupos. Las actividades guiadas están en la <a href=\"/actividades/comarca-natural-oeste-de-gredos/\">comarca del Oeste de Gredos</a>."), True) +
+        seccion("Ruta 5", "La ruta de las Cuatro Lagunas",
+                p("En la Sierra del Barco: un recorrido por varias lagunas glaciares al pie de La Covacha (2.399 m), una de las cumbres más altas de Gredos occidental. En invierno las lagunas se hielan y la ruta se convierte en una salida de montaña invernal.") +
+                ruta_blog("https://jairogredos.blogspot.com/2008/04/ruta-de-las-cuatro-lagunas-y-la-covacha.html", "ruta-cuatro-lagunas", "Una de las lagunas de la ruta, a medio deshelar.", "ruta-cuatro-lagunas-2", "Laguna helada bajo la cuerda nevada.")) +
+        seccion("Ruta 6", "El Canchal de la Ceja por Hoya Moros",
+                p("Desde Candelario por el circo glaciar de Hoya Moros hasta el Canchal de la Ceja (2.428 m), techo de Salamanca, con el Calvitero, techo de Extremadura, al lado. En invierno las canales de Hoya Moros son una escuela clásica de corredores de nieve.") +
+                ruta_blog("https://jairogredos.blogspot.com/2008/02/circo-de-hoya-moros.html", "ruta-hoya-moros", "El fondo del circo de Hoya Moros.", "ruta-hoya-moros-2", "Subiendo por la nieve hacia La Ceja.")) +
+        seccion("Ruta 7", "La Laguna del Duque",
+                p("Desde Solana de Ávila, por un paredón de roca que parece inaccesible y que se sube cómodamente hasta la laguna. Una ruta asequible para todos los niveles, que se puede alargar hacia la Laguna de las Cocinillas o el Risco de la Campana.") +
+                ruta_blog("https://jairogredos.blogspot.com/2011/12/laguna-del-duque-arroyo-malillo-laguna.html", "ruta-laguna-duque", "La Laguna del Duque.", "ruta-laguna-duque-2", "Lagunilla en la subida por el Arroyo Malillo."), True) +
         seccion("Antes de ir", "Consejos para cualquier ruta en Gredos",
                 tarjetas([
                     ("#4fb3e8", "El tiempo cambia rápido", "Niebla, tormentas de verano por la tarde y viento muy fuerte en las cumbres. Mira la <a href=\"/meteo/gredos-macizo-central/\">previsión de cumbre y base</a> y las webcams."),
