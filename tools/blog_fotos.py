@@ -64,7 +64,7 @@ if sys.argv[1] == "blog-listar":
     print(len(posts), "entradas")
 elif sys.argv[1] == "blog-bajar":
     for nombre, u in json.load(open(sys.argv[2])).items():
-        open("salida/%s.jpg" % nombre, "wb").write(get(tam(u.replace("http://", "https://"), "s1600")))
+        open("salida/%s.jpg" % nombre, "wb").write(get(u if "/s400/" in u else tam(u.replace("http://", "https://"), "s1600")))
         print(nombre)
 
 if sys.argv[1] == "blog-paginas":
