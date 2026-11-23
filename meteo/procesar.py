@@ -767,6 +767,36 @@ def icono(pr, nieve, tormenta, nubes):
     return "sol" if nubes < 25 else "poco-nuboso" if nubes < 60 else "nuboso" if nubes < 85 else "cubierto"
 
 
+def elev_sol(t, lat, lon):
+    """Seno de la altura del sol (coseno del ángulo cenital) en un instante UTC (algoritmo de la NOAA)."""
+    doy = t.timetuple().tm_yday
+    h = t.hour + t.minute / 60
+    g = 2 * math.pi / 365 * (doy - 1 + (h - 12) / 24)
+    eq = 229.18 * (0.000075 + 0.001868 * math.cos(g) - 0.032077 * math.sin(g) - 0.014615 * math.cos(2 * g) - 0.040849 * math.sin(2 * g))
+    de = (0.006918 - 0.399912 * math.cos(g) + 0.070257 * math.sin(g) - 0.006758 * math.cos(2 * g) + 0.000907 * math.sin(2 * g)
+          - 0.002697 * math.cos(3 * g) + 0.00148 * math.sin(3 * g))
+    ha = math.radians((h * 60 + eq + 4 * lon) / 4 - 180)
+    la = math.radians(lat)
+    return math.sin(la) * math.sin(de) + math.cos(la) * math.cos(de) * math.cos(ha)
+
+
+def indice_uv(t, lat, lon, alt, cc, nieve_cm):
+    """Índice UV estimado: cielo despejado (Madronich 2007) con ozono climatológico, más un 7 % por cada 1000 m,
+    más un 20 % sobre nieve, y reducido por la nubosidad. Es una estimación, no una medida."""
+    mu = elev_sol(t, lat, lon)
+    if mu <= 0:
+        return 0.0
+    doy = t.timetuple().tm_yday
+    ozono = 320 + 30 * math.cos(2 * math.pi * (doy - 80) / 365)  # máximo en primavera, mínimo en otoño
+    uv = 12.5 * mu ** 2.42 * (ozono / 300) ** -1.23
+    uv *= 1 + 0.07 * max(0.0, alt) / 1000
+    if nieve_cm is not None and nieve_cm >= 5:
+        uv *= 1.2
+    if cc is not None:
+        uv *= 1 - 0.65 * (min(100, max(0, cc)) / 100) ** 2.5
+    return uv
+
+
 def dias(eje, modelos_series, mac_id):
     """Resumen por día local (consenso = mediana de los modelos disponibles)."""
     ms = {m: s[mac_id] for m, s in modelos_series.items()}
@@ -784,6 +814,23 @@ def dias(eje, modelos_series, mac_id):
     for x in cons:
         nd = 1 if x in ("tv", "tc", "pr", "prb", "prc") else 0
         cons[x] = [None if v is None else (round(v, 1) if nd else (int(round(v / 10.0) * 10) if x in ("i0", "sl") else int(round(v)))) for v in cons[x]]
+    # índice UV por hora en cumbre y base (estimado con el sol, la altitud, la nieve y la nubosidad del consenso)
+    mac = [m for m in MACIZOS if m["id"] == mac_id][0]
+    cons["uvc"] = [round(indice_uv(eje[i], mac["cumbre"]["lat"], mac["cumbre"]["lon"], mac["cumbre"]["alt"], cons["cc"][i], cons["sn"][i]), 1) for i in range(n)]
+    cons["uvb"] = [round(indice_uv(eje[i], mac["base"]["lat"], mac["base"]["lon"], mac["base"]["alt"], cons["cc"][i], cons["snb"][i]), 1) for i in range(n)]
+    def uv_dia(d, idx, punto):
+        """Máximo del día muestreando cada media hora con la nubosidad del tramo más cercano."""
+        p = mac["cumbre"] if punto == "c" else mac["base"]
+        mejor, hora = 0.0, None
+        for k in range(12, 42):
+            t = dt.datetime(d.year, d.month, d.day, k // 2, 30 * (k % 2), tzinfo=TZ).astimezone(dt.timezone.utc)
+            i = min(idx, key=lambda j: abs((eje[j] - t).total_seconds()))
+            if abs((eje[i] - t).total_seconds()) > 4 * 3600:
+                continue
+            v = indice_uv(t, p["lat"], p["lon"], p["alt"], cons["cc"][i], cons["sn" if punto == "c" else "snb"][i])
+            if v > mejor:
+                mejor, hora = v, k / 2
+        return (round(mejor), hora)
     grupos = {}
     dur = [(eje[i] - eje[i - 1]).total_seconds() / 3600 if i else 1.0 for i in range(n)]
     for i, t in enumerate(eje):
@@ -856,6 +903,7 @@ def dias(eje, modelos_series, mac_id):
             "st_min": r(min(val("st")), 0) if val("st") else None, "sv_min": r(min(val("sv")), 0) if val("sv") else None, "sv_max": r(max(val("sv")), 0) if val("sv") else None,
             "wc_max": r(wmax[0]), "wc_dir": r(wmax[1]), "gv_max": r(max(gvs)) if gvs else None,
             "pr": pr, "nieve_c": round(nieve_c), "nieve_b": round(nieve_b), "pr_c": pr_c, "pr_b": pr_b,
+            "uv_c": uv_dia(d, idx, "c")[0], "uv_c_h": uv_dia(d, idx, "c")[1], "uv_b": uv_dia(d, idx, "b")[0], "uv_b_h": uv_dia(d, idx, "b")[1],
             "icono_c": icono(pr_c, nieve_c >= max(0.3, 0.5 * (pr_c or 0)), votos >= 2 or (votos == 1 and len(ms) == 1), nubes),
             "icono_b": icono(pr_b, nieve_b >= max(0.3, 0.5 * (pr_b or 0)), votos >= 2 or (votos == 1 and len(ms) == 1), nubes),
             "wv_max": r(wbmax[0]), "wv_dir": r(wbmax[1]), "gc_max": r(max(gcs)) if gcs else None,
