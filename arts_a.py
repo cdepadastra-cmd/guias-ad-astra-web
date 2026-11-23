@@ -82,7 +82,6 @@ ARTS.append(dict(
                 ]) +
                 '<p style="margin-top:14px">La subida invernal más clásica de nuestra zona, el <b>Almanzor por la canal de la Portilla del Crampón</b>, ronda el <b>PD</b>: pendientes de 40–50° y riesgo de caída si no sabes frenar con el piolet. Aprende a hacerlo en nuestro <a href="/actividades/cursos-alpinismo/">curso de alpinismo</a>.</p>' +
                 foto("escalada-hielo", "Escalada en una cascada de hielo: aquí se usan los grados WI.") +
-                blog("Hielo en Gredos, en el blog de Jairo", [("https://jairogredos.blogspot.com/2023/02/cascadas-del-callejon-de-la-lanchuela.html", "Cascadas del Callejón de la Lanchuela"), ("https://jairogredos.blogspot.com/2012/09/escalada-en-hielo-en-los-canalizos.html", "Escalada en hielo en Los Canalizos (Hoya Mayor)"), ("https://jairogredos.blogspot.com/2012/09/picando-hielo-en-el-circo-de-pena-negra.html", "Picando hielo en el Circo de Peña Negra de Becedas")]) +
                 dos("Escalada en hielo (WI)",
                     reglas(["<b>WI1–WI2:</b> hielo de 50–60°, fácil de proteger.",
                             "<b>WI3:</b> tramos de 70–80° con descansos. El nivel de entrada a las cascadas.",

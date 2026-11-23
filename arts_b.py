@@ -344,8 +344,7 @@ ARTS.append(dict(
                         "<b>Ojo con:</b> el viento en Los Barrerones y la vuelta, que tiene una subida de unos 250 m desde la laguna cuando ya estás cansado.",
                         "<b>Agua:</b> hay fuentes en el camino, pero no se garantiza que sea potable. Lleva la tuya.",
                         "<b>Fauna:</b> verás cabras montesas casi seguro. No les des de comer.",
-                        "Mira la <a href=\"/meteo/gredos-macizo-central/\">previsión del Macizo Central</a> y la webcam de la Laguna Grande antes de ir."]) +
-                blog("Crónicas en el blog de Jairo", [("https://jairogredos.blogspot.com/2008/05/laguna-grande.html", "Laguna Grande"), ("https://jairogredos.blogspot.com/2008/03/laguna-grande-por-la-garganta-de-las.html", "Laguna Grande por la Garganta de las Pozas y la Garganta de Gredos"), ("https://jairogredos.blogspot.com/2012/09/el-sagrao-desde-la-laguna-grande.html", "Nochevieja en la Laguna Grande y El Sagrao")])) +
+                        "Mira la <a href=\"/meteo/gredos-macizo-central/\">previsión del Macizo Central</a> y la webcam de la Laguna Grande antes de ir."])) +
         seccion("Ruta 2", "El Almanzor, techo del Sistema Central",
                 p("Con 2.591 m, el pico Almanzor es la cumbre más alta del Sistema Central. La vía normal sigue el camino de la Laguna Grande y continúa por la <b>Hoya de Antón</b> hasta la <b>canal de la Portilla del Crampón</b>, una canal estrecha y empinada de piedra suelta (de 40–50° en los tramos más fuertes). Desde la Portilla del Crampón (2.538 m) se hace una travesía sobre las Canales Oscuras y una <b>trepada final de grado II</b> hasta el vértice.") +
                 foto("almanzor", "El pico Almanzor (2.591 m), techo del Sistema Central.") +
@@ -353,15 +352,13 @@ ARTS.append(dict(
                         "<b>En invierno</b> es una ascensión de alpinismo (PD): nieve de hasta 50°, a menudo dura, y riesgo de aludes en la canal. Crampones, piolet, casco y saber autodetenerse; en algunas condiciones, cuerda. Lo explicamos en <a href=\"/crampones-piolet-botas-material-invernal/\">material invernal</a> y <a href=\"/escalas-dificultad-escalada-ferratas-alpinismo-barrancos/\">escalas de dificultad</a>.",
                         "<b>La bajada</b> por la canal es más delicada que la subida: muchos accidentes pasan ahí.",
                         "Puedes dormir en el refugio Elola (con reserva) y subir de madrugada, con más tiempo y menos gente.",
-                        "Si quieres subirlo con seguridad, lo hacemos con guía en verano y en invierno: <a href=\"/actividades/ascensiones-sierra-de-gredos/\">ascensiones en Gredos</a>."]) +
-                blog("Crónicas en el blog de Jairo", [("https://jairogredos.blogspot.com/2008/02/almanzor.html", "Almanzor (2.592 m)"), ("https://jairogredos.blogspot.com/2008/08/almanzor.html", "Almanzor y Cuerno del Almanzor"), ("https://jairogredos.blogspot.com/2009/04/almanzor-por-la-canal-este.html", "Almanzor por la Canal Este"), ("https://jairogredos.blogspot.com/2011/12/almanzor-nocturno-y-morezon.html", "Almanzor nocturno y Morezón"), ("https://jairogredos.blogspot.com/2009/09/vivac-almanzor-almanzor-cuchillar-de.html", "Vivac en el Almanzor, Cuchillar de Ballesteros y La Galana")])) +
+                        "Si quieres subirlo con seguridad, lo hacemos con guía en verano y en invierno: <a href=\"/actividades/ascensiones-sierra-de-gredos/\">ascensiones en Gredos</a>."])) +
         seccion("Ruta 3", "La Mira, el mejor mirador del Circo",
                 p("La Mira (2.343 m) está al este del Circo de Gredos y tiene una de las mejores vistas de la sierra: el Circo, Los Galayos y el valle del Tiétar a tus pies. Desde la Plataforma se sube por la <b>Vereda de la Mira</b> hasta el cordal cimero (unos 2.070 m) y se sigue por la cuerda, pasando por Los Campanarios y la Portilla Pelucas, hasta la cumbre. Cerca de la cima están las ruinas del refugio de Los Pelaos.") +
                 foto("la-mira-galayos", "La Mira y Los Galayos.") +
                 reglas(["<b>Variante circular:</b> se puede bajar por El Raso y el Puerto del Peón hasta la carretera de la Plataforma (hace falta un segundo coche o caminar por la carretera).",
                         "<b>Cuándo:</b> sin nieve es una ruta larga de cordal sin pasos técnicos. En invierno, la cuerda se hiela y el viento es fuerte: crampones y piolet.",
-                        "<b>Orientación:</b> en la cuerda el camino a veces se pierde entre bloques. Con niebla, mapa y brújula (<a href=\"/orientacion-en-montana-mapa-brujula/\">cómo usarlos</a>)."]) +
-                blog("Crónicas en el blog de Jairo", [("https://jairogredos.blogspot.com/2008/04/la-mira.html", "La Mira (2.341 m)"), ("https://jairogredos.blogspot.com/2010/04/la-mira-desde-el-km6.html", "La Mira desde el Km 6"), ("https://jairogredos.blogspot.com/2010/12/plataforma-de-gredos-la-mira-garganta.html", "Plataforma, La Mira y Garganta de los Conventos"), ("https://jairogredos.blogspot.com/2011/12/nogal-del-barranco-la-mira-garganta.html", "Nogal del Barranco, La Mira y Garganta Prao Puerto")]),
+                        "<b>Orientación:</b> en la cuerda el camino a veces se pierde entre bloques. Con niebla, mapa y brújula (<a href=\"/orientacion-en-montana-mapa-brujula/\">cómo usarlos</a>)."]),
                 True) +
         seccion("Ruta 4", "Los Galayos desde Guisando",
                 p("Los Galayos son las agujas de granito de la cara sur de Gredos, uno de los lugares de escalada clásica más importantes de España. La ruta sale del aparcamiento de <b>El Nogal del Barranco</b>, encima de Guisando, y sube por el camino de la garganta hasta el <b>refugio Victory</b>, al pie de las agujas (el Gran Galayo, la Galana, el Torreón…). Según la Junta, son unos <b>6,5 km con 870 m de subida y unas 3 horas</b>, de dificultad media-alta.") +
@@ -369,16 +366,22 @@ ARTS.append(dict(
                 reglas(["<b>La subida es dura y continua</b>, por la cara sur: en verano hace mucho calor. Sal temprano y lleva bastante agua.",
                         "<b>El refugio Victory</b> es un refugio de escaladores; consulta si está abierto antes de contar con él.",
                         "<b>Prolongación:</b> los más montañeros siguen hasta la Portilla de los Galayos y bajan al Circo o enlazan con La Mira.",
-                        "<b>Escalada:</b> las vías de Los Galayos son clásicas de verdad: graduación dura y seguros que hay que poner. Mira cómo leer los grados en <a href=\"/escalas-dificultad-escalada-ferratas-alpinismo-barrancos/\">escalas de dificultad</a>."]) +
-                blog("Crónicas en el blog de Jairo", [("https://jairogredos.blogspot.com/2011/12/torreon-de-los-galayos.html", "Torreón de los Galayos"), ("https://jairogredos.blogspot.com/2012/09/gran-diedro-al-gran-galayo.html", "Gran Diedro al Gran Galayo"), ("https://jairogredos.blogspot.com/2009/10/pequeno-galayo.html", "Pequeño Galayo"), ("https://jairogredos.blogspot.com/2012/10/la-galana-y-ameal-de-pablo.html", "La Galana y Ameal de Pablo")])) +
+                        "<b>Escalada:</b> las vías de Los Galayos son clásicas de verdad: graduación dura y seguros que hay que poner. Mira cómo leer los grados en <a href=\"/escalas-dificultad-escalada-ferratas-alpinismo-barrancos/\">escalas de dificultad</a>."])) +
+        seccion("Gredos occidental", "Nuestras rutas: Cuatro Lagunas, La Ceja–Hoya Moros y Laguna del Duque",
+                p("Además de las rutas del Circo, en la parte occidental de Gredos y la Sierra de Béjar y Candelario hay tres recorridos que son los más característicos de nuestra zona y que hacemos a menudo con grupos. Tienes las crónicas con fotos en el blog de Jairo.") +
+                tarjetas([
+                    ("#4fb3e8", "Ruta de las Cuatro Lagunas", "En la Sierra del Barco: un recorrido por varias lagunas glaciares al pie de La Covacha (2.399 m), una de las cumbres más altas de Gredos occidental. <a href=\"https://jairogredos.blogspot.com/2008/04/ruta-de-las-cuatro-lagunas-y-la-covacha.html\" target=\"_blank\" rel=\"noopener\">Leer la crónica en el blog</a>"),
+                    ("#e9a53b", "La Ceja por Hoya Moros", "Desde Candelario por el circo glaciar de Hoya Moros hasta el Canchal de la Ceja (2.428 m), techo de Salamanca, con el Calvitero, techo de Extremadura, al lado. <a href=\"https://jairogredos.blogspot.com/2008/02/circo-de-hoya-moros.html\" target=\"_blank\" rel=\"noopener\">Leer la crónica en el blog</a>"),
+                    ("#7cc47f", "Laguna del Duque", "Desde Solana de Ávila, por un paredón de roca que parece inaccesible y que se sube cómodamente hasta la laguna. Una ruta asequible para todos los niveles. <a href=\"https://jairogredos.blogspot.com/2008/02/laguna-del-duque.html\" target=\"_blank\" rel=\"noopener\">Leer la crónica en el blog</a>"),
+                ]) +
+                '<p style="margin-top:18px">Las hacemos con guía: mira las actividades de la <a href="/actividades/comarca-natural-oeste-de-gredos/">comarca del Oeste de Gredos</a>.</p>', True) +
         seccion("Antes de ir", "Consejos para cualquier ruta en Gredos",
                 tarjetas([
                     ("#4fb3e8", "El tiempo cambia rápido", "Niebla, tormentas de verano por la tarde y viento muy fuerte en las cumbres. Mira la <a href=\"/meteo/gredos-macizo-central/\">previsión de cumbre y base</a> y las webcams."),
                     ("#e9a53b", "Madruga", "Para evitar las tormentas, el calor y el aparcamiento lleno. En verano, a mediodía tienes que estar bajando."),
                     ("#7cc47f", "Respeta el parque", "Estás en el Parque Regional de la Sierra de Gredos: no se permite la acampada libre (<a href=\"/vivac-acampada-libre-espana/\">vivac y acampada</a>) ni hacer fuego."),
                     ("#e8574a", "Federado o asegurado", "Un rescate en el Circo es complicado. Lo explicamos en <a href=\"/federarse-seguro-montana-rescate/\">federarse y rescates</a>."),
-                ]) +
-                blog("Más rutas de Gredos en el blog de Jairo", [("https://jairogredos.blogspot.com/2008/09/integral-circo.html", "Integral del Circo de Gredos"), ("https://jairogredos.blogspot.com/2008/02/cinco-lagunas.html", "Cinco Lagunas"), ("https://jairogredos.blogspot.com/2008/11/cinco-lagunas-invernal.html", "Cinco Lagunas invernal"), ("https://jairogredos.blogspot.com/2012/10/refugios-de-gredos.html", "Refugios de Gredos")]))
+                ]))
     ),
     faq=[
         ("¿Cuánto se tarda en subir a la Laguna Grande de Gredos?", "Desde la Plataforma, unas 2–2,5 horas de ida y algo menos de vuelta, a un ritmo tranquilo. Son unos 6,5 km por trayecto y unos 650 m de desnivel acumulado entre la ida y la vuelta."),
