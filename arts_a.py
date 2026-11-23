@@ -131,29 +131,28 @@ ARTS.append(dict(
 ARTS.append(dict(
     path="/crampones-piolet-botas-material-invernal/",
     corto="Crampones, piolet y botas de invierno",
-    card="Crampones automáticos, semiautomáticos o de correas, 10 o 12 puntas, piolet de travesía o técnico y botas B0–B3.",
+    card="Crampones automáticos, semiautomáticos o de correas, 10 o 12 puntas, piolet de travesía o técnico y botas blandas, semirrígidas o rígidas.",
     titulo="Material invernal: crampones, piolet y botas",
     meta_title="Crampones, piolet y botas de montaña: cómo elegir | Ad Astra",
-    meta_desc="Crampones automáticos, semiautomáticos o de correas, de 10 o 12 puntas; piolet de travesía o técnico y botas B0, B1, B2 y B3. Qué es compatible con qué.",
-    lead="Qué crampones comprar (automáticos, semiautomáticos o de correas; de 10 o 12 puntas), qué piolet necesitas y de qué largo, y por qué la bota manda: la tabla de compatibilidad B0–B3 y C1–C3 explicada.",
+    meta_desc="Crampones automáticos, semiautomáticos o de correas, de 10 o 12 puntas; piolet de travesía o técnico y botas blandas, semirrígidas o rígidas.",
+    lead="Qué crampones comprar (automáticos, semiautomáticos o de correas; de 10 o 12 puntas), qué piolet necesitas y de qué largo, y por qué la bota manda: qué crampón va con cada bota.",
     hero="0c5376bd-2231-4c62-b798-6f0139e73cd7/cursos-alpinismo.webp",
     actions='<a class="btn btn-primary" href="#compatibilidad">Tabla de compatibilidad</a><a class="btn btn-ghost" href="#crampones">Crampones</a><a class="btn btn-ghost" href="#piolet">Piolet</a>',
     ico="invernal", og=("Artículo", "Crampones, piolet y botas", "Cómo elegir el material de invierno y qué es compatible", "#bfe0f7"),
     publicado="2026-11-23",
     cuerpo=(
         seccion("Lo primero", "Empieza por la bota: es la que decide",
-                p("Los crampones se eligen según la bota, y la bota según lo que vayas a hacer. Por eso los fabricantes usan dos escalas: la <b>B</b> para la rigidez de la bota (B0–B3) y la <b>C</b> para el tipo de crampón (C1–C3). Una bota de una letra B solo admite los crampones de su número o de números más bajos.") +
+                p("Los crampones se eligen según la bota, y la bota según lo que vayas a hacer. Lo que importa es <b>lo rígida que es la suela</b> y si tiene <b>rebordes</b> (las muescas de delante y de detrás donde encajan las palancas y los estribos del crampón).") +
                 escala([
-                    ("#b9a593", "B0", "Bota flexible", "Bota de senderismo normal, suela que se dobla. No admite crampones de verdad: como mucho, microcrampones o cadenas para caminos helados."),
-                    ("#4caf50", "B1", "Semirrígida ligera", "Bota de montaña con suela algo rígida y sin talones marcados. Admite crampones de correas (C1). Senderismo invernal y travesías sencillas."),
-                    ("#e6c32e", "B2", "Semirrígida", "Suela rígida y un reborde (talonera) en el talón. Admite crampones de correas y semiautomáticos (C1–C2). La más versátil para el alpinismo clásico."),
-                    ("#e8574a", "B3", "Rígida", "Suela totalmente rígida, con rebordes delante y detrás. Admite todos los crampones, incluidos los automáticos (C3). Alpinismo técnico, hielo y cascadas."),
+                    ("#4caf50", "Blanda", "Bota blanda", "Suela flexible que se dobla al caminar, sin rebordes. Solo admite crampones de correas, y mejor si la suela tiene algo de rigidez. Si es una bota de senderismo muy flexible, como mucho microcrampones para caminos helados. Para senderismo invernal."),
+                    ("#e6c32e", "Semirrígida", "Bota semirrígida", "Suela bastante rígida y un reborde en el talón. Admite crampones de correas y semiautomáticos. La más versátil para el alpinismo clásico."),
+                    ("#e8574a", "Rígida", "Bota rígida", "Suela totalmente rígida, con rebordes delante y detrás. Admite todos los crampones, incluidos los automáticos. Alpinismo técnico, hielo y cascadas."),
                 ])) +
         seccion("Crampones", "Automáticos, semiautomáticos o de correas",
                 tabla(["Tipo", "Cómo se sujeta", "Bota", "Para qué"], [
-                    ["C1 · Correas (o «universales»)", "Cestas de plástico delante y detrás y una correa.", "B1, B2, B3", "Senderismo invernal, travesía y alpinismo fácil. Se adaptan a casi cualquier bota de montaña."],
-                    ["C2 · Semiautomáticos", "Cesta de plástico delante y una palanca (talonera) atrás.", "B2, B3", "Alpinismo clásico: corredores, canales, crestas. El más polivalente."],
-                    ["C3 · Automáticos", "Un estribo metálico delante y una palanca atrás.", "B3", "Alpinismo técnico, hielo y mixto. Más precisos y firmes, pero exigen una bota totalmente rígida."],
+                    ["De correas (o «universales»)", "Cestas de plástico delante y detrás y una correa.", "Blanda, semirrígida o rígida", "Senderismo invernal, travesía y alpinismo fácil. Se adaptan a casi cualquier bota de montaña."],
+                    ["Semiautomáticos", "Cesta de plástico delante y una palanca (talonera) atrás.", "Semirrígida o rígida", "Alpinismo clásico: corredores, canales, crestas. El más polivalente."],
+                    ["Automáticos", "Un estribo metálico delante y una palanca atrás.", "Rígida", "Alpinismo técnico, hielo y mixto. Más precisos y firmes, pero exigen una bota totalmente rígida."],
                 ]) +
                 dos("¿10 o 12 puntas?",
                     reglas(["<b>10 puntas</b>: más ligeros. Para senderismo invernal, travesía y pendientes moderadas. Suelen ir con puntas frontales más cortas.",
@@ -179,27 +178,26 @@ ARTS.append(dict(
                         "<b>Dragonera o correa</b>: evita perderlo si se te cae al frenar. En terreno técnico mucha gente prefiere no llevarla.",
                         "<b>Saber autodetenerse</b> es más importante que el piolet que tengas. Un resbalón en nieve dura a 35° acelera en segundos. Practícalo en una pendiente con una salida segura o en un <a href=\"/actividades/cursos-alpinismo/\">curso de alpinismo</a>."])) +
         seccion("Compatibilidad", "Tabla de compatibilidad bota–crampón",
-                tabla(["Bota ↓ · Crampón →", "C1 · Correas", "C2 · Semiautomático", "C3 · Automático"], [
-                    ["B0", "✗", "✗", "✗"],
-                    ["B1", "✓", "✗", "✗"],
-                    ["B2", "✓", "✓", "✗"],
-                    ["B3", "✓", "✓", "✓"],
+                tabla(["Bota ↓ · Crampón →", "De correas", "Semiautomático", "Automático"], [
+                    ["Blanda", "✓ (si la suela no es muy flexible)", "✗", "✗"],
+                    ["Semirrígida", "✓", "✓", "✗"],
+                    ["Rígida", "✓", "✓", "✓"],
                 ]) +
                 aviso("<b>No fuerces la combinación.</b> Unos crampones semiautomáticos o automáticos en una bota que no es rígida se doblan, se sueltan o se rompen en el peor momento. Si dudas, llévate la bota a la tienda y pruébalo allí."),
                 True, "compatibilidad") +
         seccion("Por actividad", "¿Qué me compro?",
                 tarjetas([
-                    ("#4caf50", "Senderismo invernal", "Bota B1 (o B2), crampones de correas C1 de 10 puntas con antizuecos y un piolet de travesía de 55–65 cm. Bastones con roseta de nieve."),
-                    ("#e6c32e", "Alpinismo clásico (Gredos, Guadarrama, Picos)", "Bota B2, crampones semiautomáticos C2 de 12 puntas y un piolet de travesía tipo T de 50–60 cm. Es el equipo que usamos en el Almanzor o en Peñalara."),
-                    ("#e8574a", "Corredores empinados y hielo", "Bota B3, crampones automáticos C3 (o semiautomáticos de puntas verticales) y dos piolets técnicos."),
+                    ("#4caf50", "Senderismo invernal", "Bota blanda de montaña (o semirrígida), crampones de correas de 10 puntas con antizuecos y un piolet de travesía de 55–65 cm. Bastones con roseta de nieve."),
+                    ("#e6c32e", "Alpinismo clásico (Gredos, Guadarrama, Picos)", "Bota semirrígida, crampones semiautomáticos de 12 puntas y un piolet de travesía tipo T de 50–60 cm. Es el equipo que usamos en el Almanzor o en Peñalara."),
+                    ("#e8574a", "Corredores empinados y hielo", "Bota rígida, crampones automáticos (o semiautomáticos de puntas verticales) y dos piolets técnicos."),
                     ("#4fb3e8", "Con raquetas o esquís", "Lo explicamos en el artículo de <a href=\"/raquetas-de-nieve-y-esqui-de-travesia/\">raquetas y esquí de travesía</a>."),
                 ]) +
                 '<p style="margin-top:20px">Y no te olvides del resto: casco, ropa de invierno (<a href="/teoria-de-las-capas/">la teoría de las capas</a>), gafas de categoría 4 (<a href="/rayos-uv-proteccion-solar-montana/">por qué</a>) y, si hay riesgo de aludes, ARVA, pala y sonda (<a href="/como-leer-la-nieve-y-los-aludes/">cómo leer la nieve</a>). Tienes la lista completa en la <a href="/lista-material-montana/">lista de material</a>. Si no quieres comprar todavía, también <a href="/actividades/alquiler-material-montana/">alquilamos material</a>.</p>')
     ),
     faq=[
-        ("¿Qué crampones necesito para el Almanzor en invierno?", "Unos crampones de 12 puntas de acero, semiautomáticos (C2) si tu bota tiene talonera (B2) o de correas (C1) si es una bota B1, siempre con antizuecos. Y piolet, casco y saber autodetenerse."),
-        ("¿Puedo poner crampones en unas botas de senderismo?", "En una bota flexible (B0) no se pueden poner crampones de verdad, solo microcrampones para caminos helados. Para crampones de correas necesitas al menos una bota B1, con la suela algo rígida."),
-        ("¿Qué diferencia hay entre crampones automáticos y semiautomáticos?", "Los automáticos llevan un estribo metálico delante y necesitan una bota rígida B3 con reborde delantero. Los semiautomáticos llevan una cesta de plástico delante y sirven también en botas B2, que solo tienen reborde en el talón."),
+        ("¿Qué crampones necesito para el Almanzor en invierno?", "Unos crampones de 12 puntas de acero, semiautomáticos si tu bota es semirrígida (con reborde en el talón) o de correas si es una bota blanda de montaña, siempre con antizuecos. Y piolet, casco y saber autodetenerse."),
+        ("¿Puedo poner crampones en unas botas de senderismo?", "En una bota de senderismo muy flexible no se pueden poner crampones de verdad, solo microcrampones para caminos helados. Para crampones de correas necesitas una bota de montaña con la suela algo rígida."),
+        ("¿Qué diferencia hay entre crampones automáticos y semiautomáticos?", "Los automáticos llevan un estribo metálico delante y necesitan una bota rígida con reborde delantero. Los semiautomáticos llevan una cesta de plástico delante y sirven también en botas semirrígidas, que solo tienen reborde en el talón."),
         ("¿Qué tamaño de piolet necesito?", "Para la travesía y el alpinismo clásico, entre 50 y 70 cm. Cogido por la cabeza con el brazo relajado, la punta debe quedar por la mitad de la pantorrilla o el tobillo. Para terreno empinado, mejor corto."),
         ("¿Para qué sirven los antizuecos?", "Evitan que la nieve húmeda se pegue bajo el crampón y forme una bola que impide que las puntas agarren. Es una de las causas más comunes de resbalones en primavera."),
     ],
@@ -209,7 +207,7 @@ ARTS.append(dict(
         ("https://www.grivel.com/", "Grivel: crampones y piolets"),
         ("https://www.fedme.es/", "FEDME"),
     ],
-    nota="Las escalas B y C son convenciones de la industria y cada marca matiza su compatibilidad: consulta siempre las instrucciones del fabricante.",
+    nota="Cada marca matiza la compatibilidad entre sus crampones y las botas: consulta siempre las instrucciones del fabricante.",
 ))
 
 # ───────────────────────────── 3. MAL DE ALTURA ─────────────────────────────
