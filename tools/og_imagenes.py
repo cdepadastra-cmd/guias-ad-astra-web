@@ -13,7 +13,7 @@ PAGS = [
     ("video-ruta-3d", "Herramienta gratuita", "Vídeo 3D de tu ruta", "Tu GPX sobrevolando el relieve, con perfil y waypoints", "#e8574a", None),
     ("lista-material-montana", "Herramienta gratuita", "Lista de material", "Qué llevar en la mochila según la actividad", "#7cc47f", "img/guias/mochila-bien.webp"),
     ("herramientas", "Guías Ad Astra", "Herramientas de montaña", "Tiempo, nieve, caudales, editor GPX, vídeo 3D y más", "#e9a53b", None),
-    ("articulos", "Guías Ad Astra", "Artículos de montaña", "Nieve y aludes, mochila y ropa de montaña", "#e9a53b", None),
+    ("articulos", "Guías Ad Astra", "Artículos de montaña", "Técnica, seguridad, material y rutas de Gredos", "#e9a53b", None),
     ("como-preparar-la-mochila", "Artículo", "Cómo preparar la mochila", "Lo pesado, pegado a la espalda: dónde va cada cosa", "#e9a53b", "img/guias/mochila-zonas.webp"),
     ("rayos-uv-proteccion-solar-montana", "Artículo", "Rayos UV y protección solar", "Qué FPS usar y qué gafas necesitas en la montaña", "#f5c84b", None),
     ("teoria-de-las-capas", "Artículo", "La teoría de las capas", "Cómo vestirse para la montaña, capa a capa", "#c78bf0", None),
@@ -65,6 +65,10 @@ def tarjeta(slug, eyebrow, titulo, sub, color, imagen):
 
 
 if __name__ == "__main__":
+    import sys
+    sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+    import arts_a, arts_b
+    PAGS += [(a["path"].strip("/"),) + a["og"] + (None,) for a in arts_a.ARTS + arts_b.ARTS]
     for p in PAGS:
         tarjeta(*p)
     print(len(PAGS), "imágenes")

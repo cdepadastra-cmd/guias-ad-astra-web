@@ -50,6 +50,16 @@ RELACION = {  # qué enlazar al final de cada herramienta y artículo
     "/como-preparar-la-mochila/": ["/lista-material-montana/", "/teoria-de-las-capas/", "/calculadora-rutas/", "/meteo/"],
     "/rayos-uv-proteccion-solar-montana/": ["/meteo/", "/teoria-de-las-capas/", "/lista-material-montana/", "/como-leer-la-nieve-y-los-aludes/"],
     "/teoria-de-las-capas/": ["/como-preparar-la-mochila/", "/lista-material-montana/", "/meteo/", "/como-leer-la-nieve-y-los-aludes/"],
+    "/escalas-dificultad-escalada-ferratas-alpinismo-barrancos/": ["/crampones-piolet-botas-material-invernal/", "/barrancos-caudal/", "/calculadora-rutas/", "/tormentas-en-la-montana/"],
+    "/crampones-piolet-botas-material-invernal/": ["/raquetas-de-nieve-y-esqui-de-travesia/", "/como-leer-la-nieve-y-los-aludes/", "/lista-material-montana/", "/escalas-dificultad-escalada-ferratas-alpinismo-barrancos/"],
+    "/mal-de-altura-sintomas-prevencion/": ["/hipotermia-congelaciones-botiquin-montana/", "/rayos-uv-proteccion-solar-montana/", "/teoria-de-las-capas/", "/federarse-seguro-montana-rescate/"],
+    "/hipotermia-congelaciones-botiquin-montana/": ["/teoria-de-las-capas/", "/tormentas-en-la-montana/", "/federarse-seguro-montana-rescate/", "/meteo/"],
+    "/tormentas-en-la-montana/": ["/meteo/", "/barrancos-caudal/", "/hipotermia-congelaciones-botiquin-montana/", "/orientacion-en-montana-mapa-brujula/"],
+    "/orientacion-en-montana-mapa-brujula/": ["/editor-gpx/", "/calculadora-rutas/", "/rutas-clasicas-gredos-almanzor-laguna-grande-galayos/", "/federarse-seguro-montana-rescate/"],
+    "/vivac-acampada-libre-espana/": ["/lista-material-montana/", "/meteo/", "/tormentas-en-la-montana/", "/rutas-clasicas-gredos-almanzor-laguna-grande-galayos/"],
+    "/federarse-seguro-montana-rescate/": ["/hipotermia-congelaciones-botiquin-montana/", "/orientacion-en-montana-mapa-brujula/", "/como-leer-la-nieve-y-los-aludes/", "/mal-de-altura-sintomas-prevencion/"],
+    "/raquetas-de-nieve-y-esqui-de-travesia/": ["/nieve/", "/como-leer-la-nieve-y-los-aludes/", "/crampones-piolet-botas-material-invernal/", "/meteo/"],
+    "/rutas-clasicas-gredos-almanzor-laguna-grande-galayos/": ["/meteo/", "/editor-gpx/", "/video-ruta-3d/", "/crampones-piolet-botas-material-invernal/"],
 }
 
 
@@ -89,12 +99,14 @@ NAV_ACT = [("Todas las actividades", "/actividades/"), ("Barranquismo", "/activi
            ("Senderismo", "/actividades/?categoria=Senderismo"), ("Travesías y viajes", "/actividades/?categoria=Travesías y viajes")]
 NAV_CUR = [("Todos los cursos", "/formacion-cursos/"), ("Calendario de cursos", "/calendario/")] + [(c["disc_label"], "/actividades/%s/" % c["slug"]) for c in COURSES]
 NAV_HER = [("Todas las herramientas", "/herramientas/"), ("Meteorología de montaña", "/meteo/"), ("Estado de la nieve", "/nieve/"), ("Caudal de barrancos", "/barrancos-caudal/"), ("Calculadora de rutas", "/calculadora-rutas/"), ("Editor GPX", "/editor-gpx/"), ("Vídeo 3D de la ruta", "/video-ruta-3d/"), ("Lista de material", "/lista-material-montana/"), ("Topografía de barrancos", "/topografia-barrancos/"), ("Boulder en Las Tuerces", "/actividades/boulder-las-tuerces/"), ("Boulder en Zona Centro", "/actividades/boulder-zona-centro-salamanca-caceres/")]
+import arts_a, arts_b
+NUEVOS = arts_a.ARTS + arts_b.ARTS
 ARTICULOS = [
     ("/como-leer-la-nieve-y-los-aludes/", "Cómo leer la nieve y el peligro de aludes", "Cómo cambia el manto, placas de viento, tipos de aludes, el boletín de AEMET y cómo leer una ladera.", "nieve"),
     ("/como-preparar-la-mochila/", "Cómo preparar la mochila", "Dónde va cada cosa, por qué lo pesado va pegado a la espalda y cómo ajustar las correas, con ilustraciones.", "mochila"),
     ("/rayos-uv-proteccion-solar-montana/", "Rayos UV y protección solar", "Qué rayos UV hacen daño, por qué en la montaña te quemas más, qué FPS usar y qué gafas de sol necesitas.", "uv"),
     ("/teoria-de-las-capas/", "La teoría de las capas", "Cómo vestirse para la montaña: base, intermedia, exterior y la capa de reserva, en viñetas.", "capas"),
-]
+] + [(a["path"], a["corto"], a["card"], a["ico"]) for a in NUEVOS]
 HERRAMIENTAS = [
     ("/meteo/", "Meteorología de montaña", "Previsión a 15 días en cumbre y base para 27 macizos, con viento, nieve, isocero, avisos de AEMET y webcams.", "meteo"),
     ("/nieve/", "Estado de la nieve", "Nieve reciente, placas de viento, costras y nieve húmeda estimadas cada día por macizo, con mapa.", "nieve"),
@@ -1285,6 +1297,20 @@ def build_uv():
          body, "art", ld, priority="0.6")
 
 
+def build_nuevos():
+    for a in NUEVOS:
+        path = a["path"]
+        crumbs = [("Inicio", "/"), ("Artículos", "/articulos/"), (a["corto"], "")]
+        fuentes = "".join('<li><a href="%s" target="_blank" rel="noopener">%s</a></li>' % (u, e(t)) for u, t in a["fuentes"])
+        body = (hero("Artículos", a["titulo"], a["lead"], img(a["hero"]), crumbs, a.get("actions", "")) + a["cuerpo"] +
+                '<section class="section alt"><div class="wrap split"><div class="stack" style="gap:0">' + block("Preguntas frecuentes", faq_html(a["faq"])) +
+                '</div><div class="sticky"><div class="panel"><p class="eyebrow">Fuentes</p><ul class="gd-links">' + fuentes + '</ul>' +
+                ('<p class="small muted">%s</p>' % a["nota"] if a.get("nota") else "") + '</div></div></div></section>')
+        ld = [crumbs_ld([("Inicio", "/"), ("Artículos", "/articulos/"), (a["corto"], path)]), faq_ld(a["faq"]),
+              articulo_ld(path, a["titulo"], a["meta_desc"], a["publicado"])]
+        page(path, a["meta_title"], a["meta_desc"], body, "art", ld, priority="0.6")
+
+
 LEER_NIEVE_FAQ = [
     ("¿A partir de qué inclinación puede salir un alud?", "Los aludes de placa salen casi siempre en laderas de 30° o más, y la mayoría entre 35° y 45°. Por debajo de 30° es raro que se desencadenen, pero un alud que sale más arriba puede llegar hasta ti: cuenta también la pendiente que tienes encima."),
     ("¿Qué es una placa de viento?", "Una capa de nieve que el viento ha transportado y compactado a sotavento de crestas, collados y cambios de pendiente. Puede ser blanda o dura, pero es cohesiva: si debajo hay una capa débil, se rompe de golpe y desliza entera. Es el problema de aludes más habitual en nuestras sierras."),
@@ -1438,19 +1464,29 @@ ART_ICO = {
     "mochila": '<svg viewBox="0 0 64 64" aria-hidden="true"><rect x="16" y="12" width="32" height="44" rx="10" fill="#e9a53b"/><rect x="20" y="30" width="24" height="14" rx="4" fill="#c27f1f"/><path d="M24 12 Q32 2 40 12" fill="none" stroke="#8a5a14" stroke-width="4"/><rect x="16" y="18" width="32" height="8" rx="3" fill="#c27f1f"/></svg>',
     "uv": '<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="12" fill="#f5c84b"/><g stroke="#f5c84b" stroke-width="4" stroke-linecap="round"><path d="M32 6v8M32 50v8M6 32h8M50 32h8M13 13l6 6M45 45l6 6M13 51l6-6M45 19l6-6"/></g><text x="32" y="37" text-anchor="middle" font-family="Inter,sans-serif" font-size="13" font-weight="900" fill="#1b120c">UV</text></svg>',
     "capas": '<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M14 20 L24 12 H40 L50 20 L46 28 L42 26 V54 H22 V26 L18 28Z" fill="#6fb3e0"/><path d="M22 26 V54 H42 V26" fill="none" stroke="#e9a53b" stroke-width="4"/><path d="M28 12 Q32 18 36 12" fill="none" stroke="#7cc47f" stroke-width="4"/></svg>',
+    "escalas": '<svg viewBox="0 0 64 64" aria-hidden="true"><rect x="8" y="44" width="12" height="12" rx="2" fill="#4caf50"/><rect x="26" y="30" width="12" height="26" rx="2" fill="#e6c32e"/><rect x="44" y="12" width="12" height="44" rx="2" fill="#e8574a"/></svg>',
+    "invernal": '<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M20 8 L26 8 L26 56 L20 56Z" fill="#b9a593"/><path d="M8 10 Q24 2 44 12 L40 16 Q24 10 12 14Z" fill="#bfe0f7"/><path d="M34 40 H58 V46 H34Z" fill="#6b5a4a"/><g fill="#bfe0f7"><path d="M36 46 l2 8 l2-8Z M42 46 l2 8 l2-8Z M48 46 l2 8 l2-8Z M54 46 l2 8 l2-8Z"/></g></svg>',
+    "altura": '<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M4 56 L26 16 L36 32 L42 24 L60 56Z" fill="#6b5a4a"/><path d="M26 16 L20 28 L26 26 L30 30Z" fill="#fff"/><circle cx="50" cy="14" r="8" fill="none" stroke="#4fb3e8" stroke-width="4"/><text x="50" y="18" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" font-weight="900" fill="#4fb3e8">O₂</text></svg>',
+    "botiquin": '<svg viewBox="0 0 64 64" aria-hidden="true"><rect x="8" y="18" width="48" height="36" rx="8" fill="#e8574a"/><path d="M24 18 V12 H40 V18" fill="none" stroke="#a93226" stroke-width="4"/><path d="M28 26 H36 V32 H42 V40 H36 V46 H28 V40 H22 V32 H28Z" fill="#fff"/></svg>',
+    "tormenta": '<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M16 36 A10 10 0 0 1 18 16 A14 14 0 0 1 44 14 A10 10 0 0 1 50 36Z" fill="#8a7d9e"/><path d="M34 32 L24 48 H32 L28 60 L42 42 H34 L38 32Z" fill="#f5c84b"/></svg>',
+    "orientacion": '<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="24" fill="#f3e9df" stroke="#7cc47f" stroke-width="5"/><path d="M32 12 L38 32 L32 52 L26 32Z" fill="#b9a593"/><path d="M32 12 L38 32 H26Z" fill="#e8574a"/><circle cx="32" cy="32" r="3" fill="#1b120c"/></svg>',
+    "vivac": '<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M6 54 L32 14 L58 54Z" fill="#e9a53b"/><path d="M32 14 L24 54 H40Z" fill="#a8701e"/><circle cx="50" cy="12" r="6" fill="#f3e9df"/><circle cx="53" cy="10" r="5" fill="#1b120c"/></svg>',
+    "seguro": '<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M32 6 L54 14 V30 Q54 48 32 58 Q10 48 10 30 V14Z" fill="#4fb3e8"/><path d="M28 22 H36 V28 H42 V36 H36 V42 H28 V36 H22 V28 H28Z" fill="#fff"/></svg>',
+    "raquetas": '<svg viewBox="0 0 64 64" aria-hidden="true"><ellipse cx="22" cy="34" rx="10" ry="22" fill="none" stroke="#4fb3e8" stroke-width="5"/><path d="M14 30 H30 M14 40 H30" stroke="#4fb3e8" stroke-width="3"/><path d="M44 6 L50 58" stroke="#e8574a" stroke-width="6" stroke-linecap="round"/><path d="M40 52 Q52 60 58 48" fill="none" stroke="#e8574a" stroke-width="4"/></svg>',
+    "gredos": '<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M2 56 L18 26 L26 36 L36 12 L46 30 L52 22 L62 56Z" fill="#6b5a4a"/><path d="M36 12 L31 24 L36 21 L40 26Z" fill="#fff"/><ellipse cx="34" cy="50" rx="10" ry="3" fill="#4fb3e8"/></svg>',
 }
 
 
 def build_articulos():
     path = "/articulos/"
     cards = "".join('<a class="art-card" href="%s"><span class="art-ico">%s</span><div><h2>%s</h2><p>%s</p><span class="art-mas">Leer el artículo →</span></div></a>' % (h, ART_ICO[ic], e(t), e(d)) for h, t, d, ic in ARTICULOS)
-    body = (hero("Artículos", "Artículos de montaña", "Guías prácticas escritas por nuestros guías: nieve y aludes, cómo preparar la mochila, cómo vestirse para la montaña y más.", METEO_IMG,
+    body = (hero("Artículos", "Artículos de montaña", "Guías prácticas escritas por nuestros guías: nieve y aludes, material de invierno, grados de dificultad, seguridad, orientación, rutas de Gredos y más.", METEO_IMG,
                  [("Inicio", "/"), ("Artículos", "")]) +
-            '<section class="section"><div class="wrap"><div class="art-grid">' + cards + '</div></div></section>')
+            '<section class="section"><div class="wrap"><div class="art-grid art-grid2">' + cards + '</div></div></section>')
     ld = [crumbs_ld([("Inicio", "/"), ("Artículos", path)]), {"@context": "https://schema.org", "@type": "ItemList", "name": "Artículos de montaña de Guías Ad Astra", "itemListElement": [
         {"@type": "ListItem", "position": i + 1, "url": url(h), "name": t} for i, (h, t, _, _) in enumerate(ARTICULOS)]}]
-    page(path, "Artículos de montaña: nieve, aludes, mochila y capas | Ad Astra",
-         "Guías prácticas de montaña de Guías Ad Astra: cómo leer la nieve y el peligro de aludes, cómo preparar la mochila y la teoría de las capas.",
+    page(path, "Artículos de montaña: técnica, seguridad y rutas | Ad Astra",
+         "Guías prácticas de montaña: nieve y aludes, crampones y piolet, grados de escalada, mal de altura, tormentas, orientación, vivac y rutas de Gredos.",
          body, "art", ld, priority="0.6")
 
 
@@ -1678,7 +1714,7 @@ def main():
     cfg = os.path.join(OUT, "config.js")
     c = open(cfg, encoding="utf-8").read().replace('calendarioURL: ""', 'calendarioURL: "",\n  // Carpeta donde está publicada la web ("" si está en la raíz del dominio)\n  base: "%s"' % BASE)
     open(cfg, "w", encoding="utf-8").write(c)
-    build_home(); build_activities_index(); build_courses_index(); build_calendar(); build_rental(); build_about(); build_contact(); build_404(); build_calculator(); build_topografia(); build_meteo(); build_caudales(); build_nieve(); build_mochila(); build_capas(); build_leer_nieve(); build_articulos(); build_editor_gpx(); build_video3d(); build_lista_material(); build_herramientas(); build_uv()
+    build_home(); build_activities_index(); build_courses_index(); build_calendar(); build_rental(); build_about(); build_contact(); build_404(); build_calculator(); build_topografia(); build_meteo(); build_caudales(); build_nieve(); build_mochila(); build_capas(); build_leer_nieve(); build_articulos(); build_editor_gpx(); build_video3d(); build_lista_material(); build_herramientas(); build_uv(); build_nuevos()
     for a in ACTIVITIES:
         build_activity(a)
     build_ascensiones_macizos()
