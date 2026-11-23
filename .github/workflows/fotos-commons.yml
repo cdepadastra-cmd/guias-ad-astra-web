@@ -1,0 +1,22 @@
+# Busca o descarga fotos con licencia libre de Wikimedia Commons para los artículos (puntual).
+name: Fotos de Wikimedia Commons (puntual)
+on:
+  workflow_dispatch:
+    inputs:
+      modo:
+        description: "buscar o bajar"
+        default: "buscar"
+      lista:
+        description: "Archivo JSON"
+        default: "tools/fotos/busquedas.json"
+jobs:
+  fotos:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - run: python tools/fotos_commons.py ${{ inputs.modo }} ${{ inputs.lista }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: fotos
+          path: salida/
