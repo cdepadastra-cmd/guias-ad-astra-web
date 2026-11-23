@@ -15,6 +15,7 @@ PAGS = [
     ("herramientas", "Guías Ad Astra", "Herramientas de montaña", "Tiempo, nieve, caudales, editor GPX, vídeo 3D y más", "#e9a53b", None),
     ("articulos", "Guías Ad Astra", "Artículos de montaña", "Nieve y aludes, mochila y ropa de montaña", "#e9a53b", None),
     ("como-preparar-la-mochila", "Artículo", "Cómo preparar la mochila", "Lo pesado, pegado a la espalda: dónde va cada cosa", "#e9a53b", "img/guias/mochila-zonas.webp"),
+    ("rayos-uv-proteccion-solar-montana", "Artículo", "Rayos UV y protección solar", "Qué FPS usar y qué gafas necesitas en la montaña", "#f5c84b", None),
     ("teoria-de-las-capas", "Artículo", "La teoría de las capas", "Cómo vestirse para la montaña, capa a capa", "#c78bf0", None),
     ("como-leer-la-nieve-y-los-aludes", "Artículo", "Cómo leer la nieve y los aludes", "Manto, placas de viento y el boletín de AEMET explicado", "#bfe0f7", "img/guias/boletin-aludes-aemet-guadarrama.webp"),
 ]

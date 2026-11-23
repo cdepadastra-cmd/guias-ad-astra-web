@@ -884,3 +884,4 @@ input[type=radio],input[type=checkbox]{width:auto;padding:0}
 .mt-uv{display:inline-block;font:700 .72rem/1 var(--label,system-ui);letter-spacing:.04em;padding:4px 7px;border-radius:999px;background:var(--uv);color:#1b120c;white-space:nowrap}
 .mt-dia .mt-uv{margin-top:4px}
 .mt-uvtip{display:block;color:var(--muted);font-size:.8rem;margin-top:4px;font-weight:400}
+.uv-esc div span{width:auto;padding:0 8px}

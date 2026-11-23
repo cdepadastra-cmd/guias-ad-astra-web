@@ -38,7 +38,7 @@ ORG = {
 }
 
 RELACION = {  # qué enlazar al final de cada herramienta y artículo
-    "/meteo/": ["/nieve/", "/barrancos-caudal/", "/calculadora-rutas/", "/como-leer-la-nieve-y-los-aludes/"],
+    "/meteo/": ["/nieve/", "/rayos-uv-proteccion-solar-montana/", "/barrancos-caudal/", "/como-leer-la-nieve-y-los-aludes/"],
     "/nieve/": ["/meteo/", "/como-leer-la-nieve-y-los-aludes/", "/lista-material-montana/", "/teoria-de-las-capas/"],
     "/barrancos-caudal/": ["/meteo/", "/topografia-barrancos/", "/lista-material-montana/", "/como-preparar-la-mochila/"],
     "/calculadora-rutas/": ["/editor-gpx/", "/video-ruta-3d/", "/meteo/", "/lista-material-montana/"],
@@ -48,6 +48,7 @@ RELACION = {  # qué enlazar al final de cada herramienta y artículo
     "/topografia-barrancos/": ["/barrancos-caudal/", "/lista-material-montana/", "/meteo/", "/editor-gpx/"],
     "/como-leer-la-nieve-y-los-aludes/": ["/nieve/", "/meteo/", "/teoria-de-las-capas/", "/lista-material-montana/"],
     "/como-preparar-la-mochila/": ["/lista-material-montana/", "/teoria-de-las-capas/", "/calculadora-rutas/", "/meteo/"],
+    "/rayos-uv-proteccion-solar-montana/": ["/meteo/", "/teoria-de-las-capas/", "/lista-material-montana/", "/como-leer-la-nieve-y-los-aludes/"],
     "/teoria-de-las-capas/": ["/como-preparar-la-mochila/", "/lista-material-montana/", "/meteo/", "/como-leer-la-nieve-y-los-aludes/"],
 }
 
@@ -91,6 +92,7 @@ NAV_HER = [("Todas las herramientas", "/herramientas/"), ("Meteorología de mont
 ARTICULOS = [
     ("/como-leer-la-nieve-y-los-aludes/", "Cómo leer la nieve y el peligro de aludes", "Cómo cambia el manto, placas de viento, tipos de aludes, el boletín de AEMET y cómo leer una ladera.", "nieve"),
     ("/como-preparar-la-mochila/", "Cómo preparar la mochila", "Dónde va cada cosa, por qué lo pesado va pegado a la espalda y cómo ajustar las correas, con ilustraciones.", "mochila"),
+    ("/rayos-uv-proteccion-solar-montana/", "Rayos UV y protección solar", "Qué rayos UV hacen daño, por qué en la montaña te quemas más, qué FPS usar y qué gafas de sol necesitas.", "uv"),
     ("/teoria-de-las-capas/", "La teoría de las capas", "Cómo vestirse para la montaña: base, intermedia, exterior y la capa de reserva, en viñetas.", "capas"),
 ]
 HERRAMIENTAS = [
@@ -1176,6 +1178,113 @@ def build_video3d():
          body, "her", ld, priority="0.7", head=head, scripts=scripts)
 
 
+UV_FAQ = [
+    ("¿Hace falta crema en invierno o con nubes?", "Sí. Las nubes finas dejan pasar la mayor parte de la radiación UV, y en invierno la nieve la refleja casi entera: en una cumbre nevada de enero el índice UV puede ser tan alto como en una playa de primavera. Lo que baja en invierno es la temperatura, no tanto la radiación en la montaña."),
+    ("¿Un FPS 50 protege el doble que un 25?", "No. Un FPS 15 filtra alrededor del 93 % de los UVB, un 30 cerca del 97 % y un 50 alrededor del 98 %. La diferencia de verdad está en la cantidad que te pones y en renovarla: casi todo el mundo se echa menos de la mitad de lo necesario, y entonces el FPS real se queda muy por debajo del que pone el bote."),
+    ("¿Qué significa el logo UVA en un círculo?", "Que la protección frente a los UVA es al menos un tercio del FPS que indica el envase, como recomienda la Comisión Europea. Los UVA no queman, pero envejecen la piel y también intervienen en el cáncer de piel, así que busca siempre ese logo."),
+    ("¿Qué gafas de sol necesito en la montaña?", "De categoría 3 para un día normal de verano y de categoría 4 sobre nieve, glaciar o a mucha altitud. Que filtren el 100 % de los UV (pone «UV 400» o «100 % UV») y que tapen bien por los lados. Las de categoría 4 no sirven para conducir."),
+    ("¿Qué es la ceguera de la nieve?", "Una quemadura de la córnea por la radiación UV reflejada en la nieve (fotoqueratitis). No se nota en el momento: a las 6–12 horas aparecen dolor intenso, sensación de arena en los ojos, lagrimeo y no poder abrir los ojos. Suele curarse en uno o dos días, pero en la montaña te deja sin ver. Se evita con gafas de categoría 4 bien cerradas, también con el día nublado."),
+    ("¿Dónde veo el índice UV de cada día?", "En nuestra previsión de meteorología de montaña, para la cumbre y la base de cada sierra, con el máximo del día, la hora y el consejo de protección."),
+]
+
+
+def build_uv():
+    path = "/rayos-uv-proteccion-solar-montana/"
+    seccion = lambda eyebrow, h2, inner, alt=False: '<section class="section%s"><div class="wrap"><p class="eyebrow">%s</p><h2>%s</h2>%s</div></section>' % (" alt" if alt else "", eyebrow, h2, inner)
+    tabla = lambda cab, filas: '<div class="gd-tw"><table class="gd-t"><thead><tr>' + "".join("<th>%s</th>" % c for c in cab) + "</tr></thead><tbody>" + "".join("<tr>" + "".join(("<th>%s</th>" if i == 0 else "<td>%s</td>") % c for i, c in enumerate(f)) + "</tr>" for f in filas) + "</tbody></table></div>"
+    espectro = ('<svg viewBox="0 0 900 330" role="img" aria-label="Los UVC no llegan al suelo; los UVB se quedan en la capa superficial de la piel y queman; los UVA entran más hondo y envejecen la piel" style="width:100%;height:auto;display:block;border-radius:16px">'
+                '<rect width="900" height="330" fill="#f4efe7"/>'
+                '<rect x="0" y="0" width="900" height="70" fill="#cfe5f5"/><text x="20" y="40" font-family="Inter,system-ui,sans-serif" font-size="17" font-weight="800" fill="#1d3b57">Capa de ozono</text>'
+                '<rect x="0" y="62" width="900" height="16" fill="#8fb8d8"/>'
+                '<rect x="0" y="220" width="900" height="38" fill="#f2c9a8"/><rect x="0" y="258" width="900" height="72" fill="#e6a98a"/>'
+                '<text x="20" y="244" font-family="Inter,system-ui,sans-serif" font-size="14" font-weight="700" fill="#6b3a22">Epidermis</text><text x="20" y="300" font-family="Inter,system-ui,sans-serif" font-size="14" font-weight="700" fill="#6b3a22">Dermis</text>'
+                '<g font-family="Inter,system-ui,sans-serif" font-weight="800">'
+                '<path d="M210 10 L210 66" stroke="#8a4fc7" stroke-width="10" stroke-linecap="round"/><text x="228" y="38" font-size="20" fill="#8a4fc7">UVC</text><text x="228" y="58" font-size="13" font-weight="600" fill="#5c3a80">la frena el ozono</text>'
+                '<path d="M470 10 L470 232" stroke="#e8574a" stroke-width="10" stroke-linecap="round"/><text x="488" y="150" font-size="20" fill="#c23a2c">UVB</text><text x="488" y="170" font-size="13" font-weight="600" fill="#8a2a20">quema · se queda en la superficie</text>'
+                '<path d="M730 10 L730 300" stroke="#e9a53b" stroke-width="10" stroke-linecap="round"/><text x="748" y="150" font-size="20" fill="#b5671a">UVA</text><text x="748" y="170" font-size="13" font-weight="600" fill="#7a4512">entra hondo · envejece</text>'
+                '</g></svg>')
+    body = (hero("Artículos", "Rayos UV y protección solar en la montaña", "Qué rayos UV hacen daño, por qué en la montaña te quemas más, qué significa cada FPS y qué categoría de gafas necesitas. Todo lo que hay que saber para no volver de la cumbre quemado.", img("afe67801-cf88-4cef-a3ac-e25e4e971634/senderismo-avila-gredos.webp"),
+                 [("Inicio", "/"), ("Artículos", "/articulos/"), ("Rayos UV y protección solar", "")], '<a class="btn btn-primary" href="/meteo/">Ver el índice UV de hoy</a><a class="btn btn-ghost" href="#fps">Qué FPS usar</a>') +
+            seccion("Lo básico", "Qué son los rayos UV y cuáles hacen daño",
+                    '<p class="lead-p">La radiación ultravioleta es la parte de la luz del sol que no vemos. Se divide en tres tipos según su longitud de onda, y cada uno hace una cosa distinta:</p>'
+                    '<div class="gd-fig">' + espectro + '</div>' +
+                    tabla(["Tipo", "Longitud de onda", "Qué hace"], [
+                        ["UVC", "100–280 nm", "Es la más dañina, pero la capa de ozono la absorbe por completo: no llega al suelo."],
+                        ["UVB", "280–315 nm", "La responsable de las quemaduras. Se queda en la capa superficial de la piel y daña directamente su ADN: es la que más se relaciona con el cáncer de piel. También quema los ojos (ceguera de la nieve)."],
+                        ["UVA", "315–400 nm", "Llega en mucha más cantidad, todo el año y atraviesa las nubes y el cristal. No quema, pero entra más hondo: envejece la piel, produce manchas y también participa en el cáncer de piel."],
+                    ]) + '<p style="margin-top:16px">Así que hay que protegerse de los dos que llegan: los UVB (que miden el FPS) y los UVA (que mide el logo UVA del envase).</p>') +
+            seccion("En la montaña", "Por qué en la montaña te quemas más",
+                    '<div class="gd-capas">' + "".join('<article style="--c:%s"><h3>%s</h3><p>%s</p></article>' % x for x in [
+                        ("#4fb3e8", "La altitud", "Hay menos atmósfera por encima que filtre la radiación: según la OMS, el UV sube alrededor de un 10 % por cada 1.000 m. En una cumbre de 2.500 m recibes en torno a un 25 % más que en el valle."),
+                        ("#ffffff", "La nieve", "La nieve fresca refleja hasta el 80 % de la radiación UV, que te llega por debajo: a la barbilla, la nariz, las orejas y los ojos. Es la razón de las quemaduras raras de esquiadores y alpinistas."),
+                        ("#e9a53b", "La hora y la época", "Entre las 12 y las 16 h (hora oficial de verano) llega la mayor parte de la radiación del día. En primavera, con mucha nieve y el sol ya alto, se juntan los dos peores factores."),
+                        ("#b9a593", "Las nubes engañan", "Las nubes finas o dispersas dejan pasar casi toda la radiación, y como no sientes calor, no te das cuenta. Solo las nubes gruesas y continuas la reducen de verdad."),
+                        ("#7cc47f", "El viento y el frío", "Te refrescan y no notas que te estás quemando. La quemadura aparece horas después, cuando ya estás en casa."),
+                        ("#6fb3e8", "El agua", "En barrancos, ríos y lagos, el agua refleja parte de la radiación, y mojado la crema dura menos."),
+                    ]) + "</div>", True) +
+            seccion("El índice UV", "Cómo leer el índice UV",
+                    '<p class="lead-p">El índice UV mide la radiación que quema la piel en una escala que empieza en 0 y en España puede pasar de 11 en verano en la montaña. Es el número que te damos cada día en nuestra <a href="/meteo/">previsión de montaña</a>, para la cumbre y la base de cada sierra.</p>' +
+                    '<div class="gd-escala uv-esc">' + "".join('<div style="--c:%s"><span>%s</span><b>%s</b><p>%s</p></div>' % x for x in [
+                        ("#4caf50", "0–2", "Bajo", "Poco riesgo. Gafas de sol si hay nieve; crema si vas a estar muchas horas."),
+                        ("#e6c32e", "3–5", "Moderado", "Crema solar, gafas de sol y gorra en las horas centrales."),
+                        ("#f08a24", "6–7", "Alto", "Protección alta (FPS 30–50), gafas de categoría 3, gorra y buscar la sombra a mediodía."),
+                        ("#e8574a", "8–10", "Muy alto", "FPS 50 renovado cada 2 horas, gafas de categoría 3–4, ropa que cubra. Una piel clara se quema en menos de 15 minutos."),
+                        ("#a55fd6", "11+", "Extremo", "Todo lo anterior, sin excepciones. Habitual en verano en cumbres altas y en primavera sobre nieve."),
+                    ]) + "</div>") +
+            '<section class="section alt" id="fps"><div class="wrap"><p class="eyebrow">La crema</p><h2>Qué significa cada factor de protección (FPS)</h2>'
+            '<p class="lead-p">El FPS (o SPF) indica cuánto protege frente a los UVB, es decir, frente a la quemadura. Un FPS 30 quiere decir, en teoría, que tardarías 30 veces más en quemarte que sin nada… siempre que te pongas la cantidad correcta, cosa que casi nadie hace. Por eso en la Unión Europea los envases los agrupan en cuatro categorías:</p>' +
+            tabla(["Categoría", "FPS", "UVB que filtra", "Para qué"], [
+                ["Baja", "6–10", "≈ 83–90 %", "No es suficiente para la montaña."],
+                ["Media", "15–25", "≈ 93–96 %", "Días con índice UV bajo o moderado, a poca altitud y pocas horas al sol."],
+                ["Alta", "30–50", "≈ 97–98 %", "La opción normal para un día de montaña o barranco en verano."],
+                ["Muy alta", "50+", "≈ 98 % o más", "Nieve, glaciar, alta montaña, índice UV muy alto o extremo, pieles muy claras, niños y cicatrices."],
+            ]) +
+            '<div class="gd-dos" style="margin-top:26px"><div><h3>Cómo ponértela para que funcione</h3><ul class="gd-reglas">'
+            '<li><b>Cantidad:</b> unos 2 mg por cm² de piel. En la práctica, una cucharadita para la cara y el cuello, y unas seis para todo el cuerpo. Con la mitad, el FPS real se queda en mucho menos de la mitad.</li>'
+            '<li><b>Antes de salir:</b> 15–30 minutos antes de exponerte, con la piel seca.</li>'
+            '<li><b>Renuévala:</b> cada 2 horas y siempre después de sudar mucho, de mojarte o de secarte con la toalla. «Resistente al agua» solo significa que aguanta unos 40 minutos en el agua (80 si pone «muy resistente»).</li>'
+            '<li><b>Los sitios olvidados:</b> orejas, nariz, nuca, la parte baja de la barbilla (por el reflejo de la nieve), el cuero cabelludo si tienes poco pelo y el dorso de las manos.</li>'
+            '<li><b>Labios:</b> un protector labial con FPS; se queman y se agrietan muchísimo en altura.</li></ul></div>'
+            '<div><h3>Cómo elegirla</h3><ul class="gd-reglas">'
+            '<li><b>Busca el logo UVA en un círculo:</b> garantiza que la protección frente a los UVA es al menos un tercio del FPS.</li>'
+            '<li><b>«Amplio espectro»</b> o «UVA/UVB» en el envase: protege de los dos.</li>'
+            '<li><b>En formato barra o stick</b> para la cara y los labios: no se derrama en la mochila y se pone con los guantes a medio quitar.</li>'
+            '<li><b>Mira la fecha:</b> la crema del año pasado abierta pierde eficacia.</li>'
+            '<li><b>Ojo con algunos medicamentos</b> (ciertos antibióticos, antiinflamatorios o anticonceptivos): pueden hacer la piel más sensible al sol. Pregunta en la farmacia.</li></ul></div></div></div></section>' +
+            seccion("Los ojos", "Gafas de sol: la categoría importa",
+                    '<p class="lead-p">La categoría de unas gafas indica cuánta luz visible dejan pasar (lo oscuras que son). La protección frente a los UV es otra cosa: tiene que poner «UV 400» o «100 % UV». En la montaña necesitas las dos cosas.</p>' +
+                    tabla(["Categoría", "Luz que pasa", "Para qué"], [
+                        ["0", "80–100 %", "Transparentes o casi: interiores o días muy cubiertos."],
+                        ["1", "43–80 %", "Luz solar débil."],
+                        ["2", "18–43 %", "Luz solar media: ciudad, días con algo de nubes."],
+                        ["3", "8–18 %", "Luz solar fuerte: la normal para la montaña en verano, la playa y el agua."],
+                        ["4", "3–8 %", "Luz solar extrema: nieve, glaciar y alta montaña. No sirven para conducir."],
+                    ]) +
+                    '<ul class="gd-reglas" style="margin-top:18px"><li><b>Que cierren por los lados</b> (o con protectores laterales): sobre la nieve, la radiación también entra de lado y de abajo.</li>'
+                    '<li><b>Ceguera de la nieve:</b> es una quemadura de la córnea que aparece horas después (dolor intenso, sensación de arena, no poder abrir los ojos). Pasa también con el día nublado. Lleva siempre unas gafas de repuesto en grupo.</li>'
+                    '<li><b>Lentes polarizadas</b> quitan los reflejos del agua y la nieve, pero no protegen más de los UV por sí mismas. Las fotocromáticas son cómodas si cambias mucho de luz.</li></ul>', True) +
+            seccion("Más allá de la crema", "La mejor protección es la que no se borra",
+                    '<div class="gd-capas">' + "".join('<article style="--c:%s"><h3>%s</h3><p>%s</p></article>' % x for x in [
+                        ("#e9a53b", "Ropa", "Una camiseta de manga larga ligera protege más que cualquier crema y no hay que renovarla. Algunas prendas técnicas indican su factor de protección UPF (50+ es excelente)."),
+                        ("#4fb3e8", "Gorra, buff y sombrero", "Gorra con visera o sombrero de ala para la cara y la nuca; el buff, para el cuello y la cara en la nieve o con viento."),
+                        ("#7cc47f", "Planificación", "Empieza temprano y deja las horas centrales para las zonas de sombra o el descanso. Mira el índice UV del día en la previsión."),
+                        ("#e8574a", "Hidratación", "Con sol fuerte y altitud se pierde mucha agua sin darte cuenta: bebe a menudo."),
+                    ]) + '</div><p style="margin-top:20px">¿Qué ropa llevar? Te lo contamos en <a href="/teoria-de-las-capas/">la teoría de las capas</a>, y qué meter en la mochila, en la <a href="/lista-material-montana/">lista de material</a>.</p>') +
+            '<section class="section alt"><div class="wrap split"><div class="stack" style="gap:0">' + block("Preguntas frecuentes", faq_html(UV_FAQ)) +
+            '</div><div class="sticky"><div class="panel"><p class="eyebrow">Fuentes</p><ul class="gd-links">'
+            '<li><a href="https://www.sanidad.gob.es/areas/sanidadAmbiental/riesgosAmbientales/ultravioleta/home.htm" target="_blank" rel="noopener">Ministerio de Sanidad: radiación ultravioleta</a></li>'
+            '<li><a href="https://www.who.int/uv/faq/whatisuv/en/" target="_blank" rel="noopener">Organización Mundial de la Salud: el índice UV</a></li>'
+            '<li><a href="https://eur-lex.europa.eu/eli/reco/2006/647/oj/eng" target="_blank" rel="noopener">Recomendación 2006/647/CE sobre productos de protección solar</a></li>'
+            '<li><a href="https://www.consumer.es/salud/como-leer-etiquetas-protectores-solares" target="_blank" rel="noopener">Consumer: cómo leer las etiquetas de los protectores solares</a></li>'
+            '<li><a href="https://www.ocu.org/salud/bienestar-prevencion/informe/consejos-gafas-de-sol" target="_blank" rel="noopener">OCU: gafas de sol, consejos de compra</a></li></ul>'
+            '<p class="small muted">Este artículo es divulgativo y no sustituye el consejo de un dermatólogo u oftalmólogo.</p></div></div></div></section>')
+    ld = [crumbs_ld([("Inicio", "/"), ("Artículos", "/articulos/"), ("Rayos UV y protección solar", path)]), faq_ld(UV_FAQ),
+          articulo_ld(path, "Rayos UV y protección solar en la montaña", "Qué rayos UV hacen daño, por qué en la montaña te quemas más, qué significa cada FPS y qué gafas de sol necesitas.", "2026-11-23")]
+    page(path, "Rayos UV y protección solar en la montaña | Ad Astra",
+         "UVA, UVB y UVC: cuáles hacen daño y por qué en la montaña te quemas más. Qué significa cada FPS, cómo ponerte la crema y qué categoría de gafas usar.",
+         body, "art", ld, priority="0.6")
+
+
 LEER_NIEVE_FAQ = [
     ("¿A partir de qué inclinación puede salir un alud?", "Los aludes de placa salen casi siempre en laderas de 30° o más, y la mayoría entre 35° y 45°. Por debajo de 30° es raro que se desencadenen, pero un alud que sale más arriba puede llegar hasta ti: cuenta también la pendiente que tienes encima."),
     ("¿Qué es una placa de viento?", "Una capa de nieve que el viento ha transportado y compactado a sotavento de crestas, collados y cambios de pendiente. Puede ser blanda o dura, pero es cohesiva: si debajo hay una capa débil, se rompe de golpe y desliza entera. Es el problema de aludes más habitual en nuestras sierras."),
@@ -1327,6 +1436,7 @@ def build_leer_nieve():
 ART_ICO = {
     "nieve": '<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M4 54 L24 22 L32 32 L40 18 L60 54Z" fill="#6b5a4a"/><path d="M24 22 L18 32 L24 30 L28 34 L32 32Z M40 18 L35 27 L40 25 L44 29 L47 28Z" fill="#fff"/><path d="M40 18 L60 54 L50 54 L44 40Z" fill="#e8574a" opacity=".55"/></svg>',
     "mochila": '<svg viewBox="0 0 64 64" aria-hidden="true"><rect x="16" y="12" width="32" height="44" rx="10" fill="#e9a53b"/><rect x="20" y="30" width="24" height="14" rx="4" fill="#c27f1f"/><path d="M24 12 Q32 2 40 12" fill="none" stroke="#8a5a14" stroke-width="4"/><rect x="16" y="18" width="32" height="8" rx="3" fill="#c27f1f"/></svg>',
+    "uv": '<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="12" fill="#f5c84b"/><g stroke="#f5c84b" stroke-width="4" stroke-linecap="round"><path d="M32 6v8M32 50v8M6 32h8M50 32h8M13 13l6 6M45 45l6 6M13 51l6-6M45 19l6-6"/></g><text x="32" y="37" text-anchor="middle" font-family="Inter,sans-serif" font-size="13" font-weight="900" fill="#1b120c">UV</text></svg>',
     "capas": '<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M14 20 L24 12 H40 L50 20 L46 28 L42 26 V54 H22 V26 L18 28Z" fill="#6fb3e0"/><path d="M22 26 V54 H42 V26" fill="none" stroke="#e9a53b" stroke-width="4"/><path d="M28 12 Q32 18 36 12" fill="none" stroke="#7cc47f" stroke-width="4"/></svg>',
 }
 
@@ -1568,7 +1678,7 @@ def main():
     cfg = os.path.join(OUT, "config.js")
     c = open(cfg, encoding="utf-8").read().replace('calendarioURL: ""', 'calendarioURL: "",\n  // Carpeta donde está publicada la web ("" si está en la raíz del dominio)\n  base: "%s"' % BASE)
     open(cfg, "w", encoding="utf-8").write(c)
-    build_home(); build_activities_index(); build_courses_index(); build_calendar(); build_rental(); build_about(); build_contact(); build_404(); build_calculator(); build_topografia(); build_meteo(); build_caudales(); build_nieve(); build_mochila(); build_capas(); build_leer_nieve(); build_articulos(); build_editor_gpx(); build_video3d(); build_lista_material(); build_herramientas()
+    build_home(); build_activities_index(); build_courses_index(); build_calendar(); build_rental(); build_about(); build_contact(); build_404(); build_calculator(); build_topografia(); build_meteo(); build_caudales(); build_nieve(); build_mochila(); build_capas(); build_leer_nieve(); build_articulos(); build_editor_gpx(); build_video3d(); build_lista_material(); build_herramientas(); build_uv()
     for a in ACTIVITIES:
         build_activity(a)
     build_ascensiones_macizos()
