@@ -2,15 +2,23 @@
   python tools/blog_fotos.py blog-listar                -> salida/posts.json + salida/mini/<n>_<k>.jpg (miniaturas de cada entrada)
   python tools/blog_fotos.py blog-bajar tools/fotos/blog.json -> salida/<nombre>.jpg (fotos elegidas, a 1600 px)
 """
-import json, os, re, sys, urllib.request
+import json, os, re, sys, urllib.request, urllib.error
 UA = {"User-Agent": "Mozilla/5.0 (GuiasAdAstraWeb)"}
 BLOG = "https://jairogredos.blogspot.com"
 os.makedirs("salida/mini", exist_ok=True)
 
 
-def get(u):
-    with urllib.request.urlopen(urllib.request.Request(u, headers=UA), timeout=60) as r:
-        return r.read()
+def get(u, intentos=6):
+    import time
+    for k in range(intentos):
+        try:
+            time.sleep(1.2)
+            with urllib.request.urlopen(urllib.request.Request(u, headers=UA), timeout=60) as r:
+                return r.read()
+        except urllib.error.HTTPError as ex:
+            if ex.code != 429 or k == intentos - 1:
+                raise
+            time.sleep(20 * (k + 1))
 
 
 def tam(u, s):
@@ -42,7 +50,7 @@ if sys.argv[1] == "blog-listar":
                           "fecha": e["published"]["$t"][:10], "etiquetas": [c["term"] for c in e.get("category", [])], "imgs": imgs, "texto": texto[:600]})
         i += len(es)
     for p in posts:
-        for k, u in enumerate(p["imgs"][:6]):
+        for k, u in enumerate(p["imgs"][:4]):
             try:
                 open("salida/mini/%d_%d.jpg" % (p["n"], k), "wb").write(get(tam(u.replace("http://", "https://"), "s320")))
             except Exception as ex:
