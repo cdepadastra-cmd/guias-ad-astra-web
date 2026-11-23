@@ -18,12 +18,14 @@ jobs:
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
-      - run: |
+      - timeout-minutes: 50
+        run: |
           case "${{ inputs.modo }}" in
             blog-*) python tools/blog_fotos.py "${{ inputs.modo }}" ${{ inputs.lista }} ;;
             *) python tools/fotos_commons.py ${{ inputs.modo }} ${{ inputs.lista }} ;;
           esac
-      - run: |
+      - if: always()
+        run: |
           mkdir /tmp/r && cp -r salida /tmp/r/ && cd /tmp/r
           git init -q -b fotos-tmp && git add -A
           git -c user.name=bot -c user.email=bot@users.noreply.github.com commit -qm "fotos ${{ inputs.modo }}"

@@ -1302,7 +1302,7 @@ def build_nuevos():
         path = a["path"]
         crumbs = [("Inicio", "/"), ("Artículos", "/articulos/"), (a["corto"], "")]
         fuentes = "".join('<li><a href="%s" target="_blank" rel="noopener">%s</a></li>' % (u, e(t)) for u, t in a["fuentes"])
-        body = (hero("Artículos", a["titulo"], a["lead"], img(a["hero"]), crumbs, a.get("actions", "")) + a["cuerpo"] +
+        body = (hero("Artículos", a["titulo"], a["lead"], a["hero"] if a["hero"].startswith("/") else img(a["hero"]), crumbs, a.get("actions", "")) + a["cuerpo"] +
                 '<section class="section alt"><div class="wrap split"><div class="stack" style="gap:0">' + block("Preguntas frecuentes", faq_html(a["faq"])) +
                 '</div><div class="sticky"><div class="panel"><p class="eyebrow">Fuentes</p><ul class="gd-links">' + fuentes + '</ul>' +
                 ('<p class="small muted">%s</p>' % a["nota"] if a.get("nota") else "") + '</div></div></div></section>')

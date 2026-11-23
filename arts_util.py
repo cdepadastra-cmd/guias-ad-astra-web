@@ -61,3 +61,9 @@ def fotos(*items):
 
 def ilustracion(src, alt, pie):
     return '<figure class="gd-foto gd-ilu"><img src="%s" alt="%s" loading="lazy" decoding="async"><figcaption>%s</figcaption></figure>' % (src, alt, pie)
+
+
+def blog(titulo, enlaces):
+    """Recuadro con enlaces a crónicas del blog de Jairo: enlaces = [(url, texto)]"""
+    return ('<div class="panel gd-blog" style="margin-top:18px;border-left:5px solid var(--gold,#e9a53b)"><p class="eyebrow" style="margin:0 0 6px">%s</p><ul class="gd-links" style="margin:0">' % titulo +
+            "".join('<li><a href="%s" target="_blank" rel="noopener">%s</a></li>' % u for u in enlaces) + "</ul></div>")

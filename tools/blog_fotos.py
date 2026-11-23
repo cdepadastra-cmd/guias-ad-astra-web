@@ -26,6 +26,7 @@ def tam(u, s):
     return re.sub(r"=s\d+(-[a-z0-9-]+)?$", "=" + s, u)
 
 
+SOLO = set(json.load(open(sys.argv[2]))) if len(sys.argv) > 2 and sys.argv[1] == "blog-listar" and os.path.exists(sys.argv[2]) else None
 if sys.argv[1] == "blog-listar":
     posts, i = [], 1
     while True:
@@ -36,7 +37,10 @@ if sys.argv[1] == "blog-listar":
         for e in es:
             url = next(l["href"] for l in e["link"] if l["rel"] == "alternate")
             html = e.get("content", {}).get("$t", "")
-            if not html:
+            thumb = (e.get("media$thumbnail") or {}).get("url")
+            if not html and SOLO is not None and len(posts) not in SOLO:
+                html = '<img src="%s">' % thumb if thumb else ""
+            elif not html:
                 try:
                     pg = get(url).decode("utf-8", "ignore")
                     m = re.search(r"class=['\"]post-body[^>]*>(.*?)<div class=['\"]post-footer", pg, re.S)
@@ -49,6 +53,7 @@ if sys.argv[1] == "blog-listar":
             posts.append({"n": len(posts), "titulo": e["title"]["$t"], "url": url,
                           "fecha": e["published"]["$t"][:10], "etiquetas": [c["term"] for c in e.get("category", [])], "imgs": imgs, "texto": texto[:600]})
         i += len(es)
+    json.dump(posts, open("salida/posts.json", "w"), ensure_ascii=False, indent=1)
     for p in posts:
         for k, u in enumerate(p["imgs"][:4]):
             try:
