@@ -25,7 +25,7 @@ ARTS.append(dict(
                     ("#7cc47f", "Empieza por debajo", "En una zona nueva, empieza uno o dos grados por debajo de tu nivel hasta que te hagas a su roca y a su forma de graduar."),
                 ])) +
         seccion("Escalada en roca", "Grados de escalada: el sistema francés y sus equivalencias",
-                p("En España se usa la <b>escala francesa</b>: un número del 3 al 9, una letra (a, b, c) y a veces un «+». Cada salto de letra es un poco más difícil; el «+» es un medio grado. Hasta el 5 se considera escalada fácil o de iniciación, el 6 es el nivel de escalador habitual, el 7 es un nivel alto y del 8 en adelante es élite.") +
+                p("En España se usa la <b>escala francesa</b>: un número del 3 al 9, una letra (a, b, c) y a veces un «+». Cada salto de letra es un poco más difícil; el «+» es un medio grado. Hasta el 5 se considera escalada fácil o de iniciación, el 6 es el nivel de escalador habitual, el 7 es un nivel alto, del 8 en adelante es élite y el máximo escalado hasta hoy es el 9c.") +
                 tabla(["Francés", "UIAA", "YDS (EE. UU.)", "Británico (técnico)", "Nivel orientativo"], [
                     ["3", "III", "5.4", "—", "Trepada fácil. Hay presas grandes y la pared no es vertical."],
                     ["4a–4c", "IV / IV+", "5.5–5.6", "4a", "Iniciación. Los primeros días de curso."],
@@ -38,8 +38,10 @@ ARTS.append(dict(
                     ["7b", "VIII", "5.12b", "6c", "Muy alto."],
                     ["8a", "IX+ / X–", "5.13b", "7a", "Élite aficionada."],
                     ["9a", "XI", "5.14d", "—", "Élite mundial."],
+                    ["9b", "XI+", "5.15b", "—", "Solo unas decenas de escaladores en el mundo."],
+                    ["9c", "XII", "5.15d", "—", "El grado más alto escalado hasta hoy (ver abajo)."],
                 ]) +
-                '<p class="small muted" style="margin-top:10px">Las equivalencias entre sistemas son aproximadas: cada fuente da una tabla algo distinta.</p>' +
+                '<p class="small muted" style="margin-top:10px">Las equivalencias entre sistemas son aproximadas: cada fuente da una tabla algo distinta.</p><p style="margin-top:14px"><b>¿Cuál es el techo actual?</b> El <b>9c</b>. La primera vía de ese grado fue <i>Silence</i> (Flatanger, Noruega), de Adam Ondra en 2017. Después llegaron <i>DNA</i> (Verdon, Francia), de Seb Bouin en 2022, y <i>B.I.G.</i> (Flatanger), de Jakob Schubert en 2023. En España, Jorge Díaz-Rullo propuso 9c para <i>Café Colombia</i>, en Margalef, en 2026.</p>' +
                 dos("Escalada clásica y de aventura",
                     reglas(["La vía se gradúa por su <b>paso más difícil</b> y a veces se añade el grado obligado (lo mínimo que tienes que escalar sin tirar de los seguros).",
                             "En las vías largas, mira también la <b>longitud</b> y el <b>equipamiento</b>: «vía equipada» (con parabolts), «semiequipada» o «desequipada» (tú pones los seguros: friends, fisureros).",
@@ -52,13 +54,13 @@ ARTS.append(dict(
                             "Si te apetece probar, mira nuestras zonas de <a href=\"/actividades/boulder-las-tuerces/\">boulder en Las Tuerces</a> y <a href=\"/actividades/boulder-zona-centro-salamanca-caceres/\">Zona Centro</a>."])),
                 False, "escalada") +
         seccion("Vías ferratas", "Grados de las vías ferratas: K1 a K6 y la escala francesa",
-                p("Las ferratas se gradúan sobre todo con la <b>escala Hüsler</b> (K1–K6), que mide lo vertical que es la vía, lo que tienes que tirar de brazos y lo buenos que son los apoyos. También verás la <b>escala francesa</b> (F, PD, AD, D, TD, ED) en muchas reseñas.") +
+                p("Las ferratas se gradúan sobre todo con la <b>escala Hüsler</b> (K1–K6), que mide lo vertical que es la vía, lo que tienes que tirar de brazos y lo buenos que son los apoyos. También verás la <b>escala francesa</b> (F, PD, AD, D, MD, ED) en muchas reseñas.") +
                 escala([
                     ("#4caf50", "K1", "Fácil (F)", "Poco vertical, con buenos apoyos y escalones. Para empezar y para niños con experiencia."),
                     ("#9ccc65", "K2", "Poco difícil (PD)", "Tramos verticales cortos, siempre con buenos apoyos. Un primer día bien llevado."),
                     ("#e6c32e", "K3", "Algo difícil (AD)", "Verticales más largos, algún paso desplomado corto. Hace falta algo de fuerza de brazos."),
                     ("#f08a24", "K4", "Difícil (D)", "Verticales largos y desplomes. Hay que tirar mucho de brazos: no es para primerizos."),
-                    ("#e8574a", "K5", "Muy difícil (TD)", "Desplomada y continua, con apoyos escasos. Exige fuerza y técnica de escalada."),
+                    ("#e8574a", "K5", "Muy difícil (MD)", "Desplomada y continua, con apoyos escasos. Exige fuerza y técnica de escalada."),
                     ("#a55fd6", "K6", "Extremadamente difícil (ED)", "Casi deportiva: muy desplomada y sin apenas grapas. Para muy pocos."),
                 ]) +
                 reglas(["Muchas ferratas tienen <b>tramos de distinto grado</b> y a veces una variante más difícil: la reseña suele dar el grado del tramo más duro.",
@@ -73,7 +75,7 @@ ARTS.append(dict(
                     ["PD", "Poco difícil", "Pendientes de nieve de hasta 35–40°, crestas fáciles y trepadas de II–III. Ya hace falta saber usar la cuerda."],
                     ["AD", "Algo difícil", "Nieve o hielo de 40–55°, pasos de roca de III–IV. Hay que asegurar algunos largos."],
                     ["D", "Difícil", "Pendientes de 50–70°, roca de IV–V y rutas largas. Asegurar casi todo el tiempo."],
-                    ["TD", "Muy difícil", "Hielo de 65–80°, roca de V–VI, ruta larga y con poco escape."],
+                    ["MD", "Muy difícil", "Hielo de 65–80°, roca de V–VI, ruta larga y con poco escape. En las reseñas francesas aparece como TD (<i>très difficile</i>)."],
                     ["ED / ABO", "Extremadamente difícil / abominable", "Hielo vertical y roca de VI en adelante con gran compromiso. ED1, ED2… indican el escalón dentro del grado."],
                 ]) +
                 '<p style="margin-top:14px">La subida invernal más clásica de nuestra zona, el <b>Almanzor por la canal de la Portilla del Crampón</b>, ronda el <b>PD</b>: pendientes de 40–50° y riesgo de caída si no sabes frenar con el piolet. Aprende a hacerlo en nuestro <a href="/actividades/cursos-alpinismo/">curso de alpinismo</a>.</p>' +
