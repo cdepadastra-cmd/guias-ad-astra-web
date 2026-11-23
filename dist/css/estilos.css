@@ -885,3 +885,12 @@ input[type=radio],input[type=checkbox]{width:auto;padding:0}
 .mt-dia .mt-uv{margin-top:4px}
 .mt-uvtip{display:block;color:var(--muted);font-size:.8rem;margin-top:4px;font-weight:400}
 .uv-esc div span{width:auto;padding:0 8px}
+.gd-foto{margin:22px 0}
+.gd-foto img{display:block;width:100%;height:auto;border-radius:14px;background:var(--card)}
+.gd-foto figcaption{margin-top:8px;font-size:.93rem;color:var(--muted,#b9a593);line-height:1.45}
+.gd-foto figcaption small{display:block;font-size:.76rem;opacity:.8;margin-top:2px}
+.gd-foto figcaption a{color:inherit;text-decoration:underline}
+.gd-fotos{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:18px;margin:22px 0;align-items:start}
+.gd-fotos .gd-foto{margin:0}
+.gd-fotos .gd-foto img{aspect-ratio:4/3;object-fit:cover}
+.gd-ilu img{max-width:900px;margin:0 auto}

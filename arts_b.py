@@ -1,5 +1,5 @@
 """Artículos: orientación, vivac y acampada, federarse y rescates, raquetas y esquí de travesía, rutas clásicas de Gredos."""
-from arts_util import seccion, tabla, tarjetas, escala, reglas, dos, p, aviso
+from arts_util import seccion, tabla, tarjetas, escala, reglas, dos, p, aviso, foto, fotos, ilustracion
 
 ARTS = []
 
@@ -24,9 +24,11 @@ ARTS.append(dict(
                     ["1:50.000", "500 m", "Travesías largas y para tener una visión de conjunto."],
                     ["1:100.000 o más", "1 km o más", "Para planificar el acceso por carretera, no para orientarse en el monte."],
                 ]) +
+                foto("mtn25-laguna-grande", "Así se ve la Laguna Grande de Gredos en el mapa MTN25 del IGN: las curvas de nivel apretadas marcan las paredes del Circo.", "Mapa topográfico MTN25 del IGN de la Laguna Grande de Gredos con sus curvas de nivel") +
                 '<p style="margin-top:14px">La <b>cuadrícula</b> que cruza el mapa es la cuadrícula UTM: cada cuadro mide 1 km en los mapas 1:25.000. Te sirve para calcular distancias de un vistazo y para dar tu posición en coordenadas (las mismas que te da el móvil).</p>') +
         seccion("El relieve", "Cómo leer las curvas de nivel",
                 p("Una curva de nivel une todos los puntos que están a la misma altura. Entre dos curvas hay siempre el mismo desnivel, la <b>equidistancia</b>: 10 m en los mapas 1:25.000 del IGN y 20 m en los 1:50.000. Cada cinco curvas hay una más gruesa con su altitud, la <b>curva maestra</b>.") +
+                ilustracion("/img/guias/curvas-de-nivel.svg", "Mapa de curvas de nivel con dos cimas, un collado, una vaguada y un espolón, y el perfil del terreno debajo", "Las curvas de nivel y el perfil del terreno que dibujan. Fíjate en la cara este de la cima principal: las curvas casi se tocan y el perfil cae en picado.") +
                 tarjetas([
                     ("#e8574a", "Curvas juntas", "Pendiente fuerte. Si están muy pegadas, puede ser un cortado o una pared."),
                     ("#4caf50", "Curvas separadas", "Terreno suave: una llanura, un collado amplio, una ladera tendida."),
@@ -46,6 +48,7 @@ ARTS.append(dict(
                             "<b>2.</b> Gira el limbo hasta que sus líneas queden paralelas a las líneas norte-sur del mapa, con la «N» del limbo hacia el norte del mapa.",
                             "<b>3.</b> Levanta la brújula, ponla horizontal delante del pecho y gira tú sobre ti mismo hasta que la aguja roja quede dentro de la flecha del limbo («el rojo en la caseta»).",
                             "<b>4.</b> La flecha de dirección te marca el rumbo. Elige una referencia en esa dirección (una roca, un árbol), camina hasta ella y repite."])) +
+                '<div style="max-width:620px;margin:0 auto">' + foto("brujula-mapa", "Brújula sobre el mapa: la aguja roja apunta al norte magnético.") + '</div>' +
                 reglas(["<b>Declinación magnética:</b> el norte de la brújula no es exactamente el norte del mapa. En la península ahora la diferencia es muy pequeña (de menos de 2°) y para caminar se puede ignorar; en otros países puede ser importante.",
                         "<b>Aléjate de lo metálico</b> (el móvil, el piolet, una valla) al tomar el rumbo: desvían la aguja.",
                         "<b>Cuenta pasos o mira el reloj</b> para saber cuánto has avanzado. Un adulto da unos 60–65 dobles pasos cada 100 m en llano."]),
@@ -57,6 +60,8 @@ ARTS.append(dict(
                     ("#f5c84b", "Blanco y amarillo", "PR · Pequeño Recorrido", "Entre 10 y 50 km, una jornada o menos. Por ejemplo, el PR-AV 17 de la Plataforma a la Laguna Grande."),
                     ("#4caf50", "Blanco y verde", "SL · Sendero Local", "Menos de 10 km y con poca dificultad."),
                 ]) +
+                ilustracion("/img/guias/senales-senderos.svg", "Marcas de los senderos GR (blanco y rojo), PR (blanco y amarillo) y SL (blanco y verde): continuidad, cambio de dirección y dirección equivocada", "Las marcas de pintura de los senderos homologados.") +
+                fotos(("pr-cambio-direccion", "Marca de cambio de dirección de un PR pintada en una roca."), ("pr-poste", "Marcas de continuidad de un PR en un poste.")) +
                 tabla(["Marca", "Significado"], [
                     ["Dos franjas paralelas", "Continuidad: vas bien por el sendero."],
                     ["Las franjas en ángulo, o una franja doblada", "Cambio de dirección: el sendero gira hacia donde apunta el ángulo."],
@@ -117,6 +122,7 @@ ARTS.append(dict(
                     ("#e8574a", "Acampada libre", "Instalar una tienda fuera de un camping y quedarse durante el día o varios días en el mismo sitio. Está prohibida en casi todos los espacios naturales protegidos de España."),
                     ("#4fb3e8", "Pernocta en refugio", "Dormir en un refugio guardado (con reserva) o en un refugio libre. En los libres no hay reserva: si está lleno, muchas normas permiten vivaquear al lado."),
                 ]) +
+                '<div style="max-width:520px;margin:0 auto">' + foto("vivac-noche", "Noche de vivac bajo las estrellas.") + '</div>' +
                 '<p style="margin-top:16px">Fuera de los espacios protegidos, la acampada depende de la normativa de cada comunidad autónoma y de cada ayuntamiento, y en terreno privado necesitas permiso del propietario. Y en verano, en todo el país, <b>hacer fuego en el monte suele estar prohibido</b> (también con hornillos de llama en algunas épocas y zonas de alto riesgo).</p>') +
         seccion("Por zonas", "Qué está permitido en los espacios naturales más visitados",
                 tabla(["Espacio", "Qué dicen las normas"], [
@@ -196,6 +202,7 @@ ARTS.append(dict(
                 True, "modalidades") +
         seccion("El rescate", "¿Quién paga un rescate en España?",
                 p("En España, los rescates los hacen servicios públicos: la Guardia Civil (GREIM), los bomberos o los grupos de rescate de cada comunidad (en Castilla y León, el Grupo de Rescate de la Junta, con helicóptero). <b>En general son gratuitos</b>, pero varias comunidades tienen leyes o tasas que permiten cobrarlos en casos concretos: cuando hay imprudencia o negligencia (ignorar los avisos, ir sin el material necesario, meterse en una zona prohibida) o en falsas alarmas.") +
+                '<div style="max-width:640px;margin:0 auto">' + foto("greim-rescate", "Rescate en helicóptero de la Guardia Civil (GREIM).") + '</div>' +
                 tabla(["Comunidad", "Cuándo se puede cobrar"], [
                     ["Cataluña", "Rescates en zonas peligrosas o prohibidas, sin el material necesario o por falsa alarma."],
                     ["Asturias", "Solo en casos claros: desobedecer una orden expresa o negligencia evidente."],
@@ -256,6 +263,7 @@ ARTS.append(dict(
                     ["Ideal para", "Excursiones por bosques y laderas suaves, iniciarse en la montaña invernal.", "Recorridos largos y cumbres con mucho desnivel."],
                 ])) +
         seccion("Raquetas", "Cómo elegir unas raquetas de nieve",
+                foto("raquetas-grupo", "Excursión con raquetas por un bosque nevado: la forma más fácil de empezar en la montaña invernal.") +
                 reglas(["<b>Tamaño según el peso</b> (con mochila incluida): unas raquetas pequeñas (de unos 20 × 55 cm) sirven hasta unos 80–90 kg en nieve normal; con más peso o con nieve muy polvo, mejor más grandes o con extensiones de cola.",
                         "<b>Crampón o cuchillas:</b> las raquetas de montaña llevan un crampón bajo la fijación y cuchillas laterales que agarran en las travesías y en la nieve dura. Las de paseo con el marco tubular agarran peor en ladera.",
                         "<b>Alza talones:</b> una pieza que levanta el talón en las subidas. Ahorra mucho esfuerzo en las cuestas.",
@@ -327,9 +335,11 @@ ARTS.append(dict(
                     ["La Mira (2.343 m)", "Plataforma de Gredos", "≈ 16–18 km", "≈ +800–1.000 m", "Media-alta. Larga, por cordal, sin pasos técnicos en verano."],
                     ["Los Galayos (refugio Victory, 1.900 m)", "Nogal del Barranco, Guisando", "≈ 6,5 km (solo ida)", "≈ +870 m", "Media-alta. Subida fuerte y continua."],
                 ]) +
+                foto("circo-gredos", "El Circo de Gredos con la Laguna Grande, desde Los Barrerones.") +
                 '<p class="small muted" style="margin-top:10px">Datos orientativos sin nieve. Calcula el tiempo con tu ritmo en nuestra <a href="/calculadora-rutas/">calculadora de rutas</a>.</p>') +
         seccion("Ruta 1", "La Laguna Grande de Gredos",
                 p("La ruta más famosa de Gredos y una de las más bonitas del Sistema Central. Sale de la <b>Plataforma</b> (al final de la carretera de Hoyos del Espino, con aparcamiento de pago) y sigue el <b>PR-AV 17</b>, un camino empedrado que sube por el Prado de las Pozas hasta el mirador de <b>Los Barrerones</b> (2.170 m). Desde ahí aparece de golpe el Circo de Gredos con el Almanzor al fondo, y se baja a la <b>Laguna Grande</b> (1.935 m), con el refugio Elola en su orilla.") +
+                foto("laguna-grande-gredos", "La Laguna Grande de Gredos.") +
                 reglas(["<b>Cuándo:</b> de mayo a noviembre sin nieve. En invierno el camino se cubre y se hiela, sobre todo en Los Barrerones: crampones y piolet, o raquetas con nieve blanda.",
                         "<b>Ojo con:</b> el viento en Los Barrerones y la vuelta, que tiene una subida de unos 250 m desde la laguna cuando ya estás cansado.",
                         "<b>Agua:</b> hay fuentes en el camino, pero no se garantiza que sea potable. Lleva la tuya.",
@@ -337,6 +347,7 @@ ARTS.append(dict(
                         "Mira la <a href=\"/meteo/gredos-macizo-central/\">previsión del Macizo Central</a> y la webcam de la Laguna Grande antes de ir."])) +
         seccion("Ruta 2", "El Almanzor, techo del Sistema Central",
                 p("Con 2.591 m, el pico Almanzor es la cumbre más alta del Sistema Central. La vía normal sigue el camino de la Laguna Grande y continúa por la <b>Hoya de Antón</b> hasta la <b>canal de la Portilla del Crampón</b>, una canal estrecha y empinada de piedra suelta (de 40–50° en los tramos más fuertes). Desde la Portilla del Crampón (2.538 m) se hace una travesía sobre las Canales Oscuras y una <b>trepada final de grado II</b> hasta el vértice.") +
+                foto("almanzor", "El pico Almanzor (2.591 m), techo del Sistema Central.") +
                 reglas(["<b>No es una excursión:</b> la canal tiene piedras sueltas (casco) y la trepada final es expuesta. No es para personas con vértigo o sin experiencia de trepar.",
                         "<b>En invierno</b> es una ascensión de alpinismo (PD): nieve de hasta 50°, a menudo dura, y riesgo de aludes en la canal. Crampones, piolet, casco y saber autodetenerse; en algunas condiciones, cuerda. Lo explicamos en <a href=\"/crampones-piolet-botas-material-invernal/\">material invernal</a> y <a href=\"/escalas-dificultad-escalada-ferratas-alpinismo-barrancos/\">escalas de dificultad</a>.",
                         "<b>La bajada</b> por la canal es más delicada que la subida: muchos accidentes pasan ahí.",
@@ -344,12 +355,14 @@ ARTS.append(dict(
                         "Si quieres subirlo con seguridad, lo hacemos con guía en verano y en invierno: <a href=\"/actividades/ascensiones-sierra-de-gredos/\">ascensiones en Gredos</a>."])) +
         seccion("Ruta 3", "La Mira, el mejor mirador del Circo",
                 p("La Mira (2.343 m) está al este del Circo de Gredos y tiene una de las mejores vistas de la sierra: el Circo, Los Galayos y el valle del Tiétar a tus pies. Desde la Plataforma se sube por la <b>Vereda de la Mira</b> hasta el cordal cimero (unos 2.070 m) y se sigue por la cuerda, pasando por Los Campanarios y la Portilla Pelucas, hasta la cumbre. Cerca de la cima están las ruinas del refugio de Los Pelaos.") +
+                foto("la-mira-galayos", "La Mira y Los Galayos.") +
                 reglas(["<b>Variante circular:</b> se puede bajar por El Raso y el Puerto del Peón hasta la carretera de la Plataforma (hace falta un segundo coche o caminar por la carretera).",
                         "<b>Cuándo:</b> sin nieve es una ruta larga de cordal sin pasos técnicos. En invierno, la cuerda se hiela y el viento es fuerte: crampones y piolet.",
                         "<b>Orientación:</b> en la cuerda el camino a veces se pierde entre bloques. Con niebla, mapa y brújula (<a href=\"/orientacion-en-montana-mapa-brujula/\">cómo usarlos</a>)."]),
                 True) +
         seccion("Ruta 4", "Los Galayos desde Guisando",
                 p("Los Galayos son las agujas de granito de la cara sur de Gredos, uno de los lugares de escalada clásica más importantes de España. La ruta sale del aparcamiento de <b>El Nogal del Barranco</b>, encima de Guisando, y sube por el camino de la garganta hasta el <b>refugio Victory</b>, al pie de las agujas (el Gran Galayo, la Galana, el Torreón…). Según la Junta, son unos <b>6,5 km con 870 m de subida y unas 3 horas</b>, de dificultad media-alta.") +
+                foto("galayos", "Las agujas de granito de Los Galayos.") +
                 reglas(["<b>La subida es dura y continua</b>, por la cara sur: en verano hace mucho calor. Sal temprano y lleva bastante agua.",
                         "<b>El refugio Victory</b> es un refugio de escaladores; consulta si está abierto antes de contar con él.",
                         "<b>Prolongación:</b> los más montañeros siguen hasta la Portilla de los Galayos y bajan al Circo o enlazan con La Mira.",

@@ -1,5 +1,5 @@
 """Artículos: escalas de dificultad, material invernal, mal de altura, hipotermia y congelaciones, tormentas."""
-from arts_util import seccion, tabla, tarjetas, escala, reglas, dos, p, aviso
+from arts_util import seccion, tabla, tarjetas, escala, reglas, dos, p, aviso, foto, fotos, ilustracion
 
 ARTS = []
 
@@ -42,6 +42,7 @@ ARTS.append(dict(
                     ["9c", "XII", "5.15d", "—", "El grado más alto escalado hasta hoy (ver abajo)."],
                 ]) +
                 '<p class="small muted" style="margin-top:10px">Las equivalencias entre sistemas son aproximadas: cada fuente da una tabla algo distinta.</p><p style="margin-top:14px"><b>¿Cuál es el techo actual?</b> El <b>9c</b>. La primera vía de ese grado fue <i>Silence</i> (Flatanger, Noruega), de Adam Ondra en 2017. Después llegaron <i>DNA</i> (Verdon, Francia), de Seb Bouin en 2022, y <i>B.I.G.</i> (Flatanger), de Jakob Schubert en 2023. En España, Jorge Díaz-Rullo propuso 9c para <i>Café Colombia</i>, en Margalef, en 2026.</p>' +
+                foto("escalada-rodellar", "<i>El Delfín</i>, un 7c+ en el cañón del Mascún (Rodellar, Huesca), una de las grandes zonas de escalada deportiva de España.") +
                 dos("Escalada clásica y de aventura",
                     reglas(["La vía se gradúa por su <b>paso más difícil</b> y a veces se añade el grado obligado (lo mínimo que tienes que escalar sin tirar de los seguros).",
                             "En las vías largas, mira también la <b>longitud</b> y el <b>equipamiento</b>: «vía equipada» (con parabolts), «semiequipada» o «desequipada» (tú pones los seguros: friends, fisureros).",
@@ -63,6 +64,7 @@ ARTS.append(dict(
                     ("#e8574a", "K5", "Muy difícil (MD)", "Desplomada y continua, con apoyos escasos. Exige fuerza y técnica de escalada."),
                     ("#a55fd6", "K6", "Extremadamente difícil (ED)", "Casi deportiva: muy desplomada y sin apenas grapas. Para muy pocos."),
                 ]) +
+                foto("ferrata-sacs", "Tramo vertical de una vía ferrata: cable de vida, grapas y mucho patio.") +
                 reglas(["Muchas ferratas tienen <b>tramos de distinto grado</b> y a veces una variante más difícil: la reseña suele dar el grado del tramo más duro.",
                         "Fíjate en el <b>tiempo de aproximación y retorno</b> y en si hay escapes: una K3 de cinco horas cansa más que una K4 corta.",
                         "Una ferrata es terreno vertical aunque tenga grapas: casco, arnés y disipador homologado (EN 958) siempre. Y nunca con tormenta: el cable atrae los rayos (lo explicamos en <a href=\"/tormentas-en-la-montana/\">tormentas en la montaña</a>).",
@@ -79,6 +81,7 @@ ARTS.append(dict(
                     ["ED / ABO", "Extremadamente difícil / abominable", "Hielo vertical y roca de VI en adelante con gran compromiso. ED1, ED2… indican el escalón dentro del grado."],
                 ]) +
                 '<p style="margin-top:14px">La subida invernal más clásica de nuestra zona, el <b>Almanzor por la canal de la Portilla del Crampón</b>, ronda el <b>PD</b>: pendientes de 40–50° y riesgo de caída si no sabes frenar con el piolet. Aprende a hacerlo en nuestro <a href="/actividades/cursos-alpinismo/">curso de alpinismo</a>.</p>' +
+                foto("escalada-hielo", "Escalada en una cascada de hielo: aquí se usan los grados WI.") +
                 dos("Escalada en hielo (WI)",
                     reglas(["<b>WI1–WI2:</b> hielo de 50–60°, fácil de proteger.",
                             "<b>WI3:</b> tramos de 70–80° con descansos. El nivel de entrada a las cascadas.",
@@ -104,6 +107,7 @@ ARTS.append(dict(
                     ("#f08a24", "v4–v5 · a4", "Avanzado", "Rápeles largos o con agua, corrientes que pueden arrastrarte. Formación y experiencia."),
                     ("#e8574a", "v6–v7 · a5–a7", "Experto", "Rápeles en cascadas fuertes, rebufos y sifones. Muy pocas personas."),
                 ]) +
+                foto("barranco-rapel", "Rápel dentro de la cascada: la cuerda, la altura y la fuerza del agua deciden los grados v y a.") +
                 reglas(["El grado <b>acuático cambia con el caudal</b>: con el agua alta, un barranco a2 puede comportarse como un a4. Consulta el <a href=\"/barrancos-caudal/\">caudal en tiempo real</a> antes de ir.",
                         "En reseñas antiguas verás la escala de 1 a 6 de la Federación Española o letras como «A» y «B». Si la reseña no explica su escala, desconfía del grado.",
                         "¿Quieres empezar? Mira nuestros <a href=\"/actividades/barranquismo-avila/\">barrancos en Ávila</a> o el <a href=\"/actividades/curso-barranquismo/\">curso de barranquismo</a>."]),
@@ -147,7 +151,8 @@ ARTS.append(dict(
                     ("#4caf50", "Blanda", "Bota blanda", "Suela flexible que se dobla al caminar, sin rebordes. Solo admite crampones de correas, y mejor si la suela tiene algo de rigidez. Si es una bota de senderismo muy flexible, como mucho microcrampones para caminos helados. Para senderismo invernal."),
                     ("#e6c32e", "Semirrígida", "Bota semirrígida", "Suela bastante rígida y un reborde en el talón. Admite crampones de correas y semiautomáticos. La más versátil para el alpinismo clásico."),
                     ("#e8574a", "Rígida", "Bota rígida", "Suela totalmente rígida, con rebordes delante y detrás. Admite todos los crampones, incluidos los automáticos. Alpinismo técnico, hielo y cascadas."),
-                ])) +
+                ]) +
+                fotos(("bota-crampones", "Bota de montaña con crampones de 12 puntas."), ("crampon-hielo", "Las puntas frontales de un crampón mordiendo el hielo."))) +
         seccion("Crampones", "Automáticos, semiautomáticos o de correas",
                 tabla(["Tipo", "Cómo se sujeta", "Bota", "Para qué"], [
                     ["De correas (o «universales»)", "Cestas de plástico delante y detrás y una correa.", "Blanda, semirrígida o rígida", "Senderismo invernal, travesía y alpinismo fácil. Se adaptan a casi cualquier bota de montaña."],
@@ -174,6 +179,7 @@ ARTS.append(dict(
                     ["Para qué", "Caminar por nieve, apoyarse, autodetenerse, hacer escalones. Uno solo.", "Corredores empinados, hielo y mixto. Se usan dos (una pareja)."],
                     ["Longitud", "50–70 cm. La tendencia actual es más corto (50–60 cm) que antes.", "45–52 cm."],
                 ]) +
+                '<div style="max-width:360px;margin:0 auto">' + foto("piolet", "Piolet clásico de travesía: mango recto, pica poco inclinada y pala.") + '</div>' +
                 reglas(["<b>¿Qué largo?</b> Cogido por la cabeza con el brazo estirado y relajado, el regatón debe llegar más o menos a la mitad de la pantorrilla o al tobillo. Más corto si vas a hacer pendientes fuertes; un poco más largo si es sobre todo para apoyarte al caminar.",
                         "<b>Dragonera o correa</b>: evita perderlo si se te cae al frenar. En terreno técnico mucha gente prefiere no llevarla.",
                         "<b>Saber autodetenerse</b> es más importante que el piolet que tengas. Un resbalón en nieve dura a 35° acelera en segundos. Practícalo en una pendiente con una salida segura o en un <a href=\"/actividades/cursos-alpinismo/\">curso de alpinismo</a>."])) +
@@ -226,6 +232,7 @@ ARTS.append(dict(
     cuerpo=(
         seccion("Por qué pasa", "Menos presión, menos oxígeno",
                 p("El aire de la montaña tiene la misma proporción de oxígeno que el del mar (un 21 %), pero la <b>presión es menor</b> y en cada respiración entra menos oxígeno a la sangre. A 3.000 m hay un 30 % menos de presión que a nivel del mar; a 5.500 m, la mitad. El cuerpo se adapta (respira más, el corazón late más deprisa y con los días fabrica más glóbulos rojos), pero necesita tiempo. Si subes más rápido de lo que te adaptas, aparece el mal de altura.") +
+                fotos(("toubkal-senderistas", "Subiendo al Toubkal (4.167 m), en el Atlas: a esta altura el mal de altura ya es frecuente."), ("aconcagua", "La cara sur del Aconcagua (6.961 m): por encima de 5.500 m el cuerpo no llega a adaptarse del todo.")) +
                 tabla(["Altitud", "Ejemplos", "Qué esperar"], [
                     ["Hasta 2.500 m", "Gredos, Guadarrama, Picos de Europa", "Prácticamente no hay mal de altura. Puedes notar más cansancio y peor sueño."],
                     ["2.500–3.500 m", "Mulhacén (3.479 m), Aneto (3.404 m), Teide (3.715 m)", "Puede aparecer un mal agudo de montaña leve, sobre todo si duermes alto o subes en teleférico."],
@@ -308,7 +315,8 @@ ARTS.append(dict(
                             "<b>No frotes</b> la piel ni des masajes en las extremidades.",
                             "<b>No metas</b> a una persona con hipotermia moderada o grave en agua caliente.",
                             "<b>No la dejes sola</b> ni la hagas caminar si ya no tirita: los movimientos bruscos pueden provocar una arritmia.",
-                            "Una persona con hipotermia grave que parece muerta puede no estarlo: «nadie está muerto hasta que está caliente y muerto». Si no respira, empieza la RCP y no pares hasta que llegue el rescate."])),
+                            "Una persona con hipotermia grave que parece muerta puede no estarlo: «nadie está muerto hasta que está caliente y muerto». Si no respira, empieza la RCP y no pares hasta que llegue el rescate."])) +
+                '<div style="max-width:560px;margin:0 auto">' + foto("manta-termica", "La manta térmica pesa unos 50 gramos y debería ir siempre en el botiquín: con la cara plateada hacia el cuerpo, ayuda a retener el calor.") + '</div>',
                 False, "hipotermia") +
         seccion("Congelaciones", "Congelaciones: los dedos, la nariz y las orejas",
                 p("La congelación es la lesión de un tejido que llega a helarse. Afecta sobre todo a los dedos de los pies y las manos, la nariz, las orejas y las mejillas. La favorecen el viento, la humedad, las botas o los crampones demasiado apretados, la deshidratación, el tabaco y la altitud.") +
@@ -377,6 +385,7 @@ ARTS.append(dict(
     cuerpo=(
         seccion("Antes de salir", "Cómo se forma una tormenta de verano y cómo preverla",
                 p("La típica tormenta de verano en la montaña es de <b>evolución diurna</b>: el sol calienta el suelo por la mañana, el aire caliente y húmedo sube por las laderas, se forman cúmulos y, si la atmósfera es inestable, a primera hora de la tarde crecen hasta convertirse en cumulonimbos con rayos, granizo y rachas de viento. Por eso la regla de oro es <b>madrugar y estar bajando a mediodía</b>.") +
+                fotos(("cumulonimbo", "Un cumulonimbo crece sobre las montañas: la típica tormenta de tarde de verano."), ("rayo-montana", "Rayo sobre una montaña: las cumbres y crestas son los puntos más expuestos.")) +
                 tarjetas([
                     ("#4fb3e8", "Mira la previsión", "Busca avisos de tormenta en AEMET y la probabilidad de precipitación por la tarde. En nuestra <a href=\"/meteo/\">previsión de montaña</a> tienes el icono de tormenta por horas y los avisos oficiales en el mapa."),
                     ("#e9a53b", "Mira el cielo", "Cúmulos que a media mañana ya crecen hacia arriba como coliflores, nubes que se oscurecen por la base o una tormenta que se ve venir a lo lejos: es hora de cambiar de plan."),

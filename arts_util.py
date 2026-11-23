@@ -35,3 +35,29 @@ def p(txt):
 
 def aviso(txt):
     return '<div class="panel" style="margin-top:20px;border-left:5px solid #e8574a"><p style="margin:0">%s</p></div>' % txt
+
+
+import json as _json, os as _os
+_CRED = _json.load(open(_os.path.join(_os.path.dirname(__file__), "tools", "fotos", "creditos.json")))
+
+
+def _credito(n):
+    c = _CRED[n]
+    lic = ('<a href="%s" target="_blank" rel="noopener">%s</a>' % (c["licencia_url"], c["licencia"])) if c.get("licencia_url") else c["licencia"]
+    return 'Foto: <a href="%s" target="_blank" rel="noopener">%s</a> · %s · Wikimedia Commons' % (c["pagina"], c["autor"], lic)
+
+
+def foto(n, pie, alt=None):
+    """Foto libre de Wikimedia Commons (static/img/fotos/<n>.webp) con su pie y su crédito."""
+    c = _CRED[n]
+    return ('<figure class="gd-foto"><img src="/img/fotos/%s.webp" alt="%s" width="%d" height="%d" loading="lazy" decoding="async">'
+            '<figcaption>%s<small>%s</small></figcaption></figure>') % (n, alt or pie, c["w"], c["h"], pie, _credito(n))
+
+
+def fotos(*items):
+    """Varias fotos en fila: fotos(("nombre", "pie"), ...)"""
+    return '<div class="gd-fotos">' + "".join(foto(*i) for i in items) + "</div>"
+
+
+def ilustracion(src, alt, pie):
+    return '<figure class="gd-foto gd-ilu"><img src="%s" alt="%s" loading="lazy" decoding="async"><figcaption>%s</figcaption></figure>' % (src, alt, pie)
