@@ -66,3 +66,28 @@ else:
     for nombre, u in json.load(open(sys.argv[2])).items():
         open("salida/%s.jpg" % nombre, "wb").write(get(tam(u.replace("http://", "https://"), "s1600")))
         print(nombre)
+
+if sys.argv[1] == "blog-paginas":
+    # Lista de URLs de entradas -> salida/paginas.json + salida/mini/<i>_<k>.jpg (hasta 14 fotos por entrada)
+    res = []
+    for i, url in enumerate(json.load(open(sys.argv[2]))):
+        try:
+            pg = get(url).decode("utf-8", "ignore")
+        except Exception as ex:
+            print("error", url, ex); continue
+        m = re.search(r"class=['\"]post-body[^>]*>(.*?)<div class=['\"]post-footer", pg, re.S)
+        html = m.group(1) if m else pg
+        imgs = []
+        for u in re.findall(r'(https?://blogger\.googleusercontent\.com/img/[^"\'\s>]+|https?://\d\.bp\.blogspot\.com/[^"\'\s>]+)', html):
+            clave = re.sub(r"/s\d+(-[a-z0-9-]+)?/", "/", u)
+            if clave not in [re.sub(r"/s\d+(-[a-z0-9-]+)?/", "/", x) for x in imgs]:
+                imgs.append(u)
+        texto = re.sub(r"\s+", " ", re.sub("<[^>]+>", " ", html)).strip()
+        res.append({"i": i, "url": url, "imgs": imgs, "texto": texto[:3000]})
+        for k, u in enumerate(imgs[:14]):
+            try:
+                open("salida/mini/%d_%d.jpg" % (i, k), "wb").write(get(tam(u.replace("http://", "https://"), "s400")))
+            except Exception as ex:
+                print("error", ex)
+        json.dump(res, open("salida/paginas.json", "w"), ensure_ascii=False, indent=1)
+    print(len(res), "páginas")
