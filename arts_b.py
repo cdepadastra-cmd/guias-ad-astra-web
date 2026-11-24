@@ -441,7 +441,7 @@ ARTS.append(dict(
                 fblog("escalada-galayos-reunion", "Reunión en el Pequeño Galayo.", _BL + "2009/10/pequeno-galayo.html") + '</div>') +
         seccion("Vía 1", "Sur Clásica al Torreón de los Galayos (V/V+)",
                 p("El <b>Torreón</b> es la aguja más espectacular de Galayos: vertical por todas sus caras, sin ningún camino fácil a la cumbre (la cumbre sur se alcanzó por primera vez en 1947). Su vía Sur es la gran clásica de la sierra y una de las más bonitas del Sistema Central.") +
-                '<p class="gd-croquis"><b>Croquis original:</b> ' + '<a href="https://jairogredos.blogspot.com/2011/12/torreon-de-los-galayos.html" target="_blank" rel="noopener">croquis de la Sur Directa en la crónica de Jairo</a> · <a href="https://pablovelasco73.blogspot.com/2020/08/sur-del-torreon-galayos-130m-v.html" target="_blank" rel="noopener">reseña de Pablo Velasco</a>' + '</p>' +
+                '<p class="gd-croquis"><b>Croquis original:</b> <a href="http://pelegrinajes.blogspot.com/2012/05/aroma-galayero-el-torreon.html" target="_blank" rel="noopener">blog Pelegrinajes</a> · ' + '<a href="https://jairogredos.blogspot.com/2011/12/torreon-de-los-galayos.html" target="_blank" rel="noopener">croquis de la Sur Directa en la crónica de Jairo</a> · <a href="https://pablovelasco73.blogspot.com/2020/08/sur-del-torreon-galayos-130m-v.html" target="_blank" rel="noopener">reseña de Pablo Velasco</a>' + '</p>' +
                 '<div class="gd-fotos">' + fblog("torreon-largo-final", "En el último largo de la Sur del Torreón.", "https://jairogredos.blogspot.com/2011/12/torreon-de-los-galayos.html") + fblog("torreon-rapel", "El rápel de acceso a la cara sur.", "https://jairogredos.blogspot.com/2011/12/torreon-de-los-galayos.html") + "</div>" +
                 dos("La vía",
                     reglas(["<b>Acceso al pie:</b> desde el Victory se sube por la Trocha Palomo hasta la <b>Plataforma de las Flores</b>, en la cara norte, y desde allí se baja un <b>rápel de 60 m</b> a la cara sur. Las zapatillas de aproximación se quedan en la plataforma.",
@@ -457,7 +457,7 @@ ARTS.append(dict(
                 False, "torreon") +
         seccion("Vía 2", "Los Tres Hermanitos del Circo de Gredos (IV a V+)",
                 p("Tres agujas de granito alineadas en el <b>cordal de Cerraíllos</b>, entre el Morezón y el Casquerazo, encima del refugio Elola y la Laguna Grande, con el Almanzor de fondo. Se numeran de izquierda a derecha y en una jornada se pueden subir las tres. Muy cerca está el Risco del Perro que Fuma.") +
-                '<p class="gd-croquis"><b>Croquis original:</b> ' + '<a href="https://cuadernodemonte.wordpress.com/2012/08/24/circo-de-gredos-los-hermanitos/" target="_blank" rel="noopener">Cuaderno de monte</a> · <a href="http://acerando-el-largo.blogspot.com/2011/07/escalada-de-los-tres-hermanitos-gredos.html" target="_blank" rel="noopener">Acerando el largo</a>' + '</p>' +
+                '<p class="gd-croquis"><b>Croquis original:</b> <a href="http://pelegrinajes.blogspot.com/2014/07/tres-hermanitos-de-gredos.html" target="_blank" rel="noopener">blog Pelegrinajes</a> · ' + '<a href="https://cuadernodemonte.wordpress.com/2012/08/24/circo-de-gredos-los-hermanitos/" target="_blank" rel="noopener">Cuaderno de monte</a> · <a href="http://acerando-el-largo.blogspot.com/2011/07/escalada-de-los-tres-hermanitos-gredos.html" target="_blank" rel="noopener">Acerando el largo</a>' + '</p>' +
                 fotos(("hermanitos-laguna", "Los Tres Hermanitos desde la Laguna Grande."), ("hermanitos-cerca", "Las agujas de los Hermanitos.")) +
                 dos("Las vías",
                     reglas(["<b>3.º Hermanito · vía Teógenes (IV, ≈ 30 m, 1 largo, cara N):</b> la más fácil y la primera que se escaló (se atribuye a Teógenes Díaz, en solitario, hacia 1932). Fisura con un estrechamiento protegido con clavos.",
@@ -485,7 +485,7 @@ ARTS.append(dict(
                 False, "torozo") +
         seccion("Vía 4", "Sur de la Apretura al Pequeño Galayo (IV/IV+)",
                 p("La vía más asequible de este artículo y una de las más escaladas de Galayos: ideal como primera clásica en Gredos. Fue abierta en 1952 y sube al Pequeño Galayo por la parte baja de la canal del Gran Galayo. Mucha gente la encadena con el Gran Diedro del Gran Galayo en el mismo día.") +
-                '<p class="gd-croquis"><b>Croquis original:</b> ' + '<a href="https://guiasoeste.com/sur-de-la-apretura-y-gran-diedro-galayos/" target="_blank" rel="noopener">Guías Oeste</a> · <a href="https://www.ukclimbing.com/logbook/crags/galayos-20797/sur_de_la_apretura-744364" target="_blank" rel="noopener">UKClimbing</a>' + '</p>' +
+                '<p class="gd-croquis"><b>Croquis original:</b> <a href="http://pelegrinajes.blogspot.com/2014/08/pequeno-y-gran-galayo.html" target="_blank" rel="noopener">blog Pelegrinajes</a> · ' + '<a href="https://guiasoeste.com/sur-de-la-apretura-y-gran-diedro-galayos/" target="_blank" rel="noopener">Guías Oeste</a> · <a href="https://www.ukclimbing.com/logbook/crags/galayos-20797/sur_de_la_apretura-744364" target="_blank" rel="noopener">UKClimbing</a>' + '</p>' +
                 dos("La vía",
                     reglas(["<b>Inicio:</b> un diedrito vertical en la pared izquierda, al pie de la canal del Gran Galayo.",
                             "<b>L1:</b> hasta una gran terraza con bloques para montar la reunión.",
@@ -502,7 +502,7 @@ ARTS.append(dict(
                 True, "apretura") +
         seccion("Vía 5", "Gran Diedro del Gran Galayo (IV+)",
                 p("El <b>Gran Galayo</b> (unos 2.220 m) es la cumbre más alta de las agujas. Su Gran Diedro, de unos 60 m, se ve desde el refugio y es uno de los largos más bonitos de la sierra. Es la continuación natural de la Sur de la Apretura.") +
-                '<p class="gd-croquis"><b>Croquis original:</b> ' + '<a href="https://guiasoeste.com/sur-de-la-apretura-y-gran-diedro-galayos/" target="_blank" rel="noopener">Guías Oeste</a> · <a href="https://www.ukclimbing.com/logbook/crags/galayos-20797/gran_diedro-453110" target="_blank" rel="noopener">UKClimbing</a>' + '</p>' +
+                '<p class="gd-croquis"><b>Croquis original:</b> <a href="http://pelegrinajes.blogspot.com/2014/08/pequeno-y-gran-galayo.html" target="_blank" rel="noopener">blog Pelegrinajes</a> · ' + '<a href="https://guiasoeste.com/sur-de-la-apretura-y-gran-diedro-galayos/" target="_blank" rel="noopener">Guías Oeste</a> · <a href="https://www.ukclimbing.com/logbook/crags/galayos-20797/gran_diedro-453110" target="_blank" rel="noopener">UKClimbing</a>' + '</p>' +
                 '<div class="gd-fotos">' + fblog("gran-diedro-sol", "El sol entrando en el Gran Diedro del Gran Galayo.", "https://jairogredos.blogspot.com/2012/09/gran-diedro-al-gran-galayo.html") + fblog("gran-diedro-escalando", "Escalando el Gran Diedro.", "https://jairogredos.blogspot.com/2012/09/gran-diedro-al-gran-galayo.html") + "</div>" +
                 dos("La vía",
                     reglas(["<b>Entrada:</b> un resalte vertical y expuesto antes de la portilla del Gran Galayo (protégelo) y una terraza inclinada donde empieza el diedro.",
@@ -532,6 +532,9 @@ ARTS.append(dict(
         ("https://cuadernodemonte.wordpress.com/2012/08/24/circo-de-gredos-los-hermanitos/", "Cuaderno de monte: los Hermanitos"),
         ("https://sobreescalada.com/2019/10/07/escalada-circo-de-gredos-pared-del-refugio-el-escudo-placa-ecualicer-tres-hermanitos-y-perro-que-fuma/", "Sobre escalada: Circo de Gredos"),
         ("https://www.destinoclimbing.com/castilla-y-leon/escalada-en-galayos/", "Destino Climbing: escalada en Galayos"),
+        ("http://pelegrinajes.blogspot.com/2012/05/aroma-galayero-el-torreon.html", "Pelegrinajes: el Torreón"),
+        ("http://pelegrinajes.blogspot.com/2014/07/tres-hermanitos-de-gredos.html", "Pelegrinajes: Tres Hermanitos de Gredos"),
+        ("http://pelegrinajes.blogspot.com/2014/08/pequeno-y-gran-galayo.html", "Pelegrinajes: Pequeño y Gran Galayo"),
     ],
     nota="Reseña elaborada con nuestras palabras a partir de varias fuentes. Las vías de montaña cambian (clavos que se caen, bloques sueltos): consulta reseñas actualizadas y valora siempre tu nivel.",
 ))
