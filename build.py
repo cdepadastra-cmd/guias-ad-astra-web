@@ -100,7 +100,12 @@ NAV_ACT = [("Todas las actividades", "/actividades/"), ("Barranquismo", "/activi
            ("Alpinismo y ascensiones", "/actividades/?categoria=Ascensiones"), ("Espeleología", "/actividades/?categoria=Espeleología"), ("Escalada y boulder", "/actividades/?categoria=Escalada"),
            ("Senderismo", "/actividades/?categoria=Senderismo"), ("Travesías y viajes", "/actividades/?categoria=Travesías y viajes")]
 NAV_CUR = [("Todos los cursos", "/formacion-cursos/"), ("Calendario de cursos", "/calendario/")] + [(c["disc_label"], "/actividades/%s/" % c["slug"]) for c in COURSES]
-NAV_HER = [("Todas las herramientas", "/herramientas/"), ("Meteorología de montaña", "/meteo/"), ("Estado de la nieve", "/nieve/"), ("Caudal de barrancos", "/barrancos-caudal/"), ("Calculadora de rutas", "/calculadora-rutas/"), ("Editor GPX", "/editor-gpx/"), ("Vídeo 3D de la ruta", "/video-ruta-3d/"), ("Lista de material", "/lista-material-montana/"), ("Topografía de barrancos", "/topografia-barrancos/"), ("Boulder en Las Tuerces", "/actividades/boulder-las-tuerces/"), ("Boulder en Zona Centro", "/actividades/boulder-zona-centro-salamanca-caceres/")]
+HER_CAT = {
+    "Barrancos y escalada": [("Boulder en Las Tuerces", "/actividades/boulder-las-tuerces/"), ("Boulder en Zona Centro", "/actividades/boulder-zona-centro-salamanca-caceres/"), ("Caudal de barrancos", "/barrancos-caudal/"), ("Topografía de barrancos", "/topografia-barrancos/")],
+    "Meteorología y nieve": [("Estado de la nieve", "/nieve/"), ("Meteorología de montaña", "/meteo/")],
+    "Planificar rutas": [("Calculadora de rutas", "/calculadora-rutas/"), ("Editor GPX", "/editor-gpx/"), ("Lista de material", "/lista-material-montana/"), ("Vídeo 3D de la ruta", "/video-ruta-3d/")],
+}
+NAV_HER = [("Todas las herramientas", "/herramientas/")] + sum([[("§" + c, "")] + HER_CAT[c] for c in sorted(HER_CAT)], [])
 import arts_a, arts_b, arts_util
 NUEVOS = arts_a.ARTS + arts_b.ARTS
 ARTICULOS = [
@@ -1107,11 +1112,19 @@ HER_ICO = {k: '<svg viewBox="0 0 64 64" aria-hidden="true">%s</svg>' % v for k, 
 
 def build_herramientas():
     path = "/herramientas/"
-    cards = "".join('<a class="art-card" href="%s"><span class="art-ico">%s</span><div><h2>%s</h2><p>%s</p><span class="art-mas">Abrir la herramienta →</span></div></a>' % (h, HER_ICO[ic], e(t), e(d)) for h, t, d, ic in HERRAMIENTAS)
+    _her = {h: (h, t, d, ic) for h, t, d, ic in HERRAMIENTAS}
+
+    def tarjeta(h):
+        if h in _her:
+            _, t, d, ic = _her[h]
+            return '<a class="art-card" href="%s"><span class="art-ico">%s</span><div><h3>%s</h3><p>%s</p><span class="art-mas">Abrir la herramienta →</span></div></a>' % (h, HER_ICO[ic], e(t), e(d))
+        t = next(n for n, x in sum(HER_CAT.values(), []) if x == h)
+        return '<a class="art-card" href="%s"><span class="art-ico">%s</span><div><h3>%s</h3><p>%s</p><span class="art-mas">Ver la zona →</span></div></a>' % (h, ART_ICO["escalada"], e(t), "Guía de boulder con los bloques, sectores y accesos.")
     body = (hero("Herramientas", "Herramientas de montaña gratis", "Previsión del tiempo en cumbre, estado de la nieve, caudal de barrancos, editor GPX, vídeo 3D de tus rutas y más. Gratis, sin registro y hechas por guías de montaña.", METEO_IMG,
                  [("Inicio", "/"), ("Herramientas", "")]) +
-            '<section class="section"><div class="wrap"><div class="art-grid art-grid2">' + cards + '</div>'
-            '<p class="rel-mas" style="margin-top:28px">Y para aprender: <a href="/articulos/">artículos sobre nieve y aludes, mochila y ropa de montaña</a>.</p></div></section>')
+            "".join('<section class="section%s"><div class="wrap"><p class="eyebrow">Herramientas</p><h2>%s</h2><div class="art-grid art-grid2">' % (" alt" if k % 2 else "", e(c)) +
+                    "".join(tarjeta(h) for _, h in HER_CAT[c]) + '</div></div></section>' for k, c in enumerate(sorted(HER_CAT))) +
+            '<section class="section"><div class="wrap"><p class="rel-mas">Y para aprender: <a href="/articulos/">artículos de técnica, seguridad, material y rutas</a>.</p></div></section>')
     ld = [crumbs_ld([("Inicio", "/"), ("Herramientas", path)]),
           {"@context": "https://schema.org", "@type": "ItemList", "name": "Herramientas de montaña de Guías Ad Astra", "itemListElement": [
               {"@type": "ListItem", "position": i + 1, "url": url(h), "name": t} for i, (h, t, _, _) in enumerate(HERRAMIENTAS)]}]
