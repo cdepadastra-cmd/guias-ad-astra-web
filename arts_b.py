@@ -531,3 +531,141 @@ ARTS.append(dict(
     ],
     nota="Reseña elaborada con nuestras palabras a partir de varias fuentes. Las vías de montaña cambian (clavos que se caen, bloques sueltos): consulta reseñas actualizadas y valora siempre tu nivel.",
 ))
+
+# ───────────────────────────── 12. INICIACIÓN AL ALPINISMO EN GREDOS ─────────────────────────────
+def _ruta_alp(n, titulo, ficha, texto, aprende, ojo, fotos_, enlaces, alt=False, id_=""):
+    """Bloque de una ruta de la progresión: ficha de datos, texto, qué se aprende, precauciones, fotos y crónicas del blog."""
+    datos = '<div class="gd-ficha">' + "".join('<div><span>%s</span><b>%s</b></div>' % x for x in ficha) + "</div>"
+    fot = '<div class="gd-fotos">' + "".join(fblog(a, b, enlaces[0][0]) for a, b in fotos_) + "</div>" if fotos_ else ""
+    blogs = '<p style="margin:8px 0 0"><b>Crónicas en el blog de Jairo:</b> ' + " · ".join('<a href="%s" target="_blank" rel="noopener">%s</a>' % (u, t) for u, t in enlaces) + "</p>"
+    return seccion("Ruta %d" % n, titulo, datos + p(texto) + dos("Qué aprendes", reglas(aprende), "Ojo con", reglas(ojo)) + fot + blogs, alt, id_)
+
+
+_B = "https://jairogredos.blogspot.com/"
+ARTS.append(dict(
+    path="/iniciacion-alpinismo-gredos-rutas-progresivas/",
+    corto="Iniciación al alpinismo en Gredos: 9 rutas",
+    card="Nueve rutas de menos a más para aprender alpinismo en Gredos: del Morezón a La Ceja, Cabeza Nevada, las canales del Circo y el Almanzor.",
+    titulo="Iniciación al alpinismo en Gredos: 9 rutas progresivas",
+    meta_title="Iniciación al alpinismo en Gredos: 9 rutas progresivas",
+    meta_desc="Nueve rutas para aprender alpinismo en Gredos de menos a más: Morezón, La Mira, La Ceja, Cabeza Nevada, las canales del Circo y el Almanzor.",
+    lead="El alpinismo se aprende escalón a escalón. Te proponemos nueve rutas invernales en Gredos ordenadas de la más fácil a la más difícil: primero caminar con nieve, luego distancia y autonomía, después las canales del Circo y, al final, el Almanzor. Con datos, qué aprendes en cada una y las crónicas de Jairo.",
+    hero="/img/fotos/alp-portada.webp",
+    actions='<a class="btn btn-primary" href="#resumen">Ver las 9 rutas</a><a class="btn btn-ghost" href="/actividades/cursos-alpinismo/">Curso de alpinismo</a>',
+    ico="invernal", og=("Artículo", "Iniciación al alpinismo en Gredos", "9 rutas progresivas, del Morezón al Almanzor", "#bfe0f7"),
+    publicado="2026-11-24",
+    cuerpo=(
+        seccion("Cómo funciona", "Una progresión, no una lista",
+                p("La mayoría de los accidentes de iniciación en invierno vienen de saltarse pasos: ir al Almanzor sin haber caminado nunca con crampones, o meterse en una canal sin saber frenar una caída con el piolet. Esta progresión ordena nueve rutas clásicas de Gredos para que cada una añada <b>una sola cosa nueva</b> a lo que ya sabes.") +
+                ilustracion("/img/guias/progresion-alpinismo-gredos.svg", "Escalera de progresión de nueve rutas de iniciación al alpinismo en Gredos", "Las nueve rutas, de la más fácil a la más difícil.") +
+                tarjetas([
+                    ("#4caf50", "Rutas 1–3 · Caminar con nieve", "Cumbres sin pasos técnicos: aprender a andar con crampones, llevar el piolet, abrigarse y orientarse con niebla."),
+                    ("#cfc845", "Rutas 4–5 · Distancia y autonomía", "Jornadas largas con mucho desnivel: ritmo, horarios, hora límite y elegir la línea en terreno abierto."),
+                    ("#ef9330", "Rutas 6–8 · Canales", "Las canales del Circo de Gredos: pendiente sostenida, técnica de crampones y piolet, casco y valorar la nieve."),
+                    ("#e8574a", "Ruta 9 · El Almanzor", "Todo lo anterior junto, más una trepada final expuesta y una bajada delicada."),
+                ]) +
+                reglas(["<b>Pasa a la siguiente</b> cuando la anterior te salga cómoda, y siempre con buenas condiciones. Repite las que te cuesten.",
+                        "<b>Mira antes</b> la <a href=\"/meteo/gredos-macizo-central/\">previsión de cumbre</a>, el <a href=\"/nieve/\">estado de la nieve</a> y el boletín de aludes (te explicamos cómo en <a href=\"/como-leer-la-nieve-y-los-aludes/\">cómo leer la nieve</a>).",
+                        "<b>Material:</b> botas semirrígidas, crampones, piolet, ropa por capas, gafas de categoría 4 y frontal. Casco desde las canales. ARVA, pala y sonda donde haya riesgo de aludes. Lo explicamos en <a href=\"/crampones-piolet-botas-material-invernal/\">crampones, piolet y botas</a>.",
+                        "<b>Antes de las canales</b> tienes que saber autodetenerte con el piolet. Es lo que practicamos en el <a href=\"/actividades/cursos-alpinismo/\">curso de alpinismo</a>."])) +
+        seccion("Resumen", "Las 9 rutas de un vistazo",
+                tabla(["#", "Ruta", "Salida", "Distancia", "Desnivel", "Dificultad"], [
+                    ["1", "<a href=\"#r1\">Morezón (2.393 m)</a>", "Plataforma de Gredos", "≈ 10 km", "≈ +650 m", "F · caminar con nieve"],
+                    ["2", "<a href=\"#r2\">La Mira (2.343 m)</a>", "Plataforma de Gredos", "≈ 16–18 km", "≈ +800–1.000 m", "F · cordal largo"],
+                    ["3", "<a href=\"#r3\">Canchal de la Ceja (2.428 m)</a>", "Plataforma del Travieso", "≈ 10 km", "≈ +650 m", "F · altiplano expuesto"],
+                    ["4", "<a href=\"#r4\">La Mira por los Conventos</a>", "Km 6 (Alto del Durano)", "≈ 19 km", "≈ +1.000 m", "F · jornada larga"],
+                    ["5", "<a href=\"#r5\">Cabeza Nevada (2.431 m)</a>", "Navalperal de Tormes", "≈ 20–24 km", "≈ +1.200 m", "F+ · desnivel y autonomía"],
+                    ["6", "<a href=\"#r6\">Cerro de los Huertos por la canal de la Pluma</a>", "Plataforma de Gredos", "≈ 15 km", "≈ +1.000 m", "Primera canal"],
+                    ["7", "<a href=\"#r7\">Casquerazo (2.436 m) por la canal de los Machos</a>", "Plataforma de Gredos", "≈ 15 km", "≈ +1.100 m", "Canal y cresta final (I)"],
+                    ["8", "<a href=\"#r8\">Morezón por la canal de las Hoyuelas</a>", "Plataforma de Gredos", "≈ 14 km", "≈ +1.000 m", "Canal más técnica"],
+                    ["9", "<a href=\"#r9\">Almanzor (2.591 m)</a>", "Plataforma de Gredos", "≈ 18 km", "≈ +1.300 m", "PD · canal y trepada de II"],
+                ]) +
+                '<p class="small muted" style="margin-top:10px">Datos orientativos de ida y vuelta, recopilados de varias reseñas. En invierno los tiempos dependen mucho de la nieve: con nieve blanda puedes tardar el doble.</p>',
+                True, "resumen") +
+        _ruta_alp(1, "Morezón desde la Plataforma de Gredos",
+                  [("Altitud", "2.393 m"), ("Salida", "Plataforma (1.770 m)"), ("Distancia", "≈ 10 km i/v"), ("Desnivel", "≈ +650 m"), ("Horario", "≈ 5 h"), ("Dificultad", "F")],
+                  "La primera cumbre invernal ideal: se sube por la amplia cuerda del Cuento, sin pasos técnicos, y desde arriba se ve todo el Circo de Gredos con el Almanzor enfrente. Es la mejor forma de estrenar crampones y piolet en un terreno que perdona.",
+                  ["Caminar con crampones en nieve dura y blanda.", "Llevar el piolet en la mano del lado de la ladera.", "Gestionar capas, el frío y el viento de la cuerda."],
+                  ["El viento en la cuerda, que puede ser muy fuerte.", "La niebla en la bajada: la cuerda es ancha y es fácil desviarse."],
+                  [("alp-morezon", "Llegando al Morezón con nieve."), ("alp-morezon-2", "Vistas desde la cuerda del Morezón.")],
+                  [(_B + "2008/04/morezn.html", "Morezón 2.393 m")], False, "r1") +
+        _ruta_alp(2, "La Mira desde la Plataforma de Gredos",
+                  [("Altitud", "2.343 m"), ("Salida", "Plataforma (1.770 m)"), ("Distancia", "≈ 16–18 km"), ("Desnivel", "≈ +800–1.000 m"), ("Horario", "≈ 7–8 h"), ("Dificultad", "F")],
+                  "Misma salida y bastante más distancia: se sube por la Vereda de la Mira hasta el cordal y se sigue la cuerda, por Los Campanarios y la Portilla Pelucas, hasta la cumbre, con el refugio de Los Pelaos al lado. Un balcón sobre el Circo, Los Galayos y el valle del Tiétar.",
+                  ["Mantener un ritmo constante en una jornada larga.", "Orientarse en un cordal con niebla con mapa y brújula (lo explicamos en <a href=\"/orientacion-en-montana-mapa-brujula/\">orientación</a>).", "Comer y beber sin parar demasiado."],
+                  ["El camino se pierde entre bloques en la cuerda.", "La vuelta es larga: calcula una hora límite para darte la vuelta."],
+                  [("ruta-la-mira", "Por la cuerda hacia La Mira.")],
+                  [(_B + "2008/04/la-mira.html", "La Mira 2.341 m")], True, "r2") +
+        _ruta_alp(3, "Canchal de la Ceja desde la Plataforma del Travieso",
+                  [("Altitud", "2.428 m"), ("Salida", "El Travieso (1.870 m)"), ("Distancia", "≈ 10 km i/v"), ("Desnivel", "≈ +650 m"), ("Horario", "≈ 4–5 h"), ("Dificultad", "F")],
+                  "El techo de Salamanca, en la Sierra de Béjar y Candelario. Desde el Travieso se sube por la fuente de la Goterita hasta los altiplanos del Calvitero (techo de Extremadura) y, tras un collado, a La Ceja. Ruta corta pero muy expuesta al viento y con unos altiplanos donde perderse con niebla es facilísimo.",
+                  ["Orientarse en terreno abierto y sin referencias.", "Decidir cuándo darse la vuelta por el tiempo.", "Primeras laderas algo más inclinadas."],
+                  ["Las ventiscas y la niebla en los altiplanos.", "Tras nevadas fuertes pueden hacer falta raquetas."],
+                  [("alp-ceja", "En los altiplanos del Calvitero, camino de La Ceja."), ("alp-ceja-2", "Lagunas glaciares desde la cuerda.")],
+                  [(_B + "2008/11/paseo-el-travieso-cuerda-del-calvitero.html", "Paseo El Travieso – Cuerda del Calvitero"), (_B + "2008/02/calvitero-la-ceja-el-torreon.html", "Virgen del Calvitero, La Ceja y Calvitero")], False, "r3") +
+        _ruta_alp(4, "La Mira desde el km 6 por la Garganta de los Conventos",
+                  [("Altitud", "2.343 m"), ("Salida", "Km 6, Alto del Durano"), ("Distancia", "≈ 19 km"), ("Desnivel", "≈ +1.000 m"), ("Horario", "≈ 7 h 30"), ("Dificultad", "F")],
+                  "La misma cumbre que la ruta 2, pero desde abajo: se entra por la finca de La Covacha, se pasa a la Garganta de los Conventos y se sube por su margen hasta el Collado de las Yeguas y el refugio de Los Pelaos. La vuelta se puede hacer por el Puerto del Peón. Aquí ya no hay carretera que te deje alto: todo el desnivel es tuyo.",
+                  ["Gestionar una jornada larga con nieve de todo tipo, de la húmeda de abajo a la dura de arriba.", "Planificar horarios y puntos de retirada.", "Subir con mochila de invierno durante muchas horas."],
+                  ["Los días cortos de invierno: sal de noche y lleva frontal.", "Cruzar arroyos con nieve y hielo en la garganta."],
+                  [("ruta-la-mira-2", "En la cuerda de La Mira.")],
+                  [(_B + "2010/04/la-mira-desde-el-km6.html", "La Mira desde el Km 6"), (_B + "2010/12/plataforma-de-gredos-la-mira-garganta.html", "Plataforma, La Mira, Garganta de los Conventos y Km 6")], True, "r4") +
+        _ruta_alp(5, "Cabeza Nevada desde Navalperal de Tormes",
+                  [("Altitud", "2.431 m"), ("Salida", "Navalperal (1.303 m)"), ("Distancia", "≈ 20–24 km"), ("Desnivel", "≈ +1.200 m"), ("Horario", "≈ 9 h"), ("Dificultad", "F+")],
+                  "La ruta más larga y solitaria de la lista. Desde Navalperal de Tormes se cruza el Tormes por el puente de Gredos y se sube por la Garganta del Pinar hasta las lagunas de Majalaescoba y la Laguna Bajera. De ahí, una subida empinada lleva a la Portilla del Pluviómetro y, por la cuerda, a la cumbre. Se puede volver por el mismo camino o bajar a la Laguna Grande y la Plataforma (con un segundo coche).",
+                  ["Autonomía: horas de marcha lejos de todo.", "Elegir la mejor línea de subida en una ladera abierta.", "Las primeras pendientes serias, entre la Laguna Bajera y la portilla, donde ya hay que saber frenar con el piolet."],
+                  ["El tramo de la Laguna Bajera a la portilla, empinado y a veces helado.", "La duración: frontal obligatorio y salida muy temprano."],
+                  [("alp-cabeza-nevada", "Subiendo hacia Cabeza Nevada."), ("alp-cabeza-nevada-2", "La cara norte nevada.")],
+                  [(_B + "2008/11/cabeza-nevada.html", "Cabeza Nevada (2008)"), (_B + "2009/03/cabeza-nevada.html", "Cabeza Nevada (2009)"), (_B + "2010/03/travesia-navalperal-cabeza-nevada.html", "Travesía Navalperal – Cabeza Nevada – Plataforma")], False, "r5") +
+        _ruta_alp(6, "Cerro de los Huertos por la canal de la Pluma",
+                  [("Altitud", "≈ 2.450 m"), ("Salida", "Plataforma (1.770 m)"), ("Distancia", "≈ 15 km i/v"), ("Desnivel", "≈ +1.000 m"), ("Horario", "≈ 7–8 h"), ("Dificultad", "Primera canal")],
+                  "Primera canal de la progresión. Desde la Plataforma se baja a la Laguna Grande (unas 2 h 30) y se cruza hacia el oeste del Circo, al macizo del Cerro de los Huertos. La canal tiene una pendiente moderada y sostenida y sale a la cumbre, con vistas al Almanzor y a los Cuchillares.",
+                  ["Técnica de crampones en pendiente: en pato, de lado y de frente.", "Piolet en apoyo y en ancla en la canal.", "Ponerse el casco y valorar el estado de la nieve en la canal: dura, costra, blanda."],
+                  ["Las canales del Circo acumulan nieve venteada: mira el riesgo de aludes.", "La bajada en pendiente cansa más que la subida."],
+                  [("alp-huertos", "Entrando en el Circo hacia el Cerro de los Huertos."), ("alp-huertos-2", "Laderas nevadas del Circo.")],
+                  [(_B + "2009/02/cerro-de-los-huertos.html", "Cerro de los Huertos"), (_B + "2008/08/cerro-de-los-huertos.html", "Cerro de los Huertos y Cuchillar del Cerro")], True, "r6") +
+        _ruta_alp(7, "Casquerazo por la canal de los Machos",
+                  [("Altitud", "2.436 m"), ("Salida", "Plataforma (1.770 m)"), ("Distancia", "≈ 15 km i/v"), ("Desnivel", "≈ +1.100 m"), ("Horario", "≈ 8 h"), ("Dificultad", "Canal y cresta (I)")],
+                  "Desde el refugio Elola se cruza por las placas del lado oeste hacia el Charco de la Esmeralda y se sube la canal de los Machos, larga y empinada, hasta la Portilla de los Machos (2.382 m). Una canal secundaria lleva a la cresta y, por unos pasos fáciles pero expuestos (I), a la pequeña cumbre del Casquerazo.",
+                  ["Mantener el ritmo en una canal larga y abrir huella por relevos.", "Salir de la canal por la cornisa o la portilla.", "Moverse por una cresta expuesta con crampones; los primeros tramos donde puede hacer falta la cuerda."],
+                  ["Las cornisas a la salida de la canal.", "La cresta final con hielo: si no lo ves claro, la portilla ya es un buen objetivo."],
+                  [("alp-machos", "Camino de la canal de los Machos."), ("alp-machos-2", "Los Cuchillares nevados desde el Circo.")],
+                  [(_B + "2008/07/casquerazo.html", "Casquerazo 2.494 m"), (_B + "2020/02/canal-facil-cuhillar-de-la-navajas.html", "Canal Fácil, Cuchillar de las Navajas y Canal de los Machos")], False, "r7") +
+        _ruta_alp(8, "Morezón por la canal de las Hoyuelas",
+                  [("Altitud", "2.393 m"), ("Salida", "Plataforma (1.770 m)"), ("Distancia", "≈ 14 km i/v"), ("Desnivel", "≈ +1.000 m"), ("Horario", "≈ 7–8 h"), ("Dificultad", "Canal más técnica")],
+                  "La misma cumbre que la ruta 1, pero por su cara del Circo: desde la Laguna Grande se sube por la zona de Las Hoyuelas, bajo el Risco de las Hoyuelas, hasta el cordal del Morezón. Es la canal más técnica antes del Almanzor y la mejor prueba para saber si estás preparado para él.",
+                  ["Pendiente sostenida durante mucho rato.", "Montar las primeras reuniones y asegurar en nieve.", "Bajar por terreno técnico o elegir una bajada más fácil (por la cuerda del Cuento)."],
+                  ["Pendiente de nieve dura: una caída no se para sola.", "Calcula bien la hora: la nieve se ablanda a mediodía."],
+                  [("alp-hoyuelas", "Subiendo por Las Hoyuelas."), ("alp-hoyuelas-2", "En la parte alta de la canal.")],
+                  [(_B + "2009/12/navasomera-las-hoyuelas-canal-sur-de-la.html", "Navasomera, Las Hoyuelas y Canal de las Hoyuelas"), (_B + "2011/12/cuchillar-de-cerraillos-risco-de-las.html", "Cuchillar de Cerraíllos, Risco de las Hoyuelas y Morezón")], True, "r8") +
+        _ruta_alp(9, "El Almanzor",
+                  [("Altitud", "2.591 m"), ("Salida", "Plataforma (1.770 m)"), ("Distancia", "≈ 18 km i/v"), ("Desnivel", "≈ +1.300 m"), ("Horario", "≈ 9–10 h"), ("Dificultad", "PD · trepada de II")],
+                  "El techo del Sistema Central y el objetivo de toda la progresión. Se sube por la Laguna Grande y la Hoya de Antón a la canal de la Portilla del Crampón (pendientes de 40–50° en invierno), se cruza por encima de las Canales Oscuras y una trepada final de II, expuesta, lleva al vértice. Te lo contamos con detalle en <a href=\"/rutas-clasicas-gredos-almanzor-laguna-grande-galayos/\">rutas clásicas de Gredos</a>.",
+                  ["Juntar todo lo anterior en una jornada exigente.", "Encordarse en la trepada final y la bajada (destrepe o rápel).", "Gestionar el grupo y el horario hasta el final."],
+                  ["La bajada de la canal, donde pasan muchos accidentes.", "El riesgo de aludes en la canal tras nevadas o con viento."],
+                  [("ruta-almanzor", "El Almanzor en invierno, con el itinerario de subida marcado."), ("ruta-almanzor-2", "Cerca de la cumbre del Almanzor.")],
+                  [(_B + "2008/02/almanzor.html", "Almanzor 2.592 m"), (_B + "2009/04/almanzor-por-la-canal-este.html", "Almanzor por la Canal Este"), (_B + "2011/12/almanzor-nocturno-y-morezon.html", "Almanzor nocturno y Morezón")], False, "r9") +
+        seccion("Y después", "¿Listo para el siguiente nivel?",
+                p("Si has hecho las nueve rutas con soltura, estás preparado para el alpinismo de Picos de Europa, el Pirineo o los primeros cuatromiles de los Alpes. Antes, comprueba que sabes:") +
+                reglas(["Autodetenerte con el piolet en cualquier postura.", "Moverte con crampones en nieve dura y en roca mezclada.", "Montar una reunión en nieve y asegurar a un compañero.", "Leer el boletín de aludes y decidir sobre el terreno.", "Orientarte con niebla con mapa, brújula y GPS.", "Darte la vuelta a tiempo."]) +
+                '<p style="margin-top:16px">Te ayudamos a dar cada paso con nuestro <a href="/actividades/cursos-alpinismo/">curso de alpinismo</a> y las <a href="/actividades/ascensiones-sierra-de-gredos/">ascensiones guiadas en Gredos</a>.</p>', True)
+    ),
+    faq=[
+        ("¿Cuál es la ruta más fácil para empezar en el alpinismo en Gredos?", "El Morezón desde la Plataforma de Gredos: unos 10 km y 650 m de desnivel por una cuerda amplia, sin pasos técnicos, ideal para estrenar crampones y piolet."),
+        ("¿Hace falta cuerda en estas rutas?", "En las cinco primeras, normalmente no. En las canales (rutas 6 a 8) puede hacer falta según las condiciones, y en el Almanzor es recomendable para la trepada final y la bajada."),
+        ("¿Cuándo hay nieve en Gredos?", "Normalmente de diciembre a abril, aunque varía mucho de un año a otro. Las canales del Circo suelen estar en buenas condiciones a finales de invierno y en primavera, con nieve transformada por la mañana."),
+        ("¿Qué es una canal?", "Un corredor estrecho entre paredes de roca que en invierno se llena de nieve. Son la vía natural de subida a muchas cumbres del Circo, pero concentran la caída de piedras y de aludes."),
+        ("¿Necesito ARVA para estas rutas?", "En las canales del Circo y en cualquier ladera de más de 30° con nieve, sí: ARVA, pala y sonda para cada persona y saber usarlos."),
+    ],
+    fuentes=[
+        ("https://summitpost.org/morez-n/392970", "SummitPost: Morezón"),
+        ("https://summitpost.org/from-plataforma-del-travieso-normal/157704", "SummitPost: La Ceja desde El Travieso"),
+        ("https://www.terranostrum.es/senderismo/avila/valle-del-tormes-gredos/sendero-a-la-mira-por-los-conventos", "Terranostrum: La Mira por los Conventos"),
+        ("https://www.montanapegaso.es/carteles/2013/lamira_info.pdf", "Grupo de Montaña Pegaso: La Mira (PDF)"),
+        ("https://www.montanapegaso.es/carteles/2013/cabezanevada_info.pdf", "Grupo de Montaña Pegaso: Cabeza Nevada (PDF)"),
+        ("https://summitpost.org/pe-n-de-casquerazo/962301", "SummitPost: Casquerazo y Portilla de los Machos"),
+        ("https://summitpost.org/risco-de-las-hoyuelas/962849", "SummitPost: Risco de las Hoyuelas"),
+        ("https://guiarutas.es/rutas/castilla-y-leon/almanzor-desde-la-plataforma/", "Guiarutas: el Almanzor desde la Plataforma"),
+    ],
+    nota="Datos orientativos recopilados de varias reseñas y de las crónicas de Jairo. En invierno las condiciones lo cambian todo: infórmate antes de salir y, si dudas, date la vuelta.",
+))

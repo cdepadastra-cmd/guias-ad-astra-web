@@ -59,6 +59,7 @@ RELACION = {  # qué enlazar al final de cada herramienta y artículo
     "/vivac-acampada-libre-espana/": ["/lista-material-montana/", "/meteo/", "/tormentas-en-la-montana/", "/rutas-clasicas-gredos-almanzor-laguna-grande-galayos/"],
     "/federarse-seguro-montana-rescate/": ["/hipotermia-congelaciones-botiquin-montana/", "/orientacion-en-montana-mapa-brujula/", "/como-leer-la-nieve-y-los-aludes/", "/mal-de-altura-sintomas-prevencion/"],
     "/raquetas-de-nieve-y-esqui-de-travesia/": ["/nieve/", "/como-leer-la-nieve-y-los-aludes/", "/crampones-piolet-botas-material-invernal/", "/meteo/"],
+    "/iniciacion-alpinismo-gredos-rutas-progresivas/": ["/crampones-piolet-botas-material-invernal/", "/como-leer-la-nieve-y-los-aludes/", "/rutas-clasicas-gredos-almanzor-laguna-grande-galayos/", "/meteo/"],
     "/mejores-vias-escalada-gredos/": ["/escalas-dificultad-escalada-ferratas-alpinismo-barrancos/", "/rutas-clasicas-gredos-almanzor-laguna-grande-galayos/", "/tormentas-en-la-montana/", "/meteo/"],
     "/rutas-clasicas-gredos-almanzor-laguna-grande-galayos/": ["/meteo/", "/editor-gpx/", "/video-ruta-3d/", "/crampones-piolet-botas-material-invernal/"],
 }
@@ -120,7 +121,7 @@ HERRAMIENTAS = [
 ]
 ART_CAT = {
     "Equipo y ropa": ["/como-preparar-la-mochila/", "/teoria-de-las-capas/"],
-    "Escalada y alpinismo": ["/crampones-piolet-botas-material-invernal/", "/escalas-dificultad-escalada-ferratas-alpinismo-barrancos/", "/mejores-vias-escalada-gredos/"],
+    "Escalada y alpinismo": ["/crampones-piolet-botas-material-invernal/", "/escalas-dificultad-escalada-ferratas-alpinismo-barrancos/", "/mejores-vias-escalada-gredos/", "/iniciacion-alpinismo-gredos-rutas-progresivas/"],
     "Nieve": ["/como-leer-la-nieve-y-los-aludes/", "/raquetas-de-nieve-y-esqui-de-travesia/"],
     "Rutas y orientación": ["/orientacion-en-montana-mapa-brujula/", "/rutas-clasicas-gredos-almanzor-laguna-grande-galayos/", "/vivac-acampada-libre-espana/"],
     "Seguridad y salud": ["/federarse-seguro-montana-rescate/", "/hipotermia-congelaciones-botiquin-montana/", "/mal-de-altura-sintomas-prevencion/", "/rayos-uv-proteccion-solar-montana/", "/tormentas-en-la-montana/"],
