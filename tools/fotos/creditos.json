@@ -198,5 +198,37 @@
   "pagina": "https://commons.wikimedia.org/wiki/File:Helicopter_rescue_on_Dog_Mountain_(29942070966).jpg",
   "w": 1600,
   "h": 1068
+ },
+ "hermanitos-laguna": {
+  "autor": "Manuel Velazquez",
+  "licencia": "CC BY 3.0",
+  "licencia_url": "https://creativecommons.org/licenses/by/3.0",
+  "pagina": "https://commons.wikimedia.org/wiki/File:LOS_TRES_HERMANITOS_DESDE_LA_LAGUNA_-_panoramio.jpg",
+  "w": 1400,
+  "h": 930
+ },
+ "hermanitos-cerca": {
+  "autor": "Manuel Velazquez",
+  "licencia": "CC BY 3.0",
+  "licencia_url": "https://creativecommons.org/licenses/by/3.0",
+  "pagina": "https://commons.wikimedia.org/wiki/File:HERMANITOS_DESDE_LA_LAGUNA_-_panoramio.jpg",
+  "w": 1400,
+  "h": 930
+ },
+ "torozo": {
+  "autor": "Pagabarba",
+  "licencia": "CC BY-SA 3.0",
+  "licencia_url": "https://creativecommons.org/licenses/by-sa/3.0",
+  "pagina": "https://commons.wikimedia.org/wiki/File:Torozo.jpg",
+  "w": 1400,
+  "h": 1050
+ },
+ "torozo-nieve": {
+  "autor": "Pentarux",
+  "licencia": "CC BY-SA 2.0",
+  "licencia_url": "https://creativecommons.org/licenses/by-sa/2.0",
+  "pagina": "https://commons.wikimedia.org/wiki/File:Pico_Torozo_(Sierra_de_Gredos)-Pentarux.jpg",
+  "w": 1400,
+  "h": 416
  }
 }

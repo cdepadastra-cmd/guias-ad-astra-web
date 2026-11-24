@@ -442,6 +442,7 @@ ARTS.append(dict(
         seccion("Vía 1", "Sur Clásica al Torreón de los Galayos (V/V+)",
                 p("El <b>Torreón</b> es la aguja más espectacular de Galayos: vertical por todas sus caras, sin ningún camino fácil a la cumbre (la cumbre sur se alcanzó por primera vez en 1947). Su vía Sur es la gran clásica de la sierra y una de las más bonitas del Sistema Central.") +
                 ilustracion("/img/guias/croquis-torreon-sur.svg", "Croquis esquemático de la vía Sur Clásica al Torreón de los Galayos", "Croquis esquemático de la Sur Clásica (orientativo).") +
+                '<div class="gd-fotos">' + fblog("torreon-largo-final", "En el último largo de la Sur del Torreón.", "https://jairogredos.blogspot.com/2011/12/torreon-de-los-galayos.html") + fblog("torreon-rapel", "El rápel de acceso a la cara sur.", "https://jairogredos.blogspot.com/2011/12/torreon-de-los-galayos.html") + "</div>" +
                 dos("La vía",
                     reglas(["<b>Acceso al pie:</b> desde el Victory se sube por la Trocha Palomo hasta la <b>Plataforma de las Flores</b>, en la cara norte, y desde allí se baja un <b>rápel de 60 m</b> a la cara sur. Las zapatillas de aproximación se quedan en la plataforma.",
                             "<b>L1 (≈ 50 m, V):</b> la entrada es dura, junto a un clavo. Se termina en un nicho bajo un pequeño techo, con un puente de roca para reforzar la reunión.",
@@ -457,6 +458,7 @@ ARTS.append(dict(
         seccion("Vía 2", "Los Tres Hermanitos del Circo de Gredos (IV a V+)",
                 p("Tres agujas de granito alineadas en el <b>cordal de Cerraíllos</b>, entre el Morezón y el Casquerazo, encima del refugio Elola y la Laguna Grande, con el Almanzor de fondo. Se numeran de izquierda a derecha y en una jornada se pueden subir las tres. Muy cerca está el Risco del Perro que Fuma.") +
                 ilustracion("/img/guias/croquis-hermanitos.svg", "Croquis esquemático de los Tres Hermanitos de Gredos con sus vías", "Croquis esquemático de los Tres Hermanitos (orientativo).") +
+                fotos(("hermanitos-laguna", "Los Tres Hermanitos desde la Laguna Grande."), ("hermanitos-cerca", "Las agujas de los Hermanitos.")) +
                 dos("Las vías",
                     reglas(["<b>3.º Hermanito · vía Teógenes (IV, ≈ 30 m, 1 largo, cara N):</b> la más fácil y la primera que se escaló (se atribuye a Teógenes Díaz, en solitario, hacia 1932). Fisura con un estrechamiento protegido con clavos.",
                             "<b>2.º Hermanito · vía Teógenes (V+, ≈ 45 m, 2 largos, cara SO):</b> abierta en 1951. El primer largo pide buscar bien la línea; el segundo es corto, desplomado y con una salida expuesta.",
@@ -471,6 +473,7 @@ ARTS.append(dict(
         seccion("Vía 3", "Gran Diedro del Torozo (V+)",
                 p("El <b>Torozo</b> es la punta occidental del Macizo Oriental de Gredos, encima del Puerto del Pico, con una cara sur de hasta 400 m sobre el valle de las Cinco Villas. Su aproximación es mucho más corta que la de Galayos, y el <b>Gran Diedro</b>, abierto en 1972, es su gran clásica.") +
                 ilustracion("/img/guias/croquis-torozo-gran-diedro.svg", "Croquis esquemático del Gran Diedro del Torozo con sus seis largos", "Croquis esquemático del Gran Diedro (orientativo).") +
+                fotos(("torozo", "El Torozo desde el valle."), ("torozo-nieve", "El Torozo nevado.")) +
                 dos("La vía",
                     reglas(["Unos <b>200 m en 6 largos</b>: IV, IV, V, V, V+ y IV.", "Sigue un gran diedro muy evidente desde abajo: la línea no tiene pérdida.",
                             "El quinto largo es el más difícil y el más físico.", "Las reuniones suelen estar equipadas; entre medias, seguros tuyos."]),
@@ -500,6 +503,7 @@ ARTS.append(dict(
         seccion("Vía 5", "Gran Diedro del Gran Galayo (IV+)",
                 p("El <b>Gran Galayo</b> (unos 2.220 m) es la cumbre más alta de las agujas. Su Gran Diedro, de unos 60 m, se ve desde el refugio y es uno de los largos más bonitos de la sierra. Es la continuación natural de la Sur de la Apretura.") +
                 ilustracion("/img/guias/croquis-gran-galayo-gran-diedro.svg", "Croquis esquemático de la vía Gran Diedro al Gran Galayo", "Croquis esquemático del Gran Diedro (orientativo).") +
+                '<div class="gd-fotos">' + fblog("gran-diedro-sol", "El sol entrando en el Gran Diedro del Gran Galayo.", "https://jairogredos.blogspot.com/2012/09/gran-diedro-al-gran-galayo.html") + fblog("gran-diedro-escalando", "Escalando el Gran Diedro.", "https://jairogredos.blogspot.com/2012/09/gran-diedro-al-gran-galayo.html") + "</div>" +
                 dos("La vía",
                     reglas(["<b>Entrada:</b> un resalte vertical y expuesto antes de la portilla del Gran Galayo (protégelo) y una terraza inclinada donde empieza el diedro.",
                             "<b>El diedro (≈ 60 m, IV+):</b> un desplome en la primera mitad marca la dificultad. Hacia los dos tercios hay una reunión con tres clavos. Al final se convierte casi en chimenea: se entra para chapar un clavo alto y se sale por fuera. Todos los pasos tienen clavos.",
