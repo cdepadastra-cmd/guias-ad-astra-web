@@ -55,7 +55,9 @@ if sys.argv[1] == "blog-listar":
         i += len(es)
     json.dump(posts, open("salida/posts.json", "w"), ensure_ascii=False, indent=1)
     for p in posts:
-        for k, u in enumerate(p["imgs"][:4]):
+        if SOLO is not None and p["n"] not in SOLO:
+            continue
+        for k, u in enumerate(p["imgs"][:4] if SOLO is None else p["imgs"][::2][:10]):
             try:
                 open("salida/mini/%d_%d.jpg" % (p["n"], k), "wb").write(get(tam(u.replace("http://", "https://"), "s320")))
             except Exception as ex:
