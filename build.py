@@ -59,6 +59,7 @@ RELACION = {  # qué enlazar al final de cada herramienta y artículo
     "/vivac-acampada-libre-espana/": ["/lista-material-montana/", "/meteo/", "/tormentas-en-la-montana/", "/rutas-clasicas-gredos-almanzor-laguna-grande-galayos/"],
     "/federarse-seguro-montana-rescate/": ["/hipotermia-congelaciones-botiquin-montana/", "/orientacion-en-montana-mapa-brujula/", "/como-leer-la-nieve-y-los-aludes/", "/mal-de-altura-sintomas-prevencion/"],
     "/raquetas-de-nieve-y-esqui-de-travesia/": ["/nieve/", "/como-leer-la-nieve-y-los-aludes/", "/crampones-piolet-botas-material-invernal/", "/meteo/"],
+    "/mejores-vias-escalada-gredos/": ["/escalas-dificultad-escalada-ferratas-alpinismo-barrancos/", "/rutas-clasicas-gredos-almanzor-laguna-grande-galayos/", "/tormentas-en-la-montana/", "/meteo/"],
     "/rutas-clasicas-gredos-almanzor-laguna-grande-galayos/": ["/meteo/", "/editor-gpx/", "/video-ruta-3d/", "/crampones-piolet-botas-material-invernal/"],
 }
 
@@ -117,14 +118,34 @@ HERRAMIENTAS = [
     ("/lista-material-montana/", "Lista de material", "Qué llevar en la mochila para barrancos, escalada, alpinismo, senderismo, montañismo o vivac, para ir tachando.", "lista"),
     ("/topografia-barrancos/", "Topografía de barrancos", "Dibuja el croquis de un barranco con rápeles y destrepes y calcula la cuerda necesaria.", "topo"),
 ]
-NAV_ART = [("Todos los artículos", "/articulos/")] + [(t, h) for h, t, _, _ in ARTICULOS]
+ART_CAT = {
+    "Equipo y ropa": ["/como-preparar-la-mochila/", "/teoria-de-las-capas/"],
+    "Escalada y alpinismo": ["/crampones-piolet-botas-material-invernal/", "/escalas-dificultad-escalada-ferratas-alpinismo-barrancos/", "/mejores-vias-escalada-gredos/"],
+    "Nieve": ["/como-leer-la-nieve-y-los-aludes/", "/raquetas-de-nieve-y-esqui-de-travesia/"],
+    "Rutas y orientación": ["/orientacion-en-montana-mapa-brujula/", "/rutas-clasicas-gredos-almanzor-laguna-grande-galayos/", "/vivac-acampada-libre-espana/"],
+    "Seguridad y salud": ["/federarse-seguro-montana-rescate/", "/hipotermia-congelaciones-botiquin-montana/", "/mal-de-altura-sintomas-prevencion/", "/rayos-uv-proteccion-solar-montana/", "/tormentas-en-la-montana/"],
+}
+import unicodedata as _ud
+def _orden(t):
+    return _ud.normalize("NFD", t.lower()).encode("ascii", "ignore").decode()
+_ART_POR_PATH = {h: (h, t, d, ic) for h, t, d, ic in ARTICULOS}
+assert sorted(sum(ART_CAT.values(), [])) == sorted(_ART_POR_PATH), "Falta categorizar algún artículo"
+ART_GRUPOS = [(c, sorted((_ART_POR_PATH[h] for h in ART_CAT[c]), key=lambda a: _orden(a[1]))) for c in sorted(ART_CAT, key=_orden)]
+NAV_ART = [("Todos los artículos", "/articulos/")] + sum([[("§" + c, "")] + [(t, h) for h, t, _, _ in arts] for c, arts in ART_GRUPOS], [])
 NAV_OTR = [("Iniciativas de turismo rural", "/iniciativas-turismo-rural/"), ("Creación y mantenimiento de senderos", "/creacion-mantenimiento-senderos/"), ("Route setting", "/route-setting/"), ("Organización de eventos", "/actividades/organizacion-eventos-deportivos/"), ("Gredos Limpio", "/actividades/gredos-limpio/"),
            ("Oeste de Gredos", "/actividades/comarca-natural-oeste-de-gredos/"), ("Vía Verde Ruta de la Plata", "/actividades/via-verde-ruta-de-la-plata/")]
 
 def dd(label, items, key, active):
-    links = "".join('<a href="%s">%s</a>' % (e(h), e(n)) for n, h in items)
+    links, abierto = "", False
+    for n, h in items:
+        if n.startswith("§"):
+            links += ("</div>" if abierto else "") + '<div class="dd-grupo"><span class="dd-cat">%s</span>' % e(n[1:])
+            abierto = True
+        else:
+            links += '<a href="%s">%s</a>' % (e(h), e(n))
+    links += "</div>" if abierto else ""
     cur = ' style="color:var(--gold)"' if active == key else ""
-    return '<div class="dd"><button type="button" aria-expanded="false"%s>%s %s</button><div class="dd-menu">%s</div></div>' % (cur, label, CHEV, links)
+    return '<div class="dd%s"><button' % (" dd-ancho" if any(n.startswith("§") for n, _ in items) else "") + ' type="button" aria-expanded="false"%s>%s %s</button><div class="dd-menu">%s</div></div>' % (cur, label, CHEV, links)
 
 def header(active=""):
     def a(h, n, k):
@@ -1473,6 +1494,7 @@ ART_ICO = {
     "vivac": '<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M6 54 L32 14 L58 54Z" fill="#e9a53b"/><path d="M32 14 L24 54 H40Z" fill="#a8701e"/><circle cx="50" cy="12" r="6" fill="#f3e9df"/><circle cx="53" cy="10" r="5" fill="#1b120c"/></svg>',
     "seguro": '<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M32 6 L54 14 V30 Q54 48 32 58 Q10 48 10 30 V14Z" fill="#4fb3e8"/><path d="M28 22 H36 V28 H42 V36 H36 V42 H28 V36 H22 V28 H28Z" fill="#fff"/></svg>',
     "raquetas": '<svg viewBox="0 0 64 64" aria-hidden="true"><ellipse cx="22" cy="34" rx="10" ry="22" fill="none" stroke="#4fb3e8" stroke-width="5"/><path d="M14 30 H30 M14 40 H30" stroke="#4fb3e8" stroke-width="3"/><path d="M44 6 L50 58" stroke="#e8574a" stroke-width="6" stroke-linecap="round"/><path d="M40 52 Q52 60 58 48" fill="none" stroke="#e8574a" stroke-width="4"/></svg>',
+    "escalada": '<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M6 58 L22 14 L30 10 L40 18 L58 58Z" fill="#8d8378"/><path d="M24 56 L26 40 L32 30 L30 18" stroke="#e9a53b" stroke-width="4" fill="none" stroke-linecap="round"/><circle cx="32" cy="30" r="4" fill="#f3e9df"/><circle cx="26" cy="40" r="4" fill="#f3e9df"/></svg>',
     "gredos": '<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M2 56 L18 26 L26 36 L36 12 L46 30 L52 22 L62 56Z" fill="#6b5a4a"/><path d="M36 12 L31 24 L36 21 L40 26Z" fill="#fff"/><ellipse cx="34" cy="50" rx="10" ry="3" fill="#4fb3e8"/></svg>',
 }
 
@@ -1482,7 +1504,9 @@ def build_articulos():
     cards = "".join('<a class="art-card" href="%s"><span class="art-ico">%s</span><div><h2>%s</h2><p>%s</p><span class="art-mas">Leer el artículo →</span></div></a>' % (h, ART_ICO[ic], e(t), e(d)) for h, t, d, ic in ARTICULOS)
     body = (hero("Artículos", "Artículos de montaña", "Guías prácticas escritas por nuestros guías: nieve y aludes, material de invierno, grados de dificultad, seguridad, orientación, rutas de Gredos y más.", METEO_IMG,
                  [("Inicio", "/"), ("Artículos", "")]) +
-            '<section class="section"><div class="wrap"><div class="art-grid art-grid2">' + cards + '</div></div></section>')
+            "".join('<section class="section%s"><div class="wrap"><p class="eyebrow">Artículos</p><h2>%s</h2><div class="art-grid art-grid2">' % (" alt" if i % 2 else "", e(c)) +
+                    "".join('<a class="art-card" href="%s"><span class="art-ico">%s</span><div><h3>%s</h3><p>%s</p><span class="art-mas">Leer el artículo →</span></div></a>' % (h, ART_ICO[ic], e(t), e(d)) for h, t, d, ic in arts) +
+                    '</div></div></section>' for i, (c, arts) in enumerate(ART_GRUPOS)))
     ld = [crumbs_ld([("Inicio", "/"), ("Artículos", path)]), {"@context": "https://schema.org", "@type": "ItemList", "name": "Artículos de montaña de Guías Ad Astra", "itemListElement": [
         {"@type": "ListItem", "position": i + 1, "url": url(h), "name": t} for i, (h, t, _, _) in enumerate(ARTICULOS)]}]
     page(path, "Artículos de montaña: técnica, seguridad y rutas | Ad Astra",

@@ -1,5 +1,5 @@
 """Artículos: orientación, vivac y acampada, federarse y rescates, raquetas y esquí de travesía, rutas clásicas de Gredos."""
-from arts_util import seccion, tabla, tarjetas, escala, reglas, dos, p, aviso, foto, fotos, ilustracion, blog, ruta_blog
+from arts_util import seccion, tabla, tarjetas, escala, reglas, dos, p, aviso, foto, fotos, ilustracion, blog, ruta_blog, fblog
 
 ARTS = []
 
@@ -400,4 +400,134 @@ ARTS.append(dict(
         ("https://www.ign.es/iberpix/visor/", "IGN: visor de mapas"),
     ],
     nota="Datos orientativos para condiciones de verano sin nieve. Las condiciones de la montaña cambian: infórmate antes de salir.",
+))
+
+# ───────────────────────────── 11. MEJORES VÍAS DE ESCALADA DE GREDOS ─────────────────────────────
+_BL = "https://jairogredos.blogspot.com/"
+ARTS.append(dict(
+    path="/mejores-vias-escalada-gredos/",
+    corto="Las mejores vías de escalada de Gredos",
+    card="Sur del Torreón, Tres Hermanitos, Gran Diedro del Torozo, Sur de la Apretura y Gran Diedro del Gran Galayo, con croquis.",
+    titulo="Las mejores vías clásicas de escalada de Gredos",
+    meta_title="Mejores vías de escalada clásica en Gredos | Ad Astra",
+    meta_desc="Reseña de cinco clásicas de Gredos: Sur del Torreón, Tres Hermanitos, Gran Diedro del Torozo, Sur de la Apretura y Gran Diedro del Gran Galayo. Con croquis.",
+    lead="Cinco vías de granito que todo escalador de clásica debería hacer en Gredos: la Sur del Torreón de los Galayos, los Tres Hermanitos del Circo, el Gran Diedro del Torozo, la Sur de la Apretura al Pequeño Galayo y el Gran Diedro del Gran Galayo. Largos, grados, material, bajadas y un croquis de cada una.",
+    hero="/img/fotos/escalada-galayos-cordada.webp",
+    actions='<a class="btn btn-primary" href="#resumen">Las cinco vías</a><a class="btn btn-ghost" href="/actividades/curso-iniciacion-escalada-en-roca/">Curso de escalada</a>',
+    ico="escalada", og=("Artículo", "Vías clásicas de Gredos", "Torreón, Hermanitos, Torozo, Pequeño y Gran Galayo", "#e9a53b"),
+    publicado="2026-11-24", cat="Escalada y alpinismo",
+    cuerpo=(
+        seccion("Antes de nada", "Escalada clásica en granito: lo que hay que saber",
+                p("Gredos es una de las grandes escuelas de escalada clásica de España. Sus vías son de <b>granito</b>, cortas comparadas con las del Pirineo pero con mucho ambiente, y casi todas se abrieron entre los años 30 y 70. Eso quiere decir dos cosas: los <b>grados son «de los de antes»</b> (un IV+ de Galayos puede parecerte un 5b largo de deportiva) y <b>casi todo el seguro lo pones tú</b>, con friends y fisureros, con algún clavo viejo de recuerdo.") +
+                tarjetas([
+                    ("#e9a53b", "Material de base", "Dos cuerdas de 60 m (o una de 60 m en las vías cortas), un juego de friends hasta el n.º 3 (algún n.º 4 ayuda en los diedros), fisureros, 10–12 cintas, cordinos y material de reunión. Casco siempre."),
+                    ("#4fb3e8", "Clavos y reuniones", "Los clavos que encuentres pueden tener 50 años: refuérzalos con tus seguros. Las cadenas de rápel de las cimas sí suelen estar en buen estado, pero revísalas."),
+                    ("#7cc47f", "Época", "De mayo a octubre. En verano, madruga: las tormentas de tarde son habituales y el granito mojado con líquenes resbala muchísimo (lo explicamos en <a href=\"/tormentas-en-la-montana/\">tormentas</a>)."),
+                ]) +
+                '<p style="margin-top:16px">Si no tienes claro cómo se leen los grados, mira las <a href="/escalas-dificultad-escalada-ferratas-alpinismo-barrancos/">escalas de dificultad</a>. Y si quieres empezar con seguridad, tenemos un <a href="/actividades/curso-iniciacion-escalada-en-roca/">curso de iniciación a la escalada en roca</a>.</p>') +
+        seccion("Resumen", "Las cinco vías de un vistazo",
+                tabla(["Vía", "Dónde", "Longitud", "Largos", "Dificultad"], [
+                    ["<a href=\"#torreon\">Sur Clásica del Torreón</a>", "Galayos", "≈ 130–140 m", "3–4", "V / V+"],
+                    ["<a href=\"#hermanitos\">Tres Hermanitos</a>", "Circo de Gredos", "30–50 m cada aguja", "1–2 por aguja", "IV a V+"],
+                    ["<a href=\"#torozo\">Gran Diedro del Torozo</a>", "Puerto del Pico", "≈ 200 m", "6", "V+ (IV–V+)"],
+                    ["<a href=\"#apretura\">Sur de la Apretura</a>", "Galayos (Pequeño Galayo)", "≈ 120–150 m", "4–6", "IV/IV+ (un paso de V+ evitable)"],
+                    ["<a href=\"#gran-diedro\">Gran Diedro</a>", "Galayos (Gran Galayo)", "≈ 100–120 m", "3", "IV+ (pasos de V)"],
+                ]) +
+                '<p class="small muted" style="margin-top:10px">Datos orientativos recopilados de varias reseñas; los metros y los grados varían de una fuente a otra. Los croquis de este artículo son esquemas nuestros, no topos a escala.</p>',
+                True, "resumen") +
+        seccion("Los Galayos", "Cómo llegar a Los Galayos",
+                p("Las tres vías de Galayos salen del <b>refugio Victory</b> (unos 1.950 m), al pie de las agujas. Se llega desde el aparcamiento del <b>Nogal del Barranco</b>, encima de Guisando, por el camino de la garganta: unos 6,5 km y 870 m de subida, entre 2 y 3 horas con la mochila de escalada. Otra opción, más larga y sin camino en algún tramo, es entrar desde el norte por Los Pelaos. Lo contamos en <a href=\"/rutas-clasicas-gredos-almanzor-laguna-grande-galayos/\">rutas clásicas de Gredos</a>.") +
+                '<div class="gd-fotos">' + fblog("escalada-galayos-agujas", "Las agujas de granito de Los Galayos.", _BL + "2009/10/pequeno-galayo.html") +
+                fblog("escalada-galayos-reunion", "Reunión en el Pequeño Galayo.", _BL + "2009/10/pequeno-galayo.html") + '</div>') +
+        seccion("Vía 1", "Sur Clásica al Torreón de los Galayos (V/V+)",
+                p("El <b>Torreón</b> es la aguja más espectacular de Galayos: vertical por todas sus caras, sin ningún camino fácil a la cumbre (la cumbre sur se alcanzó por primera vez en 1947). Su vía Sur es la gran clásica de la sierra y una de las más bonitas del Sistema Central.") +
+                ilustracion("/img/guias/croquis-torreon-sur.svg", "Croquis esquemático de la vía Sur Clásica al Torreón de los Galayos", "Croquis esquemático de la Sur Clásica (orientativo).") +
+                dos("La vía",
+                    reglas(["<b>Acceso al pie:</b> desde el Victory se sube por la Trocha Palomo hasta la <b>Plataforma de las Flores</b>, en la cara norte, y desde allí se baja un <b>rápel de 60 m</b> a la cara sur. Las zapatillas de aproximación se quedan en la plataforma.",
+                            "<b>L1 (≈ 50 m, V):</b> la entrada es dura, junto a un clavo. Se termina en un nicho bajo un pequeño techo, con un puente de roca para reforzar la reunión.",
+                            "<b>L2 (≈ 30 m, V+):</b> travesía corta a la izquierda hasta una fisura vertical que entra en un sistema de diedros. Muy buen largo.",
+                            "<b>L3 (≈ 50 m, V):</b> más vertical, con buena roca, hasta una placa tumbada que lleva a la cadena de la cumbre. Asegura desde la cadena: es expuesto.",
+                            "Hay una variante, la <b>Sur Directa</b> (≈ 140–150 m, V+), con la que comparte la parte alta."]),
+                    "Material y bajada",
+                    reglas(["Dos cuerdas de 60 m (imprescindibles para el rápel).", "Juego de friends con predominio de medidas pequeñas y fisureros; unas 12–15 cintas.",
+                            "<b>Bajada:</b> rápel de 60 m desde la cadena de la cumbre por la cara norte hasta la Plataforma de las Flores, y destrepe con cuidado (mejor encordados) hasta la canal y el refugio.",
+                            "Cuenta con una jornada larga: unas 9–10 horas de coche a coche.",
+                            "<a href=\"" + _BL + "2011/12/torreon-de-los-galayos.html\" target=\"_blank\" rel=\"noopener\">Crónica del Torreón en el blog de Jairo →</a>"])),
+                False, "torreon") +
+        seccion("Vía 2", "Los Tres Hermanitos del Circo de Gredos (IV a V+)",
+                p("Tres agujas de granito alineadas en el <b>cordal de Cerraíllos</b>, entre el Morezón y el Casquerazo, encima del refugio Elola y la Laguna Grande, con el Almanzor de fondo. Se numeran de izquierda a derecha y en una jornada se pueden subir las tres. Muy cerca está el Risco del Perro que Fuma.") +
+                ilustracion("/img/guias/croquis-hermanitos.svg", "Croquis esquemático de los Tres Hermanitos de Gredos con sus vías", "Croquis esquemático de los Tres Hermanitos (orientativo).") +
+                dos("Las vías",
+                    reglas(["<b>3.º Hermanito · vía Teógenes (IV, ≈ 30 m, 1 largo, cara N):</b> la más fácil y la primera que se escaló (se atribuye a Teógenes Díaz, en solitario, hacia 1932). Fisura con un estrechamiento protegido con clavos.",
+                            "<b>2.º Hermanito · vía Teógenes (V+, ≈ 45 m, 2 largos, cara SO):</b> abierta en 1951. El primer largo pide buscar bien la línea; el segundo es corto, desplomado y con una salida expuesta.",
+                            "<b>1.º Hermanito · vía Pirineos (V+, ≈ 50 m, 2 largos, cara SO):</b> abierta en 1973. Fisura hasta un rellano y travesía bajo el gran diedro que separa sus dos cumbres; los últimos pasos son los más expuestos.",
+                            "Hay vías más duras en las tres agujas (diedros de V/V+ en la cara norte del 2.º, la Folliot en el 1.º…)."]),
+                    "Acceso, material y bajada",
+                    reglas(["<b>Acceso:</b> de la Plataforma al refugio Elola (unas 2 h 30) y de allí, por hitos hacia la portilla de los Machos y canales sencillas (II), una hora más.",
+                            "Fisureros y friends hasta el n.º 3. Una cuerda doble o dos cuerdas de 60 m.",
+                            "<b>Bajada:</b> rápel desde la cadena de cada cumbre, por la misma cara (unos 30 m en el 2.º y el 3.º). Cuidado al recuperar las cuerdas: se enganchan.",
+                            "Puedes hacerlo en dos días durmiendo en el refugio Elola."])),
+                True, "hermanitos") +
+        seccion("Vía 3", "Gran Diedro del Torozo (V+)",
+                p("El <b>Torozo</b> es la punta occidental del Macizo Oriental de Gredos, encima del Puerto del Pico, con una cara sur de hasta 400 m sobre el valle de las Cinco Villas. Su aproximación es mucho más corta que la de Galayos, y el <b>Gran Diedro</b>, abierto en 1972, es su gran clásica.") +
+                ilustracion("/img/guias/croquis-torozo-gran-diedro.svg", "Croquis esquemático del Gran Diedro del Torozo con sus seis largos", "Croquis esquemático del Gran Diedro (orientativo).") +
+                dos("La vía",
+                    reglas(["Unos <b>200 m en 6 largos</b>: IV, IV, V, V, V+ y IV.", "Sigue un gran diedro muy evidente desde abajo: la línea no tiene pérdida.",
+                            "El quinto largo es el más difícil y el más físico.", "Las reuniones suelen estar equipadas; entre medias, seguros tuyos."]),
+                    "Acceso, material y bajada",
+                    reglas(["<b>Acceso:</b> desde el Puerto del Pico (aparcamiento, fuente y bar). Se sigue la senda que sale detrás del restaurante y, por la cueva de pastores, una vereda hacia el este lleva al pie de las vías. Unos 30–45 minutos.",
+                            "Juego de friends y fisureros, unas 10 cintas y dos cuerdas de 60 m.",
+                            "<b>Bajada:</b> de la cumbre al collado norte siguiendo hitos (hay un rápel instalado a la derecha si la roca está mojada o con hielo) y por una canal hacia el oeste.",
+                            "Al estar orientado al sur, es una buena opción en primavera y otoño. En verano, solo a primera hora."])),
+                False, "torozo") +
+        seccion("Vía 4", "Sur de la Apretura al Pequeño Galayo (IV/IV+)",
+                p("La vía más asequible de este artículo y una de las más escaladas de Galayos: ideal como primera clásica en Gredos. Fue abierta en 1952 y sube al Pequeño Galayo por la parte baja de la canal del Gran Galayo. Mucha gente la encadena con el Gran Diedro del Gran Galayo en el mismo día.") +
+                ilustracion("/img/guias/croquis-pequeno-galayo-apretura.svg", "Croquis esquemático de la vía Sur de la Apretura al Pequeño Galayo", "Croquis esquemático de la Sur de la Apretura (orientativo).") +
+                dos("La vía",
+                    reglas(["<b>Inicio:</b> un diedrito vertical en la pared izquierda, al pie de la canal del Gran Galayo.",
+                            "<b>L1:</b> hasta una gran terraza con bloques para montar la reunión.",
+                            "<b>L2:</b> pared vertical de buenos cantos derivando a la derecha hasta una canal; reunión en un nicho con un clavo.",
+                            "<b>L3:</b> travesía a la izquierda hasta un espolón, chimenea corta (mejor en oposición que con la mochila dentro), placa y canal-chimenea hasta una repisa grande.",
+                            "<b>L4:</b> se sube a un hombro amplio y de ahí a una <b>fisura de V+</b> (bien protegible), y un diedro tumbado hasta el collado y la cumbre. El V+ se puede evitar.",
+                            "Se suele graduar <b>IV+</b>, aunque casi todo es IV salvo el paso final."]),
+                    "Material y bajada",
+                    reglas(["Friends hasta el n.º 3 y un juego de fisureros. Con una cuerda de 60 m vas sobrado; con 40 m tendrás que montar más reuniones.",
+                            "<b>Bajada:</b> rápel corto hasta el hombro y destrepe por hitos. Los hitos se separan: abajo y a la derecha, a la canal del Gran Galayo y el refugio; arriba y a la izquierda, al pie del Gran Diedro.",
+                            "<a href=\"" + _BL + "2009/10/pequeno-galayo.html\" target=\"_blank\" rel=\"noopener\">Crónica del Pequeño Galayo en el blog de Jairo →</a>"])) +
+                '<div class="gd-fotos">' + fblog("escalada-pequeno-galayo", "Escalando en el Pequeño Galayo.", _BL + "2009/10/pequeno-galayo.html") +
+                fblog("escalada-galayos-cordada", "Cordada en las placas de Galayos.", _BL + "2009/10/pequeno-galayo.html") + "</div>",
+                True, "apretura") +
+        seccion("Vía 5", "Gran Diedro del Gran Galayo (IV+)",
+                p("El <b>Gran Galayo</b> (unos 2.220 m) es la cumbre más alta de las agujas. Su Gran Diedro, de unos 60 m, se ve desde el refugio y es uno de los largos más bonitos de la sierra. Es la continuación natural de la Sur de la Apretura.") +
+                ilustracion("/img/guias/croquis-gran-galayo-gran-diedro.svg", "Croquis esquemático de la vía Gran Diedro al Gran Galayo", "Croquis esquemático del Gran Diedro (orientativo).") +
+                dos("La vía",
+                    reglas(["<b>Entrada:</b> un resalte vertical y expuesto antes de la portilla del Gran Galayo (protégelo) y una terraza inclinada donde empieza el diedro.",
+                            "<b>El diedro (≈ 60 m, IV+):</b> un desplome en la primera mitad marca la dificultad. Hacia los dos tercios hay una reunión con tres clavos. Al final se convierte casi en chimenea: se entra para chapar un clavo alto y se sale por fuera. Todos los pasos tienen clavos.",
+                            "<b>Salida:</b> un hombrito con clavo, un diedro tumbado hasta un collado y un tramo fácil que acaba en una cueva entre bloques; se atraviesa y se sale a la derecha a la cumbre.",
+                            "Se gradúa IV+, aunque algunos pasos son de V. A la izquierda hay variantes más difíciles."]),
+                    "Material y bajada",
+                    reglas(["Friends hasta el n.º 3 (un n.º 4 ayuda al final del diedro) y fisureros.",
+                            "<b>Bajada sin rápel:</b> por hitos hasta la portilla, con trepadas y destrepes de hasta III, y por la canal al refugio. También se puede volver hacia Los Pelaos por la Trocha Palomo.",
+                            "<a href=\"" + _BL + "2012/09/gran-diedro-al-gran-galayo.html\" target=\"_blank\" rel=\"noopener\">Crónica del Gran Diedro en el blog de Jairo →</a>"])),
+                False, "gran-diedro")
+    ),
+    faq=[
+        ("¿Cuál es la vía más fácil de Galayos?", "Entre las clásicas, la Sur de la Apretura al Pequeño Galayo: casi toda de IV, con un paso de V+ al final que se puede evitar. Es muy habitual encadenarla con el Gran Diedro del Gran Galayo."),
+        ("¿Qué grado tiene la Sur del Torreón de los Galayos?", "La Sur Clásica tiene unos 130–140 m en 3 o 4 largos, de V a V+. Se accede rapelando 60 m desde la Plataforma de las Flores y se baja también en rápel de 60 m."),
+        ("¿Qué material hace falta para escalar en Galayos?", "Dos cuerdas de 60 m, un juego de friends hasta el n.º 3 (algún n.º 4 ayuda), fisureros, 10–15 cintas, material de reunión, casco y calzado de aproximación."),
+        ("¿Cuánto se tarda en llegar al refugio Victory?", "Desde el aparcamiento del Nogal del Barranco, en Guisando, entre 2 y 3 horas, con unos 870 m de subida."),
+        ("¿Dónde están los Tres Hermanitos de Gredos?", "En el cordal de Cerraíllos, entre el Morezón y el Casquerazo, encima del refugio Elola y la Laguna Grande. Se llega en unas 3 horas y media desde la Plataforma de Gredos."),
+    ],
+    fuentes=[
+        ("https://summitpost.org/galayos/150896", "SummitPost: Galayos"),
+        ("https://summitpost.org/torozo/151045", "SummitPost: Torozo (Gran Diedro)"),
+        ("https://www.sanestebandelvalle.es/pdf/escalada_torozo.pdf", "Ayuntamiento de San Esteban del Valle: escalada en el Torozo (PDF)"),
+        ("https://pablovelasco73.blogspot.com/2020/08/sur-del-torreon-galayos-130m-v.html", "Pablo Velasco: Sur del Torreón"),
+        ("https://picosyaventura.com/torreon-de-los-galayos-por-la-via-sur-directa/", "Picos y Aventura: el Torreón por la Sur Directa"),
+        ("https://guiasoeste.com/sur-de-la-apretura-y-gran-diedro-galayos/", "Guías Oeste: Sur de la Apretura y Gran Diedro"),
+        ("https://cuadernodemonte.wordpress.com/2012/08/24/circo-de-gredos-los-hermanitos/", "Cuaderno de monte: los Hermanitos"),
+        ("https://sobreescalada.com/2019/10/07/escalada-circo-de-gredos-pared-del-refugio-el-escudo-placa-ecualicer-tres-hermanitos-y-perro-que-fuma/", "Sobre escalada: Circo de Gredos"),
+        ("https://www.destinoclimbing.com/castilla-y-leon/escalada-en-galayos/", "Destino Climbing: escalada en Galayos"),
+    ],
+    nota="Reseña elaborada con nuestras palabras a partir de varias fuentes. Las vías de montaña cambian (clavos que se caen, bloques sueltos): consulta reseñas actualizadas y valora siempre tu nivel.",
 ))
