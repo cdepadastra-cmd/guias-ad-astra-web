@@ -90,3 +90,10 @@ def fblog(n, pie, url):
 def ruta_blog(url, a, pa, b, pb, texto="Leer la crónica de la ruta en el blog de Jairo"):
     return ('<div class="gd-fotos">' + fblog(a, pa, url) + fblog(b, pb, url) + '</div>'
             '<p style="margin-top:6px"><a class="btn btn-ghost" href="%s" target="_blank" rel="noopener">%s →</a></p>' % (url, texto))
+
+
+def croquis(*items):
+    """Croquis ilustrados (static/img/croquis/<n>.webp): croquis(("nombre", "pie"), ...) sin recortar."""
+    return '<div class="gd-croquis-img">' + "".join(
+        '<figure><a href="/img/croquis/%s.webp" target="_blank" rel="noopener"><img src="/img/croquis/%s.webp" alt="Croquis: %s" loading="lazy" decoding="async"></a><figcaption>%s</figcaption></figure>' % (n, n, pie, pie)
+        for n, pie in items) + "</div>"

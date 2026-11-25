@@ -909,3 +909,7 @@ input[type=radio],input[type=checkbox]{width:auto;padding:0}
 .gd-ficha b{font-size:1.02rem}
 .gd-croquis{margin:4px 0 18px;padding:12px 16px;border:1px dashed var(--line);border-radius:10px}
 .gd-croquis a{text-decoration:underline}
+.gd-croquis-img{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:18px;margin:20px 0 10px;align-items:start}
+.gd-croquis-img figure{margin:0}
+.gd-croquis-img img{display:block;width:100%;height:auto;border-radius:12px;max-height:820px;object-fit:contain;background:#f4efe7}
+.gd-croquis-img figcaption{margin-top:8px;font-size:.92rem;color:var(--muted)}
