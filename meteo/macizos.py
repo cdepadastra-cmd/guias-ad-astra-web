@@ -244,6 +244,8 @@ ESTACIONES = [
      "cumbre": {"nombre": "Veleta", "lat": 37.056, "lon": -3.366, "alt": 3300},
      "texto": "Previsión en la cota base y la cota alta de la estación de Sierra Nevada (estación) (Granada)."},
 ]
+import unicodedata as _ud
+ESTACIONES.sort(key=lambda m: _ud.normalize("NFD", m["nombre"]).encode("ascii", "ignore").decode().lower())  # orden alfabético
 MACIZOS = MACIZOS + ESTACIONES
 
 # Webcams. "windy": cámaras de Windy.com que se pueden insertar en la página (su reproductor público).
