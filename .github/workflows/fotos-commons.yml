@@ -21,6 +21,7 @@ jobs:
       - timeout-minutes: 50
         run: |
           case "${{ inputs.modo }}" in
+            sonda) python tools/sonda.py sonda ${{ inputs.lista }} ;;
             blog-*) python tools/blog_fotos.py "${{ inputs.modo }}" ${{ inputs.lista }} ;;
             *) python tools/fotos_commons.py ${{ inputs.modo }} ${{ inputs.lista }} ;;
           esac
