@@ -258,7 +258,7 @@
           ev.preventDefault(); elegir(a.getAttribute("data-mac"), true);
         });
       });
-    }).catch(function () { el.innerHTML = '<p class="mt-err">La previsión se está generando. Vuelve a intentarlo en unos minutos.</p>'; });
+    }).catch(function (e) { console.error(e); el.innerHTML = '<p class="mt-err">La previsión se está generando. Vuelve a intentarlo en unos minutos.</p>'; });
   }
 
   /* ---------------------------------------------------------------- selector cordillera -> sierra (todo en la misma página) */
@@ -427,12 +427,12 @@
       var DUR = HH.map(function (h, i) { return i ? h - HH[i - 1] : 1; });
       var modo = "1h", punto = "c";
       try { var pg = localStorage.getItem("mt-punto"); punto = pg === "b" || pg === "x" ? pg : "c"; } catch (e) {}
+      var C = doc.consenso, mods = Object.keys(doc.series);
       /* cotas con perfil vertical calculado (claves p<altura> y w<altura> del consenso) */
       var COTAS = Object.keys(C).filter(function (x) { return /^p\d+$/.test(x) && C[x].some(function (v) { return v != null; }); }).map(function (x) { return +x.slice(1); }).sort(function (a, b) { return a - b; });
       var cota = COTAS.length ? COTAS[Math.floor(COTAS.length / 2)] : null;
       try { var cg = +localStorage.getItem("mt-cota-" + id); if (COTAS.indexOf(cg) > -1) cota = cg; } catch (e) {}
       if (punto === "x" && !COTAS.length) punto = "c";
-      var C = doc.consenso, mods = Object.keys(doc.series);
       /* claves de la serie según el punto elegido; los datos antiguos sin precipitación por punto usan la media */
       function K() {
         if (punto === "x") return { p: "x", t: "p" + cota, s: null, pr: C.prc ? "prc" : "pr", w: "w" + cota, d: "dc", g: null, frio: 1.0, lbl: "Cota " + cota.toLocaleString("es-ES") + " m",
@@ -664,7 +664,7 @@
         });
       }
       pintar();
-    }).catch(function () { el.innerHTML = '<p class="mt-err">La previsión se está generando. Vuelve a intentarlo en unos minutos.</p>'; });
+    }).catch(function (e) { console.error(e); el.innerHTML = '<p class="mt-err">La previsión se está generando. Vuelve a intentarlo en unos minutos.</p>'; });
   }
 
   document.addEventListener("DOMContentLoaded", function () {
