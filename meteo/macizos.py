@@ -47,11 +47,11 @@ MACIZOS = [
      "base": {"nombre": "Linares de Riofrío", "lat": 40.580, "lon": -5.920, "alt": 940},
      "cumbre": {"nombre": "Pico Cervero", "lat": 40.531, "lon": -5.875, "alt": 1465},
      "texto": "Sierra de las Quilamas, entre la Sierra de Francia y la de Béjar."},
-    {"id": "guadarrama", "nombre": "Sierra de Guadarrama", "corto": "Guadarrama", "region": "Sistema Central",
+    {"id": "guadarrama", "nombre": "Guadarrama", "corto": "Guadarrama", "region": "Sistema Central",
      "base": {"nombre": "Rascafría", "lat": 40.903, "lon": -3.879, "alt": 1163},
      "cumbre": {"nombre": "Peñalara", "lat": 40.8505, "lon": -3.9551, "alt": 2428},
      "texto": "Peñalara, Cuerda Larga, Siete Picos y La Pedriza."},
-    {"id": "ayllon", "nombre": "Sierra de Ayllón", "corto": "Ayllón", "region": "Sistema Central",
+    {"id": "ayllon", "nombre": "Ayllón", "corto": "Ayllón", "region": "Sistema Central",
      "base": {"nombre": "Riaza", "lat": 41.280, "lon": -3.478, "alt": 1190},
      "cumbre": {"nombre": "Pico del Lobo", "lat": 41.187, "lon": -3.462, "alt": 2273},
      "texto": "Pico del Lobo, Hayedo de la Pedrosa, Somosierra y el Ocejón."},
@@ -245,7 +245,12 @@ ESTACIONES = [
      "texto": "Previsión en la cota base y la cota alta de la estación de Sierra Nevada (estación) (Granada)."},
 ]
 import unicodedata as _ud
-ESTACIONES.sort(key=lambda m: _ud.normalize("NFD", m["nombre"]).encode("ascii", "ignore").decode().lower())  # orden alfabético
+def _alfa(m):
+    return _ud.normalize("NFD", m["nombre"]).encode("ascii", "ignore").decode().lower()
+
+
+MACIZOS.sort(key=lambda m: (REGIONES.index(m["region"]), _alfa(m)))  # por zona y, dentro, en orden alfabético
+ESTACIONES.sort(key=_alfa)
 MACIZOS = MACIZOS + ESTACIONES
 
 # Webcams. "windy": cámaras de Windy.com que se pueden insertar en la página (su reproductor público).
