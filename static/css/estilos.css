@@ -947,3 +947,9 @@ input[type=radio],input[type=checkbox]{width:auto;padding:0}
 .dcard-f{display:flex;justify-content:space-between;align-items:center;gap:10px}
 .dcard-f .price{font-size:1.3rem;font-weight:700;color:var(--gold)}
 .dcard-f .btn{padding:10px 16px}
+.nv-aludes{margin-top:34px}
+.nv-aludes h2{margin-bottom:4px}
+.nv-aludes .mt-modo{margin:10px 0 12px}
+.nv-alud{display:inline-block;font:700 .78rem/1 var(--label,system-ui);padding:5px 9px;border-radius:999px;background:var(--a);color:#1b120c;margin-right:6px;white-space:nowrap}
+.nv-oficial{margin:10px 0;font-size:.92rem}
+.mt-alud{margin-left:4px}

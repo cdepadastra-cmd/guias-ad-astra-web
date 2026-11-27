@@ -181,6 +181,9 @@
     if (v == null) return null;
     return v < 3 ? { n: "bajo", c: "#4caf50" } : v < 6 ? { n: "moderado", c: "#e6c32e" } : v < 8 ? { n: "alto", c: "#f08a24" } : v < 11 ? { n: "muy alto", c: "#e8574a" } : { n: "extremo", c: "#a55fd6" };
   }
+  /* peligro de aludes oficial (escala europea, colores de la EAWS) */
+  var ALUD = { 1: ["Débil", "#ccff66", "#1b120c"], 2: ["Limitado", "#ffff00", "#1b120c"], 3: ["Notable", "#ff9900", "#1b120c"], 4: ["Fuerte", "#ff0000", "#fff"], 5: ["Muy fuerte", "#1b120c", "#ff4d4d"] };
+  function aludChip(v, largo) { var c = ALUD[v]; return c ? '<span class="mt-uv mt-alud" style="--uv:' + c[1] + ";color:" + c[2] + '" title="Peligro de aludes ' + v + " (" + c[0] + ')">' + (largo ? "Aludes " + v + " · " + c[0] : "Aludes " + v) + "</span>" : ""; }
   function uvChip(v) { var c = uvCat(v); return c ? '<span class="mt-uv" style="--uv:' + c.c + '" title="Índice UV máximo: ' + c.n + '">UV ' + v + "</span>" : ""; }
   function uvConsejo(v, nieve) {
     if (v == null) return "";
@@ -452,7 +455,7 @@
         return '<div class="mt-dias" role="tablist">' + dias.map(function (d, k) {
           var v = diaP(d, kk);
           return '<button type="button" role="tab" class="mt-dia' + (k === sel ? " on" : "") + (k >= 7 ? " mt-lejos" : "") + '" data-k="' + k + '" aria-selected="' + (k === sel) + '"><b>' + diaCorto(d.fecha) + (k >= 10 ? ' <em class="mt-tend">tendencia</em>' : "") + "</b><small>" + fFecha.format(fechaLocal(d.fecha)) + "</small>" + icono(v.ico) +
-            '<span class="mt-t" title="' + kk.lbl + ': máxima / mínima"><i>' + n(v.tmax, "°") + "</i> " + n(v.tmin, "°") + '</span><span class="mt-s">' + precipDia(v.pr, v.nv, "Sin precip.") + '</span><span class="mt-s">' + flecha(v.wd) + n(v.w) + " km/h</span>" + uvChip(v.uv) + (d.avisos && d.avisos.length ? '<span class="mt-pt" title="' + esc(d.avisos.join(" · ")) + '">!</span>' : "") + aemetPunto(d.fecha) + "</button>";
+            '<span class="mt-t" title="' + kk.lbl + ': máxima / mínima"><i>' + n(v.tmax, "°") + "</i> " + n(v.tmin, "°") + '</span><span class="mt-s">' + precipDia(v.pr, v.nv, "Sin precip.") + '</span><span class="mt-s">' + flecha(v.wd) + n(v.w) + " km/h</span>" + uvChip(v.uv) + (doc.aludes && doc.aludes.dias ? aludChip(doc.aludes.dias[d.fecha]) : "") + (d.avisos && d.avisos.length ? '<span class="mt-pt" title="' + esc(d.avisos.join(" · ")) + '">!</span>' : "") + aemetPunto(d.fecha) + "</button>";
         }).join("") + "</div>";
       }
 
@@ -476,6 +479,7 @@
           "<div><dt>Rachas</dt><dd>" + n(v.g) + " km/h</dd></div>" +
           "<div><dt>Precipitación</dt><dd>" + (v.pr ? dec(v.pr) + " mm" : "No") + (v.nv ? " · " + v.nv + " cm de nieve" : "") + "</dd></div>" +
           (v.uv != null ? '<div class="mt-kv-uv"><dt>Índice UV máximo</dt><dd>' + uvChip(v.uv) + " " + uvCat(v.uv).n + (v.uvh != null ? ' <small class="mt-st">hacia las ' + String(Math.floor(v.uvh)).padStart(2, "0") + ":" + (v.uvh % 1 ? "30" : "00") + "</small>" : "") + '<small class="mt-uvtip">' + uvConsejo(v.uv, (k.p === "c" ? d.nieve_c : d.nieve_b) > 0 || (C.sn && C.sn.some(function (x) { return x >= 5; }) && k.p === "c")) + "</small></dd></div>" : "") +
+          (doc.aludes && doc.aludes.dias && doc.aludes.dias[d.fecha] ? '<div class="mt-kv-uv"><dt>Peligro de aludes</dt><dd>' + aludChip(doc.aludes.dias[d.fecha], true) + '<small class="mt-uvtip">Boletín oficial de ' + esc(doc.aludes.fuente) + " para " + esc(doc.aludes.nombre) + '. <a href="' + esc(doc.aludes.url) + '" target="_blank" rel="noopener">Ver el boletín</a> · <a href="/nieve/">Mapa de aludes</a></small></dd></div>' : "") +
           "<div><dt>Isocero</dt><dd>" + (d.i0_min == null ? "–" : (d.i0_min === d.i0_max ? d.i0_min.toLocaleString("es-ES") : d.i0_min.toLocaleString("es-ES") + "–" + d.i0_max.toLocaleString("es-ES")) + " m") + "</dd></div>" +
           "<div><dt>Tormentas</dt><dd>" + (d.tormenta >= 2 ? "Probables" : d.tormenta === 1 ? "Posibles" : "No") + "</dd></div>" +
           "<div><dt>Acuerdo entre modelos</dt><dd>" + (d.acuerdo ? cap(d.acuerdo) : "–") + "</dd></div></dl></div>";

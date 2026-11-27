@@ -28,6 +28,8 @@
     var col = COL[m.estado] || "#8d847b", c = CAMS[m.id] || {};
     var h = '<article class="nv-card" id="' + m.id + '" style="--nv:' + col + '"><header><div><h2>' + esc(m.nombre) + '</h2><p class="muted small">' + esc(m.cumbre.nombre) + " " + m.cumbre.alt.toLocaleString("es-ES") + " m · " + esc(m.region) + '</p></div><span class="nv-estado">' + esc(m.estado) + "</span></header>";
     h += '<div class="nv-kv"><div><b>' + n(m.manto, " cm") + "</b><span>Manto (modelo, cumbre)</span></div><div><b>" + n(m.nieve_72h, " cm") + "</b><span>Nieve nueva 3 días</span></div><div><b>" + n(m.nieve_prevista, " cm") + "</b><span>Prevista 3 días</span></div><div><b>" + n(m.manto_base, " cm") + "</b><span>Manto en " + esc(m.base.nombre) + "</span></div></div>";
+    var za = ALUDES && ALUDES.macizos && ALUDES.macizos[m.id], ra = za && ALUDES.regiones[za];
+    if (ra) { var va = (ra.dias || {})[ALUDES.fechas[0]]; h += '<p class="nv-oficial">Peligro de aludes oficial hoy (' + esc(ra.nombre) + "): " + (va ? chipAlud(va) : "<b>sin boletín en vigor</b>") + ' · <a href="' + esc(ra.url) + '" target="_blank" rel="noopener">boletín de ' + esc(ra.fuente) + "</a></p>"; }
     h += '<ul class="nv-s">' + m.senales.map(function (s) { return '<li style="--c:' + NIV[s.nivel] + '">' + esc(s.txt) + "</li>"; }).join("") + "</ul>";
     h += tabla(m);
     if (c.windy && c.windy.length) h += '<details class="nv-cams"><summary>Ver webcam (' + esc(c.windy[0][1]) + ")</summary>" + '<div class="mt-cam-v"><iframe data-src="https://webcams.windy.com/webcams/public/embed/player/' + esc(c.windy[0][0]) + '/day" title="Webcam ' + esc(c.windy[0][1]) + '" loading="lazy" allowfullscreen></iframe></div></details>';
@@ -77,7 +79,10 @@
     var css = document.createElement("link"); css.rel = "stylesheet"; css.href = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"; document.head.appendChild(css);
     var js = document.createElement("script"); js.src = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"; js.onload = cb; document.head.appendChild(js);
   }
-  function tam(cm) { return Math.round(20 + 40 * Math.sqrt(Math.min(cm, 150) / 150)); }
+  function tam(cm) { return cm >= 80 ? 40 : cm >= 30 ? 36 : 32; }
+  /* color por espesor del manto: 5 cm verde, 30 amarillo, 80 naranja, 150 rojo */
+  var ESCALA = [[150, "#e8574a", "150 cm o más"], [80, "#f08a24", "80–150 cm"], [30, "#f5d000", "30–80 cm"], [5, "#4caf50", "5–30 cm"]];
+  function colNieve(cm) { for (var i = 0; i < ESCALA.length; i++) if (cm >= ESCALA[i][0]) return ESCALA[i][1]; return "#bfe0f7"; }
   var mapa = null, capas = {};
   function pintarMapa(lista, elegido, alPulsar) {
     cargarLeaflet(function () {
@@ -95,7 +100,7 @@
       var pts = [];
       lista.forEach(function (m) {
         var manto = m.manto || 0, prev = m.nieve_prevista || 0, val = manto >= 3 ? manto : prev, solo = manto < 3 && prev >= 3;
-        var col = COL[m.estado] || "#8d847b", sz = m.hay_nieve ? tam(val) : 12;
+        var col = solo ? "#c9a7e8" : colNieve(val), sz = m.hay_nieve ? tam(val) : 12;
         var html = m.hay_nieve ? '<div class="nv-pin' + (solo ? " nv-pin-p" : "") + (m.id === elegido ? " nv-pin-sel" : "") + '" style="width:' + sz + "px;height:" + sz + "px;--c:" + col + ';font-size:' + Math.round(sz * 0.55) + 'px">❄</div>' : '<div class="nv-pin nv-pin-0" style="width:12px;height:12px"></div>';
         var mk = L.marker([m.cumbre.lat, m.cumbre.lon], { icon: L.divIcon({ html: html, className: "", iconSize: [sz, sz], iconAnchor: [sz / 2, sz / 2] }), zIndexOffset: Math.round(val) });
         mk.bindTooltip("<b>" + esc(m.corto) + "</b><br>" + esc(m.estado) + "<br>Manto: " + n(m.manto, " cm") + " · prevista 3 días: " + n(m.nieve_prevista, " cm"), { direction: "top", offset: [0, -sz / 2] });
@@ -109,9 +114,51 @@
       setTimeout(function () { mapa.invalidateSize(); }, 50);
     });
   }
-  var leyenda = '<div class="nv-ley">' + [5, 30, 80, 150].map(function (cm) { var z = tam(cm); return '<span><i class="nv-pin" style="width:' + z + "px;height:" + z + "px;--c:#bfe0f7;font-size:" + Math.round(z * .55) + 'px">❄</i>' + cm + " cm</span>"; }).join("") +
-    '<span><i class="nv-pin nv-pin-p" style="width:26px;height:26px;--c:#c9a7e8;font-size:14px">❄</i>solo nevada prevista</span><span><i class="nv-pin nv-pin-0" style="width:12px;height:12px"></i>sin nieve</span></div>';
+  var leyenda = '<div class="nv-ley"><b>Espesor del manto (cumbre):</b>' + ESCALA.slice().reverse().map(function (x) { return '<span><i class="nv-pin" style="width:24px;height:24px;--c:' + x[1] + ';font-size:13px">❄</i>' + x[2] + "</span>"; }).join("") +
+    '<span><i class="nv-pin" style="width:24px;height:24px;--c:#bfe0f7;font-size:13px">❄</i>menos de 5 cm</span><span><i class="nv-pin nv-pin-p" style="width:24px;height:24px;--c:#c9a7e8;font-size:13px">❄</i>solo nevada prevista</span><span><i class="nv-pin nv-pin-0" style="width:12px;height:12px"></i>sin nieve</span></div>';
 
+  /* mapa de peligro de aludes oficial (boletines de AEMET, ICGC, Arán y Andorra vía EAWS) */
+  var ALUD = { 1: ["Débil", "#ccff66"], 2: ["Limitado", "#ffff00"], 3: ["Notable", "#ff9900"], 4: ["Fuerte", "#ff0000"], 5: ["Muy fuerte", "#1b120c"] };
+  var ALUDES = null, mapaA = null, capaA = null, diaA = 0;
+  function chipAlud(v) { var c = ALUD[v]; return c ? '<span class="nv-alud" style="--a:' + c[1] + (v >= 4 ? ";color:#fff" : "") + '">' + v + " · " + c[0] + "</span>" : ""; }
+  function pintarAludes() {
+    if (!ALUDES) return;
+    var f = ALUDES.fechas[diaA];
+    cargarLeaflet(function () {
+      if (!mapaA) {
+        mapaA = L.map("nv-mapa-aludes", { scrollWheelZoom: false });
+        L.tileLayer("https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png", { maxZoom: 13, subdomains: "abc", opacity: .8,
+          attribution: 'Peligro: boletines de AEMET, ICGC, Conselh Generau d\'Aran y Andorra (vía <a href="https://www.avalanches.org">EAWS</a>) · Mapa: &copy; OpenTopoMap, &copy; OpenStreetMap' }).addTo(mapaA);
+      }
+      if (capaA) mapaA.removeLayer(capaA);
+      capaA = L.layerGroup();
+      var b = [];
+      Object.keys(ALUDES.zonas).forEach(function (id) {
+        var r = ALUDES.regiones[id] || {}, v = (r.dias || {})[f], c = ALUD[v];
+        ALUDES.zonas[id].forEach(function (an) {
+          var pol = L.polygon(an, c ? { color: "#1b120c", weight: 1, fillColor: c[1], fillOpacity: .75 } : { color: "#8d847b", weight: 1, dashArray: "4 4", fillColor: "#8d847b", fillOpacity: .15 });
+          pol.bindTooltip("<b>" + esc(r.nombre || id) + "</b><br>" + (c ? "Peligro " + v + " (" + c[0] + ")" : "Sin boletín para este día") + "<br><small>" + esc(r.fuente || "") + "</small>", { sticky: true });
+          pol.on("click", function () { if (r.url) window.open(r.url, "_blank", "noopener"); });
+          capaA.addLayer(pol); an.forEach(function (p) { b.push(p); });
+        });
+      });
+      capaA.addTo(mapaA);
+      if (b.length && !mapaA._ajustado) { mapaA.fitBounds(b, { padding: [20, 20] }); mapaA._ajustado = true; }
+      setTimeout(function () { mapaA.invalidateSize(); }, 50);
+      var hay = Object.keys(ALUDES.regiones).some(function (k) { return (ALUDES.regiones[k].dias || {})[f]; });
+      document.getElementById("nv-al-nota").innerHTML = hay ? "" : "Ahora mismo no hay boletines de peligro de aludes en vigor para este día (fuera de temporada o aún no publicados). Las zonas en gris son las que tienen boletín oficial durante la temporada.";
+    });
+  }
+  function bloqueAludes() {
+    var fmt = new Intl.DateTimeFormat("es-ES", { timeZone: "UTC", weekday: "long", day: "numeric", month: "long" });
+    var fd = function (s) { var p = s.split("-"); return fmt.format(new Date(Date.UTC(+p[0], +p[1] - 1, +p[2], 12))); };
+    return '<section class="nv-aludes"><h2>Peligro de aludes oficial</h2><p class="muted small">Nivel máximo de cada zona según los boletines oficiales. Pulsa una zona para abrir su boletín.</p>' +
+      '<div class="mt-modo" role="group" aria-label="Día">' + ALUDES.fechas.map(function (f, i) { return '<button type="button" data-ad="' + i + '" class="' + (i === diaA ? "on" : "") + '">' + (i ? "Mañana" : "Hoy") + " · " + fd(f) + "</button>"; }).join("") + "</div>" +
+      '<div id="nv-mapa-aludes" class="nv-mapa" role="region" aria-label="Mapa de peligro de aludes"></div><p id="nv-al-nota" class="muted small"></p>' +
+      '<div class="nv-ley"><b>Escala europea:</b>' + [1, 2, 3, 4, 5].map(function (v) { return chipAlud(v); }).join("") + '<span><i style="display:inline-block;width:18px;height:12px;border:1px dashed #8d847b;background:rgba(141,132,123,.15);margin-right:6px"></i>sin boletín</span></div></section>';
+  }
+
+  var pAludes = fetch("/meteo/datos/aludes.json?t=" + Math.floor(Date.now() / 6e5), { cache: "no-cache" }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; });
   fetch("/meteo/datos/nieve.json?t=" + Math.floor(Date.now() / 6e5), { cache: "no-cache" }).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }).then(function (d) {
     var aplicar;
     var S = selector(d.macizos, function (m) { return m.region; }, function (m) { return m.nombre; }, "Cordillera", "Sierra o macizo", "Todas las sierras", function (id, z) {
@@ -127,6 +174,14 @@
       pintarMapa(de, id, elegir);
     });
     function elegir(id) { history.replaceState(null, "", "#" + id); aplicar(id, ""); window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 90, behavior: "smooth" }); }
+    pAludes.then(function (A) {
+      if (!A || !A.zonas) return;
+      ALUDES = A;
+      var box = document.createElement("div"); box.innerHTML = bloqueAludes(); el.insertBefore(box.firstChild, document.getElementById("nv-cont"));
+      el.querySelectorAll("[data-ad]").forEach(function (b) { b.addEventListener("click", function () { diaA = +b.getAttribute("data-ad"); el.querySelectorAll("[data-ad]").forEach(function (x) { x.classList.toggle("on", x === b); }); pintarAludes(); }); });
+      pintarAludes();
+      aplicar(location.hash.slice(1), "");
+    });
     el.innerHTML = S.html + '<p class="mt-act">Actualizado el ' + fAct.format(new Date(d.generado.replace("Z", ":00Z"))) + " · 4 veces al día con la previsión de meteorología</p>" +
       '<div id="nv-mapa" class="nv-mapa" role="region" aria-label="Mapa de la nieve por macizo"></div>' + leyenda + '<div id="nv-cont"></div>';
     var cont = document.getElementById("nv-cont");

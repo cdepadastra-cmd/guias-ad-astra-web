@@ -1193,16 +1193,23 @@ def main():
     gen = now.strftime("%Y-%m-%dT%H:%MZ")
     resumen = {"generado": gen, "modelos": info, "regiones": REGIONES, "macizos": []}
     oficiales = avisos_oficiales()
+    try:
+        import aludes
+        aludes_mac = aludes.generar(a.out, MACIZOS, log)
+    except Exception:
+        aludes_mac = {}
+        log("ERROR en el peligro de aludes:\n%s" % traceback.format_exc())
     for mac in MACIZOS:
         ds, cons = dias(eje, series, mac["id"])
         doc = {"id": mac["id"], "nombre": mac["nombre"], "region": mac["region"], "base": mac["base"], "cumbre": mac["cumbre"],
                "generado": gen, "modelos": info, "t0": eje[0].strftime("%Y-%m-%dT%H:%MZ"), "paso": PASO, "horario": HORARIO,
                "h": [int((t - eje[0]).total_seconds() // 3600) for t in eje],
-               "series": {n: s[mac["id"]] for n, s in series.items()}, "consenso": cons, "dias": ds, "aemet": oficiales.get(mac["id"], [])}
+               "series": {n: s[mac["id"]] for n, s in series.items()}, "consenso": cons, "dias": ds, "aemet": oficiales.get(mac["id"], []), "aludes": aludes_mac.get(mac["id"])}
         json.dump(doc, open(os.path.join(a.out, mac["id"] + ".json"), "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
         resumen["macizos"].append({"id": mac["id"], "nombre": mac["nombre"], "corto": mac["corto"], "region": mac["region"],
                                    "base": mac["base"], "cumbre": mac["cumbre"], "dias": ds,
-                                   "aemet": [{k: a[k] for k in ("nivel", "evento", "inicio", "fin")} for a in oficiales.get(mac["id"], [])]})
+                                   "aemet": [{k: a[k] for k in ("nivel", "evento", "inicio", "fin")} for a in oficiales.get(mac["id"], [])],
+                                   "aludes": aludes_mac.get(mac["id"])})
         d0 = ds[0] if ds else {}
         log("%-28s hoy: cumbre %s/%s °C, viento %s km/h, precip %s mm, isocero %s m, %s" % (
             mac["id"], d0.get("tc_min"), d0.get("tc_max"), d0.get("wc_max"), d0.get("pr"), d0.get("i0_min"), ",".join(d0.get("avisos", []))))
