@@ -953,3 +953,9 @@ input[type=radio],input[type=checkbox]{width:auto;padding:0}
 .nv-alud{display:inline-block;font:700 .78rem/1 var(--label,system-ui);padding:5px 9px;border-radius:999px;background:var(--a);color:#1b120c;margin-right:6px;white-space:nowrap}
 .nv-oficial{margin:10px 0;font-size:.92rem}
 .mt-alud{margin-left:4px}
+.mt-puntobar{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center}
+.mt-cota{display:flex;align-items:center;gap:10px;padding:6px 12px;border:1px solid var(--line);border-radius:999px;opacity:.65}
+.mt-cota.on{opacity:1;border-color:var(--gold)}
+.mt-cota span{font:700 .72rem/1 var(--label);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.mt-cota input[type=range]{width:180px;accent-color:var(--gold);padding:0}
+.mt-cota output{font:700 .9rem/1 var(--body);color:var(--gold);min-width:70px;font-variant-numeric:tabular-nums}

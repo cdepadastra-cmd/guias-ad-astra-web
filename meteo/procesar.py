@@ -38,6 +38,12 @@ ECMWF_MAX = 240       # ECMWF IFS publica 10 días en las pasadas de 00 y 12 UTC
 HORARIO = 72          # las primeras 72 h van hora a hora
 LEVELS = [1000, 925, 850, 700, 600, 500]
 ALTURAS_NUBES = [500, 1000, 2000, 3000]   # nubosidad estimada a estas altitudes (m)
+ALT_PERFIL = list(range(500, 3751, 250))   # temperatura y viento a cualquier cota (selector de altitud de la web)
+
+
+def cotas_de(mac):
+    """Cotas del perfil que tienen sentido en este macizo: de algo por debajo de la base a algo por encima de la cumbre."""
+    return [h for h in ALT_PERFIL if mac["base"]["alt"] - 250 <= h <= mac["cumbre"]["alt"] + 500]
 CACHE = os.environ.get("METEO_CACHE", "meteo-cache")
 UA = {"User-Agent": "guiasadastra-meteo/1.0 (+https://www.guiasadastra.com/meteo/)"}
 
@@ -739,8 +745,19 @@ def series_modelo(m, eje, orog_proxy):
             snc, snb_ = g("snd", c), g("snd", b)
             vals = dict(sn=None if snc is None else r(max(0.0, snc)), snb=None if snb_ is None else r(max(0.0, snb_)), tv=r(tv, 1), tc=r(tc, 1), wc=r(wc), dc=r(dc), wv=r(wv), db=r(db), gv=r(gv), gc=r(gc_), pr=r(pr, 1), prb=r(prb, 1), prc=r(prc, 1), cc=r(cc), sv=r(sv), st=r(st_), **nub,
                         i0=None if i0 is None else int(round(i0 / 10.0) * 10), sl=None if sl is None else int(round(sl / 10.0) * 10), cp=r(cp))
-            for x in s:
-                s[x].append(vals[x])
+            # perfil vertical (punto de rejilla de la cumbre): temperatura y viento a cada cota
+            for hh in cotas_de(mac):
+                tp = perfil_en(hh, hc, t2c, niv_t)
+                if tp is None and t2c is not None and hc is not None and not math.isnan(hc):
+                    tp = t2c + (hc - hh) * 0.0065
+                up = perfil_en(hh, None if hc is None else hc + 10, u10c, niv_u)
+                vp = perfil_en(hh, None if hc is None else hc + 10, v10c, niv_v)
+                if (up is None or vp is None) and u10c is not None and v10c is not None and hc is not None and not math.isnan(hc) and hh <= hc + 10:
+                    up, vp = u10c, v10c
+                vals["p%d" % hh] = r(tp, 1)
+                vals["w%d" % hh] = None if up is None or vp is None else r(math.hypot(up, vp) * 3.6)
+            for x in vals:
+                s.setdefault(x, [None] * ii).append(vals[x])
         out[mac["id"]] = s
     return out
 
@@ -802,6 +819,7 @@ def dias(eje, modelos_series, mac_id):
     ms = {m: s[mac_id] for m, s in modelos_series.items()}
     n = len(eje)
     claves = ("tv", "tc", "wc", "dc", "wv", "db", "gv", "gc", "pr", "prb", "prc", "cc", "i0", "sl", "cp", "sv", "st", "sn", "snb") + tuple("n%d" % h for h in ALTURAS_NUBES)
+    claves += tuple(sorted({x for m in ms for x in ms[m] if x[0] in "pw" and x[1:].isdigit()}, key=lambda x: (x[0], int(x[1:]))))
     cons = {x: [mediana([ms[m].get(x, [None] * n)[i] for m in ms]) for i in range(n)] for x in claves}
     def dir_media(i, k="dc"):  # media circular de la dirección del viento
         d = [ms[m].get(k, [None] * n)[i] for m in ms if ms[m].get(k, [None] * n)[i] is not None]
@@ -812,7 +830,7 @@ def dias(eje, modelos_series, mac_id):
     cons["dc"] = [dir_media(i) for i in range(n)]
     cons["db"] = [dir_media(i, "db") for i in range(n)]
     for x in cons:
-        nd = 1 if x in ("tv", "tc", "pr", "prb", "prc") else 0
+        nd = 1 if x in ("tv", "tc", "pr", "prb", "prc") or (x[0] == "p" and x[1:].isdigit()) else 0
         cons[x] = [None if v is None else (round(v, 1) if nd else (int(round(v / 10.0) * 10) if x in ("i0", "sl") else int(round(v)))) for v in cons[x]]
     # índice UV por hora en cumbre y base (estimado con el sol, la altitud, la nieve y la nubosidad del consenso)
     mac = [m for m in MACIZOS if m["id"] == mac_id][0]
@@ -1204,7 +1222,7 @@ def main():
         doc = {"id": mac["id"], "nombre": mac["nombre"], "region": mac["region"], "base": mac["base"], "cumbre": mac["cumbre"],
                "generado": gen, "modelos": info, "t0": eje[0].strftime("%Y-%m-%dT%H:%MZ"), "paso": PASO, "horario": HORARIO,
                "h": [int((t - eje[0]).total_seconds() // 3600) for t in eje],
-               "series": {n: s[mac["id"]] for n, s in series.items()}, "consenso": cons, "dias": ds, "aemet": oficiales.get(mac["id"], []), "aludes": aludes_mac.get(mac["id"])}
+               "series": {n: {k: v for k, v in s[mac["id"]].items() if not (k[0] in "pw" and k[1:].isdigit())} for n, s in series.items()}, "consenso": cons, "dias": ds, "aemet": oficiales.get(mac["id"], []), "aludes": aludes_mac.get(mac["id"])}
         json.dump(doc, open(os.path.join(a.out, mac["id"] + ".json"), "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
         resumen["macizos"].append({"id": mac["id"], "nombre": mac["nombre"], "corto": mac["corto"], "region": mac["region"],
                                    "base": mac["base"], "cumbre": mac["cumbre"], "dias": ds,
