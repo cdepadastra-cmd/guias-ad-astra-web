@@ -1588,9 +1588,9 @@ def build_caudales():
 def build_meteo():
     path = "/meteo/"
     regiones = ", ".join(REGIONES)
-    body = (hero("Herramientas", "Meteorología de montaña", "Previsión a 15 días en cumbre y en el pueblo base para %d macizos de España, calculada cada 6 horas directamente con los modelos ECMWF, GFS, ICON y AROME." % len(MACIZOS), METEO_IMG,
+    body = (hero("Herramientas", "Meteorología de montaña", "Previsión a 15 días en cumbre y en el pueblo base para %d macizos de España y en la cota base y alta de %d estaciones de esquí, calculada cada 6 horas directamente con los modelos ECMWF, GFS, ICON y AROME." % (len([m for m in MACIZOS if not m.get("esqui")]), len([m for m in MACIZOS if m.get("esqui")])), METEO_IMG,
                  [("Inicio", "/"), ("Meteorología de montaña", "")], '<a class="btn btn-primary" href="#previsiones">Ver previsiones</a><a class="btn btn-ghost" href="#como">Cómo se calcula</a>') +
-            keybar([("Macizos", "%d" % len(MACIZOS)), ("Modelos", "ECMWF · GFS · ICON · AROME"), ("Alcance", "15 días"), ("Actualización", "4 veces al día")]) +
+            keybar([("Macizos", "%d" % len([m for m in MACIZOS if not m.get("esqui")])), ("Estaciones de esquí", "%d" % len([m for m in MACIZOS if m.get("esqui")])), ("Modelos", "ECMWF · GFS · ICON · AROME"), ("Alcance", "15 días"), ("Actualización", "4 veces al día")]) +
             '<section class="section" id="previsiones"><div class="wrap">' + meteo_selector() + '<div id="mt-index" class="mt"><p class="mt-cargando">Cargando previsiones…</p></div><div id="mt-mac" class="mt" hidden></div>'
             '<noscript><ul>' + "".join('<li><a href="/meteo/%s/">%s</a></li>' % (m["id"], e(m["nombre"])) for m in MACIZOS) + '</ul></noscript></div></section>' +
             '<section class="section alt" id="como"><div class="wrap split"><div class="stack" style="gap:0">' + meteo_metodo() + block("Preguntas frecuentes", faq_html(METEO_FAQ)) +
@@ -1600,7 +1600,7 @@ def build_meteo():
     ld = [crumbs_ld([("Inicio", "/"), ("Meteorología de montaña", path)]), faq_ld(METEO_FAQ)]
     ld.append(app_ld(path, "Meteorología de montaña", "Previsión del tiempo en montaña a 15 días en cumbre y base, con varios modelos y avisos de AEMET.", "WeatherApplication"))
     page(path, "Tiempo en montaña: previsión a 15 días en cumbre | Ad Astra",
-         "Previsión del tiempo en montaña a 15 días para %d macizos: temperatura y viento en cumbre, nieve, isocero y tormentas. Modelos ECMWF, GFS, ICON y AROME." % len(MACIZOS),
+         "Previsión del tiempo en montaña y estaciones de esquí a 15 días: temperatura y viento en cumbre, nieve, isocero y tormentas. Modelos ECMWF, GFS, ICON y AROME.",
          body, "her", ld, priority="0.8", scripts='<script src="/js/meteo.js" defer></script>')
     for m in MACIZOS:
         build_meteo_macizo(m)
@@ -1611,6 +1611,9 @@ def build_meteo_macizo(m):
     fmt = lambda x: "{:,}".format(x).replace(",", ".")
     h1 = "Tiempo en %s" % m["nombre"]
     lead = "Previsión de montaña a 15 días en %s (%s m) y %s (%s m): temperatura, viento en cumbre, precipitación, nieve, isocero y tormentas. %s" % (c["nombre"], fmt(c["alt"]), b["nombre"], fmt(b["alt"]), m["texto"])
+    if m.get("esqui"):
+        h1 = "Tiempo en la estación de esquí %s" % m["corto"]
+        lead = "Previsión a 15 días en la cota alta (%s m) y la cota base (%s m) de la estación de esquí %s: temperatura, viento, nieve nueva, isocero, cota de nieve y tormentas, calculada con los modelos ECMWF, GFS, ICON y AROME." % (fmt(c["alt"]), fmt(b["alt"]), m["corto"])
     acts = [x for x in ACTIVITIES if x["slug"] in METEO_ACT.get(m["id"], [])]
     otros = [x for x in MACIZOS if x["region"] == m["region"] and x["id"] != m["id"]]
     lateral = ""
@@ -1620,7 +1623,7 @@ def build_meteo_macizo(m):
     if otros:
         lateral += '<div class="panel"><p class="eyebrow">%s</p>%s<a href="/meteo/">Todos los macizos</a></div>' % (e(m["region"]), "".join('<a href="/meteo/%s/">%s</a>' % (x["id"], e(x["nombre"])) for x in otros))
     body = (hero("Meteorología de montaña", e(h1), e(lead), METEO_IMG, [("Inicio", "/"), ("Meteorología", "/meteo/"), (m["nombre"], "")]) +
-            keybar([("Cumbre", "%s · %s m" % (c["nombre"], fmt(c["alt"]))), ("Base", "%s · %s m" % (b["nombre"], fmt(b["alt"]))), ("Modelos", "ECMWF · GFS · ICON · AROME"), ("Actualización", "4 veces al día")]) +
+            keybar([("Cota alta" if m.get("esqui") else "Cumbre", "%s · %s m" % (c["nombre"], fmt(c["alt"]))), ("Cota base" if m.get("esqui") else "Base", "%s · %s m" % (b["nombre"], fmt(b["alt"]))), ("Modelos", "ECMWF · GFS · ICON · AROME"), ("Actualización", "4 veces al día")]) +
             '<section class="section" id="previsiones"><div class="wrap">' + meteo_selector(m["id"]) + '<div id="mt-mac" class="mt" data-id="%s"><p class="mt-cargando">Cargando previsión…</p></div></div></section>' % m["id"] +
             '<section class="section alt"><div class="wrap split"><div class="stack" style="gap:0">' + meteo_metodo() + block("Preguntas frecuentes", faq_html(METEO_FAQ[:4])) +
             '</div><div class="sticky" style="display:grid;gap:18px">' + lateral + '</div></div></section>')
@@ -1631,7 +1634,10 @@ def build_meteo_macizo(m):
     title = "Tiempo en %s: previsión de montaña a 15 días" % nom
     if len(title) > 64:
         title = "Tiempo en %s: previsión de montaña" % nom
-    desc = _short("Previsión meteorológica de montaña en %s: tiempo en %s (%s m) y %s a 15 días, viento en cumbre, nieve, isocero y tormentas con ECMWF, GFS, ICON y AROME." % (m["nombre"], c["nombre"], fmt(c["alt"]), b["nombre"]), 158)
+    if m.get("esqui"):
+        title = "Tiempo en %s: previsión estación de esquí" % m["corto"]
+        desc = _short("Previsión del tiempo en la estación de esquí %s a 15 días: nieve nueva, temperatura y viento en cota alta (%s m) y cota base (%s m), isocero y cota de nieve." % (m["corto"], fmt(c["alt"]), fmt(b["alt"])), 158)
+    desc = desc if m.get("esqui") else _short("Previsión meteorológica de montaña en %s: tiempo en %s (%s m) y %s a 15 días, viento en cumbre, nieve, isocero y tormentas con ECMWF, GFS, ICON y AROME." % (m["nombre"], c["nombre"], fmt(c["alt"]), b["nombre"]), 158)
     page(path, title, desc, body, "her", ld, priority="0.6", scripts='<script src="/js/meteo.js" defer></script>')
 
 def build_service(s):
