@@ -195,6 +195,8 @@
   var calRoots = $$("[data-calendar], [data-upcoming]");
   if (!calRoots.length) return;
   var EVENTS = [], LIVE = !!CFG.calendarioURL;
+  // De momento el calendario solo muestra actividades (los cursos se ocultan). Para volver a mostrarlos: SIN_CURSOS = false
+  var SIN_CURSOS = true;
 
   // Acepta fechas 2026-12-12, 12/12/2026, 12-12-2026 o 12/12/26 (como las escribe Google Sheets en España)
   function isoDate(v) {
@@ -224,7 +226,7 @@
     var cat = fetch((CFG.base || "") + "/data/catalogo.json").then(function (r) { return r.json(); }).then(function (j) { CAT = j || {}; }).catch(function () {});
     return cat.then(function () { return fetch(url); }).then(function (r) { return r.json(); }).then(function (j) {
       var arr = Array.isArray(j) ? j : (j.events || []);
-      EVENTS = arr.map(norm).filter(function (e) { return e.fecha && (e.fecha_fin || e.fecha) >= todayISO(); }).sort(function (a, b) { return a.fecha < b.fecha ? -1 : 1; });
+      EVENTS = arr.map(norm).filter(function (e) { return e.fecha && (e.fecha_fin || e.fecha) >= todayISO() && !(SIN_CURSOS && e.tipo === "curso"); }).sort(function (a, b) { return a.fecha < b.fecha ? -1 : 1; });
       return EVENTS;
     }).catch(function () { EVENTS = []; return EVENTS; });
   }
@@ -294,24 +296,38 @@
       '<p class="meta">' + esc(dateRange(e)) + (e.hora ? " · " + esc(e.hora) : "") + (e.lugar ? " · " + esc(e.lugar) : "") + (e.notas ? "<br>" + esc(e.notas) : "") + "</p>" + seatsHTML(e) + "</div>" +
       '<div class="evact"><span class="price">' + (e.precio ? eur(e.precio) : "Gratis") + '</span><button class="btn ' + (e.libres ? "btn-primary" : "btn-ghost") + '" data-res="' + esc(e.id) + '"' + (e.libres ? "" : " disabled") + ">" + (e.libres ? "Reservar plaza" : "Completo") + "</button></div></article>";
   }
-  var view = new Date(); view.setDate(1); var tipo = "";
+  var view = new Date(); view.setDate(1); var tipo = "", selDay = "";
+  function estadoDia(evs) {
+    if (!evs.length) return "";
+    var libres = evs.reduce(function (a, e) { return a + e.libres; }, 0);
+    if (!libres) return "full";
+    return evs.some(function (e) { return e.libres && e.libres <= Math.max(2, Math.ceil(e.max * 0.25)); }) ? "low" : "ok";
+  }
+  function dayCard(e) {
+    var st = e.libres === 0 ? "full" : (e.libres <= Math.max(2, Math.ceil(e.max * 0.25)) ? "low" : "ok");
+    var badge = st === "full" ? "Completo" : st === "low" ? "Últimas plazas" : "Disponible";
+    return '<article class="dcard"><div class="dcard-h"><h4>' + (e.slug ? '<a href="' + (CFG.base || "") + '/actividades/' + esc(e.slug) + '/">' + esc(e.titulo) + "</a>" : esc(e.titulo)) + '</h4><span class="badge ' + st + '">' + badge + "</span></div>" +
+      '<p class="dcard-m">' + (e.max ? (e.max - e.libres) + "/" + e.max + " reservados" : "") + (e.hora ? " · " + esc(e.hora) : "") + (e.lugar ? " · " + esc(e.lugar) : "") + (e.fecha_fin && e.fecha_fin !== e.fecha ? "<br>" + esc(dateRange(e)) : "") + (e.notas ? "<br>" + esc(e.notas) : "") + "</p>" +
+      '<div class="dcard-f"><span class="price">' + (e.precio ? eur(e.precio) : "Gratis") + '</span><button class="btn ' + (e.libres ? "btn-primary" : "btn-ghost") + '" data-res="' + esc(e.id) + '"' + (e.libres ? "" : " disabled") + ">" + (e.libres ? "Reservar" : "Sin plazas") + "</button></div></article>";
+  }
   function renderCalendar(root) {
-    var list = $("[data-evlist]", root), grid = $("[data-month]", root), title = $("[data-mtitle]", root);
+    var grid = $("[data-month]", root), title = $("[data-mtitle]", root), panel = $("[data-day]", root);
     var evs = EVENTS.filter(function (e) { return !tipo || e.tipo === tipo; });
+    var on = function (s) { return evs.filter(function (e) { return s >= e.fecha && s <= (e.fecha_fin || e.fecha); }); };
     title.textContent = MESES[view.getMonth()] + " " + view.getFullYear();
     var first = new Date(view), start = (first.getDay() + 6) % 7, d = new Date(first); d.setDate(1 - start);
-    var html = ["L", "M", "X", "J", "V", "S", "D"].map(function (x, i) { return '<div class="dow">' + ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"][i] + "</div>"; }).join("");
+    var html = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"].map(function (x) { return '<div class="dow">' + x + "</div>"; }).join("");
     for (var i = 0; i < 42; i++) {
-      var s = iso(d), out = d.getMonth() !== view.getMonth();
-      var today = s === todayISO();
-      var dayEv = evs.filter(function (e) { return s >= e.fecha && s <= (e.fecha_fin || e.fecha); });
-      html += '<div class="day' + (out ? " out" : "") + (today ? " today" : "") + '"><span class="n">' + d.getDate() + "</span>" +
-        dayEv.map(function (e) { return '<button class="ev ' + e.tipo + (e.libres ? "" : " full") + '" data-res="' + esc(e.id) + '" title="' + esc(e.titulo + " · " + (e.libres ? e.libres + " plazas libres" : "completo")) + '">' + esc(e.titulo) + "</button>"; }).join("") + "</div>";
+      var s = iso(d), out = d.getMonth() !== view.getMonth(), st = out ? "" : estadoDia(on(s));
+      html += out ? '<span class="cday out"></span>' : '<button type="button" class="cday' + (st ? " has " + st : "") + (s === todayISO() ? " today" : "") + (s === selDay ? " sel" : "") + '" data-d="' + s + '"' + (st ? "" : " tabindex=\"-1\"") + ">" + d.getDate() + (st === "full" ? "<i></i>" : "") + "</button>";
       d.setDate(d.getDate() + 1);
       if (i === 34 && d.getMonth() !== view.getMonth()) break;
     }
     grid.innerHTML = html;
-    list.innerHTML = evs.length ? evs.map(evRow).join("") : '<div class="empty">No hay fechas publicadas ' + (tipo ? "de este tipo " : "") + "ahora mismo. Escríbenos por WhatsApp y te avisamos de las próximas salidas.</div>";
+    if (!selDay || !on(selDay).length) { var nx = evs.filter(function (e) { return (e.fecha_fin || e.fecha) >= todayISO(); })[0]; selDay = nx ? (nx.fecha < todayISO() ? todayISO() : nx.fecha) : ""; }
+    var lista = selDay ? on(selDay) : [];
+    panel.innerHTML = selDay ? '<h3 class="dhead">' + fmtLong(selDay) + "</h3>" + (lista.length ? lista.map(dayCard).join("") : '<p class="muted">No hay actividades este día. Elige un día marcado en el calendario.</p>')
+      : '<p class="muted">No hay fechas publicadas ahora mismo. Escríbenos por WhatsApp y te avisamos de las próximas salidas.</p>';
   }
   function renderUpcoming(root) {
     var slug = root.dataset.upcoming, evs = EVENTS.filter(function (e) { return e.slug === slug; }).slice(0, 4);
@@ -338,10 +354,11 @@
   $$("[data-calendar]").forEach(function (root) {
     $("[data-prev]", root).addEventListener("click", function () { view.setMonth(view.getMonth() - 1); renderCalendar(root); });
     $("[data-next]", root).addEventListener("click", function () { view.setMonth(view.getMonth() + 1); renderCalendar(root); });
+    $("[data-month]", root).addEventListener("click", function (ev) { var b = ev.target.closest("[data-d]"); if (!b || !b.classList.contains("has")) return; selDay = b.dataset.d; renderCalendar(root); var p = $("[data-day]", root); if (window.innerWidth < 900) p.scrollIntoView({ behavior: "smooth", block: "start" }); });
     $$("[data-tipo-btn]", root).forEach(function (c) { c.addEventListener("click", function () { tipo = c.dataset.tipoBtn; $$("[data-tipo-btn]", root).forEach(function (x) { x.setAttribute("aria-pressed", x === c); }); renderCalendar(root); }); });
   });
   load().then(function () {
-    if (EVENTS.length && $("[data-calendar]")) { var f = parseDate(EVENTS[0].fecha); if (f > new Date()) { view = new Date(f.getFullYear(), f.getMonth(), 1); } }
+    if (EVENTS.length && $("[data-calendar]")) { var f = parseDate(EVENTS[0].fecha); if (f > new Date()) { view = new Date(f.getFullYear(), f.getMonth(), 1); } selDay = EVENTS[0].fecha < todayISO() ? todayISO() : EVENTS[0].fecha; }
     renderAll(); if ($("[data-calendar]")) injectLD();
   });
 

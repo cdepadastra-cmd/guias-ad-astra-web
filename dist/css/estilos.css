@@ -913,3 +913,37 @@ input[type=radio],input[type=checkbox]{width:auto;padding:0}
 .gd-croquis-img figure{margin:0}
 .gd-croquis-img img{display:block;width:100%;height:auto;border-radius:12px;max-height:820px;object-fit:contain;background:#f4efe7}
 .gd-croquis-img figcaption{margin-top:8px;font-size:.92rem;color:var(--muted)}
+/* calendario compacto con panel del día */
+.calx{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:24px;max-width:960px;margin:0 auto;align-items:start}
+@media (max-width:860px){.calx{grid-template-columns:1fr}}
+.calx-cal,.calx-day{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px}
+.calx .cal-nav{justify-content:space-between;margin-bottom:14px}
+.calx .cal-nav h3{font-size:1.35rem;text-align:center;flex:1}
+.calx .icon-btn{width:36px;height:36px;border:0}
+.cmonth{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+.cmonth .dow{font:600 .74rem/1 var(--label);text-align:center;color:var(--dim);padding:6px 0 10px}
+.cday{aspect-ratio:1.35;display:grid;place-items:center;position:relative;border:1px solid transparent;border-radius:10px;background:none;color:var(--muted);font:500 .95rem/1 var(--body);font-variant-numeric:tabular-nums;cursor:default;padding:0}
+.cday.out{visibility:hidden}
+.cday.today{color:var(--gold);font-weight:800}
+.cday.has{cursor:pointer;color:var(--fg);font-weight:700}
+.cday.ok{background:rgba(124,196,127,.16);border-color:rgba(124,196,127,.55)}
+.cday.low{background:rgba(240,180,69,.18);border-color:rgba(240,180,69,.65)}
+.cday.full{background:rgba(232,87,74,.18);border-color:rgba(232,87,74,.6);color:#ff8f84}
+.cday.full i{position:absolute;bottom:5px;left:50%;width:5px;height:5px;margin-left:-2.5px;border-radius:50%;background:#e8574a}
+.cday.sel{outline:2px solid var(--gold);outline-offset:1px}
+.cday.has:hover{filter:brightness(1.2)}
+.calx-leg{margin-top:16px;font-size:.85rem}
+.calx-leg i{border-radius:50%}
+.calx-leg i.ok{background:#7cc47f}.calx-leg i.low{background:#f0b445}.calx-leg i.full{background:#e8574a}
+.dhead{font-size:1.15rem;margin:0 0 14px;text-transform:none}
+.dhead::first-letter{text-transform:uppercase}
+.dcard{border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:12px}
+.dcard-h{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.dcard-h h4{margin:0;font-size:1.05rem;text-transform:none;letter-spacing:0}
+.dcard-h h4 a{color:inherit}
+.badge{font:700 .72rem/1 var(--body);padding:6px 10px;border-radius:99px;white-space:nowrap}
+.badge.ok{background:rgba(124,196,127,.2);color:#9fe0a1}.badge.low{background:rgba(240,180,69,.2);color:#f5c463}.badge.full{background:rgba(232,87,74,.2);color:#ff8f84}
+.dcard-m{color:var(--muted);font-size:.85rem;margin:6px 0 12px}
+.dcard-f{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.dcard-f .price{font-size:1.3rem;font-weight:700;color:var(--gold)}
+.dcard-f .btn{padding:10px 16px}
