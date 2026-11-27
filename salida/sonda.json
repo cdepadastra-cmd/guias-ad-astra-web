@@ -1,0 +1,37 @@
+{
+ "https://www.guiasadastra.com/meteo/datos/gredos-macizo-central.json": {
+  "status": 200,
+  "len": 12006,
+  "file": "e161352a40",
+  "ct": "text/html",
+  "head": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf8\">\n  <meta name=\"viewport\" content=\"width=device-width,initial-scale=1.0\">\n  <script nonce=\"PMAIB1y257PilYzm5/8B+Q==\">\n      (function(){\n          setTimeout(function(){\n              window.location.reload();\n          }, 5000);\n      }())\n  </script>\n  <link rel=\"icon\" href=\"data:,\">\n  <title>One moment, please...</title>\n  <style nonce=\"PMAIB1y257PilYzm5/8B+Q==\">\n.spinner {\n    -webkit-animation: spin 1s ease-out;\n    animation: spin 1s ease-out;\n}\n@keyframes spin {\n    0% {\n        -webkit-transform: rotate(0deg);\n        -moz-t"
+ },
+ "https://www.guiasadastra.com/meteo/datos/la-covatilla.json": {
+  "status": 200,
+  "len": 12078,
+  "file": "27fce73638",
+  "ct": "text/html",
+  "head": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf8\">\n  <meta name=\"viewport\" content=\"width=device-width,initial-scale=1.0\">\n  <script nonce=\"fKUlezcT9MyXFly+n1yZGw==\">\n      (function(){\n          setTimeout(function(){\n              window.location.reload();\n          }, 5000);\n      }())\n  </script>\n  <link rel=\"icon\" href=\"data:,\">\n  <title>One moment, please...</title>\n  <style nonce=\"fKUlezcT9MyXFly+n1yZGw==\">\n.spinner {\n    -webkit-animation: spin 1s ease-out;\n    animation: spin 1s ease-out;\n}\n@keyframes spin {\n    0% {\n        -webkit-transform: rotate(0deg);\n        -moz-t"
+ },
+ "https://www.guiasadastra.com/meteo/datos/aludes.json": {
+  "status": 200,
+  "len": 12006,
+  "file": "5028cc405c",
+  "ct": "text/html",
+  "head": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf8\">\n  <meta name=\"viewport\" content=\"width=device-width,initial-scale=1.0\">\n  <script nonce=\"RbmiUyc/9owxkmWU1yL4GQ==\">\n      (function(){\n          setTimeout(function(){\n              window.location.reload();\n          }, 5000);\n      }())\n  </script>\n  <link rel=\"icon\" href=\"data:,\">\n  <title>One moment, please...</title>\n  <style nonce=\"RbmiUyc/9owxkmWU1yL4GQ==\">\n.spinner {\n    -webkit-animation: spin 1s ease-out;\n    animation: spin 1s ease-out;\n}\n@keyframes spin {\n    0% {\n        -webkit-transform: rotate(0deg);\n        -moz-t"
+ },
+ "https://www.guiasadastra.com/meteo/datos/nieve.json": {
+  "status": 200,
+  "len": 12005,
+  "file": "0b34bd1d1e",
+  "ct": "text/html",
+  "head": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf8\">\n  <meta name=\"viewport\" content=\"width=device-width,initial-scale=1.0\">\n  <script nonce=\"9F5sneredSEBqd5Dflt/yw==\">\n      (function(){\n          setTimeout(function(){\n              window.location.reload();\n          }, 5000);\n      }())\n  </script>\n  <link rel=\"icon\" href=\"data:,\">\n  <title>One moment, please...</title>\n  <style nonce=\"9F5sneredSEBqd5Dflt/yw==\">\n.spinner {\n    -webkit-animation: spin 1s ease-out;\n    animation: spin 1s ease-out;\n}\n@keyframes spin {\n    0% {\n        -webkit-transform: rotate(0deg);\n        -moz-t"
+ },
+ "https://www.guiasadastra.com/meteo/datos/resumen.json": {
+  "status": 200,
+  "len": 12098,
+  "file": "8ba2e35491",
+  "ct": "text/html",
+  "head": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"utf8\">\n  <meta name=\"viewport\" content=\"width=device-width,initial-scale=1.0\">\n  <script nonce=\"p50ZGsEhISr3rzbinltmxQ==\">\n      (function(){\n          setTimeout(function(){\n              window.location.reload();\n          }, 5000);\n      }())\n  </script>\n  <link rel=\"icon\" href=\"data:,\">\n  <title>One moment, please...</title>\n  <style nonce=\"p50ZGsEhISr3rzbinltmxQ==\">\n.spinner {\n    -webkit-animation: spin 1s ease-out;\n    animation: spin 1s ease-out;\n}\n@keyframes spin {\n    0% {\n        -webkit-transform: rotate(0deg);\n        -moz-t"
+ }
+}
